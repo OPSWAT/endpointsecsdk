@@ -1,0 +1,12 @@
+E:\github\endpointsecsdk\VAPM-Scanner\src\VAPMAdapter\bin\Release\net6.0\VAPMAdapter.deps.json
+E:\github\endpointsecsdk\VAPM-Scanner\src\VAPMAdapter\bin\Release\net6.0\VAPMAdapter.dll
+E:\github\endpointsecsdk\VAPM-Scanner\src\VAPMAdapter\bin\Release\net6.0\VAPMAdapter.pdb
+E:\github\endpointsecsdk\VAPM-Scanner\src\VAPMAdapter\obj\Release\net6.0\VAPMAdapter.csproj.AssemblyReference.cache
+E:\github\endpointsecsdk\VAPM-Scanner\src\VAPMAdapter\obj\Release\net6.0\VAPMAdapter.GeneratedMSBuildEditorConfig.editorconfig
+E:\github\endpointsecsdk\VAPM-Scanner\src\VAPMAdapter\obj\Release\net6.0\VAPMAdapter.AssemblyInfoInputs.cache
+E:\github\endpointsecsdk\VAPM-Scanner\src\VAPMAdapter\obj\Release\net6.0\VAPMAdapter.AssemblyInfo.cs
+E:\github\endpointsecsdk\VAPM-Scanner\src\VAPMAdapter\obj\Release\net6.0\VAPMAdapter.csproj.CoreCompileInputs.cache
+E:\github\endpointsecsdk\VAPM-Scanner\src\VAPMAdapter\obj\Release\net6.0\VAPMAdapter.dll
+E:\github\endpointsecsdk\VAPM-Scanner\src\VAPMAdapter\obj\Release\net6.0\refint\VAPMAdapter.dll
+E:\github\endpointsecsdk\VAPM-Scanner\src\VAPMAdapter\obj\Release\net6.0\VAPMAdapter.pdb
+E:\github\endpointsecsdk\VAPM-Scanner\src\VAPMAdapter\obj\Release\net6.0\ref\VAPMAdapter.dll
