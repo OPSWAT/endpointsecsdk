@@ -17,7 +17,7 @@ namespace VAPMAdapater
         //
         private static string DOWNLOAD_TOKEN = "%download_token%";
         private static string VCR_URL = "https://vcr.opswat.com/gw/file/download/%file%?type=1&token=%token%";
-        private static string SDK_INDEX_URL = "https://%SDK-URL%/OESIS_V4/OesisPackageLinks.xml";
+        private static string SDK_INDEX_URL = "https://%SDK-URL%/OesisPackageLinks.xml";
 
         public static string getTokenDownloadURL(string fileName)
         {
