@@ -10,7 +10,7 @@
 using System;
 using VAPMAdapater.Log;
 using VAPMAdapter.OESIS;
-using VAPMAdapter.POCO;
+using VAPMAdapter.OESIS.POCO;
 
 namespace VAPMAdapter.Tasks
 {

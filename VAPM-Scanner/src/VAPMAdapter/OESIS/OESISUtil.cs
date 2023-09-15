@@ -13,7 +13,7 @@ using System.IO;
 using System.Security.Cryptography;
 using System.Text;
 using VAPMAdapater.Log;
-using VAPMAdapter.POCO;
+using VAPMAdapter.OESIS.POCO;
 
 namespace VAPMAdapter.OESIS
 {

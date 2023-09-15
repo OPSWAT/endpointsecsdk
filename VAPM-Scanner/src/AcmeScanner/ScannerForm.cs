@@ -14,7 +14,9 @@ using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 using VAPMAdapater.Updates;
-using VAPMAdapter.POCO;
+using VAPMAdapter.Catalog;
+using VAPMAdapter.Catalog.POCO;
+using VAPMAdapter.OESIS.POCO;
 using VAPMAdapter.Tasks;
 using VAPMAdapter.Updates;
 
@@ -22,16 +24,17 @@ namespace AcmeScanner
 {
     public partial class ScannerForm : Form
     {
-        #nullable disable
-        
         static Dictionary<string, ProductScanResult> staticScanResults = new Dictionary<string, ProductScanResult>();
         static Dictionary<string, OnlinePatchDetail> staticOrchestrationScanResults = new Dictionary<string, OnlinePatchDetail>();
+        static List<CatalogProduct> staticProductList = null;
 
 
         private System.ComponentModel.BackgroundWorker scanWorker;
         private System.ComponentModel.BackgroundWorker updateDBWorker;
         private System.ComponentModel.BackgroundWorker installVAPMPatchWorker;
         private System.ComponentModel.BackgroundWorker installOnlinePatchWorker;
+        private System.ComponentModel.BackgroundWorker loadCatalogWorker;
+
 
         public ScannerForm()
         {
@@ -64,11 +67,6 @@ namespace AcmeScanner
                 updateDBWorker.RunWorkerAsync(false);
             }
         }
-
-
-
-
-
 
         // Set up the BackgroundWorker object by
         // attaching event handlers.
@@ -103,6 +101,14 @@ namespace AcmeScanner
             updateDBWorker.RunWorkerCompleted +=
                 new RunWorkerCompletedEventHandler(
             updateDBWorker_Completed);
+
+            loadCatalogWorker = new BackgroundWorker();
+            loadCatalogWorker.DoWork +=
+                new DoWorkEventHandler(loadCatalogWorker_DoWork);
+            loadCatalogWorker.RunWorkerCompleted +=
+                new RunWorkerCompletedEventHandler(
+            loadCatalogWorker_Completed);
+
 
         }
 
@@ -145,6 +151,23 @@ namespace AcmeScanner
 
             ShowLoading(false);
         }
+
+
+        private void loadCatalogWorker_DoWork(object sender, DoWorkEventArgs e)
+        {
+            staticProductList = TaskLoadCatalog.Load();
+        }
+
+        private void loadCatalogWorker_Completed(object sender, RunWorkerCompletedEventArgs e)
+        {
+            if (staticProductList != null)
+            {
+                UpdateCatalogResults();
+            }
+
+            ShowLoading(false);
+        }
+
 
         private void installVAPMPatchWorker_DoWork(object sender, DoWorkEventArgs e)
         {
@@ -254,6 +277,45 @@ namespace AcmeScanner
             }
 
             return result;
+        }
+
+
+        private void UpdateCatalogResults()
+        {
+            List<ListViewItem> resultList = new List<ListViewItem>();
+
+            //
+            // Setup the header
+            //
+
+            lvCatalog.Columns.Clear();
+            lvCatalog.Columns.Add("Application", 300);
+            lvCatalog.Columns.Add("CVE Count", 100);
+            lvCatalog.Columns.Add("Severity", 100);
+            lvCatalog.Columns.Add("Installable", 100);
+            lvCatalog.Columns.Add("Platform", 50);
+            lvCatalog.Columns.Add("", 400);
+            lvCatalog.View = View.Details;
+            lvCatalog.Update();
+
+
+            foreach (CatalogProduct product in staticProductList)
+            {
+                foreach(CatalogSignature signature in product.SigList)
+                {
+                    ListViewItem lviCurrent = new ListViewItem();
+                    lviCurrent.Text = signature.Name;
+                    lviCurrent.SubItems.Add(signature.CVECount.ToString());
+                    lviCurrent.SubItems.Add("");
+                    lviCurrent.SubItems.Add(product.SupportsInstall ? "Yes" : "");
+
+                    lviCurrent.Tag = product.Id;
+                    resultList.Add(lviCurrent);
+                }
+            }
+
+            lvCatalog.Items.Clear();
+            lvCatalog.Items.AddRange(resultList.ToArray());
         }
 
 
@@ -471,6 +533,12 @@ namespace AcmeScanner
             }
 
 
+        }
+
+        private void mbLoad_Click(object sender, EventArgs e)
+        {
+            ShowLoading(true);
+            loadCatalogWorker.RunWorkerAsync();
         }
     }
 }

@@ -14,7 +14,7 @@ using System.Text;
 using System.Threading.Tasks;
 using VAPMAdapater.Log;
 using VAPMAdapter.OESIS;
-using VAPMAdapter.POCO;
+using VAPMAdapter.OESIS.POCO;
 
 namespace VAPMAdapter.Tasks
 {

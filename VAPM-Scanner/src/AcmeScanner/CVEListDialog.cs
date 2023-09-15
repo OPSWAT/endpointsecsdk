@@ -10,11 +10,11 @@ using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
 using VAPMAdapater.Updates;
-using VAPMAdapter.POCO;
+using VAPMAdapter.OESIS.POCO;
 
 namespace AcmeScanner
 {
-    
+
 
     internal class CVEListDialog : Form
     {

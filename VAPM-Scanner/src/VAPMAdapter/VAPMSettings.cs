@@ -1,4 +1,8 @@
 ﻿///////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////
+
+
+using System.IO;
 ///  Sample Code for Acme Scanner
 ///  Reference Implementation using OPSWAT Endpoint SDK Patch and Vulnerability Modules
 ///  
@@ -26,6 +30,22 @@ namespace VAPMAdapater
         {
             return SDK_INDEX_URL;
         }
+
+        public static string getCatalogURL()
+        {
+            return getTokenDownloadURL("analog.zip");    
+        }
+
+        public static string getLocalCatalogDir()
+        {
+            //
+            // First delete the SDK directory if it exists
+            //
+            string sdkDir = Path.Combine(Directory.GetCurrentDirectory(), "catalog");
+            return sdkDir;
+        }
+
+
 
 
     }

@@ -41,7 +41,7 @@ namespace AcmeScanner
             this.panel3 = new System.Windows.Forms.Panel();
             this.pbLoading = new System.Windows.Forms.PictureBox();
             this.panel2 = new System.Windows.Forms.Panel();
-            this.tabControl1 = new System.Windows.Forms.TabControl();
+            this.tabCatalog = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
             this.lvScanResults = new AcmeScanner.ScannerListView();
             this.tabPage2 = new System.Windows.Forms.TabPage();
@@ -50,15 +50,21 @@ namespace AcmeScanner
             this.btnUpdateSDK = new MaterialSkin.Controls.MaterialButton();
             this.btnInstallOrchestration = new MaterialSkin.Controls.MaterialButton();
             this.btnScanOrchestration = new MaterialSkin.Controls.MaterialButton();
+            this.tabPage3 = new System.Windows.Forms.TabPage();
+            this.lvCatalog = new AcmeScanner.ScannerListView();
+            this.panel5 = new System.Windows.Forms.Panel();
+            this.mbLoad = new MaterialSkin.Controls.MaterialButton();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
             this.panel1.SuspendLayout();
             this.panel3.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pbLoading)).BeginInit();
             this.panel2.SuspendLayout();
-            this.tabControl1.SuspendLayout();
+            this.tabCatalog.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.tabPage2.SuspendLayout();
             this.panel4.SuspendLayout();
+            this.tabPage3.SuspendLayout();
+            this.panel5.SuspendLayout();
             this.SuspendLayout();
             // 
             // panel1
@@ -201,23 +207,24 @@ namespace AcmeScanner
             // panel2
             // 
             this.panel2.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.panel2.Controls.Add(this.tabControl1);
+            this.panel2.Controls.Add(this.tabCatalog);
             this.panel2.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panel2.Location = new System.Drawing.Point(15, 15);
             this.panel2.Name = "panel2";
             this.panel2.Size = new System.Drawing.Size(1068, 652);
             this.panel2.TabIndex = 2;
             // 
-            // tabControl1
+            // tabCatalog
             // 
-            this.tabControl1.Controls.Add(this.tabPage1);
-            this.tabControl1.Controls.Add(this.tabPage2);
-            this.tabControl1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tabControl1.Location = new System.Drawing.Point(0, 0);
-            this.tabControl1.Name = "tabControl1";
-            this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(1066, 650);
-            this.tabControl1.TabIndex = 3;
+            this.tabCatalog.Controls.Add(this.tabPage1);
+            this.tabCatalog.Controls.Add(this.tabPage2);
+            this.tabCatalog.Controls.Add(this.tabPage3);
+            this.tabCatalog.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tabCatalog.Location = new System.Drawing.Point(0, 0);
+            this.tabCatalog.Name = "tabCatalog";
+            this.tabCatalog.SelectedIndex = 0;
+            this.tabCatalog.Size = new System.Drawing.Size(1066, 650);
+            this.tabCatalog.TabIndex = 3;
             // 
             // tabPage1
             // 
@@ -348,6 +355,65 @@ namespace AcmeScanner
             this.btnScanOrchestration.UseVisualStyleBackColor = true;
             this.btnScanOrchestration.Click += new System.EventHandler(this.btnScanOrchestration_Click);
             // 
+            // tabPage3
+            // 
+            this.tabPage3.Controls.Add(this.lvCatalog);
+            this.tabPage3.Controls.Add(this.panel5);
+            this.tabPage3.Location = new System.Drawing.Point(4, 24);
+            this.tabPage3.Name = "tabPage3";
+            this.tabPage3.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage3.Size = new System.Drawing.Size(1058, 622);
+            this.tabPage3.TabIndex = 2;
+            this.tabPage3.Text = "Catalog";
+            this.tabPage3.UseVisualStyleBackColor = true;
+            // 
+            // lvCatalog
+            // 
+            this.lvCatalog.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.lvCatalog.FullRowSelect = true;
+            this.lvCatalog.GridLines = true;
+            this.lvCatalog.Location = new System.Drawing.Point(3, 80);
+            this.lvCatalog.MultiSelect = false;
+            this.lvCatalog.Name = "lvCatalog";
+            this.lvCatalog.OwnerDraw = true;
+            this.lvCatalog.Size = new System.Drawing.Size(1052, 539);
+            this.lvCatalog.TabIndex = 6;
+            this.lvCatalog.UseCompatibleStateImageBehavior = false;
+            this.lvCatalog.View = System.Windows.Forms.View.Details;
+            // 
+            // panel5
+            // 
+            this.panel5.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.panel5.Controls.Add(this.mbLoad);
+            this.panel5.Dock = System.Windows.Forms.DockStyle.Top;
+            this.panel5.Location = new System.Drawing.Point(3, 3);
+            this.panel5.Margin = new System.Windows.Forms.Padding(15);
+            this.panel5.Name = "panel5";
+            this.panel5.Padding = new System.Windows.Forms.Padding(15);
+            this.panel5.Size = new System.Drawing.Size(1052, 77);
+            this.panel5.TabIndex = 5;
+            // 
+            // mbLoad
+            // 
+            this.mbLoad.AutoSize = false;
+            this.mbLoad.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.mbLoad.Density = MaterialSkin.Controls.MaterialButton.MaterialButtonDensity.Default;
+            this.mbLoad.Depth = 0;
+            this.mbLoad.HighEmphasis = true;
+            this.mbLoad.Icon = null;
+            this.mbLoad.Location = new System.Drawing.Point(19, 21);
+            this.mbLoad.Margin = new System.Windows.Forms.Padding(4, 6, 4, 6);
+            this.mbLoad.MouseState = MaterialSkin.MouseState.HOVER;
+            this.mbLoad.Name = "mbLoad";
+            this.mbLoad.NoAccentTextColor = System.Drawing.Color.Empty;
+            this.mbLoad.Size = new System.Drawing.Size(124, 36);
+            this.mbLoad.TabIndex = 0;
+            this.mbLoad.Text = "Load Latest";
+            this.mbLoad.Type = MaterialSkin.Controls.MaterialButton.MaterialButtonType.Contained;
+            this.mbLoad.UseAccentColor = false;
+            this.mbLoad.UseVisualStyleBackColor = true;
+            this.mbLoad.Click += new System.EventHandler(this.mbLoad_Click);
+            // 
             // ScannerForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
@@ -361,10 +427,12 @@ namespace AcmeScanner
             this.panel3.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.pbLoading)).EndInit();
             this.panel2.ResumeLayout(false);
-            this.tabControl1.ResumeLayout(false);
+            this.tabCatalog.ResumeLayout(false);
             this.tabPage1.ResumeLayout(false);
             this.tabPage2.ResumeLayout(false);
             this.panel4.ResumeLayout(false);
+            this.tabPage3.ResumeLayout(false);
+            this.panel5.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -376,7 +444,7 @@ namespace AcmeScanner
         private MaterialSkin.Controls.MaterialButton btnScan;
         private ScannerListView lvScanResults;
         private System.Windows.Forms.Timer timer1;
-        private TabControl tabControl1;
+        private TabControl tabCatalog;
         private TabPage tabPage1;
         private TabPage tabPage2;
         private CheckBox cbScanOSCVEs;
@@ -389,5 +457,9 @@ namespace AcmeScanner
         private MaterialSkin.Controls.MaterialButton btnUpdateSDK;
         private MaterialSkin.Controls.MaterialButton btnInstallOrchestration;
         private MaterialSkin.Controls.MaterialButton btnScanOrchestration;
+        private TabPage tabPage3;
+        private ScannerListView lvCatalog;
+        private Panel panel5;
+        private MaterialSkin.Controls.MaterialButton mbLoad;
     }
 }

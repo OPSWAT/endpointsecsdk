@@ -8,6 +8,7 @@
 
 using System;
 using System.IO;
+using VAPMAdapter.Updates;
 
 namespace VAPMAdapater.Updates
 {
@@ -64,31 +65,6 @@ namespace VAPMAdapater.Updates
         }
 
 
-        //
-        // Extract all the zip files in the SDK Directory
-        //
-        private static void ExtractZipFiles(string sdkDir)
-        {
-            string[] sdkFiles = Directory.GetFiles(sdkDir);
-
-            if (sdkFiles != null)
-            {
-                foreach(string current in sdkFiles)
-                {
-                    FileInfo fileInfo = new FileInfo(current);
-                    if(fileInfo.Extension == ".zip")
-                    {
-                        //
-                        // New Directory
-                        //
-                        System.IO.Compression.ZipFile.ExtractToDirectory(fileInfo.FullName, sdkDir, true);
-                        File.Delete(fileInfo.FullName);
-                    }
-                }
-            }
-        }
-
-
         public static string getLocalSDKDir()
         {
             //
@@ -112,7 +88,7 @@ namespace VAPMAdapater.Updates
             string sdkDir = getLocalSDKDir();
 
             DownloadSDK.DownloadAllSDKFiles(sdkDir);
-            ExtractZipFiles(sdkDir);
+            ExtractUtils.ExtractZipFiles(sdkDir);
             CopyAllFiles(sdkDir);
             CleanSDKFiles(sdkDir);
         }
