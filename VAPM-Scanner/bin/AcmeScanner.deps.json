@@ -1,0 +1,70 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v6.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v6.0": {
+      "AcmeScanner/1.0.0": {
+        "dependencies": {
+          "MaterialSkin.2.RTL": "2.3.1.1",
+          "VAPMAdapter": "1.0.0"
+        },
+        "runtime": {
+          "AcmeScanner.dll": {}
+        }
+      },
+      "MaterialSkin.2.RTL/2.3.1.1": {
+        "runtime": {
+          "lib/net5.0-windows7.0/MaterialSkin.dll": {
+            "assemblyVersion": "2.3.1.1",
+            "fileVersion": "2.3.1.1"
+          }
+        }
+      },
+      "Newtonsoft.Json/13.0.3": {
+        "runtime": {
+          "lib/net6.0/Newtonsoft.Json.dll": {
+            "assemblyVersion": "13.0.0.0",
+            "fileVersion": "13.0.3.27908"
+          }
+        }
+      },
+      "VAPMAdapter/1.0.0": {
+        "dependencies": {
+          "Newtonsoft.Json": "13.0.3"
+        },
+        "runtime": {
+          "VAPMAdapter.dll": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "AcmeScanner/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "MaterialSkin.2.RTL/2.3.1.1": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-+mAOOWqXsAxvRX4z3kFQhnl3vWiZ1e58UISjkJ31zZIX7Ujkq0BuWmsfgB0jC5ztKnJ7xyN76abmopaEHzvwkA==",
+      "path": "materialskin.2.rtl/2.3.1.1",
+      "hashPath": "materialskin.2.rtl.2.3.1.1.nupkg.sha512"
+    },
+    "Newtonsoft.Json/13.0.3": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-HrC5BXdl00IP9zeV+0Z848QWPAoCr9P3bDEZguI+gkLcBKAOxix/tLEAAHC+UvDNPv4a2d18lOReHMOagPa+zQ==",
+      "path": "newtonsoft.json/13.0.3",
+      "hashPath": "newtonsoft.json.13.0.3.nupkg.sha512"
+    },
+    "VAPMAdapter/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}
