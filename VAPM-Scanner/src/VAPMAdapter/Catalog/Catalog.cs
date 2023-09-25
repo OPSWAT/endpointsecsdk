@@ -6,10 +6,12 @@
 ///  OPSWAT OEM Solutions Architect
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using VAPMAdapter.Catalog.POCO;
+using CVEDetail = VAPMAdapter.OESIS.POCO.CVEDetail;
 
 namespace VAPMAdapter.Catalog
 {
@@ -166,6 +168,28 @@ namespace VAPMAdapter.Catalog
         {
             return Cves.GetCVEsFromDate(date);
         }
+
+        public List<CVEDetail> GetCVEDetailsList(List<CatalogVulnerabilityAssociation> cveList)
+        {
+            List<CVEDetail> result = new List<CVEDetail>();
+
+            foreach (CatalogVulnerabilityAssociation vulnAssociation in cveList)
+            {
+                string cveString = GetCVEDetail(vulnAssociation.Cve);
+                dynamic jsonOut = JObject.Parse(cveString);
+
+                var cveJson = jsonOut;
+                CVEDetail cveDetail = new CVEDetail();
+                cveDetail.cveId =   (string)cveJson.cve;
+                cveDetail.description = (string)cveJson.description;
+                cveDetail.opswatSeverity = (int)cveJson.severity_index;
+                cveDetail.rawData = cveString;
+                result.Add(cveDetail);
+            }
+
+            return result;
+        }
+
 
 
 

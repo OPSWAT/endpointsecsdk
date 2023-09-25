@@ -58,6 +58,7 @@ namespace VAPMAdapter.OESIS
                 cveDetail.cveId = (string)cveList[i].cve;
                 cveDetail.description = (string)cveList[i].description;
                 cveDetail.opswatSeverity = (int)cveList[i].severity_index;
+                cveDetail.rawData = product_vulnerability_json;
                 result.Add(cveDetail);
             }
 

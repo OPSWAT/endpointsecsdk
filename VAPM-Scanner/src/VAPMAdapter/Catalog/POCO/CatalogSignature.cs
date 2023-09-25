@@ -21,5 +21,7 @@ namespace VAPMAdapter.Catalog.POCO
         public string   Platform;
         public string   Architecture;
         public int      CVECount;
+        public List<CatalogVulnerabilityAssociation> CveList;
+
     }
 }

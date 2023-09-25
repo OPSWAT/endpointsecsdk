@@ -8,8 +8,8 @@
 
 using System;
 using System.Collections.Generic;
+using System.Text;
 using System.Windows.Forms;
-using VAPMAdapater.Updates;
 using VAPMAdapter.OESIS.POCO;
 
 namespace AcmeScanner
@@ -26,7 +26,7 @@ namespace AcmeScanner
         private MaterialSkin.Controls.MaterialLabel lblApplication;
         private MaterialSkin.Controls.MaterialButton btnClose;
 
-        private ProductScanResult productScanResult;
+        private List<CVEDetail> CVEDetailList;
 
         private void InitializeComponent()
         {
@@ -128,12 +128,12 @@ namespace AcmeScanner
 
         }
 
-        public CVEListDialog(ProductScanResult productScanResult)
+        public CVEListDialog(string productName, List<CVEDetail> cveDetailList)
         {
             InitializeComponent();
-            this.productScanResult = productScanResult;
+            this.CVEDetailList = cveDetailList;
 
-            lblApplication.Text = "Application:  " + productScanResult.product.name;
+            lblApplication.Text = "Application:  " + productName;
 
             populateList();
         }
@@ -144,9 +144,7 @@ namespace AcmeScanner
             lvCVEList.Columns.Add("Severity", 100);
             lvCVEList.Columns.Add("Description", 900);
 
-            List<CVEDetail> cveDetailList = productScanResult.cveDetailList;
-
-            foreach(CVEDetail current in cveDetailList)
+            foreach(CVEDetail current in CVEDetailList)
             {
                 ListViewItem lviCurrent = new ListViewItem();
                 lviCurrent.Text = current.cveId;
@@ -164,7 +162,14 @@ namespace AcmeScanner
 
         private void btnDetails_Click(object sender, EventArgs e)
         {
-            TextDialog textDialog = new TextDialog(productScanResult.cveJson);
+            StringBuilder cveJson = new StringBuilder();
+
+            foreach(CVEDetail current in CVEDetailList)
+            {
+                cveJson.Append(current.rawData);
+            }
+            
+            TextDialog textDialog = new TextDialog(cveJson.ToString());
             textDialog.StartPosition = FormStartPosition.CenterParent;
 
             textDialog.ShowDialog();

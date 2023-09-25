@@ -14,7 +14,6 @@ using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 using VAPMAdapater.Updates;
-using VAPMAdapter.Catalog;
 using VAPMAdapter.Catalog.POCO;
 using VAPMAdapter.OESIS.POCO;
 using VAPMAdapter.Tasks;
@@ -25,6 +24,7 @@ namespace AcmeScanner
     public partial class ScannerForm : Form
     {
         static Dictionary<string, ProductScanResult> staticScanResults = new Dictionary<string, ProductScanResult>();
+        static Dictionary<string, CatalogSignature> staticCatalogResults = new Dictionary<string, CatalogSignature>();
         static Dictionary<string, OnlinePatchDetail> staticOrchestrationScanResults = new Dictionary<string, OnlinePatchDetail>();
         static List<CatalogProduct> staticProductList = null;
 
@@ -156,6 +156,14 @@ namespace AcmeScanner
         private void loadCatalogWorker_DoWork(object sender, DoWorkEventArgs e)
         {
             staticProductList = TaskLoadCatalog.Load();
+
+            foreach(CatalogProduct product in staticProductList)
+            {
+                foreach(CatalogSignature signature in product.SigList)
+                {
+                    staticCatalogResults.Add(signature.Id, signature);
+                }
+            }
         }
 
         private void loadCatalogWorker_Completed(object sender, RunWorkerCompletedEventArgs e)
@@ -424,7 +432,7 @@ namespace AcmeScanner
 
                 if(scanResult.cveDetailList.Count > 0)
                 {
-                    CVEListDialog cveDialog = new CVEListDialog(scanResult);
+                    CVEListDialog cveDialog = new CVEListDialog(scanResult.product.name, scanResult.cveDetailList);
                     cveDialog.StartPosition = FormStartPosition.CenterParent;
 
                     cveDialog.ShowDialog();
@@ -539,6 +547,34 @@ namespace AcmeScanner
         {
             ShowLoading(true);
             loadCatalogWorker.RunWorkerAsync();
+        }
+
+        private void btnListCatalogCVE_Click(object sender, EventArgs e)
+        {
+            if (lvCatalog.SelectedItems != null && lvCatalog.SelectedItems.Count > 0)
+            {
+
+                string productId = lvCatalog.SelectedItems[0].Tag.ToString();
+                CatalogSignature product = staticCatalogResults[productId];
+
+                if (product.CveList.Count > 0)
+                {
+                    List<CVEDetail> cveDetailList = TaskGetCVEDetails.GetCveDetailList(product.CveList);
+                    CVEListDialog cveDialog = new CVEListDialog(product.Name, cveDetailList);
+                    cveDialog.StartPosition = FormStartPosition.CenterParent;
+
+                    cveDialog.ShowDialog();
+                }
+                else
+                {
+                    ShowMessageDialog("There are no CVE's on the selected item.", false);
+                }
+            }
+            else
+            {
+                ShowMessageDialog("There is not an item selected.", false);
+            }
+
         }
     }
 }

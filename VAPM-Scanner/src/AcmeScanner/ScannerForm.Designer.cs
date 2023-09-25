@@ -53,6 +53,7 @@ namespace AcmeScanner
             this.tabPage3 = new System.Windows.Forms.TabPage();
             this.lvCatalog = new AcmeScanner.ScannerListView();
             this.panel5 = new System.Windows.Forms.Panel();
+            this.btnListCatalogCVE = new MaterialSkin.Controls.MaterialButton();
             this.mbLoad = new MaterialSkin.Controls.MaterialButton();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
             this.panel1.SuspendLayout();
@@ -140,7 +141,7 @@ namespace AcmeScanner
             this.btnCVEJSON.NoAccentTextColor = System.Drawing.Color.Empty;
             this.btnCVEJSON.Size = new System.Drawing.Size(106, 36);
             this.btnCVEJSON.TabIndex = 2;
-            this.btnCVEJSON.Text = "CVE Json";
+            this.btnCVEJSON.Text = "List CVEs";
             this.btnCVEJSON.Type = MaterialSkin.Controls.MaterialButton.MaterialButtonType.Contained;
             this.btnCVEJSON.UseAccentColor = false;
             this.btnCVEJSON.UseVisualStyleBackColor = true;
@@ -384,6 +385,7 @@ namespace AcmeScanner
             // panel5
             // 
             this.panel5.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.panel5.Controls.Add(this.btnListCatalogCVE);
             this.panel5.Controls.Add(this.mbLoad);
             this.panel5.Dock = System.Windows.Forms.DockStyle.Top;
             this.panel5.Location = new System.Drawing.Point(3, 3);
@@ -392,6 +394,27 @@ namespace AcmeScanner
             this.panel5.Padding = new System.Windows.Forms.Padding(15);
             this.panel5.Size = new System.Drawing.Size(1052, 77);
             this.panel5.TabIndex = 5;
+            // 
+            // btnListCatalogCVE
+            // 
+            this.btnListCatalogCVE.AutoSize = false;
+            this.btnListCatalogCVE.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.btnListCatalogCVE.Density = MaterialSkin.Controls.MaterialButton.MaterialButtonDensity.Default;
+            this.btnListCatalogCVE.Depth = 0;
+            this.btnListCatalogCVE.HighEmphasis = true;
+            this.btnListCatalogCVE.Icon = null;
+            this.btnListCatalogCVE.Location = new System.Drawing.Point(907, 21);
+            this.btnListCatalogCVE.Margin = new System.Windows.Forms.Padding(4, 6, 4, 6);
+            this.btnListCatalogCVE.MouseState = MaterialSkin.MouseState.HOVER;
+            this.btnListCatalogCVE.Name = "btnListCatalogCVE";
+            this.btnListCatalogCVE.NoAccentTextColor = System.Drawing.Color.Empty;
+            this.btnListCatalogCVE.Size = new System.Drawing.Size(124, 36);
+            this.btnListCatalogCVE.TabIndex = 1;
+            this.btnListCatalogCVE.Text = "List CVEs";
+            this.btnListCatalogCVE.Type = MaterialSkin.Controls.MaterialButton.MaterialButtonType.Contained;
+            this.btnListCatalogCVE.UseAccentColor = false;
+            this.btnListCatalogCVE.UseVisualStyleBackColor = true;
+            this.btnListCatalogCVE.Click += new System.EventHandler(this.btnListCatalogCVE_Click);
             // 
             // mbLoad
             // 
@@ -461,5 +484,6 @@ namespace AcmeScanner
         private ScannerListView lvCatalog;
         private Panel panel5;
         private MaterialSkin.Controls.MaterialButton mbLoad;
+        private MaterialSkin.Controls.MaterialButton btnListCatalogCVE;
     }
 }

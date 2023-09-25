@@ -26,7 +26,8 @@ namespace VAPMAdapter.Tasks
             {
                 foreach(CatalogSignature signature in product.SigList)
                 {
-                    signature.CVECount = catalog.GetVulnerabilityAssociationFromSignatureId(product.Id).Count;
+                    signature.CveList = catalog.GetVulnerabilityAssociationFromSignatureId(signature.Id);
+                    signature.CVECount = signature.CveList.Count;
                 }
             }
 
