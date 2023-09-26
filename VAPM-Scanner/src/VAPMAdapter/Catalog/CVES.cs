@@ -18,6 +18,8 @@ namespace VAPMAdapter.Catalog
     internal class CVES
     {
         string jsonLocation;
+        JObject cveJsonObject;
+
 
         public bool Load(string fileLocation)
         {
@@ -46,16 +48,21 @@ namespace VAPMAdapter.Catalog
 
         private JObject getCvesListJson()
         {
-            JObject result = null;
+            JObject result = cveJsonObject;
 
-            JObject productJsonObject = getCVEJsonObject();
-            JArray oesisJson = (JArray)productJsonObject["oesis"];
-
-            foreach (JObject current in oesisJson.Children<JObject>())
+            if (result == null)
             {
-                if ("cves" == JsonUtil.GetJObjectName(current))
+                JObject productJsonObject = getCVEJsonObject();
+                JArray oesisJson = (JArray)productJsonObject["oesis"];
+
+                foreach (JObject current in oesisJson.Children<JObject>())
                 {
-                    return ((JObject)current["cves"]);
+                    if ("cves" == JsonUtil.GetJObjectName(current))
+                    {
+                        result = ((JObject)current["cves"]);
+                        cveJsonObject = result;
+                        return result;
+                    }
                 }
             }
 

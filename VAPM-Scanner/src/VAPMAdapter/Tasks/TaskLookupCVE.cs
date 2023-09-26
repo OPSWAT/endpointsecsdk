@@ -6,28 +6,25 @@
 ///  OPSWAT OEM Solutions Architect
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
-using System.Collections.Generic;
 using System.IO;
 using VAPMAdapater;
-using VAPMAdapter.Catalog.POCO;
-using VAPMAdapter.OESIS.POCO;
-using VAPMAdapter.Updates;
+
 
 namespace VAPMAdapter.Tasks
 {
-    public class TaskGetCVEDetails
+    public class TaskLookupCVE
     {
 
-        public static List<CVEDetail> GetCveDetailList(List<CatalogVulnerabilityAssociation> vulAssociationList)
+        public static string LookupCVE(string CVE)
         {
-            List<CVEDetail> result = new List<CVEDetail>();
+            string result;
             Catalog.Catalog catalog = new Catalog.Catalog();
 
             string catalogRoot = VAPMSettings.getLocalCatalogDir();
             catalogRoot = Path.Combine(catalogRoot, "analog/server");
             catalog.Load(catalogRoot);
 
-            result = catalog.GetCVEDetailsList(vulAssociationList);
+            result = catalog.GetCVEDetail(CVE);
 
             return result;
         }

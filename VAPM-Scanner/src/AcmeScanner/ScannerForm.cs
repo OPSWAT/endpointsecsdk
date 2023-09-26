@@ -12,6 +12,7 @@ using System.ComponentModel;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Windows.Forms;
 using VAPMAdapater.Updates;
 using VAPMAdapter.Catalog.POCO;
@@ -306,7 +307,8 @@ namespace AcmeScanner
             lvCatalog.View = View.Details;
             lvCatalog.Update();
 
-
+            int productCount = 0;
+            int cveCount = 0;
             foreach (CatalogProduct product in staticProductList)
             {
                 foreach(CatalogSignature signature in product.SigList)
@@ -319,8 +321,13 @@ namespace AcmeScanner
 
                     lviCurrent.Tag = product.Id;
                     resultList.Add(lviCurrent);
+                    productCount++;
+                    cveCount += signature.CVECount;
                 }
             }
+
+            lblTotalCVEs.Text = cveCount.ToString();
+            lblTotalProducts.Text = productCount.ToString();
 
             lvCatalog.Items.Clear();
             lvCatalog.Items.AddRange(resultList.ToArray());
@@ -575,6 +582,23 @@ namespace AcmeScanner
                 ShowMessageDialog("There is not an item selected.", false);
             }
 
+        }
+
+        private void btnLookupCVE_Click(object sender, EventArgs e)
+        {
+            string cve = tbCVE.Text;
+
+            string cveJson = TaskLookupCVE.LookupCVE(cve);
+            if(!string.IsNullOrEmpty(cveJson))
+            {
+                TextDialog textDialog = new TextDialog(cveJson);
+                textDialog.StartPosition = FormStartPosition.CenterParent;
+                textDialog.ShowDialog();
+            }
+            else
+            {
+                ShowMessageDialog("CVE Entered is not valid.  Check the value and try again.",false);
+            }
         }
     }
 }
