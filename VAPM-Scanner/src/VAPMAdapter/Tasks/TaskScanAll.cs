@@ -8,9 +8,9 @@
 
 using VAPMAdapater.Log;
 using VAPMAdapter.OESIS;
-using VAPMAdapter.POCO;
 using System.Collections.Generic;
 using System;
+using VAPMAdapter.OESIS.POCO;
 
 namespace VAPMAdapter.Tasks
 {

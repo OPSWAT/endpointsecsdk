@@ -12,9 +12,11 @@ using System.ComponentModel;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Windows.Forms;
 using VAPMAdapater.Updates;
-using VAPMAdapter.POCO;
+using VAPMAdapter.Catalog.POCO;
+using VAPMAdapter.OESIS.POCO;
 using VAPMAdapter.Tasks;
 using VAPMAdapter.Updates;
 
@@ -22,16 +24,18 @@ namespace AcmeScanner
 {
     public partial class ScannerForm : Form
     {
-        #nullable disable
-        
         static Dictionary<string, ProductScanResult> staticScanResults = new Dictionary<string, ProductScanResult>();
+        static Dictionary<string, CatalogSignature> staticSignatureCatalogResults = new Dictionary<string, CatalogSignature>();
         static Dictionary<string, OnlinePatchDetail> staticOrchestrationScanResults = new Dictionary<string, OnlinePatchDetail>();
+        static List<CatalogProduct> staticProductList = null;
 
 
         private System.ComponentModel.BackgroundWorker scanWorker;
         private System.ComponentModel.BackgroundWorker updateDBWorker;
         private System.ComponentModel.BackgroundWorker installVAPMPatchWorker;
         private System.ComponentModel.BackgroundWorker installOnlinePatchWorker;
+        private System.ComponentModel.BackgroundWorker loadCatalogWorker;
+
 
         public ScannerForm()
         {
@@ -64,11 +68,6 @@ namespace AcmeScanner
                 updateDBWorker.RunWorkerAsync(false);
             }
         }
-
-
-
-
-
 
         // Set up the BackgroundWorker object by
         // attaching event handlers.
@@ -103,6 +102,14 @@ namespace AcmeScanner
             updateDBWorker.RunWorkerCompleted +=
                 new RunWorkerCompletedEventHandler(
             updateDBWorker_Completed);
+
+            loadCatalogWorker = new BackgroundWorker();
+            loadCatalogWorker.DoWork +=
+                new DoWorkEventHandler(loadCatalogWorker_DoWork);
+            loadCatalogWorker.RunWorkerCompleted +=
+                new RunWorkerCompletedEventHandler(
+            loadCatalogWorker_Completed);
+
 
         }
 
@@ -145,6 +152,32 @@ namespace AcmeScanner
 
             ShowLoading(false);
         }
+
+
+        private void loadCatalogWorker_DoWork(object sender, DoWorkEventArgs e)
+        {
+            staticProductList = TaskLoadCatalog.Load();
+            staticSignatureCatalogResults.Clear();
+
+            foreach (CatalogProduct product in staticProductList)
+            {
+                foreach(CatalogSignature signature in product.SigList)
+                {
+                    staticSignatureCatalogResults.Add(signature.Id, signature);
+                }
+            }
+        }
+
+        private void loadCatalogWorker_Completed(object sender, RunWorkerCompletedEventArgs e)
+        {
+            if (staticProductList != null)
+            {
+                UpdateCatalogResults();
+            }
+
+            ShowLoading(false);
+        }
+
 
         private void installVAPMPatchWorker_DoWork(object sender, DoWorkEventArgs e)
         {
@@ -257,6 +290,58 @@ namespace AcmeScanner
         }
 
 
+        private void UpdateCatalogResults()
+        {
+            List<ListViewItem> resultList = new List<ListViewItem>();
+
+            //
+            // Setup the header
+            //
+
+            lvCatalog.Columns.Clear();
+            lvCatalog.Columns.Add("Application", 300);
+            lvCatalog.Columns.Add("CVE Count", 80);
+            lvCatalog.Columns.Add("Installable", 80);
+            lvCatalog.Columns.Add("Platform", 100);
+            lvCatalog.Columns.Add("", 400);
+            lvCatalog.View = View.Details;
+            lvCatalog.Update();
+
+            int productCount = 0;
+            int cveCount = 0;
+            int installCount = 0;
+
+            foreach (CatalogProduct product in staticProductList)
+            {
+                foreach(CatalogSignature signature in product.SigList)
+                {
+                    ListViewItem lviCurrent = new ListViewItem();
+                    lviCurrent.Text = signature.Name;
+                    lviCurrent.SubItems.Add(signature.CVECount.ToString());
+                    lviCurrent.SubItems.Add(product.SupportsInstall ? "Yes" : "");
+                    lviCurrent.SubItems.Add(signature.Platform);
+
+                    lviCurrent.Tag = signature.Id;
+                    resultList.Add(lviCurrent);
+
+                    productCount++;
+                    cveCount += signature.CVECount;
+                    if(product.SupportsInstall)
+                    {
+                        installCount++;
+                    }
+                }
+            }
+
+            lblTotalCVEs.Text = cveCount.ToString();
+            lblTotalProducts.Text = productCount.ToString();
+            lblTotalInstalls.Text = installCount.ToString();
+
+            lvCatalog.Items.Clear();
+            lvCatalog.Items.AddRange(resultList.ToArray());
+        }
+
+
         private void UpdateScanResults()
         {
             List<ListViewItem> resultList = new List<ListViewItem>();
@@ -362,7 +447,7 @@ namespace AcmeScanner
 
                 if(scanResult.cveDetailList.Count > 0)
                 {
-                    CVEListDialog cveDialog = new CVEListDialog(scanResult);
+                    CVEListDialog cveDialog = new CVEListDialog(scanResult.product.name, scanResult.cveDetailList);
                     cveDialog.StartPosition = FormStartPosition.CenterParent;
 
                     cveDialog.ShowDialog();
@@ -471,6 +556,57 @@ namespace AcmeScanner
             }
 
 
+        }
+
+        private void mbLoad_Click(object sender, EventArgs e)
+        {
+            ShowLoading(true);
+            loadCatalogWorker.RunWorkerAsync();
+        }
+
+        private void btnListCatalogCVE_Click(object sender, EventArgs e)
+        {
+            if (lvCatalog.SelectedItems != null && lvCatalog.SelectedItems.Count > 0)
+            {
+
+                string signatureID = lvCatalog.SelectedItems[0].Tag.ToString();
+                CatalogSignature signature = staticSignatureCatalogResults[signatureID];
+
+                if (signature != null && signature.CVECount > 0)
+                {
+                    List<CVEDetail> cveDetailList = TaskGetCVEDetails.GetCveDetailList(signature.CVEList);
+                    CVEListDialog cveDialog = new CVEListDialog(signature.Name, cveDetailList);
+                    cveDialog.StartPosition = FormStartPosition.CenterParent;
+
+                    cveDialog.ShowDialog();
+                }
+                else
+                {
+                    ShowMessageDialog("There are no CVE's on the selected item.", false);
+                }
+            }
+            else
+            {
+                ShowMessageDialog("There is not an item selected.", false);
+            }
+
+        }
+
+        private void btnLookupCVE_Click(object sender, EventArgs e)
+        {
+            string cve = tbCVE.Text;
+
+            string cveJson = TaskLookupCVE.LookupCVE(cve);
+            if(!string.IsNullOrEmpty(cveJson))
+            {
+                TextDialog textDialog = new TextDialog(cveJson);
+                textDialog.StartPosition = FormStartPosition.CenterParent;
+                textDialog.ShowDialog();
+            }
+            else
+            {
+                ShowMessageDialog("CVE Entered is not valid.  Check the value and try again.",false);
+            }
         }
     }
 }

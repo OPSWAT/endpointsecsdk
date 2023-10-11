@@ -6,15 +6,14 @@
 ///  OPSWAT OEM Solutions Architect
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
-
-namespace VAPMAdapter.POCO
+namespace VAPMAdapter.OESIS.POCO
 {
-    #nullable disable
-
-    public class VersionDetail
+    public class CVEDetail
     {
-        public string version;
-        public string architecture;
-        public string language;
+        public Product  product;
+        public string   cveId;
+        public string   description;
+        public int      opswatSeverity;
+        public string   rawData;
     }
 }

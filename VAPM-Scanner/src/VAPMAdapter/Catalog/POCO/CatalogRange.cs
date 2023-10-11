@@ -6,17 +6,14 @@
 ///  OPSWAT OEM Solutions Architect
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
-
-
-namespace VAPMAdapter.POCO
+namespace VAPMAdapter.Catalog.POCO
 {
-    #nullable disable
-
-    public class Product
+    public class CatalogRange
     {
-        public string signatureId;
-        public string name;
-        public string vendor;
-        public VersionDetail versionDetail;
+        string start;
+        string limit;
+
+        public string Start { get => start; set => start = value; }
+        public string Limit { get => limit; set => limit = value; }
     }
 }

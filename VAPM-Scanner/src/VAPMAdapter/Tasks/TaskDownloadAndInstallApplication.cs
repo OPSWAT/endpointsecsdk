@@ -9,10 +9,10 @@
 using VAPMAdapater.Log;
 using VAPMAdapater.Updates;
 using VAPMAdapter.OESIS;
-using VAPMAdapter.POCO;
 using System.Collections.Generic;
 using System.IO;
 using System;
+using VAPMAdapter.OESIS.POCO;
 
 namespace VAPMAdapter.Tasks
 {

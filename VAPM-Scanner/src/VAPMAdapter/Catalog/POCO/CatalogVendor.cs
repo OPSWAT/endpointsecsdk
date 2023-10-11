@@ -5,21 +5,12 @@
 ///  Created by Chris Seiler
 ///  OPSWAT OEM Solutions Architect
 ///////////////////////////////////////////////////////////////////////////////////////////////
-using System.Collections.Generic;
 
-namespace VAPMAdapter.POCO
+namespace VAPMAdapter.Catalog.POCO
 {
-    #nullable disable
-
-    public class InstallerDetail
+    public class CatalogVendor
     {
-        public string url;
-        public string fileType;
-        public List<string> checksumList;
-        public int result_code;
-        public string title;
-        public string severity;
-        public string category;
-        public string security_update_id;
+        public string Id;
+        public string Name;
     }
 }

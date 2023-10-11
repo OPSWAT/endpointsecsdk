@@ -14,8 +14,6 @@ using System.Windows.Forms;
 /// </summary>
 public class ListViewColumnSorter : IComparer
 {
-    #nullable disable
-
     /// <summary>
     /// Specifies the column to be sorted
     /// </summary>

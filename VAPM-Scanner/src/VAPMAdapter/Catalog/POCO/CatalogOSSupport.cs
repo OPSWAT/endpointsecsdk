@@ -6,17 +6,18 @@
 ///  OPSWAT OEM Solutions Architect
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-
-namespace VAPMAdapter.POCO
+namespace VAPMAdapter.Catalog.POCO
 {
-    #nullable disable
-
-    internal class InstallResults
+    public class CatalogOSSupport
     {
-        public string version;
-        public bool success;
-        public int result_code;
-        public int require_restart;
+        public bool Windows;
+        public bool Mac;
+        public bool Linux;
     }
 }

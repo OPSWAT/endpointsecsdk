@@ -8,16 +8,12 @@
 
 using System;
 using System.IO;
-using System.Numerics;
 using System.Reflection;
-using VAPMAdapter.POCO;
 
 namespace VAPMAdapter.OESIS
 {
     internal class OESISPipe
     {
-        #nullable disable
-
         public static void InitializeFramework(bool onlineMode)
         {
             // This code is used to initialize the OESIS Framework

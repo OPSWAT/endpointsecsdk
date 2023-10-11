@@ -13,14 +13,12 @@ using System.IO;
 using System.Security.Cryptography;
 using System.Text;
 using VAPMAdapater.Log;
-using VAPMAdapter.POCO;
+using VAPMAdapter.OESIS.POCO;
 
 namespace VAPMAdapter.OESIS
 {
     internal class OESISUtil
     {
-        #nullable disable
-
 
         // Expects JSON from DETECT Products
         public static List<Product> GetProductList(string detect_product_json)
@@ -58,6 +56,7 @@ namespace VAPMAdapter.OESIS
                 cveDetail.cveId = (string)cveList[i].cve;
                 cveDetail.description = (string)cveList[i].description;
                 cveDetail.opswatSeverity = (int)cveList[i].severity_index;
+                cveDetail.rawData = product_vulnerability_json;
                 result.Add(cveDetail);
             }
 

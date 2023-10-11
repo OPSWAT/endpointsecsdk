@@ -6,16 +6,15 @@
 ///  OPSWAT OEM Solutions Architect
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace VAPMAdapter.POCO
+namespace VAPMAdapter.Catalog.POCO
 {
-    #nullable disable
-
-    public class CVEDetail
+    internal class CatalogPatchAssociation
     {
-        public Product product;
-        public string cveId;
-        public string description;
-        public int opswatSeverity;
     }
 }

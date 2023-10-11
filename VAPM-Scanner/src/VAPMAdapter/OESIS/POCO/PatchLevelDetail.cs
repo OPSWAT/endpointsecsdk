@@ -6,10 +6,7 @@
 ///  OPSWAT OEM Solutions Architect
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
-
-#nullable disable
-
-namespace VAPMAdapter.POCO
+namespace VAPMAdapter.OESIS.POCO
 {
     public class PatchLevelDetail
     {

@@ -1,6 +1,7 @@
-
->Net Dekstop may be required.  Run the following command to install it.
-
-winget install Microsoft.DotNet.DesktopRuntime.7
+# OPSWAT Endpoint SDK Samples
 
 
+### Contents
+
+#### `VAPM-Scanner`
+Contains a sample implementation to help develop to the SDK Vulnerability and Patch Modules.  This has the ability to Scan for applications, shows how to query Operatying System Updater, and will load data from the Vulnerability Catalog.
