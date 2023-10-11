@@ -9,7 +9,9 @@
 
 using Newtonsoft.Json.Linq;
 using System;
+using System.Collections.Generic;
 using System.IO;
+using VAPMAdapter.Catalog.POCO;
 
 namespace VAPMAdapter.Catalog
 {
@@ -35,5 +37,7 @@ namespace VAPMAdapter.Catalog
 
             return result;
         }
+
+
     }
 }

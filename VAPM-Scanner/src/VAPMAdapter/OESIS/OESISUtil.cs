@@ -19,8 +19,6 @@ namespace VAPMAdapter.OESIS
 {
     internal class OESISUtil
     {
-        #nullable disable
-
 
         // Expects JSON from DETECT Products
         public static List<Product> GetProductList(string detect_product_json)

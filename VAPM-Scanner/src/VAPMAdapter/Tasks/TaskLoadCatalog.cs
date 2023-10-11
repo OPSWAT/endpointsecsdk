@@ -27,16 +27,8 @@ namespace VAPMAdapter.Tasks
             catalogRoot = Path.Combine(catalogRoot, "analog/server");
             catalog.Load(catalogRoot);
 
-
+            catalog.PopulateSignatureVulnerability();
             result = catalog.GetProductList();
-            foreach(CatalogProduct product in result)
-            {
-                foreach(CatalogSignature signature in product.SigList)
-                {
-                    signature.CveList = catalog.GetVulnerabilityAssociationFromSignatureId(signature.Id);
-                    signature.CVECount = signature.CveList.Count;
-                }
-            }
 
             return result;
         }

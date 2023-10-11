@@ -6,19 +6,15 @@
 ///  OPSWAT OEM Solutions Architect
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
+using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace VAPMAdapter.OESIS.POCO
+namespace VAPMAdapter.Catalog.POCO
 {
-    public class InstallerDetail
+    internal class CatalogPatch
     {
-        public string url;
-        public string fileType;
-        public List<string> checksumList;
-        public int result_code;
-        public string title;
-        public string severity;
-        public string category;
-        public string security_update_id;
     }
 }

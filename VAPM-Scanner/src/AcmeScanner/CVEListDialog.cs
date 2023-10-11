@@ -18,8 +18,6 @@ namespace AcmeScanner
 
     internal class CVEListDialog : Form
     {
-        #nullable disable
-
         private Panel panel1;
         private MaterialSkin.Controls.MaterialButton btnDetails;
         private ScannerListView lvCVEList;

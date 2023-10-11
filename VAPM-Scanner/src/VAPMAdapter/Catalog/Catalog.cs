@@ -90,22 +90,22 @@ namespace VAPMAdapter.Catalog
             return Vuln_Associations.GetList();
         }
 
-        public List<CatalogVulnerabilityAssociation> GetVulnerabilityAssociationFromSignatureId(string signatureID)
+        public List<CatalogVulnerabilityAssociation> GetVulnerabilityAssociationFromProductId(string productID)
         {
             Dictionary<string, List<CatalogVulnerabilityAssociation>> vulDictionary = vuln_Associations.GetProductVulnerablityDictionary();
 
-            if (vulDictionary != null && vulDictionary.ContainsKey(signatureID))
+            if (vulDictionary != null && vulDictionary.ContainsKey(productID))
             {
-                return vulDictionary[signatureID];
+                return vulDictionary[productID];
             }
 
             return new List<CatalogVulnerabilityAssociation>();
         }
 
-        public CatalogOSSupport GetOSSupportForSignatureId(string signatureId)
+        public CatalogOSSupport GetOSSupportForProductId(string productId)
         {
             CatalogOSSupport result = new CatalogOSSupport();
-            List<CatalogVulnerabilityAssociation> vulList = GetVulnerabilityAssociationFromSignatureId(signatureId);
+            List<CatalogVulnerabilityAssociation> vulList = GetVulnerabilityAssociationFromProductId(productId);
 
             if (vulList != null)
             {
@@ -137,25 +137,23 @@ namespace VAPMAdapter.Catalog
             return result;
         }
 
-        public Dictionary<string, CatalogProductVulnerabilityJoin> JoinProductVulnerability()
+
+        public void PopulateSignatureVulnerability()
         {
-            Dictionary<string, CatalogProductVulnerabilityJoin> result = new Dictionary<string, CatalogProductVulnerabilityJoin>();
             Dictionary<string, CatalogProduct> productDictionary = Products.GetProductIdDictionary();
-            Dictionary<string, List<CatalogVulnerabilityAssociation>> prodVulnDictionary = Vuln_Associations.GetProductVulnerablityDictionary();
+            Dictionary<string, List<CatalogVulnerabilityAssociation>> productVulnDictionary = Vuln_Associations.GetProductVulnerablityDictionary();
 
             foreach (CatalogProduct product in productDictionary.Values)
             {
-                if (prodVulnDictionary.ContainsKey(product.Id))
+                if (productVulnDictionary.ContainsKey(product.Id))
                 {
-                    CatalogProductVulnerabilityJoin join = new CatalogProductVulnerabilityJoin();
-                    join.Product = product;
-                    join.VulnerabilityAssociationList = prodVulnDictionary[product.Id];
-
-                    result.Add(product.Id, join);
+                    foreach (CatalogSignature signature in product.SigList)
+                    {
+                        signature.CVEList = productVulnDictionary[product.Id];
+                        signature.CVECount = signature.CVEList.Count;
+                    }
                 }
             }
-
-            return result;
         }
 
 

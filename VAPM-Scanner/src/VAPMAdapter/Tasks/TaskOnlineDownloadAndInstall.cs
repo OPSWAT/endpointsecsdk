@@ -14,7 +14,6 @@ using VAPMAdapter.OESIS.POCO;
 
 namespace VAPMAdapter.Tasks
 {
-#nullable disable
     public class TaskOnlineDownloadAndInstall
     {
         private static void DownloadPatch(OnlinePatchDetail patchDetail)

@@ -1,19 +1,18 @@
 ﻿///////////////////////////////////////////////////////////////////////////////////////////////
+///  Sample Code for Acme Scanner
+///  Reference Implementation using OPSWAT Endpoint SDK Patch and Vulnerability Modules
+///  
+///  Created by Chris Seiler
+///  OPSWAT OEM Solutions Architect
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
 using System;
 using System.Windows.Forms;
-///  Sample Code for Acme Scanner
-///  Reference Implementation for OPSWAT Endpoint SDK
-///  
-///  Created by Chris Seiler
-///  OPSWAT OEM Solutions Architect
+
 namespace AcmeScanner
 {
     internal class TextDialog : Form
     {
-        #nullable disable
-
         private Panel panel1;
         private MaterialSkin.Controls.MaterialMultiLineTextBox rtbText;
         private MaterialSkin.Controls.MaterialButton btnClose;

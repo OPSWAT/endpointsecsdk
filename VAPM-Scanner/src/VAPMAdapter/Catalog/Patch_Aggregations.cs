@@ -34,5 +34,8 @@ namespace VAPMAdapter.Catalog
 
             return result;
         }
+
+
+
     }
 }

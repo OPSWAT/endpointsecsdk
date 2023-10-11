@@ -8,9 +8,6 @@
 
 using System;
 using System.Windows.Forms;
-using VAPMAdapater.Updates;
-using VAPMAdapter.Tasks;
-using VAPMAdapter.Updates;
 
 namespace AcmeScanner
 {

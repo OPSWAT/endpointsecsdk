@@ -101,6 +101,21 @@ namespace VAPMAdapter.Catalog
                     newSignature.Name = (string)currentSig["name"];
                     newSignature.Id = (string)currentSig["id"];
 
+                    newSignature.Platform = "Windows";
+                    int signatureIntId = int.Parse(newSignature.Id);
+                    if(signatureIntId > 100000)
+                    {
+                        if(signatureIntId > 200000)
+                        {
+                            newSignature.Platform = "Linux";
+                        }
+                        else
+                        {
+                            newSignature.Platform = "Mac";
+                        }
+                    }
+
+
                     newProduct.SigList.Add(newSignature);
                 }
 

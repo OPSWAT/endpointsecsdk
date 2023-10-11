@@ -25,7 +25,7 @@ namespace AcmeScanner
     public partial class ScannerForm : Form
     {
         static Dictionary<string, ProductScanResult> staticScanResults = new Dictionary<string, ProductScanResult>();
-        static Dictionary<string, CatalogSignature> staticCatalogResults = new Dictionary<string, CatalogSignature>();
+        static Dictionary<string, CatalogSignature> staticSignatureCatalogResults = new Dictionary<string, CatalogSignature>();
         static Dictionary<string, OnlinePatchDetail> staticOrchestrationScanResults = new Dictionary<string, OnlinePatchDetail>();
         static List<CatalogProduct> staticProductList = null;
 
@@ -157,12 +157,13 @@ namespace AcmeScanner
         private void loadCatalogWorker_DoWork(object sender, DoWorkEventArgs e)
         {
             staticProductList = TaskLoadCatalog.Load();
+            staticSignatureCatalogResults.Clear();
 
-            foreach(CatalogProduct product in staticProductList)
+            foreach (CatalogProduct product in staticProductList)
             {
                 foreach(CatalogSignature signature in product.SigList)
                 {
-                    staticCatalogResults.Add(signature.Id, signature);
+                    staticSignatureCatalogResults.Add(signature.Id, signature);
                 }
             }
         }
@@ -299,16 +300,17 @@ namespace AcmeScanner
 
             lvCatalog.Columns.Clear();
             lvCatalog.Columns.Add("Application", 300);
-            lvCatalog.Columns.Add("CVE Count", 100);
-            lvCatalog.Columns.Add("Severity", 100);
-            lvCatalog.Columns.Add("Installable", 100);
-            lvCatalog.Columns.Add("Platform", 50);
+            lvCatalog.Columns.Add("CVE Count", 80);
+            lvCatalog.Columns.Add("Installable", 80);
+            lvCatalog.Columns.Add("Platform", 100);
             lvCatalog.Columns.Add("", 400);
             lvCatalog.View = View.Details;
             lvCatalog.Update();
 
             int productCount = 0;
             int cveCount = 0;
+            int installCount = 0;
+
             foreach (CatalogProduct product in staticProductList)
             {
                 foreach(CatalogSignature signature in product.SigList)
@@ -316,18 +318,24 @@ namespace AcmeScanner
                     ListViewItem lviCurrent = new ListViewItem();
                     lviCurrent.Text = signature.Name;
                     lviCurrent.SubItems.Add(signature.CVECount.ToString());
-                    lviCurrent.SubItems.Add("");
                     lviCurrent.SubItems.Add(product.SupportsInstall ? "Yes" : "");
+                    lviCurrent.SubItems.Add(signature.Platform);
 
-                    lviCurrent.Tag = product.Id;
+                    lviCurrent.Tag = signature.Id;
                     resultList.Add(lviCurrent);
+
                     productCount++;
                     cveCount += signature.CVECount;
+                    if(product.SupportsInstall)
+                    {
+                        installCount++;
+                    }
                 }
             }
 
             lblTotalCVEs.Text = cveCount.ToString();
             lblTotalProducts.Text = productCount.ToString();
+            lblTotalInstalls.Text = installCount.ToString();
 
             lvCatalog.Items.Clear();
             lvCatalog.Items.AddRange(resultList.ToArray());
@@ -561,13 +569,13 @@ namespace AcmeScanner
             if (lvCatalog.SelectedItems != null && lvCatalog.SelectedItems.Count > 0)
             {
 
-                string productId = lvCatalog.SelectedItems[0].Tag.ToString();
-                CatalogSignature product = staticCatalogResults[productId];
+                string signatureID = lvCatalog.SelectedItems[0].Tag.ToString();
+                CatalogSignature signature = staticSignatureCatalogResults[signatureID];
 
-                if (product.CveList.Count > 0)
+                if (signature != null && signature.CVECount > 0)
                 {
-                    List<CVEDetail> cveDetailList = TaskGetCVEDetails.GetCveDetailList(product.CveList);
-                    CVEListDialog cveDialog = new CVEListDialog(product.Name, cveDetailList);
+                    List<CVEDetail> cveDetailList = TaskGetCVEDetails.GetCveDetailList(signature.CVEList);
+                    CVEListDialog cveDialog = new CVEListDialog(signature.Name, cveDetailList);
                     cveDialog.StartPosition = FormStartPosition.CenterParent;
 
                     cveDialog.ShowDialog();

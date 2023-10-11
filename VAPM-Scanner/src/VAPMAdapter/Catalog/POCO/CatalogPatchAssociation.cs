@@ -6,16 +6,15 @@
 ///  OPSWAT OEM Solutions Architect
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
+using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace VAPMAdapter.Catalog.POCO
 {
-    public class CatalogProductVulnerabilityJoin
+    internal class CatalogPatchAssociation
     {
-        CatalogProduct product;
-        List<CatalogVulnerabilityAssociation> vulnerabilityAssociationList;
-
-        public CatalogProduct Product { get => product; set => product = value; }
-        public List<CatalogVulnerabilityAssociation> VulnerabilityAssociationList { get => vulnerabilityAssociationList; set => vulnerabilityAssociationList = value; }
     }
 }

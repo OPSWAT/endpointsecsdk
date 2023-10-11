@@ -53,6 +53,10 @@ namespace AcmeScanner
             this.tabPage3 = new System.Windows.Forms.TabPage();
             this.lvCatalog = new AcmeScanner.ScannerListView();
             this.panel5 = new System.Windows.Forms.Panel();
+            this.materialButton2 = new MaterialSkin.Controls.MaterialButton();
+            this.materialButton1 = new MaterialSkin.Controls.MaterialButton();
+            this.lblTotalInstalls = new System.Windows.Forms.Label();
+            this.label3 = new System.Windows.Forms.Label();
             this.lblTotalCVEs = new System.Windows.Forms.Label();
             this.lblTotalProducts = new System.Windows.Forms.Label();
             this.tbCVE = new MaterialSkin.Controls.MaterialTextBox2();
@@ -391,6 +395,10 @@ namespace AcmeScanner
             // panel5
             // 
             this.panel5.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.panel5.Controls.Add(this.materialButton2);
+            this.panel5.Controls.Add(this.materialButton1);
+            this.panel5.Controls.Add(this.lblTotalInstalls);
+            this.panel5.Controls.Add(this.label3);
             this.panel5.Controls.Add(this.lblTotalCVEs);
             this.panel5.Controls.Add(this.lblTotalProducts);
             this.panel5.Controls.Add(this.tbCVE);
@@ -407,11 +415,73 @@ namespace AcmeScanner
             this.panel5.Size = new System.Drawing.Size(1052, 77);
             this.panel5.TabIndex = 5;
             // 
+            // materialButton2
+            // 
+            this.materialButton2.AutoSize = false;
+            this.materialButton2.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.materialButton2.Density = MaterialSkin.Controls.MaterialButton.MaterialButtonDensity.Default;
+            this.materialButton2.Depth = 0;
+            this.materialButton2.Enabled = false;
+            this.materialButton2.HighEmphasis = true;
+            this.materialButton2.Icon = null;
+            this.materialButton2.Location = new System.Drawing.Point(921, 21);
+            this.materialButton2.Margin = new System.Windows.Forms.Padding(4, 6, 4, 6);
+            this.materialButton2.MouseState = MaterialSkin.MouseState.HOVER;
+            this.materialButton2.Name = "materialButton2";
+            this.materialButton2.NoAccentTextColor = System.Drawing.Color.Empty;
+            this.materialButton2.Size = new System.Drawing.Size(110, 36);
+            this.materialButton2.TabIndex = 11;
+            this.materialButton2.Text = "Domains";
+            this.materialButton2.Type = MaterialSkin.Controls.MaterialButton.MaterialButtonType.Contained;
+            this.materialButton2.UseAccentColor = false;
+            this.materialButton2.UseVisualStyleBackColor = true;
+            // 
+            // materialButton1
+            // 
+            this.materialButton1.AutoSize = false;
+            this.materialButton1.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.materialButton1.Density = MaterialSkin.Controls.MaterialButton.MaterialButtonDensity.Default;
+            this.materialButton1.Depth = 0;
+            this.materialButton1.Enabled = false;
+            this.materialButton1.HighEmphasis = true;
+            this.materialButton1.Icon = null;
+            this.materialButton1.Location = new System.Drawing.Point(671, 21);
+            this.materialButton1.Margin = new System.Windows.Forms.Padding(4, 6, 4, 6);
+            this.materialButton1.MouseState = MaterialSkin.MouseState.HOVER;
+            this.materialButton1.Name = "materialButton1";
+            this.materialButton1.NoAccentTextColor = System.Drawing.Color.Empty;
+            this.materialButton1.Size = new System.Drawing.Size(124, 36);
+            this.materialButton1.TabIndex = 10;
+            this.materialButton1.Text = "Install Details";
+            this.materialButton1.Type = MaterialSkin.Controls.MaterialButton.MaterialButtonType.Contained;
+            this.materialButton1.UseAccentColor = false;
+            this.materialButton1.UseVisualStyleBackColor = true;
+            // 
+            // lblTotalInstalls
+            // 
+            this.lblTotalInstalls.AutoSize = true;
+            this.lblTotalInstalls.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+            this.lblTotalInstalls.Location = new System.Drawing.Point(311, 47);
+            this.lblTotalInstalls.Name = "lblTotalInstalls";
+            this.lblTotalInstalls.Size = new System.Drawing.Size(19, 21);
+            this.lblTotalInstalls.TabIndex = 9;
+            this.lblTotalInstalls.Text = "0";
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+            this.label3.Location = new System.Drawing.Point(182, 47);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(114, 21);
+            this.label3.TabIndex = 8;
+            this.label3.Text = "Total Install\'s:";
+            // 
             // lblTotalCVEs
             // 
             this.lblTotalCVEs.AutoSize = true;
             this.lblTotalCVEs.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-            this.lblTotalCVEs.Location = new System.Drawing.Point(311, 45);
+            this.lblTotalCVEs.Location = new System.Drawing.Point(311, 27);
             this.lblTotalCVEs.Name = "lblTotalCVEs";
             this.lblTotalCVEs.Size = new System.Drawing.Size(19, 21);
             this.lblTotalCVEs.TabIndex = 7;
@@ -421,7 +491,7 @@ namespace AcmeScanner
             // 
             this.lblTotalProducts.AutoSize = true;
             this.lblTotalProducts.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-            this.lblTotalProducts.Location = new System.Drawing.Point(311, 15);
+            this.lblTotalProducts.Location = new System.Drawing.Point(311, 6);
             this.lblTotalProducts.Name = "lblTotalProducts";
             this.lblTotalProducts.Size = new System.Drawing.Size(19, 21);
             this.lblTotalProducts.TabIndex = 6;
@@ -438,7 +508,7 @@ namespace AcmeScanner
             this.tbCVE.Font = new System.Drawing.Font("Microsoft Sans Serif", 16F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Pixel);
             this.tbCVE.HideSelection = true;
             this.tbCVE.LeadingIcon = null;
-            this.tbCVE.Location = new System.Drawing.Point(430, 16);
+            this.tbCVE.Location = new System.Drawing.Point(394, 9);
             this.tbCVE.MaxLength = 32767;
             this.tbCVE.MouseState = MaterialSkin.MouseState.OUT;
             this.tbCVE.Name = "tbCVE";
@@ -450,10 +520,9 @@ namespace AcmeScanner
             this.tbCVE.SelectionLength = 0;
             this.tbCVE.SelectionStart = 0;
             this.tbCVE.ShortcutsEnabled = true;
-            this.tbCVE.Size = new System.Drawing.Size(152, 48);
+            this.tbCVE.Size = new System.Drawing.Size(138, 48);
             this.tbCVE.TabIndex = 5;
             this.tbCVE.TabStop = false;
-            this.tbCVE.Text = "Enter CVE";
             this.tbCVE.TextAlign = System.Windows.Forms.HorizontalAlignment.Left;
             this.tbCVE.TrailingIcon = null;
             this.tbCVE.UseSystemPasswordChar = false;
@@ -466,7 +535,7 @@ namespace AcmeScanner
             this.btnLookupCVE.Depth = 0;
             this.btnLookupCVE.HighEmphasis = true;
             this.btnLookupCVE.Icon = null;
-            this.btnLookupCVE.Location = new System.Drawing.Point(595, 21);
+            this.btnLookupCVE.Location = new System.Drawing.Point(539, 21);
             this.btnLookupCVE.Margin = new System.Windows.Forms.Padding(4, 6, 4, 6);
             this.btnLookupCVE.MouseState = MaterialSkin.MouseState.HOVER;
             this.btnLookupCVE.Name = "btnLookupCVE";
@@ -483,7 +552,7 @@ namespace AcmeScanner
             // 
             this.label2.AutoSize = true;
             this.label2.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-            this.label2.Location = new System.Drawing.Point(182, 45);
+            this.label2.Location = new System.Drawing.Point(182, 27);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(97, 21);
             this.label2.TabIndex = 3;
@@ -493,7 +562,7 @@ namespace AcmeScanner
             // 
             this.label1.AutoSize = true;
             this.label1.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-            this.label1.Location = new System.Drawing.Point(182, 15);
+            this.label1.Location = new System.Drawing.Point(182, 6);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(123, 21);
             this.label1.TabIndex = 2;
@@ -507,14 +576,14 @@ namespace AcmeScanner
             this.btnListCatalogCVE.Depth = 0;
             this.btnListCatalogCVE.HighEmphasis = true;
             this.btnListCatalogCVE.Icon = null;
-            this.btnListCatalogCVE.Location = new System.Drawing.Point(861, 21);
+            this.btnListCatalogCVE.Location = new System.Drawing.Point(803, 21);
             this.btnListCatalogCVE.Margin = new System.Windows.Forms.Padding(4, 6, 4, 6);
             this.btnListCatalogCVE.MouseState = MaterialSkin.MouseState.HOVER;
             this.btnListCatalogCVE.Name = "btnListCatalogCVE";
             this.btnListCatalogCVE.NoAccentTextColor = System.Drawing.Color.Empty;
-            this.btnListCatalogCVE.Size = new System.Drawing.Size(170, 36);
+            this.btnListCatalogCVE.Size = new System.Drawing.Size(110, 36);
             this.btnListCatalogCVE.TabIndex = 1;
-            this.btnListCatalogCVE.Text = "Show Product CVES";
+            this.btnListCatalogCVE.Text = "Product CVES";
             this.btnListCatalogCVE.Type = MaterialSkin.Controls.MaterialButton.MaterialButtonType.Contained;
             this.btnListCatalogCVE.UseAccentColor = false;
             this.btnListCatalogCVE.UseVisualStyleBackColor = true;
@@ -596,5 +665,9 @@ namespace AcmeScanner
         private Label lblTotalCVEs;
         private Label lblTotalProducts;
         private MaterialSkin.Controls.MaterialTextBox2 tbCVE;
+        private Label lblTotalInstalls;
+        private Label label3;
+        private MaterialSkin.Controls.MaterialButton materialButton2;
+        private MaterialSkin.Controls.MaterialButton materialButton1;
     }
 }

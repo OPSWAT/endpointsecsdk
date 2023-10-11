@@ -153,14 +153,14 @@ namespace VAPMAdapter.Catalog
 
                     if (productIdList != null)
                     {
-                        foreach (string productId in productIdList)
+                        foreach (string signatureId in productIdList)
                         {
-                            if (!newProductVulnDictionary.ContainsKey(productId))
+                            if (!newProductVulnDictionary.ContainsKey(signatureId))
                             {
-                                newProductVulnDictionary.Add(productId, new List<CatalogVulnerabilityAssociation>());
+                                newProductVulnDictionary.Add(signatureId, new List<CatalogVulnerabilityAssociation>());
                             }
 
-                            newProductVulnDictionary[productId].Add(association);
+                            newProductVulnDictionary[signatureId].Add(association);
                         }
                     }
                 }

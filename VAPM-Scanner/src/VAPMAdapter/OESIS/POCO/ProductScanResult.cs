@@ -10,7 +10,6 @@ using System.Collections.Generic;
 
 namespace VAPMAdapter.OESIS.POCO
 {
-#nullable disable
     public class ProductScanResult
     {
         public Product product;

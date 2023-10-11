@@ -1,18 +1,18 @@
 ﻿///////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////
-using System.Drawing;
-using System.Windows.Forms;
 ///  Sample Code for Acme Scanner
-///  Reference Implementation for OPSWAT Endpoint SDK
+///  Reference Implementation using OPSWAT Endpoint SDK Patch and Vulnerability Modules
 ///  
 ///  Created by Chris Seiler
 ///  OPSWAT OEM Solutions Architect
+///////////////////////////////////////////////////////////////////////////////////////////////
+using System.Drawing;
+using System.Windows.Forms;
+
 namespace AcmeScanner
 {
 
     public class ScannerListView : ListView
     {
-#nullable disable
         private ListViewColumnSorter lvwColumnSorter;
 
         public ScannerListView() : base()
