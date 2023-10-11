@@ -1,0 +1,6 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/VAPM-Scanner/src/AcmeScanner/license.cfg
+/VAPM-Scanner/src/AcmeScanner/pass_key.txt
