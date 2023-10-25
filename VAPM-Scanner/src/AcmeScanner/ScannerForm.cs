@@ -608,5 +608,28 @@ namespace AcmeScanner
                 ShowMessageDialog("CVE Entered is not valid.  Check the value and try again.",false);
             }
         }
+
+        private void btnExportCSV_Click(object sender, EventArgs e)
+        {
+            StringBuilder csvFile = new StringBuilder();
+
+            foreach (CatalogProduct product in staticProductList)
+            {
+                foreach (CatalogSignature signature in product.SigList)
+                {
+                    csvFile.Append(signature.Name);
+                    csvFile.Append(",");
+                    csvFile.Append(signature.CVECount);
+                    csvFile.Append(",");
+                    csvFile.Append(product.SupportsInstall ? "Yes" : "");
+                    csvFile.Append(",");
+                    csvFile.AppendLine(signature.Platform);
+                    
+                }
+            }
+
+            File.WriteAllText("ProductSupport.csv", csvFile.ToString());
+            MessageBox.Show("Results have been written to " + Path.Combine(Directory.GetCurrentDirectory(), "ProductSupport.csv"));
+        }
     }
 }
