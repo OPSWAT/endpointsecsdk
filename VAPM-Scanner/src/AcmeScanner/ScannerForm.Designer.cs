@@ -561,6 +561,7 @@ namespace AcmeScanner
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1098, 682);
             this.Controls.Add(this.panel3);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "ScannerForm";
             this.Text = "Acme Scanner";
             this.panel1.ResumeLayout(false);
