@@ -53,13 +53,11 @@ namespace AcmeScanner
             this.tabPage3 = new System.Windows.Forms.TabPage();
             this.lvCatalog = new AcmeScanner.ScannerListView();
             this.panel5 = new System.Windows.Forms.Panel();
-            this.materialButton2 = new MaterialSkin.Controls.MaterialButton();
-            this.materialButton1 = new MaterialSkin.Controls.MaterialButton();
+            this.btnExportCSV = new MaterialSkin.Controls.MaterialButton();
             this.lblTotalInstalls = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
             this.lblTotalCVEs = new System.Windows.Forms.Label();
             this.lblTotalProducts = new System.Windows.Forms.Label();
-            this.tbCVE = new MaterialSkin.Controls.MaterialTextBox2();
             this.btnLookupCVE = new MaterialSkin.Controls.MaterialButton();
             this.label2 = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
@@ -395,13 +393,11 @@ namespace AcmeScanner
             // panel5
             // 
             this.panel5.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.panel5.Controls.Add(this.materialButton2);
-            this.panel5.Controls.Add(this.materialButton1);
+            this.panel5.Controls.Add(this.btnExportCSV);
             this.panel5.Controls.Add(this.lblTotalInstalls);
             this.panel5.Controls.Add(this.label3);
             this.panel5.Controls.Add(this.lblTotalCVEs);
             this.panel5.Controls.Add(this.lblTotalProducts);
-            this.panel5.Controls.Add(this.tbCVE);
             this.panel5.Controls.Add(this.btnLookupCVE);
             this.panel5.Controls.Add(this.label2);
             this.panel5.Controls.Add(this.label1);
@@ -415,47 +411,26 @@ namespace AcmeScanner
             this.panel5.Size = new System.Drawing.Size(1052, 77);
             this.panel5.TabIndex = 5;
             // 
-            // materialButton2
+            // btnExportCSV
             // 
-            this.materialButton2.AutoSize = false;
-            this.materialButton2.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.materialButton2.Density = MaterialSkin.Controls.MaterialButton.MaterialButtonDensity.Default;
-            this.materialButton2.Depth = 0;
-            this.materialButton2.Enabled = false;
-            this.materialButton2.HighEmphasis = true;
-            this.materialButton2.Icon = null;
-            this.materialButton2.Location = new System.Drawing.Point(921, 21);
-            this.materialButton2.Margin = new System.Windows.Forms.Padding(4, 6, 4, 6);
-            this.materialButton2.MouseState = MaterialSkin.MouseState.HOVER;
-            this.materialButton2.Name = "materialButton2";
-            this.materialButton2.NoAccentTextColor = System.Drawing.Color.Empty;
-            this.materialButton2.Size = new System.Drawing.Size(110, 36);
-            this.materialButton2.TabIndex = 11;
-            this.materialButton2.Text = "Domains";
-            this.materialButton2.Type = MaterialSkin.Controls.MaterialButton.MaterialButtonType.Contained;
-            this.materialButton2.UseAccentColor = false;
-            this.materialButton2.UseVisualStyleBackColor = true;
-            // 
-            // materialButton1
-            // 
-            this.materialButton1.AutoSize = false;
-            this.materialButton1.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.materialButton1.Density = MaterialSkin.Controls.MaterialButton.MaterialButtonDensity.Default;
-            this.materialButton1.Depth = 0;
-            this.materialButton1.Enabled = false;
-            this.materialButton1.HighEmphasis = true;
-            this.materialButton1.Icon = null;
-            this.materialButton1.Location = new System.Drawing.Point(671, 21);
-            this.materialButton1.Margin = new System.Windows.Forms.Padding(4, 6, 4, 6);
-            this.materialButton1.MouseState = MaterialSkin.MouseState.HOVER;
-            this.materialButton1.Name = "materialButton1";
-            this.materialButton1.NoAccentTextColor = System.Drawing.Color.Empty;
-            this.materialButton1.Size = new System.Drawing.Size(124, 36);
-            this.materialButton1.TabIndex = 10;
-            this.materialButton1.Text = "Install Details";
-            this.materialButton1.Type = MaterialSkin.Controls.MaterialButton.MaterialButtonType.Contained;
-            this.materialButton1.UseAccentColor = false;
-            this.materialButton1.UseVisualStyleBackColor = true;
+            this.btnExportCSV.AutoSize = false;
+            this.btnExportCSV.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.btnExportCSV.Density = MaterialSkin.Controls.MaterialButton.MaterialButtonDensity.Default;
+            this.btnExportCSV.Depth = 0;
+            this.btnExportCSV.HighEmphasis = true;
+            this.btnExportCSV.Icon = null;
+            this.btnExportCSV.Location = new System.Drawing.Point(921, 21);
+            this.btnExportCSV.Margin = new System.Windows.Forms.Padding(4, 6, 4, 6);
+            this.btnExportCSV.MouseState = MaterialSkin.MouseState.HOVER;
+            this.btnExportCSV.Name = "btnExportCSV";
+            this.btnExportCSV.NoAccentTextColor = System.Drawing.Color.Empty;
+            this.btnExportCSV.Size = new System.Drawing.Size(110, 36);
+            this.btnExportCSV.TabIndex = 11;
+            this.btnExportCSV.Text = "Export CSV";
+            this.btnExportCSV.Type = MaterialSkin.Controls.MaterialButton.MaterialButtonType.Contained;
+            this.btnExportCSV.UseAccentColor = false;
+            this.btnExportCSV.UseVisualStyleBackColor = true;
+            this.btnExportCSV.Click += new System.EventHandler(this.btnExportCSV_Click);
             // 
             // lblTotalInstalls
             // 
@@ -496,36 +471,6 @@ namespace AcmeScanner
             this.lblTotalProducts.Size = new System.Drawing.Size(19, 21);
             this.lblTotalProducts.TabIndex = 6;
             this.lblTotalProducts.Text = "0";
-            // 
-            // tbCVE
-            // 
-            this.tbCVE.AnimateReadOnly = false;
-            this.tbCVE.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.None;
-            this.tbCVE.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.None;
-            this.tbCVE.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
-            this.tbCVE.CharacterCasing = System.Windows.Forms.CharacterCasing.Normal;
-            this.tbCVE.Depth = 0;
-            this.tbCVE.Font = new System.Drawing.Font("Microsoft Sans Serif", 16F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Pixel);
-            this.tbCVE.HideSelection = true;
-            this.tbCVE.LeadingIcon = null;
-            this.tbCVE.Location = new System.Drawing.Point(394, 9);
-            this.tbCVE.MaxLength = 32767;
-            this.tbCVE.MouseState = MaterialSkin.MouseState.OUT;
-            this.tbCVE.Name = "tbCVE";
-            this.tbCVE.PasswordChar = '\0';
-            this.tbCVE.PrefixSuffixText = null;
-            this.tbCVE.ReadOnly = false;
-            this.tbCVE.RightToLeft = System.Windows.Forms.RightToLeft.No;
-            this.tbCVE.SelectedText = "";
-            this.tbCVE.SelectionLength = 0;
-            this.tbCVE.SelectionStart = 0;
-            this.tbCVE.ShortcutsEnabled = true;
-            this.tbCVE.Size = new System.Drawing.Size(138, 48);
-            this.tbCVE.TabIndex = 5;
-            this.tbCVE.TabStop = false;
-            this.tbCVE.TextAlign = System.Windows.Forms.HorizontalAlignment.Left;
-            this.tbCVE.TrailingIcon = null;
-            this.tbCVE.UseSystemPasswordChar = false;
             // 
             // btnLookupCVE
             // 
@@ -667,7 +612,6 @@ namespace AcmeScanner
         private MaterialSkin.Controls.MaterialTextBox2 tbCVE;
         private Label lblTotalInstalls;
         private Label label3;
-        private MaterialSkin.Controls.MaterialButton materialButton2;
-        private MaterialSkin.Controls.MaterialButton materialButton1;
+        private MaterialSkin.Controls.MaterialButton btnExportCSV;
     }
 }
