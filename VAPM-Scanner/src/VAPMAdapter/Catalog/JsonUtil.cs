@@ -29,6 +29,19 @@ namespace VAPMAdapter.Catalog
             return result;
         }
 
+        public static List<string> GetStringArrayFromJson(JArray json)
+        {
+            List<string> result = new List<string>();
+
+            foreach (JValue jsonObject in json)
+            {
+                result.Add(jsonObject.ToString());
+            }
+
+            return result;
+        }
+
+
         public static DateTime UnixTimeStampToDateTime(double unixTimeStamp)
         {
             // Unix timestamp is seconds past epoch

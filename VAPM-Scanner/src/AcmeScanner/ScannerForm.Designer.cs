@@ -53,6 +53,7 @@ namespace AcmeScanner
             this.tabPage3 = new System.Windows.Forms.TabPage();
             this.lvCatalog = new AcmeScanner.ScannerListView();
             this.panel5 = new System.Windows.Forms.Panel();
+            this.btnFreshInstall = new MaterialSkin.Controls.MaterialButton();
             this.btnExportCSV = new MaterialSkin.Controls.MaterialButton();
             this.lblTotalInstalls = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
@@ -393,6 +394,7 @@ namespace AcmeScanner
             // panel5
             // 
             this.panel5.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.panel5.Controls.Add(this.btnFreshInstall);
             this.panel5.Controls.Add(this.btnExportCSV);
             this.panel5.Controls.Add(this.lblTotalInstalls);
             this.panel5.Controls.Add(this.label3);
@@ -410,6 +412,27 @@ namespace AcmeScanner
             this.panel5.Padding = new System.Windows.Forms.Padding(15);
             this.panel5.Size = new System.Drawing.Size(1052, 77);
             this.panel5.TabIndex = 5;
+            // 
+            // btnFreshInstall
+            // 
+            this.btnFreshInstall.AutoSize = false;
+            this.btnFreshInstall.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.btnFreshInstall.Density = MaterialSkin.Controls.MaterialButton.MaterialButtonDensity.Default;
+            this.btnFreshInstall.Depth = 0;
+            this.btnFreshInstall.HighEmphasis = true;
+            this.btnFreshInstall.Icon = null;
+            this.btnFreshInstall.Location = new System.Drawing.Point(671, 21);
+            this.btnFreshInstall.Margin = new System.Windows.Forms.Padding(4, 6, 4, 6);
+            this.btnFreshInstall.MouseState = MaterialSkin.MouseState.HOVER;
+            this.btnFreshInstall.Name = "btnFreshInstall";
+            this.btnFreshInstall.NoAccentTextColor = System.Drawing.Color.Empty;
+            this.btnFreshInstall.Size = new System.Drawing.Size(124, 36);
+            this.btnFreshInstall.TabIndex = 12;
+            this.btnFreshInstall.Text = "Fresh Install";
+            this.btnFreshInstall.Type = MaterialSkin.Controls.MaterialButton.MaterialButtonType.Contained;
+            this.btnFreshInstall.UseAccentColor = false;
+            this.btnFreshInstall.UseVisualStyleBackColor = true;
+            this.btnFreshInstall.Click += new System.EventHandler(this.btnFreshInstall_Click);
             // 
             // btnExportCSV
             // 
@@ -614,5 +637,6 @@ namespace AcmeScanner
         private Label lblTotalInstalls;
         private Label label3;
         private MaterialSkin.Controls.MaterialButton btnExportCSV;
+        private MaterialSkin.Controls.MaterialButton btnFreshInstall;
     }
 }
