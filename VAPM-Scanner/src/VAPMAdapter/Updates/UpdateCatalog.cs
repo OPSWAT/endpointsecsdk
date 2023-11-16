@@ -5,6 +5,7 @@
 ///  Created by Chris Seiler
 ///  OPSWAT OEM Solutions Architect
 ///////////////////////////////////////////////////////////////////////////////////////////////
+using System;
 using System.IO;
 using VAPMAdapater;
 
@@ -17,8 +18,15 @@ namespace VAPMAdapter.Updates
         {
             string catalogDir = VAPMSettings.getLocalCatalogDir();
 
+
             if (Directory.Exists(catalogDir))
             {
+                // Only update the catalog once a day
+                if (Directory.GetCreationTime(catalogDir).Add(TimeSpan.FromDays(1)) > DateTime.Now)
+                {
+                    return;
+                }
+
                 Directory.Delete(catalogDir, true);
             }
             Directory.CreateDirectory(catalogDir);

@@ -98,8 +98,16 @@ namespace VAPMAdapter.Catalog
                 foreach (JObject currentSig in signatures.Children<JObject>())
                 {
                     CatalogSignature newSignature = new CatalogSignature();
+                    newSignature.FreshInstall = false;
+
                     newSignature.Name = (string)currentSig["name"];
                     newSignature.Id = (string)currentSig["id"];
+
+                    string stringFreshInstall = (string)currentSig["fresh_installable"];
+                    if(stringFreshInstall == "1")
+                    {
+                        newSignature.FreshInstall = true;
+                    }
 
                     newSignature.Platform = "Windows";
                     int signatureIntId = int.Parse(newSignature.Id);

@@ -224,7 +224,7 @@ namespace VAPMAdapter.OESIS
         public static string GetLatestInstaller(string signatureId, int download, int index)
         {
             string result = "";
-            string json_in = "{\"input\" : {\"method\" : 50300, \"signature\" :" + signatureId + ", \"download\": " + download + ", \"index\" : " + index + " }}";
+            string json_in = "{\"input\" : {\"method\" : 50300, \"signature\" :" + signatureId + ", \"download\": " + download + ", \"index\" : " + index + ", \"language\" : \"fr-lu\" }}";
 
             if (index == -1)
             {

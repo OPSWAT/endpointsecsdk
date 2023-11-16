@@ -142,16 +142,31 @@ namespace VAPMAdapter.Catalog
         {
             Dictionary<string, CatalogProduct> productDictionary = Products.GetProductIdDictionary();
             Dictionary<string, List<CatalogVulnerabilityAssociation>> productVulnDictionary = Vuln_Associations.GetProductVulnerablityDictionary();
-
+            Dictionary<string, List<CatalogPatchAssociation>> productPatchDictionary = Patch_Associations.GetProductPatchDictionary();
+            
             foreach (CatalogProduct product in productDictionary.Values)
             {
-                if (productVulnDictionary.ContainsKey(product.Id))
-                {
                     foreach (CatalogSignature signature in product.SigList)
                     {
-                        signature.CVEList = productVulnDictionary[product.Id];
-                        signature.CVECount = signature.CVEList.Count;
-                    }
+                        if (signature.Id == "3029")
+                        {
+                            System.Console.WriteLine("Test");
+                        }
+
+                        if (productPatchDictionary.ContainsKey(signature.Id))
+                        {
+                            signature.PatchAssociations = productPatchDictionary[signature.Id];
+                        }
+                        else
+                        {
+                            signature.PatchAssociations = new List<CatalogPatchAssociation>();
+                        }
+                        
+                        if (productVulnDictionary.ContainsKey(product.Id))
+                        {
+                            signature.CVEList = productVulnDictionary[product.Id];
+                            signature.CVECount = signature.CVEList.Count;
+                        }
                 }
             }
         }

@@ -11,6 +11,8 @@ using VAPMAdapter.OESIS;
 using System.Collections.Generic;
 using System;
 using VAPMAdapter.OESIS.POCO;
+using System.Reflection.Metadata;
+using VAPMAdapter.Catalog;
 
 namespace VAPMAdapter.Tasks
 {
@@ -54,6 +56,7 @@ namespace VAPMAdapter.Tasks
             {
                 try
                 {
+
                     string installDetailString = OESISPipe.GetLatestInstaller(product.signatureId, 0, index);
                     InstallerDetail currentDetail = OESISUtil.GetInstallerDetail(installDetailString);
                     index++;

@@ -48,7 +48,7 @@ namespace AcmeScanner
 
         private void CheckLicenseFiles()
         {
-            if(!File.Exists("license.cfg") || !File.Exists("pass_key.txt"))
+            if (!File.Exists("license.cfg") || !File.Exists("pass_key.txt"))
             {
                 ShowMessageDialog("This program requires the license.cfg and pass_key.txt to be in the running directory.  Please check and make sure this is correct.", false);
                 Close();
@@ -122,7 +122,7 @@ namespace AcmeScanner
         {
             bool isOffline = (bool)e.Argument;
 
-            if(isOffline)
+            if (isOffline)
             {
                 // Scan Offline
                 bool scanOSCVEs = cbScanOSCVEs.Checked;
@@ -141,7 +141,7 @@ namespace AcmeScanner
         {
             bool isOffline = (bool)e.Result;
 
-            if(isOffline)
+            if (isOffline)
             {
                 UpdateScanResults();
             }
@@ -161,7 +161,7 @@ namespace AcmeScanner
 
             foreach (CatalogProduct product in staticProductList)
             {
-                foreach(CatalogSignature signature in product.SigList)
+                foreach (CatalogSignature signature in product.SigList)
                 {
                     staticSignatureCatalogResults.Add(signature.Id, signature);
                 }
@@ -188,8 +188,9 @@ namespace AcmeScanner
         private void installVAPMPatchWorker_Completed(object sender, RunWorkerCompletedEventArgs e)
         {
             // Do a scan again
-            lvScanResults.Items.Clear();
-            scanWorker.RunWorkerAsync(true);
+            //lvScanResults.Items.Clear();
+            //scanWorker.RunWorkerAsync(true);
+            ShowLoading(false);
         }
 
         private void installOnlinePatchWorker_DoWork(object sender, DoWorkEventArgs e)
@@ -275,11 +276,11 @@ namespace AcmeScanner
         {
             int result = 0;
 
-            if(scanResult.cveDetailList.Count > 0)
+            if (scanResult.cveDetailList.Count > 0)
             {
-                foreach(CVEDetail current in scanResult.cveDetailList)
+                foreach (CVEDetail current in scanResult.cveDetailList)
                 {
-                    if(current.opswatSeverity > result)
+                    if (current.opswatSeverity > result)
                     {
                         result = current.opswatSeverity;
                     }
@@ -303,6 +304,9 @@ namespace AcmeScanner
             lvCatalog.Columns.Add("CVE Count", 80);
             lvCatalog.Columns.Add("Installable", 80);
             lvCatalog.Columns.Add("Platform", 100);
+            lvCatalog.Columns.Add("Fresh Install", 100);
+            lvCatalog.Columns.Add("Package Count", 100);
+
             lvCatalog.Columns.Add("", 400);
             lvCatalog.View = View.Details;
             lvCatalog.Update();
@@ -313,20 +317,44 @@ namespace AcmeScanner
 
             foreach (CatalogProduct product in staticProductList)
             {
-                foreach(CatalogSignature signature in product.SigList)
+                foreach (CatalogSignature signature in product.SigList)
                 {
+                    bool supportsPatch = product.SupportsInstall;
+                    if (supportsPatch && signature.PatchAssociations.Count == 0)
+                    {
+                        supportsPatch = false;
+                    }
+
+                    bool freshInstall = signature.FreshInstall;
+                    if (freshInstall && signature.PatchAssociations.Count == 0)
+                    {
+                        freshInstall = false;
+                    }
+
+
                     ListViewItem lviCurrent = new ListViewItem();
                     lviCurrent.Text = signature.Name;
                     lviCurrent.SubItems.Add(signature.CVECount.ToString());
-                    lviCurrent.SubItems.Add(product.SupportsInstall ? "Yes" : "");
+                    lviCurrent.SubItems.Add(supportsPatch ? "Yes" : "");
                     lviCurrent.SubItems.Add(signature.Platform);
+                    lviCurrent.SubItems.Add(freshInstall ? "Yes" : "");
+
+                    if (signature.PatchAssociations != null)
+                    {
+                        lviCurrent.SubItems.Add(signature.PatchAssociations.Count.ToString());
+                    }
+                    else
+                    {
+                        lviCurrent.SubItems.Add("");
+                    }
+
 
                     lviCurrent.Tag = signature.Id;
                     resultList.Add(lviCurrent);
 
                     productCount++;
                     cveCount += signature.CVECount;
-                    if(product.SupportsInstall)
+                    if (supportsPatch)
                     {
                         installCount++;
                     }
@@ -411,7 +439,7 @@ namespace AcmeScanner
             lvOrchestrationScanResult.Update();
 
 
-            foreach(OnlinePatchDetail current in sortedList)
+            foreach (OnlinePatchDetail current in sortedList)
             {
                 ListViewItem lviCurrent = new ListViewItem();
                 lviCurrent.Text = current.title;
@@ -445,7 +473,7 @@ namespace AcmeScanner
 
                 ProductScanResult scanResult = staticScanResults[signatureId];
 
-                if(scanResult.cveDetailList.Count > 0)
+                if (scanResult.cveDetailList.Count > 0)
                 {
                     CVEListDialog cveDialog = new CVEListDialog(scanResult.product.name, scanResult.cveDetailList);
                     cveDialog.StartPosition = FormStartPosition.CenterParent;
@@ -597,7 +625,7 @@ namespace AcmeScanner
             string cve = tbCVE.Text;
 
             string cveJson = TaskLookupCVE.LookupCVE(cve);
-            if(!string.IsNullOrEmpty(cveJson))
+            if (!string.IsNullOrEmpty(cveJson))
             {
                 TextDialog textDialog = new TextDialog(cveJson);
                 textDialog.StartPosition = FormStartPosition.CenterParent;
@@ -605,7 +633,7 @@ namespace AcmeScanner
             }
             else
             {
-                ShowMessageDialog("CVE Entered is not valid.  Check the value and try again.",false);
+                ShowMessageDialog("CVE Entered is not valid.  Check the value and try again.", false);
             }
         }
 
@@ -624,12 +652,48 @@ namespace AcmeScanner
                     csvFile.Append(product.SupportsInstall ? "Yes" : "");
                     csvFile.Append(",");
                     csvFile.AppendLine(signature.Platform);
-                    
+
                 }
             }
 
             File.WriteAllText("ProductSupport.csv", csvFile.ToString());
             MessageBox.Show("Results have been written to " + Path.Combine(Directory.GetCurrentDirectory(), "ProductSupport.csv"));
         }
+
+        private void btnFreshInstall_Click(object sender, EventArgs e)
+        {
+            if (staticSignatureCatalogResults != null && staticSignatureCatalogResults.Count > 0)
+            {
+                if (lvCatalog.SelectedItems.Count > 0)
+                {
+
+                    string signatureId = lvCatalog.SelectedItems[0].Tag.ToString();
+                    CatalogSignature sig = staticSignatureCatalogResults[signatureId];
+
+                    if (sig.FreshInstall && sig.PatchAssociations.Count > 0)
+                    {
+
+                        if (ShowMessageDialog("Are you sure you want to install \"" + sig.Name + "\"", true))
+                        {
+                            ShowLoading(true);
+                            installVAPMPatchWorker.RunWorkerAsync(signatureId);
+                        }
+                    }
+                    else
+                    {
+                        ShowMessageDialog("Select an Application with the Fresh Install flag.", false);
+                    }
+                }
+                else
+                {
+                    ShowMessageDialog("Select an Application to install.", false);
+                }
+            }
+            else
+            {
+                ShowMessageDialog("Make sure to Scan for products.  After doing that select a product to install.", false);
+            }
+        }
+
     }
 }

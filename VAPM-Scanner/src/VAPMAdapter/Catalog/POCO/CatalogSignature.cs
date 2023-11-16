@@ -20,8 +20,10 @@ namespace VAPMAdapter.Catalog.POCO
         public string   Name;
         public string   Platform;
         public string   Architecture;
+        public bool     FreshInstall;
         public int      CVECount;
         public List<CatalogVulnerabilityAssociation> CVEList;
+        public List<CatalogPatchAssociation> PatchAssociations;
 
     }
 }
