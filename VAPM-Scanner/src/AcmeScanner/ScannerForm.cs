@@ -388,6 +388,10 @@ namespace AcmeScanner
             lvScanResults.Columns.Add("CVE Count", 100);
             lvScanResults.Columns.Add("Patched", 100);
             lvScanResults.Columns.Add("Auto", 50);
+            lvScanResults.Columns.Add("SigId", 50);
+            lvScanResults.Columns.Add("PatchId", 50);
+            lvScanResults.Columns.Add("Url", 50);
+
             lvScanResults.Columns.Add("", 400);
             lvScanResults.View = View.Details;
             lvScanResults.Update();
@@ -408,6 +412,13 @@ namespace AcmeScanner
                 lviCurrent.SubItems.Add(cveCount == 0 ? "" : cveCount.ToString());
                 lviCurrent.SubItems.Add(current.patchLevelDetail.isLatest ? "" : "Missing");
                 lviCurrent.SubItems.Add(current.installDetail.Count == 0 ? "" : "Yes");
+                lviCurrent.SubItems.Add(current.product.signatureId);
+
+                if (current.installDetail.Count > 0)
+                {
+                    lviCurrent.SubItems.Add(current.installDetail[0].patch_id);
+                    lviCurrent.SubItems.Add(current.installDetail[0].url);
+                }
 
                 lviCurrent.Tag = current.product.signatureId;
 

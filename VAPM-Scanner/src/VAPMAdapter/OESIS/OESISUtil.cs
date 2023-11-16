@@ -143,6 +143,7 @@ namespace VAPMAdapter.OESIS
                 result.severity = jsonOut.severity;
                 result.security_update_id = jsonOut.result.security_update_id;
                 result.category = jsonOut.result.category;
+                result.patch_id = jsonOut.result.patch_id;
 
                 var md5Array = jsonOut.result.expected_sha256;
                 if (md5Array != null)
