@@ -53,6 +53,7 @@ namespace AcmeScanner
             this.tabPage3 = new System.Windows.Forms.TabPage();
             this.lvCatalog = new AcmeScanner.ScannerListView();
             this.panel5 = new System.Windows.Forms.Panel();
+            this.btnDomainCSV = new MaterialSkin.Controls.MaterialButton();
             this.btnFreshInstall = new MaterialSkin.Controls.MaterialButton();
             this.btnExportCSV = new MaterialSkin.Controls.MaterialButton();
             this.lblTotalInstalls = new System.Windows.Forms.Label();
@@ -394,6 +395,7 @@ namespace AcmeScanner
             // panel5
             // 
             this.panel5.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.panel5.Controls.Add(this.btnDomainCSV);
             this.panel5.Controls.Add(this.btnFreshInstall);
             this.panel5.Controls.Add(this.btnExportCSV);
             this.panel5.Controls.Add(this.lblTotalInstalls);
@@ -413,6 +415,28 @@ namespace AcmeScanner
             this.panel5.Size = new System.Drawing.Size(1052, 77);
             this.panel5.TabIndex = 5;
             // 
+            // btnDomainCSV
+            // 
+            this.btnDomainCSV.AutoSize = false;
+            this.btnDomainCSV.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.btnDomainCSV.Density = MaterialSkin.Controls.MaterialButton.MaterialButtonDensity.Default;
+            this.btnDomainCSV.Depth = 0;
+            this.btnDomainCSV.HighEmphasis = true;
+            this.btnDomainCSV.Icon = null;
+            this.btnDomainCSV.Location = new System.Drawing.Point(458, 21);
+            this.btnDomainCSV.Margin = new System.Windows.Forms.Padding(4, 6, 4, 6);
+            this.btnDomainCSV.MouseState = MaterialSkin.MouseState.HOVER;
+            this.btnDomainCSV.Name = "btnDomainCSV";
+            this.btnDomainCSV.NoAccentTextColor = System.Drawing.Color.Empty;
+            this.btnDomainCSV.Size = new System.Drawing.Size(110, 36);
+            this.btnDomainCSV.TabIndex = 13;
+            this.btnDomainCSV.Text = "Url CSV";
+            this.btnDomainCSV.Type = MaterialSkin.Controls.MaterialButton.MaterialButtonType.Contained;
+            this.btnDomainCSV.UseAccentColor = false;
+            this.btnDomainCSV.UseMnemonic = false;
+            this.btnDomainCSV.UseVisualStyleBackColor = true;
+            this.btnDomainCSV.Click += new System.EventHandler(this.btnUrlCSV_Click);
+            // 
             // btnFreshInstall
             // 
             this.btnFreshInstall.AutoSize = false;
@@ -421,12 +445,12 @@ namespace AcmeScanner
             this.btnFreshInstall.Depth = 0;
             this.btnFreshInstall.HighEmphasis = true;
             this.btnFreshInstall.Icon = null;
-            this.btnFreshInstall.Location = new System.Drawing.Point(671, 21);
+            this.btnFreshInstall.Location = new System.Drawing.Point(694, 21);
             this.btnFreshInstall.Margin = new System.Windows.Forms.Padding(4, 6, 4, 6);
             this.btnFreshInstall.MouseState = MaterialSkin.MouseState.HOVER;
             this.btnFreshInstall.Name = "btnFreshInstall";
             this.btnFreshInstall.NoAccentTextColor = System.Drawing.Color.Empty;
-            this.btnFreshInstall.Size = new System.Drawing.Size(124, 36);
+            this.btnFreshInstall.Size = new System.Drawing.Size(110, 36);
             this.btnFreshInstall.TabIndex = 12;
             this.btnFreshInstall.Text = "Fresh Install";
             this.btnFreshInstall.Type = MaterialSkin.Controls.MaterialButton.MaterialButtonType.Contained;
@@ -442,7 +466,7 @@ namespace AcmeScanner
             this.btnExportCSV.Depth = 0;
             this.btnExportCSV.HighEmphasis = true;
             this.btnExportCSV.Icon = null;
-            this.btnExportCSV.Location = new System.Drawing.Point(921, 21);
+            this.btnExportCSV.Location = new System.Drawing.Point(930, 21);
             this.btnExportCSV.Margin = new System.Windows.Forms.Padding(4, 6, 4, 6);
             this.btnExportCSV.MouseState = MaterialSkin.MouseState.HOVER;
             this.btnExportCSV.Name = "btnExportCSV";
@@ -503,12 +527,12 @@ namespace AcmeScanner
             this.btnLookupCVE.Depth = 0;
             this.btnLookupCVE.HighEmphasis = true;
             this.btnLookupCVE.Icon = null;
-            this.btnLookupCVE.Location = new System.Drawing.Point(539, 21);
+            this.btnLookupCVE.Location = new System.Drawing.Point(576, 21);
             this.btnLookupCVE.Margin = new System.Windows.Forms.Padding(4, 6, 4, 6);
             this.btnLookupCVE.MouseState = MaterialSkin.MouseState.HOVER;
             this.btnLookupCVE.Name = "btnLookupCVE";
             this.btnLookupCVE.NoAccentTextColor = System.Drawing.Color.Empty;
-            this.btnLookupCVE.Size = new System.Drawing.Size(124, 36);
+            this.btnLookupCVE.Size = new System.Drawing.Size(110, 36);
             this.btnLookupCVE.TabIndex = 4;
             this.btnLookupCVE.Text = "Lookup CVE";
             this.btnLookupCVE.Type = MaterialSkin.Controls.MaterialButton.MaterialButtonType.Contained;
@@ -544,7 +568,7 @@ namespace AcmeScanner
             this.btnListCatalogCVE.Depth = 0;
             this.btnListCatalogCVE.HighEmphasis = true;
             this.btnListCatalogCVE.Icon = null;
-            this.btnListCatalogCVE.Location = new System.Drawing.Point(803, 21);
+            this.btnListCatalogCVE.Location = new System.Drawing.Point(812, 21);
             this.btnListCatalogCVE.Margin = new System.Windows.Forms.Padding(4, 6, 4, 6);
             this.btnListCatalogCVE.MouseState = MaterialSkin.MouseState.HOVER;
             this.btnListCatalogCVE.Name = "btnListCatalogCVE";
@@ -638,5 +662,6 @@ namespace AcmeScanner
         private Label label3;
         private MaterialSkin.Controls.MaterialButton btnExportCSV;
         private MaterialSkin.Controls.MaterialButton btnFreshInstall;
+        private MaterialSkin.Controls.MaterialButton btnDomainCSV;
     }
 }

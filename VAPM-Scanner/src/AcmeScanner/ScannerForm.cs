@@ -706,5 +706,71 @@ namespace AcmeScanner
             }
         }
 
+        private void ForceWrite(StringBuilder sb, string filename)
+        {
+            if (File.Exists(filename))
+            {
+                File.Delete(filename);
+            }
+
+            File.WriteAllText(filename, sb.ToString());
+        }
+
+        private void btnUrlCSV_Click(object sender, EventArgs e)
+        {
+            if(staticSignatureCatalogResults == null || staticSignatureCatalogResults.Count == 0)
+            {
+                ShowMessageDialog("Load the Catalog first to generate the URLs", false);
+                return;
+            }
+
+            StringBuilder urlOutput = new StringBuilder();
+            urlOutput.AppendLine("Application,URL,Architecture,Language");
+
+            StringBuilder domainOutput = new StringBuilder();
+
+            HashSet<string> domains = new HashSet<string>();
+            foreach(CatalogSignature signature in staticSignatureCatalogResults.Values)
+            {
+                foreach(CatalogPatchAssociation association in signature.PatchAssociations)
+                {
+                    if(association.PatchAggregation != null && association.PatchAggregation.DownloadDetailsList != null)
+                    {
+                        foreach(CatalogDownloadDetails details in association.PatchAggregation.DownloadDetailsList)
+                        {
+                            urlOutput.Append(signature.Name);
+                            urlOutput.Append(",");
+
+                            urlOutput.Append(details.Link);
+                            urlOutput.Append(",");
+
+                            if (details.Architecture != null)
+                                urlOutput.Append(details.Architecture);
+
+                            urlOutput.Append(",");
+
+                            if (details.Language != null)
+                                urlOutput.Append(details.Language);
+
+                            urlOutput.AppendLine();
+
+                            Uri myUri = new Uri(details.Link);
+                            string host = myUri.Host;
+
+                            if (!domains.Contains(host))
+                            {
+                                domains.Add(host);
+                                domainOutput.AppendLine(host);
+                            }
+                        }
+                    }
+                }
+            }
+
+            ForceWrite(urlOutput, "urls.csv");
+            ForceWrite(domainOutput, "domains.csv");
+
+            ShowMessageDialog("The files \"urls.csv\" and \"domains.csv\" have been created in the working directory.", false);
+        }
     }
 }

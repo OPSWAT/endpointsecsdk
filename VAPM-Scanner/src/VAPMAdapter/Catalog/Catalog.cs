@@ -51,11 +51,12 @@ namespace VAPMAdapter.Catalog
                     Products = new Products();
                     CheckSuccess(Products.Load(catalogRoot + "/products.json"));
 
-                    Patch_Associations = new Patch_Associations();
-                    CheckSuccess(Patch_Associations.Load(catalogRoot + "/patch_associations.json"));
-
                     Patch_Aggregations = new Patch_Aggregations();
                     CheckSuccess(Patch_Aggregations.Load(catalogRoot + "/patch_aggregation.json"));
+
+                    Patch_Associations = new Patch_Associations();
+                    CheckSuccess(Patch_Associations.Load(catalogRoot + "/patch_associations.json",Patch_Aggregations));
+
 
                     Vuln_Associations = new Vuln_Associations();
                     CheckSuccess(Vuln_Associations.Load(catalogRoot + "/vuln_associations.json"));
@@ -89,6 +90,7 @@ namespace VAPMAdapter.Catalog
         {
             return Vuln_Associations.GetList();
         }
+
 
         public List<CatalogVulnerabilityAssociation> GetVulnerabilityAssociationFromProductId(string productID)
         {

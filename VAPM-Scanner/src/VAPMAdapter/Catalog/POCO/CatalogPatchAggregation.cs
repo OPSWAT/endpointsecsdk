@@ -10,12 +10,14 @@ using System.Collections.Generic;
 
 namespace VAPMAdapter.Catalog.POCO
 {
-    public class CatalogPatchAssociation
+    public class CatalogPatchAggregation
     {
-        public List<string>             SigIdList;
-        public string                   PatchId;
-        public bool                     IsLatest;
-        public string                   VersionComparer;
-        public CatalogPatchAggregation  PatchAggregation;
+        public List<CatalogDownloadDetails> DownloadDetailsList;
+        public string ReleaseNoteLink;
+        public string Release_Date;
+        public List<string> Architectures;
+        public string PatchId;
+        public string Fresh_Installable;
+        public string Requires_Reboot;
     }
 }
