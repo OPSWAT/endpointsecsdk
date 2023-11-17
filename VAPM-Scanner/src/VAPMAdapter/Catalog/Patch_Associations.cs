@@ -17,14 +17,15 @@ namespace VAPMAdapter.Catalog
 {
     internal class Patch_Associations
     {
-        JObject pAssociationJson;
         private string jsonLocation;
+        Patch_Aggregations patch_Aggregations = null;
         public Dictionary<string, List<CatalogPatchAssociation>> sigIdToPatchAssociation = null;
         List<CatalogPatchAssociation> patchAssociationList = null;
 
 
-        public bool Load(string fileLocation)
+        public bool Load(string fileLocation, Patch_Aggregations patchAgreggations)
         {
+            this.patch_Aggregations = patchAgreggations;
             jsonLocation = fileLocation;
             return true;
         }
@@ -81,6 +82,7 @@ namespace VAPMAdapter.Catalog
             }
 
             List<CatalogPatchAssociation> result = null;
+            Dictionary<string, CatalogPatchAggregation> patchAggregationDictionary = patch_Aggregations.GetPatchIdAggregationsDictionary();
 
             if (result == null)
             {
@@ -95,6 +97,11 @@ namespace VAPMAdapter.Catalog
 
                         newPatchAssociation.PatchId = (string)jsonPatchAssociationsList[current.Name]["patch_id"];
                         newPatchAssociation.SigIdList = JsonUtil.GetStringArrayFromJson((JArray)jsonPatchAssociationsList[current.Name]["v4_signatures"]);
+                        
+                        if(patchAggregationDictionary.ContainsKey(newPatchAssociation.PatchId))
+                        {
+                            newPatchAssociation.PatchAggregation = patchAggregationDictionary[newPatchAssociation.PatchId];
+                        }
 
                         result.Add(newPatchAssociation);
                     }
