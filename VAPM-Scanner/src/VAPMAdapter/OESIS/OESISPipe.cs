@@ -228,6 +228,7 @@ namespace VAPMAdapter.OESIS
             //string json_in = "{\"input\" : {\"method\" : 50300, \"signature\" :" + signatureId + ", \"download\": " + download + ", \"index\" : " + index + ", \"language\" : \"fr-lu\" }}";
 
             string json_in = "{\"input\" : {\"method\" : 50300, \"signature\" :" + signatureId + ", \"download\": " + download + ", \"index\" : " + index + "}}";
+            
             if (index == -1)
             {
                 json_in = "{\"input\" : {\"method\" : 50300, \"signature\" :" + signatureId + ", \"download\": " + download + " }}";
@@ -235,6 +236,23 @@ namespace VAPMAdapter.OESIS
 
             int rc = Invoke(json_in, out result);
 
+
+            if (rc < 0 && rc != -1039)//Ignore -1039 since that is end of index
+            {
+                throw new Exception("GetLatestInstaller failed to run correctly.  " + result);
+            }
+
+            return result;
+        }
+
+        public static string GetLatestInstaller(string signatureId, int download, string downloadPath)
+        {
+            string result = "";
+
+            downloadPath = downloadPath.Replace("\\", "/");
+            string json_in = "{\"input\" : {\"method\" : 50300, \"signature\" :" + signatureId + ", \"download\": " + download + ", \"path\":\"" + downloadPath + "\"}}";
+
+            int rc = Invoke(json_in, out result);
 
             if (rc < 0 && rc != -1039)//Ignore -1039 since that is end of index
             {
