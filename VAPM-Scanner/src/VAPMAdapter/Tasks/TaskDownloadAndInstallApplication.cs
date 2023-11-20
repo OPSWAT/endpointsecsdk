@@ -61,7 +61,18 @@ namespace VAPMAdapter.Tasks
             {
                 try
                 {
-                    string installDetailString = OESISPipe.GetLatestInstaller(signatureId, 0, index);
+                    string installDetailString = null;
+
+                    // Office 365 requires you pass in a 1 because it's Orchestrating the download tool for office 365
+                    if (signatureId != "3029")
+                    {
+                        installDetailString = OESISPipe.GetLatestInstaller(signatureId, 0, index);
+                    }
+                    else
+                    {
+                        installDetailString = OESISPipe.GetLatestInstaller(signatureId, 1, Directory.GetCurrentDirectory());                        break;
+                    }
+
                     InstallerDetail currentDetail = OESISUtil.GetInstallerDetail(installDetailString);
                     index++;
                     if (currentDetail.result_code != -1039)
@@ -121,7 +132,12 @@ namespace VAPMAdapter.Tasks
 
                 try
                 {
-                    DownloadPatches(current, localFileName);
+                    // Note Do not download Office 365 here
+                    if (signatureId != "3029")
+                    {
+                        DownloadPatches(current, localFileName);
+                    }
+
                     InstallPatch(signatureId, localFileName);
                 }
                 catch(Exception e)
