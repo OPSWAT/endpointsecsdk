@@ -3,5 +3,5 @@
 
 ### Contents
 
-#### `VAPM-Scanner`
-Contains a sample implementation to help develop to the SDK Vulnerability and Patch Modules.  This can Scan for applications, shows how to query Operating System Updater, and will load data from the Vulnerability Catalog.
+#### `opswat-posture`
+Contains a sample implementation to help understand some use cases that can be used with the Compliance Module.  This provides use cases for creating a policy for validating posture on an endpoint, providing a basic security score, enforcing policy based on geolocation and how to add browser plugins into a security policy.
