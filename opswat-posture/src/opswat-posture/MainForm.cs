@@ -23,14 +23,16 @@ namespace OPSWATPosture
     public partial class MainForm : Form
     {
 
-        private System.ComponentModel.BackgroundWorker validatePolicyWorker;
-        private System.ComponentModel.BackgroundWorker getSecurityScoreWorker;
-        private System.ComponentModel.BackgroundWorker geoLocationWorker;
-        private System.ComponentModel.BackgroundWorker updateSDKWorker;
+        private BackgroundWorker validatePolicyWorker;
+        private BackgroundWorker getSecurityScoreWorker;
+        private BackgroundWorker geoLocationWorker;
+        private BackgroundWorker updateSDKWorker;
+        private BackgroundWorker checkPluginsWorker;
 
 
-        private TaskValidatePolicy  taskValidatePolicy;
-        private TaskSecurityScore   taskSecurityScore;
+        private TaskValidatePolicy      taskValidatePolicy;
+        private TaskSecurityScore       taskSecurityScore;
+        private List<BrowserPlugins>    browserPluginList = null;
 
 
 
@@ -123,6 +125,16 @@ namespace OPSWATPosture
             updateSDKWorker.RunWorkerCompleted +=
                 new RunWorkerCompletedEventHandler(
             updateSDK_Worker_Completed);
+
+
+            checkPluginsWorker = new BackgroundWorker();
+            checkPluginsWorker.DoWork +=
+                new DoWorkEventHandler(checkPlugins_Worker_DoWork);
+            checkPluginsWorker.RunWorkerCompleted +=
+                new RunWorkerCompletedEventHandler(
+            checkPlugins_Worker_Completed);
+
+            
 
             UpdateFilesOnStartup();
         }
@@ -289,8 +301,31 @@ namespace OPSWATPosture
             LoadLists();
         }
 
+        ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>
+        ///  Worker Threads - Checkin Plugins
+        /// </summary>
+        ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        private void checkPlugins_Worker_DoWork(object sender, DoWorkEventArgs e)
+        {
+            checkPlugins();
+        }
+
+        private void checkPlugins_Worker_Completed(object sender, RunWorkerCompletedEventArgs e)
+        {
+            updatePluginUI();
+            pbLoader.SendToBack();
+            btnCheckPlugins.Enabled = true;
+
+            pbLoader.Visible = false;
+        }
 
 
+        ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>
+        ///  Buttons and other logic
+        /// </summary>
+        ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         private void cbAntimalwareEnabled_CheckedChanged(object sender, EventArgs e)
         {
             if(cbAntimalwareEnabled.Checked)
@@ -330,8 +365,6 @@ namespace OPSWATPosture
         private bool checkFirewall()
         {
             bool result = true;
-
-
             return result;
         }
 
@@ -480,11 +513,31 @@ namespace OPSWATPosture
             return result;
         }
 
+        private bool isBrowswerBlocked(BrowserPlugins browserPlugin)
+        {
+            bool result = false;
 
-        private void btnCheckPlugins_Click(object sender, EventArgs e)
+            foreach (string blockedItem in cblBrowsers.CheckedItems)
+            {
+                if (blockedItem == browserPlugin.browserName)
+                {
+                    result = true;
+                    break;
+                }
+            }
+
+            return result;
+        }
+
+
+        private void checkPlugins()
         {
             TaskGetPlugins task = new TaskGetPlugins();
-            List<BrowserPlugins> pluginList = task.GetPlugins();
+            browserPluginList = task.GetPlugins();
+        }
+
+        private void updatePluginUI()
+        {
             bool isAllowed = true;
 
             //
@@ -493,26 +546,34 @@ namespace OPSWATPosture
             lvPlugins.Items.Clear();
             lvPlugins.Columns.Clear();
             lvPlugins.Columns.Add("", 20);
-            lvPlugins.Columns.Add("Plugin",250);
-            lvPlugins.Columns.Add("Type",75);
-            lvPlugins.Columns.Add("Browser",125);
-            lvPlugins.Columns.Add("Description",400);
+            lvPlugins.Columns.Add("Plugin", 250);
+            lvPlugins.Columns.Add("Type", 75);
+            lvPlugins.Columns.Add("Browser", 125);
+            lvPlugins.Columns.Add("Description", 400);
             lvPlugins.View = View.Details;
             lvPlugins.Update();
 
 
-            foreach (BrowserPlugins current in pluginList)
+            foreach (BrowserPlugins current in browserPluginList)
             {
-                foreach(PluginDetail currentDetail in current.pluginList)
+                bool browserBlocked = false;
+                if (isBrowswerBlocked(current))
+                {
+                    isAllowed = false;
+                    browserBlocked = true;
+                }
+
+
+                foreach (PluginDetail currentDetail in current.pluginList)
                 {
                     bool isBlocked = isPluginBlocked(currentDetail);
-                    if(isBlocked)
+                    if (isBlocked)
                     {
                         isAllowed = false;
                     }
 
                     ListViewItem lviCurrent = new ListViewItem();
-                    lviCurrent.Text = isBlocked ? "*" : "";
+                    lviCurrent.Text = isBlocked || browserBlocked ? "*" : "";
                     lviCurrent.SubItems.Add(currentDetail.name);
                     lviCurrent.SubItems.Add(currentDetail.type);
                     lviCurrent.SubItems.Add(current.browserName);
@@ -533,7 +594,16 @@ namespace OPSWATPosture
             }
 
             Cursor.Current = Cursors.Default;
+        }
 
+        private void btnCheckPlugins_Click(object sender, EventArgs e)
+        {
+            pbLoader.BringToFront();
+            pbLoader.Visible = true;
+            lvPlugins.Clear();
+            btnCheckPlugins.Enabled = false;
+
+            checkPluginsWorker.RunWorkerAsync(true);
         }
     }
 }

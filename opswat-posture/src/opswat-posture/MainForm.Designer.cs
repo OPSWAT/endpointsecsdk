@@ -31,8 +31,8 @@ namespace OPSWATPosture
         private void InitializeComponent()
         {
             System.Windows.Forms.ListViewItem listViewItem3 = new System.Windows.Forms.ListViewItem("");
-            System.Windows.Forms.ListViewItem listViewItem4 = new System.Windows.Forms.ListViewItem("");
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
+            System.Windows.Forms.ListViewItem listViewItem4 = new System.Windows.Forms.ListViewItem("");
             this.GeolocationTab = new System.Windows.Forms.TabControl();
             this.tabPolicyCheck = new System.Windows.Forms.TabPage();
             this.lvPolicy = new System.Windows.Forms.ListView();
@@ -99,14 +99,16 @@ namespace OPSWATPosture
             this.cbAllowedCountries = new System.Windows.Forms.CheckedListBox();
             this.rbDistanceInMiles = new System.Windows.Forms.RadioButton();
             this.tabPage2 = new System.Windows.Forms.TabPage();
+            this.label21 = new System.Windows.Forms.Label();
+            this.cblBrowsers = new System.Windows.Forms.CheckedListBox();
+            this.label20 = new System.Windows.Forms.Label();
+            this.clbBlockedPlugins = new System.Windows.Forms.CheckedListBox();
             this.btnCheckPlugins = new System.Windows.Forms.Button();
             this.pbPluginStatus = new System.Windows.Forms.PictureBox();
             this.label12 = new System.Windows.Forms.Label();
             this.label13 = new System.Windows.Forms.Label();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.pbLoader = new System.Windows.Forms.PictureBox();
-            this.clbBlockedPlugins = new System.Windows.Forms.CheckedListBox();
-            this.label20 = new System.Windows.Forms.Label();
             this.lvPlugins = new OPSWATPosture.PostureListView();
             this.GeolocationTab.SuspendLayout();
             this.tabPolicyCheck.SuspendLayout();
@@ -815,6 +817,8 @@ namespace OPSWATPosture
             // 
             // tabPage2
             // 
+            this.tabPage2.Controls.Add(this.label21);
+            this.tabPage2.Controls.Add(this.cblBrowsers);
             this.tabPage2.Controls.Add(this.label20);
             this.tabPage2.Controls.Add(this.clbBlockedPlugins);
             this.tabPage2.Controls.Add(this.lvPlugins);
@@ -827,6 +831,54 @@ namespace OPSWATPosture
             this.tabPage2.TabIndex = 3;
             this.tabPage2.Text = "Browser Plugins";
             this.tabPage2.UseVisualStyleBackColor = true;
+            // 
+            // label21
+            // 
+            this.label21.AutoSize = true;
+            this.label21.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label21.Location = new System.Drawing.Point(474, 25);
+            this.label21.Name = "label21";
+            this.label21.Size = new System.Drawing.Size(152, 20);
+            this.label21.TabIndex = 15;
+            this.label21.Text = "Blocked Browsers";
+            // 
+            // cblBrowsers
+            // 
+            this.cblBrowsers.FormattingEnabled = true;
+            this.cblBrowsers.Items.AddRange(new object[] {
+            "Microsoft Edge",
+            "Mozilla Firefox (x64)",
+            "Internet Explorer (x64)",
+            "Opera"});
+            this.cblBrowsers.Location = new System.Drawing.Point(478, 49);
+            this.cblBrowsers.Name = "cblBrowsers";
+            this.cblBrowsers.Size = new System.Drawing.Size(310, 94);
+            this.cblBrowsers.TabIndex = 14;
+            // 
+            // label20
+            // 
+            this.label20.AutoSize = true;
+            this.label20.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label20.Location = new System.Drawing.Point(136, 25);
+            this.label20.Name = "label20";
+            this.label20.Size = new System.Drawing.Size(136, 20);
+            this.label20.TabIndex = 13;
+            this.label20.Text = "Blocked Plugins";
+            // 
+            // clbBlockedPlugins
+            // 
+            this.clbBlockedPlugins.FormattingEnabled = true;
+            this.clbBlockedPlugins.Items.AddRange(new object[] {
+            "Google Docs Offline",
+            "Firefox Alpenglow",
+            "Opera Wallet",
+            "Opera Ad Blocker",
+            "Cashback Assistant",
+            "Microsoft OneDrive for Business Browser Helper"});
+            this.clbBlockedPlugins.Location = new System.Drawing.Point(140, 49);
+            this.clbBlockedPlugins.Name = "clbBlockedPlugins";
+            this.clbBlockedPlugins.Size = new System.Drawing.Size(310, 94);
+            this.clbBlockedPlugins.TabIndex = 12;
             // 
             // btnCheckPlugins
             // 
@@ -886,32 +938,6 @@ namespace OPSWATPosture
             this.pbLoader.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
             this.pbLoader.TabIndex = 5;
             this.pbLoader.TabStop = false;
-            // 
-            // clbBlockedPlugins
-            // 
-            this.clbBlockedPlugins.FormattingEnabled = true;
-            this.clbBlockedPlugins.Items.AddRange(new object[] {
-            "Google Docs Offline",
-            "Firefox Alpenglow",
-            "Opera Wallet",
-            "Opera Ad Blocker",
-            "Cashback Assistant",
-            "Microsoft OneDrive for Business Browser Helper",
-            "Send to OneNote From Internet Explorer button"});
-            this.clbBlockedPlugins.Location = new System.Drawing.Point(140, 34);
-            this.clbBlockedPlugins.Name = "clbBlockedPlugins";
-            this.clbBlockedPlugins.Size = new System.Drawing.Size(310, 109);
-            this.clbBlockedPlugins.TabIndex = 12;
-            // 
-            // label20
-            // 
-            this.label20.AutoSize = true;
-            this.label20.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label20.Location = new System.Drawing.Point(136, 11);
-            this.label20.Name = "label20";
-            this.label20.Size = new System.Drawing.Size(136, 20);
-            this.label20.TabIndex = 13;
-            this.label20.Text = "Blocked Plugins";
             // 
             // lvPlugins
             // 
@@ -1051,6 +1077,8 @@ namespace OPSWATPosture
         private PostureListView lvPlugins;
         private Label label20;
         private CheckedListBox clbBlockedPlugins;
+        private Label label21;
+        private CheckedListBox cblBrowsers;
     }
 }
 
