@@ -13,6 +13,7 @@ using System;
 using VAPMAdapter.OESIS.POCO;
 using System.Reflection.Metadata;
 using VAPMAdapter.Catalog;
+using VAPMAdapater;
 
 namespace VAPMAdapter.Tasks
 {
@@ -99,16 +100,16 @@ namespace VAPMAdapter.Tasks
             //
             // Now Load all the Patch databases
             //
-            OESISPipe.LoadPatchDatabase("patch.dat", ""); // Note for a scan only you can skip loading this.  Checksums are not needed for scan
-            OESISPipe.ConsumeOfflineVmodDatabase("vmod.dat"); // This loads Third-Party Patches. You can also use vmod-oft.dat if you do not need a CVE Description or text
+            OESISPipe.LoadPatchDatabase(VAPMSettings.THIRD_PARTY_PATCH_DB, ""); // Note for a scan only you can skip loading this.  Checksums are not needed for scan
+            OESISPipe.ConsumeOfflineVmodDatabase(VAPMSettings.THIRD_PARTY_VULNERABILITY_DB); // This loads Third-Party Patches. You can also use vmod-oft.dat if you do not need a CVE Description or text
 
             //
             // Load Windows Detection libraries
             //
             if (scanWindows)
             {
-                OESISPipe.LoadPatchDatabase("wuo.dat", ""); // This is needed for scanning for CVE's in Microsoft Products. 
-                OESISPipe.ConsumeOfflineVmodDatabase("wiv-lite.dat"); // This is needed for Microsoft Product CVE Detection
+                OESISPipe.LoadPatchDatabase(VAPMSettings.WINDOWS_PATCH_DB, ""); // This is needed for scanning for CVE's in Microsoft Products. 
+                OESISPipe.ConsumeOfflineVmodDatabase(VAPMSettings.WINDOWS_VULNERABILITY_DB); // This is needed for Microsoft Product CVE Detection
             }
 
             //

@@ -31,12 +31,11 @@ namespace VAPMAdapter.Updates
         {
             string destPath = Directory.GetCurrentDirectory();
 
-            DownloadDBFile(destPath, "vmod.dat");
-            DownloadDBFile(destPath, "patch.dat");
-            DownloadDBFile(destPath, "wuo.dat");
-            DownloadDBFile(destPath, "wiv-lite.dat");
-            DownloadDBFile(destPath, "ap_checksum.dat");
+            DownloadDBFile(destPath, VAPMSettings.THIRD_PARTY_VULNERABILITY_DB);
+            DownloadDBFile(destPath, VAPMSettings.THIRD_PARTY_PATCH_DB);
+            DownloadDBFile(destPath, VAPMSettings.WINDOWS_PATCH_DB);
+            DownloadDBFile(destPath, VAPMSettings.WINDOWS_VULNERABILITY_DB);
+            DownloadDBFile(destPath, VAPMSettings.PATCH_CHECKSUMS_DB);
         }
-
     }
 }
