@@ -21,6 +21,13 @@ namespace VAPMAdapater
         private static string VCR_URL = "https://vcr.opswat.com/gw/file/download/%file%?type=1&token=%token%";
         private static string SDK_INDEX_URL = "https://software.opswat.com/OESIS_V4/OesisPackageLinks.xml";
 
+        public static string THIRD_PARTY_VULNERABILITY_DB   = "v2mod.dat";
+        public static string THIRD_PARTY_PATCH_DB           = "patch.dat";
+        public static string WINDOWS_VULNERABILITY_DB       = "wiv-lite.dat";
+        public static string WINDOWS_PATCH_DB               = "wuo.dat";
+        public static string PATCH_CHECKSUMS_DB             = "ap_checksum.dat";
+
+
         public static string getTokenDownloadURL(string fileName)
         {
             string result = VCR_URL.Replace("%token%", DOWNLOAD_TOKEN);

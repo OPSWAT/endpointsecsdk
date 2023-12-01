@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Security.Cryptography;
 using System.Text;
+using VAPMAdapater;
 using VAPMAdapater.Log;
 using VAPMAdapter.OESIS.POCO;
 
@@ -282,22 +283,22 @@ namespace VAPMAdapter.OESIS
         {
             bool result = true;
 
-            if (!File.Exists("vmod.dat"))
+            if (!File.Exists(VAPMSettings.THIRD_PARTY_VULNERABILITY_DB))
             {
                 result = false;
             }
 
-            if (!File.Exists("patch.dat"))
+            if (!File.Exists(VAPMSettings.THIRD_PARTY_PATCH_DB))
             {
                 result = false;
             }
 
-            if (!File.Exists("wuo.dat"))
+            if (!File.Exists(VAPMSettings.WINDOWS_PATCH_DB))
             {
                 result = false;
             }
 
-            if (!File.Exists("wiv-lite.dat"))
+            if (!File.Exists(VAPMSettings.WINDOWS_VULNERABILITY_DB))
             {
                 result = false;
             }
