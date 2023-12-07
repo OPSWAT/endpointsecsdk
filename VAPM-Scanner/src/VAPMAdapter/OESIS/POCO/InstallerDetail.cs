@@ -21,5 +21,7 @@ namespace VAPMAdapter.OESIS.POCO
         public string category;
         public string security_update_id;
         public string patch_id;
+        public string path;
+        public string language;
     }
 }

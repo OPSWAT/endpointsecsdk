@@ -145,6 +145,8 @@ namespace VAPMAdapter.OESIS
                 result.security_update_id = jsonOut.result.security_update_id;
                 result.category = jsonOut.result.category;
                 result.patch_id = jsonOut.result.patch_id;
+                result.path = jsonOut.result.path;
+                result.language = jsonOut.result.language;
 
                 var md5Array = jsonOut.result.expected_sha256;
                 if (md5Array != null)
@@ -163,6 +165,37 @@ namespace VAPMAdapter.OESIS
 
             return result;
         }
+
+
+        // Expects JSON from GetLatestInstaller Products
+        public static OSInfoDetail GetOSInfo(string osInfo_json)
+        {
+            OSInfoDetail result = new OSInfoDetail();
+
+            dynamic jsonOut = JObject.Parse(osInfo_json);
+            if (jsonOut.result != null)
+            {
+                result.code = jsonOut.result.code;
+                result.version = jsonOut.result.version;
+                result.architecture = jsonOut.result.architecture;
+                result.service_pack = jsonOut.result.service_pack;
+                result.os_type = jsonOut.result.os_type;
+                result.os_id = jsonOut.result.os_id;
+                result.compatibility_mode_detected = jsonOut.result.details.compatibility_mode_detected;
+                result.computer_type = jsonOut.result.details.computer_type;
+                result.os_language = jsonOut.result.details.os_language;
+                result.domain = jsonOut.result.details.domain;
+                result.netbios_name = jsonOut.result.details.netbios_name;
+                result.host_name = jsonOut.result.details.host_name;
+            }
+            else
+            {
+                result.code = jsonOut.error.code;
+            }
+
+            return result;
+        }
+
 
 
         // Expects JSON from GetLatestInstaller Products
@@ -310,6 +343,29 @@ namespace VAPMAdapter.OESIS
             }
 
             return result;
+        }
+
+        public static void CleanupDebugFiles()
+        {
+            foreach(string f in Directory.EnumerateFiles(Directory.GetCurrentDirectory(),"v4DebugInfo*"))
+            {
+                File.Delete(f);
+            }
+        }
+
+        public static void MoveDebugFiles(string destPath)
+        {
+            if(!Directory.Exists(destPath))
+            {
+                Directory.CreateDirectory(destPath);
+            }
+
+            foreach (string f in Directory.EnumerateFiles(Directory.GetCurrentDirectory(), "v4DebugInfo*"))
+            {
+                FileInfo fileInfo = new FileInfo(f);
+                string newFile = Path.Combine(destPath, fileInfo.Name);
+                File.Move(f, newFile, true);
+            }
         }
 
     }

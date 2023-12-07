@@ -47,7 +47,7 @@ namespace VAPMAdapter.Tasks
             return result;
         }
 
-        private static List<InstallerDetail> GetInstallDetailList(Product product)
+        private static List<InstallerDetail> GetInstallDetailListForScan(Product product)
         {
             List<InstallerDetail> result = new List<InstallerDetail>();
             bool installerStillExists = true;
@@ -58,8 +58,9 @@ namespace VAPMAdapter.Tasks
                 try
                 {
 
-                    // Note a 2 is used for checking applicability for a signature. 
-                    string installDetailString = OESISPipe.GetLatestInstaller(product.signatureId, 2, index);
+                    // Note a 2 is used for checking applicability for a signature
+                    // This will get the currently installed product.
+                    string installDetailString = OESISPipe.GetLatestInstaller(product.signatureId, 2, index,null);
                     InstallerDetail currentDetail = OESISUtil.GetInstallerDetail(installDetailString);
                     index++;
                     if (currentDetail.result_code != -1039)
@@ -138,7 +139,7 @@ namespace VAPMAdapter.Tasks
                     productScanResult.product = current;
                     productScanResult.patchLevelDetail = GetPatchLevel(current);
                     productScanResult.cveDetailList = GetVulnerabilities(current,out productScanResult.cveJson);
-                    productScanResult.installDetail = GetInstallDetailList(current);
+                    productScanResult.installDetail = GetInstallDetailListForScan(current);
                     result.Add(current.signatureId.ToString(), productScanResult);
                 }
                 catch (Exception e)

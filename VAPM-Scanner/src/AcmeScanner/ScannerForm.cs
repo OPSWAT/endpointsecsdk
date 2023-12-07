@@ -181,12 +181,33 @@ namespace AcmeScanner
 
         private void installVAPMPatchWorker_DoWork(object sender, DoWorkEventArgs e)
         {
-            string signatureId = (string)e.Argument;
-            TaskDownloadAndInstallApplication.InstallAndDownload(signatureId);
+            InstallCommand installCommand = (InstallCommand)e.Argument;
+            ProductInstallResult installResult = TaskDownloadAndInstallApplication.InstallAndDownload(installCommand.signatureId,installCommand.freshInstall);
+            e.Result = installResult;
         }
 
         private void installVAPMPatchWorker_Completed(object sender, RunWorkerCompletedEventArgs e)
         {
+            if(e.Result != null && e.Result is ProductInstallResult)
+            {
+                ProductInstallResult productInstallResult = (ProductInstallResult)e.Result;
+
+                if (productInstallResult.success)
+                {
+                    ShowMessageDialog("Successfully installed latest application.",false);
+                }
+                else
+                {
+                    ShowMessageDialog("An error occured during install: \n" + productInstallResult.errorMessage , false);
+                }
+            }
+            else
+            {
+                ShowMessageDialog("Unexpected result occurred installing the product",false);
+            }
+
+
+
             // Do a scan again
             //lvScanResults.Items.Clear();
             //scanWorker.RunWorkerAsync(true);
@@ -198,7 +219,7 @@ namespace AcmeScanner
             string kb = (string)e.Argument;
             OnlinePatchDetail patchDetail = staticOrchestrationScanResults[kb];
 
-            TaskOnlineDownloadAndInstall.InstallAndDownload(patchDetail);
+            TaskOrchestrateDownloadAndInstall.InstallAndDownload(patchDetail);
         }
 
         private void installOnlinePatchWorker_Completed(object sender, RunWorkerCompletedEventArgs e)
@@ -301,6 +322,7 @@ namespace AcmeScanner
 
             lvCatalog.Columns.Clear();
             lvCatalog.Columns.Add("Application", 300);
+            lvCatalog.Columns.Add("SigId", 80);
             lvCatalog.Columns.Add("CVE Count", 80);
             lvCatalog.Columns.Add("Installable", 80);
             lvCatalog.Columns.Add("Platform", 100);
@@ -334,6 +356,7 @@ namespace AcmeScanner
 
                     ListViewItem lviCurrent = new ListViewItem();
                     lviCurrent.Text = signature.Name;
+                    lviCurrent.SubItems.Add(signature.Id);
                     lviCurrent.SubItems.Add(signature.CVECount.ToString());
                     lviCurrent.SubItems.Add(supportsPatch ? "Yes" : "");
                     lviCurrent.SubItems.Add(signature.Platform);
@@ -519,7 +542,8 @@ namespace AcmeScanner
                             if (ShowMessageDialog("Are you sure you want to install \"" + scanResult.product.name + "\"", true))
                             {
                                 ShowLoading(true);
-                                installVAPMPatchWorker.RunWorkerAsync(signatureId);
+                                InstallCommand installCommand = new InstallCommand(signatureId, false);
+                                installVAPMPatchWorker.RunWorkerAsync(installCommand);
                             }
                         }
                         else
@@ -687,7 +711,8 @@ namespace AcmeScanner
                         if (ShowMessageDialog("Are you sure you want to install \"" + sig.Name + "\"", true))
                         {
                             ShowLoading(true);
-                            installVAPMPatchWorker.RunWorkerAsync(signatureId);
+                            InstallCommand installCommand = new InstallCommand(signatureId, true);
+                            installVAPMPatchWorker.RunWorkerAsync(installCommand);
                         }
                     }
                     else

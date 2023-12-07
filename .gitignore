@@ -4,3 +4,8 @@
 
 /VAPM-Scanner/src/AcmeScanner/license.cfg
 /VAPM-Scanner/src/AcmeScanner/pass_key.txt
+/simple-samples/vulnerability/scan3rdParty-cSharp/src/scan-vuln/obj/Debug
+/simple-samples/vulnerability/scan3rdParty-cSharp/src/scan-vuln/bin/Debug
+/simple-samples/vulnerability/scan3rdParty-cSharp/src/packages/Newtonsoft.Json.13.0.1
+/simple-samples/vulnerability/scan3rdParty-cSharp/src/.vs/WindowsOfflinePatch/FileContentIndex
+/simple-samples/vulnerability/scan3rdParty-cSharp/src/.vs/scan-vuln

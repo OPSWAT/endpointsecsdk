@@ -81,15 +81,25 @@ namespace VAPMAdapater.Updates
 
             if (File.Exists(localFilePath))
             {
-                if (CheckSha256(localFilePath, sha256Hash))
+                if (sha256Hash != null)
                 {
-                    result = true;
+
+                    if (CheckSha256(localFilePath, sha256Hash))
+                    {
+                        result = true;
+                    }
+                    else
+                    {
+                        Console.WriteLine("Failed to validate hash : " + localFilePath);
+                        Console.WriteLine("Failed to validate hash : " + sha256Hash);
+                    }
                 }
                 else
                 {
-                    Console.WriteLine("Failed to validate hash : " + localFilePath);
-                    Console.WriteLine("Failed to validate hash : " + sha256Hash);
+                    Logger.Log("Checksum Validation did not occur because there was no 256 key");
+                    result = true;
                 }
+
             }
             else
             {

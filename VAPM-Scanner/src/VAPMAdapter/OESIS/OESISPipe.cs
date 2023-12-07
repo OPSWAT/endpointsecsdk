@@ -9,12 +9,14 @@
 using System;
 using System.IO;
 using System.Reflection;
+using System.Text;
+using VAPMAdapter.Catalog;
 
 namespace VAPMAdapter.OESIS
 {
     internal class OESISPipe
     {
-        public static void InitializeFramework(bool onlineMode)
+        public static void InitializeFramework(bool enableLogging)
         {
             // This code is used to initialize the OESIS Framework
             // The folling linkk describes the setup
@@ -23,16 +25,23 @@ namespace VAPMAdapter.OESIS
 
             string path = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
             string passkey = File.ReadAllText(path + "/pass_key.txt");
-            string config = "{ \"config\" : { \"passkey_string\": \"" + passkey + "\", \"enable_pretty_print\": true, \"online_mode\": false, \"silent_mode\": true } }";
+            StringBuilder configString = new StringBuilder();
 
-            if (onlineMode)
+            configString.Append("{");
+            configString.Append("\"config\":{\"passkey_string\":\"" + passkey + "\", \"enable_pretty_print\":true, \"online_mode\":false, \"silent_mode\":true}");
+
+            if(enableLogging)
             {
-                config = "{ \"config\" : { \"passkey_string\": \"" + passkey + "\", \"enable_pretty_print\": true, \"online_mode\": true, \"silent_mode\": true } }";
+                configString.Append(",");
+                configString.Append("\"config_debug\":{\"debug_log_level\":\"ALL\"}");
             }
 
-            IntPtr outPtr = IntPtr.Zero;
+            configString.Append("}");
+
+
             // Note if you get a Bad Image exception, that may be because Prefer 32-bit is checked
-            int rc = OESISAdapter.wa_api_setup(config, out outPtr);
+            IntPtr outPtr = IntPtr.Zero;
+            int rc = OESISAdapter.wa_api_setup(configString.ToString(), out outPtr);
             string json_out = "{ }";
             if (outPtr != IntPtr.Zero)
             {
@@ -221,14 +230,16 @@ namespace VAPMAdapter.OESIS
         }
 
 
-        public static string GetLatestInstaller(string signatureId, int download, int index)
+        public static string GetLatestInstaller(string signatureId, int download, int index, string language)
         {
             string result = "";
             // This is used to demonstrate languages
-            //string json_in = "{\"input\" : {\"method\" : 50300, \"signature\" :" + signatureId + ", \"download\": " + download + ", \"index\" : " + index + ", \"language\" : \"fr-lu\" }}";
-
             string json_in = "{\"input\" : {\"method\" : 50300, \"signature\" :" + signatureId + ", \"download\": " + download + ", \"index\" : " + index + "}}";
-            
+            if (language != null)
+            {
+                json_in = "{\"input\" : {\"method\" : 50300, \"signature\" :" + signatureId + ", \"download\": " + download + ", \"index\" : " + index + ",\"language\" : \"" + language + "\"}}";
+            }
+
             if (index == -1)
             {
                 json_in = "{\"input\" : {\"method\" : 50300, \"signature\" :" + signatureId + ", \"download\": " + download + " }}";
@@ -245,12 +256,12 @@ namespace VAPMAdapter.OESIS
             return result;
         }
 
-        public static string GetLatestInstaller(string signatureId, int download, string downloadPath)
+        public static string GetLatestInstaller(string signatureId, int download, string downloadPath, string language)
         {
             string result = "";
 
             downloadPath = downloadPath.Replace("\\", "/");
-            string json_in = "{\"input\" : {\"method\" : 50300, \"signature\" :" + signatureId + ", \"download\": " + download + ", \"path\":\"" + downloadPath + "\"}}";
+            string json_in = "{\"input\" : {\"method\" : 50300, \"signature\" :" + signatureId + ", \"download\": " + download + ", \"path\":\"" + downloadPath + "\",\"language\":\"" + language + "\"}}";
 
             int rc = Invoke(json_in, out result);
 
@@ -262,14 +273,14 @@ namespace VAPMAdapter.OESIS
             return result;
         }
 
-        public static string GetLatestInstaller(string signatureId)
+        public static string GetLatestInstaller(string signatureId, string language)
         {
-            return GetLatestInstaller(signatureId, 0, -1);
+            return GetLatestInstaller(signatureId, 0, -1,language);
         }
 
 
         // !!!! This requires Administrator or better access
-        public static string InstallFromFiles(string signatureId, int force_close, string location)
+        public static string InstallFromFiles(string signatureId, int force_close, string location, string patchId, string language)
         {
             string result;
 
@@ -278,11 +289,26 @@ namespace VAPMAdapter.OESIS
                 force_close = 0;
             }
 
-            string json_in = "{\"input\" : { \"method\" : 50301, \"signature\" :" + signatureId + ", \"force_close\" : " + force_close + ", \"path\":" + "\"" + location + "\" }}";
+            string json_in = "{\"input\" : { \"method\" : 50301, \"signature\" :" + signatureId + ", \"force_close\" : " + force_close + ", \"path\":" + "\"" + JsonUtil.EscapeJSONString(location) + "\",\"language\":\"" + language + "\", \"patch_id\":" + patchId + "}}";
             int rc = Invoke(json_in, out result);
             if (rc < 0)
             {
                 throw new Exception("InstallFromFiles failed to run correctly.  " + result);
+            }
+
+            return result;
+        }
+
+
+        public static string GetOSInfo()
+        {
+            string result;
+
+            string json_in = "{\"input\" : { \"method\" : 1}}";
+            int rc = Invoke(json_in, out result);
+            if (rc < 0)
+            {
+                throw new Exception("GetOSInfo failed to run correctly.  " + result);
             }
 
             return result;
