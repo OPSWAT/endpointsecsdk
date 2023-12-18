@@ -55,6 +55,12 @@ namespace VAPMAdapter.Catalog
             return (TimeZoneInfo.ConvertTimeToUtc(dateTime) -
                    new DateTime(1970, 1, 1, 0, 0, 0, 0, System.DateTimeKind.Utc)).TotalSeconds;
         }
+
+        public static string EscapeJSONString(string json)
+        {
+            string result = json.Replace("\\","/");
+            return result;
+        }
     }
 
 }

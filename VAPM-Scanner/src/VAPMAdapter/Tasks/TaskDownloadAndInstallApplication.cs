@@ -14,6 +14,7 @@ using System.IO;
 using System;
 using VAPMAdapter.OESIS.POCO;
 using VAPMAdapater;
+using System.Globalization;
 
 namespace VAPMAdapter.Tasks
 {
@@ -31,28 +32,14 @@ namespace VAPMAdapter.Tasks
             return result;
         }
 
-
-        public static void DownloadPatches(InstallerDetail installerDetail, string localFileName)
+        public static void InstallPatch(string signatureId, InstallerDetail installDetail)
         {
-            string url;
-            string checksum;
-
-            url = installerDetail.url;
-            checksum = installerDetail.checksumList[0];
-
-            // TODO:  Make sure to replace the token with the public token
-            if(!HttpClientUtils.DownloadValidFile(url, localFileName, checksum))
-            {
-                throw (new Exception("Failed to download file or validate checksum"));
-            }
+            OESISPipe.InstallFromFiles(signatureId, 0, installDetail.path,installDetail.patch_id,installDetail.language);
         }
 
-        public static void InstallPatch(string signatureId, string localFileName)
-        {
-            OESISPipe.InstallFromFiles(signatureId, 0, localFileName);
-        }
 
-        private static List<InstallerDetail> GetInstallerDetailList(string signatureId)
+        //  Note for patching the language will be automatically detected, but for new install a language needs to be specified
+        private static List<InstallerDetail> GetInstallerDetailList(string signatureId, bool isFreshInstall)
         {
             List<InstallerDetail> result = new List<InstallerDetail>();
             bool installerStillExists = true;
@@ -63,22 +50,36 @@ namespace VAPMAdapter.Tasks
                 try
                 {
                     string installDetailString = null;
+                    string language = null;
+
+                    //
+                    // If this is a fresh install pass in the language for the OS
+                    //
+                    if (isFreshInstall)
+                    {
+                        CultureInfo ci = CultureInfo.InstalledUICulture;
+                        language = ci.ToString();
+                    }
+
 
                     // Office 365 requires you pass in a 1 because it's Orchestrating the download tool for office 365
                     if (signatureId != "3029")
                     {
-                        installDetailString = OESISPipe.GetLatestInstaller(signatureId, 0, index);
+                        installDetailString = OESISPipe.GetLatestInstaller(signatureId, 1, Directory.GetCurrentDirectory(), language); 
+                        //installDetailString = OESISPipe.GetLatestInstaller(signatureId, 0, index);
                     }
                     else
                     {
-                        installDetailString = OESISPipe.GetLatestInstaller(signatureId, 1, Directory.GetCurrentDirectory());                        break;
+                        installDetailString = OESISPipe.GetLatestInstaller(signatureId, 1, Directory.GetCurrentDirectory(),language);                        
                     }
 
                     InstallerDetail currentDetail = OESISUtil.GetInstallerDetail(installDetailString);
                     index++;
+
                     if (currentDetail.result_code != -1039)
                     {
                         result.Add(currentDetail);
+                        break; // Need to fix this for WIndows patches
                     }
                     else
                     {
@@ -96,9 +97,10 @@ namespace VAPMAdapter.Tasks
         }
 
 
-        public static ProductInstallResult InstallAndDownload(string signatureId)
+        public static ProductInstallResult InstallAndDownload(string signatureId, bool isFreshInstall)
         {
             ProductInstallResult result = new ProductInstallResult();
+            result.success = true;
 
 
             // 
@@ -108,8 +110,9 @@ namespace VAPMAdapter.Tasks
 
             //
             // First initialize the OESIS Framework
+            // Always enable debugging on an install.  Clean this up on a success, but save this on a failure
             //
-            OESISPipe.InitializeFramework(false);
+            OESISPipe.InitializeFramework(true);
 
             //
             // Now Load all the Patch databases
@@ -125,21 +128,25 @@ namespace VAPMAdapter.Tasks
                 OESISPipe.LoadPatchDatabase(VAPMSettings.WINDOWS_PATCH_DB, ""); // This is needed for scanning for CVE's in Microsoft Products. 
             }
 
-            List<InstallerDetail> installDetailList = GetInstallerDetailList(signatureId);
 
+
+
+            // Make sure to get the languge of the OS on a Fresh Install.  This will attempt to download the patch
+            Logger.Log("Getting Install Details");
+            List<InstallerDetail> installDetailList = GetInstallerDetailList(signatureId,isFreshInstall);
+            
             foreach (InstallerDetail current in installDetailList)
             {
-                string localFileName = OESISUtil.GetFilenameFromUrl(current);
-
                 try
                 {
-                    // Note Do not download Office 365 here
-                    if (signatureId != "3029")
-                    {
-                        DownloadPatches(current, localFileName);
-                    }
+                    Logger.Log("Installing " + current.title);
+                    InstallPatch(signatureId, current);
 
-                    InstallPatch(signatureId, localFileName);
+                    //
+                    // Cleanup the installer if success
+                    //
+                    File.Delete(current.path);
+
                 }
                 catch(Exception e)
                 {
@@ -150,6 +157,18 @@ namespace VAPMAdapter.Tasks
             }
 
             OESISPipe.Teardown();
+
+            if(result.success)
+            {
+                //
+                // Now delete the log file here
+                //
+                OESISUtil.CleanupDebugFiles();
+            }
+            else
+            {
+                OESISUtil.MoveDebugFiles(Path.Combine(Directory.GetCurrentDirectory(), "FailedInstalls"));
+            }
 
             return result;
         }

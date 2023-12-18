@@ -10,6 +10,7 @@ namespace VAPMAdapter.OESIS.POCO
     public class ProductInstallResult
     {
         public bool success;
+        public bool errorCode;
         public string errorMessage;
     }
 }
