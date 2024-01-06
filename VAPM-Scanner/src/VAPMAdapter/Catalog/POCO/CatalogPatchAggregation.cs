@@ -19,5 +19,7 @@ namespace VAPMAdapter.Catalog.POCO
         public string PatchId;
         public string Fresh_Installable;
         public string Requires_Reboot;
+        public string LatestVersion;
+
     }
 }

@@ -115,7 +115,8 @@ namespace VAPMAdapter.Catalog
                         newPatchAggregation.Release_Date = (string)jsonPatchAggregationList[current.Name]["release_date"];
                         newPatchAggregation.Architectures = JsonUtil.GetStringArrayFromJson((JArray)jsonPatchAggregationList[current.Name]["architectures"]);
                         newPatchAggregation.Requires_Reboot = (string)jsonPatchAggregationList[current.Name]["requires_reboot"];
-
+                        newPatchAggregation.LatestVersion = (string)jsonPatchAggregationList[current.Name]["latest_version"];
+                        
                         result.Add(newPatchAggregation);
                     }
                 }

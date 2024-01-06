@@ -328,6 +328,8 @@ namespace AcmeScanner
             lvCatalog.Columns.Add("Platform", 100);
             lvCatalog.Columns.Add("Fresh Install", 100);
             lvCatalog.Columns.Add("Package Count", 100);
+            lvCatalog.Columns.Add("Install Version", 100);
+
 
             lvCatalog.Columns.Add("", 400);
             lvCatalog.View = View.Details;
@@ -369,6 +371,11 @@ namespace AcmeScanner
                     else
                     {
                         lviCurrent.SubItems.Add("");
+                    }
+
+                    if(supportsPatch)
+                    {
+                        lviCurrent.SubItems.Add(signature.PatchAssociations[0].PatchAggregation.LatestVersion);
                     }
 
 
