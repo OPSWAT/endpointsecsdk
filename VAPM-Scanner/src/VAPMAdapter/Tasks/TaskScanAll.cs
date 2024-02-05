@@ -60,7 +60,7 @@ namespace VAPMAdapter.Tasks
 
                     // Note a 2 is used for checking applicability for a signature
                     // This will get the currently installed product.
-                    string installDetailString = OESISPipe.GetLatestInstaller(product.signatureId, 2, index,null);
+                    string installDetailString = OESISPipe.GetLatestInstaller(product.signatureId, 2, index,"",1);
                     InstallerDetail currentDetail = OESISUtil.GetInstallerDetail(installDetailString);
                     index++;
                     if (currentDetail.result_code != -1039)

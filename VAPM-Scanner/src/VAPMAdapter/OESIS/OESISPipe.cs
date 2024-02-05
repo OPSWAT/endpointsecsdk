@@ -10,6 +10,7 @@ using System;
 using System.IO;
 using System.Reflection;
 using System.Text;
+using VAPMAdapater.Log;
 using VAPMAdapter.Catalog;
 
 namespace VAPMAdapter.OESIS
@@ -230,25 +231,21 @@ namespace VAPMAdapter.OESIS
         }
 
 
-        public static string GetLatestInstaller(string signatureId, int download, int index, string language)
+        public static string GetLatestInstaller(string signatureId, int download, int index, string language, int ensureVersioning)
         {
             string result = "";
             // This is used to demonstrate languages
-            string json_in = "{\"input\" : {\"method\" : 50300, \"signature\" :" + signatureId + ", \"download\": " + download + ", \"index\" : " + index + "}}";
-            if (language != null)
-            {
-                json_in = "{\"input\" : {\"method\" : 50300, \"signature\" :" + signatureId + ", \"download\": " + download + ", \"index\" : " + index + ",\"language\" : \"" + language + "\"}}";
-            }
+            string json_in = "{\"input\" : {\"method\" : 50300, \"signature\" : %SIGNATUREID%, \"download\": %DOWNLOAD%, \"index\" : %INDEX%,\"language\" : \"%LANGUAGE%\",\"validate_installer\" : %VALIDATE%}}";
 
-            if (index == -1)
-            {
-                json_in = "{\"input\" : {\"method\" : 50300, \"signature\" :" + signatureId + ", \"download\": " + download + " }}";
-            }
+            json_in = json_in.Replace("%SIGNATUREID%", signatureId);
+            json_in = json_in.Replace("%DOWNLOAD%", download.ToString());
+            json_in = json_in.Replace("%INDEX%", index.ToString());
+            json_in = json_in.Replace("%LANGUAGE%", language);
+            json_in = json_in.Replace("%VALIDATE%", ensureVersioning.ToString());
 
             int rc = Invoke(json_in, out result);
 
-
-            if (rc < 0 && rc != -1039)//Ignore -1039 since that is end of index
+            if (rc < 0 && rc != -1039 && rc != 14)//Ignore -1039 since that is end of index
             {
                 throw new Exception("GetLatestInstaller failed to run correctly.  " + result);
             }
@@ -275,7 +272,7 @@ namespace VAPMAdapter.OESIS
 
         public static string GetLatestInstaller(string signatureId, string language)
         {
-            return GetLatestInstaller(signatureId, 0, -1,language);
+            return GetLatestInstaller(signatureId, 0, -1,language,0);
         }
 
 
