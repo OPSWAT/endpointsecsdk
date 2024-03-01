@@ -553,36 +553,38 @@ namespace OPSWATPosture
             lvPlugins.View = View.Details;
             lvPlugins.Update();
 
-
-            foreach (BrowserPlugins current in browserPluginList)
+            if (browserPluginList != null)
             {
-                bool browserBlocked = false;
-                if (isBrowswerBlocked(current))
+                foreach (BrowserPlugins current in browserPluginList)
                 {
-                    isAllowed = false;
-                    browserBlocked = true;
-                }
-
-
-                foreach (PluginDetail currentDetail in current.pluginList)
-                {
-                    bool isBlocked = isPluginBlocked(currentDetail);
-                    if (isBlocked)
+                    bool browserBlocked = false;
+                    if (isBrowswerBlocked(current))
                     {
                         isAllowed = false;
+                        browserBlocked = true;
                     }
 
-                    ListViewItem lviCurrent = new ListViewItem();
-                    lviCurrent.Text = isBlocked || browserBlocked ? "*" : "";
-                    lviCurrent.SubItems.Add(currentDetail.name);
-                    lviCurrent.SubItems.Add(currentDetail.type);
-                    lviCurrent.SubItems.Add(current.browserName);
-                    lviCurrent.SubItems.Add(currentDetail.description);
-                    lviCurrent.Tag = currentDetail.id;
-                    lvPlugins.Items.Add(lviCurrent);
+
+                    foreach (PluginDetail currentDetail in current.pluginList)
+                    {
+                        bool isBlocked = isPluginBlocked(currentDetail);
+                        if (isBlocked)
+                        {
+                            isAllowed = false;
+                        }
+
+                        ListViewItem lviCurrent = new ListViewItem();
+                        lviCurrent.Text = isBlocked || browserBlocked ? "*" : "";
+                        lviCurrent.SubItems.Add(currentDetail.name);
+                        lviCurrent.SubItems.Add(currentDetail.type);
+                        lviCurrent.SubItems.Add(current.browserName);
+                        lviCurrent.SubItems.Add(currentDetail.description);
+                        lviCurrent.Tag = currentDetail.id;
+                        lvPlugins.Items.Add(lviCurrent);
+                    }
                 }
+                lvPlugins.Update();
             }
-            lvPlugins.Update();
 
             if (isAllowed == true)
             {

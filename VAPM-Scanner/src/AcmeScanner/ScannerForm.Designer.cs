@@ -163,9 +163,9 @@ namespace AcmeScanner
             this.cbScanOSCVEs.Font = new System.Drawing.Font("Segoe UI", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this.cbScanOSCVEs.Location = new System.Drawing.Point(149, 23);
             this.cbScanOSCVEs.Name = "cbScanOSCVEs";
-            this.cbScanOSCVEs.Size = new System.Drawing.Size(271, 29);
+            this.cbScanOSCVEs.Size = new System.Drawing.Size(147, 29);
             this.cbScanOSCVEs.TabIndex = 1;
-            this.cbScanOSCVEs.Text = "Scan Operating System CVEs";
+            this.cbScanOSCVEs.Text = "Scan OS CVEs";
             this.cbScanOSCVEs.UseVisualStyleBackColor = true;
             // 
             // btnScan

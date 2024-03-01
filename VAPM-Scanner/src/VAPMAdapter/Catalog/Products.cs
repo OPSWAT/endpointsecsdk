@@ -93,7 +93,7 @@ namespace VAPMAdapter.Catalog
                 newProduct.Vendor.Id = (string)jsonProductList[current.Name]["vendor"]["id"];
 
                 newProduct.SupportsInstall = (bool)jsonProductList[current.Name]["support_3rd_party_patch"];
-
+                
                 JArray signatures = (JArray)jsonProductList[current.Name]["signatures"];
                 foreach (JObject currentSig in signatures.Children<JObject>())
                 {
@@ -122,6 +122,23 @@ namespace VAPMAdapter.Catalog
                             newSignature.Platform = "Mac";
                         }
                     }
+
+
+                    if (newProduct.SupportsInstall)
+                    {
+                        if (currentSig["background_patching"] != null && (int)currentSig["background_patching"] > 0)
+                        {
+                            newSignature.BackgroundInstallSupport = true;
+                        }
+
+                        if (currentSig["validation_supported"] != null && (int)currentSig["validation_supported"] > 0)
+                        {
+                            newSignature.ValidateInstallSupport = true;
+                        }
+                    }
+
+
+
 
 
                     newProduct.SigList.Add(newSignature);

@@ -328,6 +328,11 @@ namespace AcmeScanner
             lvCatalog.Columns.Add("Platform", 100);
             lvCatalog.Columns.Add("Fresh Install", 100);
             lvCatalog.Columns.Add("Package Count", 100);
+            lvCatalog.Columns.Add("Install Version", 100);
+            lvCatalog.Columns.Add("Background", 80);
+            lvCatalog.Columns.Add("Validate", 80);
+
+
 
             lvCatalog.Columns.Add("", 400);
             lvCatalog.View = View.Details;
@@ -362,6 +367,7 @@ namespace AcmeScanner
                     lviCurrent.SubItems.Add(signature.Platform);
                     lviCurrent.SubItems.Add(freshInstall ? "Yes" : "");
 
+
                     if (signature.PatchAssociations != null)
                     {
                         lviCurrent.SubItems.Add(signature.PatchAssociations.Count.ToString());
@@ -370,6 +376,18 @@ namespace AcmeScanner
                     {
                         lviCurrent.SubItems.Add("");
                     }
+
+                    if(supportsPatch)
+                    {
+                        lviCurrent.SubItems.Add(signature.PatchAssociations[0].PatchAggregation.LatestVersion);
+                    }
+
+                    //
+                    // Add the Background and Validate flags
+                    //
+                    lviCurrent.SubItems.Add(signature.BackgroundInstallSupport ? "Yes" : "");
+                    lviCurrent.SubItems.Add(signature.ValidateInstallSupport ? "Yes" : "");
+
 
 
                     lviCurrent.Tag = signature.Id;
