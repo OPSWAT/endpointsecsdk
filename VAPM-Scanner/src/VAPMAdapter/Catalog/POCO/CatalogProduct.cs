@@ -19,6 +19,5 @@ namespace VAPMAdapter.Catalog.POCO
         public List<CatalogSignature> SigList;
         public CatalogOSSupport OsType;
         public int CveCount;
-
     }
 }

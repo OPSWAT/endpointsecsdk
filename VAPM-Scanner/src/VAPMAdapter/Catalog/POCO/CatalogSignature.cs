@@ -22,6 +22,9 @@ namespace VAPMAdapter.Catalog.POCO
         public string   Architecture;
         public bool     FreshInstall;
         public int      CVECount;
+        public bool     BackgroundInstallSupport;
+        public bool     ValidateInstallSupport;
+
         public List<CatalogVulnerabilityAssociation> CVEList;
         public List<CatalogPatchAssociation> PatchAssociations;
 
