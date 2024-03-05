@@ -10,6 +10,7 @@ using System;
 using System.IO;
 using System.Reflection;
 using System.Text;
+using System.Text.Json.Nodes;
 using VAPMAdapater.Log;
 using VAPMAdapter.Catalog;
 
@@ -231,36 +232,40 @@ namespace VAPMAdapter.OESIS
         }
 
 
-        public static string GetLatestInstaller(string signatureId, int download, int index, string language, int ensureVersioning)
+        public static string GetLatestInstaller(string signatureId, int download, int index, string language, bool backgroundInstall, bool validateInstaller, string downloadPath)
         {
             string result = "";
-            // This is used to demonstrate languages
-            string json_in = "{\"input\" : {\"method\" : 50300, \"signature\" : %SIGNATUREID%, \"download\": %DOWNLOAD%, \"index\" : %INDEX%,\"language\" : \"%LANGUAGE%\",\"validate_installer\" : %VALIDATE%}}";
 
-            json_in = json_in.Replace("%SIGNATUREID%", signatureId);
-            json_in = json_in.Replace("%DOWNLOAD%", download.ToString());
-            json_in = json_in.Replace("%INDEX%", index.ToString());
-            json_in = json_in.Replace("%LANGUAGE%", language);
-            json_in = json_in.Replace("%VALIDATE%", ensureVersioning.ToString());
+            JsonObject inputObject = new JsonObject();
+            inputObject.Add("method", 50300);
+            inputObject.Add("signature", int.Parse(signatureId));
+            inputObject.Add("download", download);
+            inputObject.Add("index", index);
 
-            int rc = Invoke(json_in, out result);
-
-            if (rc < 0 && rc != -1039 && rc != 14)//Ignore -1039 since that is end of index
+            if (language != null)
             {
-                throw new Exception("GetLatestInstaller failed to run correctly.  " + result);
+                inputObject.Add("language", language.ToString());
             }
 
-            return result;
-        }
+            if(validateInstaller)
+            {
+                inputObject.Add("validate_installer", 1);
+            }
 
-        public static string GetLatestInstaller(string signatureId, int download, string downloadPath, string language)
-        {
-            string result = "";
+            if (backgroundInstall)
+            {
+                inputObject.Add("background", 1);
+            }
 
-            downloadPath = downloadPath.Replace("\\", "/");
-            string json_in = "{\"input\" : {\"method\" : 50300, \"signature\" :" + signatureId + ", \"download\": " + download + ", \"path\":\"" + downloadPath + "\",\"language\":\"" + language + "\"}}";
+            if (downloadPath != null)
+            {
+                inputObject.Add("path", downloadPath.ToString());
+            }
 
-            int rc = Invoke(json_in, out result);
+            JsonObject json = new JsonObject();
+            json.Add("input", inputObject);
+
+            int rc = Invoke(json.ToJsonString(), out result);
 
             if (rc < 0 && rc != -1039)//Ignore -1039 since that is end of index
             {
@@ -270,24 +275,58 @@ namespace VAPMAdapter.OESIS
             return result;
         }
 
+        public static string GetLatestInstaller(string signatureId, int download, string downloadPath, string language, bool isBackgroundInstall)
+        {
+            string result = GetLatestInstaller(signatureId, download, 0, language, isBackgroundInstall, false, downloadPath);
+            return result;
+        }
+
         public static string GetLatestInstaller(string signatureId, string language)
         {
-            return GetLatestInstaller(signatureId, 0, -1,language,0);
+            return GetLatestInstaller(signatureId, 0, 0,language,false,false,null);
+        }
+
+        public static string GetLatestInstallerScan(string signatureId,int index)
+        {
+            return GetLatestInstaller(signatureId, 2, index, null, false, false, null);
         }
 
 
         // !!!! This requires Administrator or better access
-        public static string InstallFromFiles(string signatureId, int force_close, string location, string patchId, string language)
+        public static string InstallFromFiles(string signatureId, string location, string patchId, string language, bool force_close, bool isBackground)
         {
             string result;
 
-            if (force_close != 1)
+            JsonObject inputObject = new JsonObject();
+            inputObject.Add("method", 50301);
+            inputObject.Add("signature", int.Parse(signatureId));
+            inputObject.Add("path", location);
+
+            if (force_close)
             {
-                force_close = 0;
+                inputObject.Add("force_close", 1);
             }
 
-            string json_in = "{\"input\" : { \"method\" : 50301, \"signature\" :" + signatureId + ", \"force_close\" : " + force_close + ", \"path\":" + "\"" + JsonUtil.EscapeJSONString(location) + "\",\"language\":\"" + language + "\", \"patch_id\":" + patchId + "}}";
-            int rc = Invoke(json_in, out result);
+            if (language != null)
+            {
+                inputObject.Add("language", language.ToString());
+            }
+
+            if (patchId != null)
+            {
+                inputObject.Add("patch_id", int.Parse(patchId));
+            }
+
+            if (isBackground)
+            {
+                inputObject.Add("background", 1);
+            }
+
+ 
+            JsonObject json = new JsonObject();
+            json.Add("input", inputObject);
+
+            int rc = Invoke(json.ToJsonString(), out result);
             if (rc < 0)
             {
                 throw new Exception("InstallFromFiles failed to run correctly.  " + result);

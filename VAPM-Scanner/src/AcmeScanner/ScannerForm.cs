@@ -182,7 +182,12 @@ namespace AcmeScanner
         private void installVAPMPatchWorker_DoWork(object sender, DoWorkEventArgs e)
         {
             InstallCommand installCommand = (InstallCommand)e.Argument;
-            ProductInstallResult installResult = TaskDownloadAndInstallApplication.InstallAndDownload(installCommand.signatureId,installCommand.freshInstall);
+            ProductInstallResult installResult = TaskDownloadAndInstallApplication.InstallAndDownload(installCommand.signatureId,
+                                                                                                      installCommand.freshInstall,
+                                                                                                      installCommand.backgroundInstall,
+                                                                                                      installCommand.validateInstall,
+                                                                                                      installCommand.forceClose,
+                                                                                                      installCommand.usePatchId);
             e.Result = installResult;
         }
 
@@ -249,17 +254,22 @@ namespace AcmeScanner
         }
 
 
-        private bool ShowMessageDialog(string message, bool question)
+        private bool ShowMessageDialog(IScannerMessageDialog messageDialog)
         {
             bool result = false;
 
-
-            CustomMessageDialog messageDialog = new CustomMessageDialog(message, question);
-            messageDialog.StartPosition = FormStartPosition.CenterParent;
+            messageDialog.SetStartPosition(FormStartPosition.CenterParent);
             messageDialog.ShowDialog();
             result = messageDialog.IsSuccess();
 
             return result;
+        }
+
+
+        private bool ShowMessageDialog(string message, bool question)
+        {
+            CustomMessageDialog messageDialog = new CustomMessageDialog(message, question);
+            return this.ShowMessageDialog(messageDialog);
         }
 
         private void EnableButtons(bool enabled)
@@ -557,10 +567,18 @@ namespace AcmeScanner
                     {
                         if (!scanResult.patchLevelDetail.isLatest)
                         {
-                            if (ShowMessageDialog("Are you sure you want to install \"" + scanResult.product.name + "\"", true))
+                            InstallPatchMessageDialog installConfirmation = new InstallPatchMessageDialog("Are you sure you want to install \"" + scanResult.product.name + "\"", true);
+                            if (ShowMessageDialog(installConfirmation))
                             {
                                 ShowLoading(true);
-                                InstallCommand installCommand = new InstallCommand(signatureId, false);
+                                
+                                InstallCommand installCommand = new InstallCommand( signatureId, 
+                                                                                    false, 
+                                                                                    installConfirmation.IsBackgroundInstall(), 
+                                                                                    installConfirmation.IsValidateInstaller(),
+                                                                                    installConfirmation.IsForceClose(),
+                                                                                    installConfirmation.UsePatchId());
+
                                 installVAPMPatchWorker.RunWorkerAsync(installCommand);
                             }
                         }
@@ -725,11 +743,17 @@ namespace AcmeScanner
 
                     if (sig.FreshInstall && sig.PatchAssociations.Count > 0)
                     {
-
-                        if (ShowMessageDialog("Are you sure you want to install \"" + sig.Name + "\"", true))
+                        InstallPatchMessageDialog installConfirmation = new InstallPatchMessageDialog("Are you sure you want to install \"" + sig.Name + "\"", true);
+                        if (ShowMessageDialog(installConfirmation))
                         {
                             ShowLoading(true);
-                            InstallCommand installCommand = new InstallCommand(signatureId, true);
+                            InstallCommand installCommand = new InstallCommand(signatureId,
+                                                                                true,
+                                                                                installConfirmation.IsBackgroundInstall(),
+                                                                                installConfirmation.IsValidateInstaller(),
+                                                                                installConfirmation.IsForceClose(),
+                                                                                installConfirmation.UsePatchId());
+
                             installVAPMPatchWorker.RunWorkerAsync(installCommand);
                         }
                     }
