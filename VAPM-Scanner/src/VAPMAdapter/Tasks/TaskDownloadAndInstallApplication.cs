@@ -15,6 +15,7 @@ using System;
 using VAPMAdapter.OESIS.POCO;
 using VAPMAdapater;
 using System.Globalization;
+using System.Runtime.CompilerServices;
 
 namespace VAPMAdapter.Tasks
 {
@@ -32,14 +33,57 @@ namespace VAPMAdapter.Tasks
             return result;
         }
 
-        public static void InstallPatch(string signatureId, InstallerDetail installDetail)
+        public static void InstallPatch(string signatureId, InstallerDetail installDetail, bool forceClose, bool isBackground, bool usePatchId)
         {
-            OESISPipe.InstallFromFiles(signatureId, 0, installDetail.path,installDetail.patch_id,installDetail.language);
+            string patchId = null;
+
+            //
+            // This is an advanced option.  The preferred method for installing patches
+            // is to use just the signature ID and allow the system to patch the correct installer
+            // the PatchID is only needed for the use case of enforcing specific versions.  The recommendation
+            // is to not use this feature.
+            //
+            if(usePatchId)
+            {
+                patchId = installDetail.patch_id;
+            }
+
+
+
+            OESISPipe.InstallFromFiles(signatureId, installDetail.path,patchId,installDetail.language,forceClose, isBackground);
         }
 
+        private static bool ValidateInstaller(string signatureId, bool isFreshInstall)
+        {
+            bool result = false;
+
+            //
+            // If this is a fresh install pass in the language for the OS
+            //
+            string language = null;
+            if (isFreshInstall)
+            {
+                CultureInfo ci = CultureInfo.InstalledUICulture;
+                language = ci.ToString();
+            }
+
+            //
+            // Use the Download=2 for query only details and to validate the install
+            //
+            string validateResult = OESISPipe.GetLatestInstaller(signatureId, 2, 0, language,false,true,null);
+            InstallerDetail currentDetail = OESISUtil.GetInstallerDetail(validateResult);
+
+            int result_code = currentDetail.result_code;
+            if(result_code >= 0)
+            {
+                result = true;
+            }
+
+            return result;
+        }
 
         //  Note for patching the language will be automatically detected, but for new install a language needs to be specified
-        private static List<InstallerDetail> GetInstallerDetailList(string signatureId, bool isFreshInstall)
+        private static List<InstallerDetail> GetInstallerDetailList(string signatureId, bool isFreshInstall, bool isBackgroundInstall)
         {
             List<InstallerDetail> result = new List<InstallerDetail>();
             bool installerStillExists = true;
@@ -62,16 +106,8 @@ namespace VAPMAdapter.Tasks
                     }
 
 
-                    // Office 365 requires you pass in a 1 because it's Orchestrating the download tool for office 365
-                    if (signatureId != "3029")
-                    {
-                        installDetailString = OESISPipe.GetLatestInstaller(signatureId, 1, Directory.GetCurrentDirectory(), language); 
-                        //installDetailString = OESISPipe.GetLatestInstaller(signatureId, 0, index);
-                    }
-                    else
-                    {
-                        installDetailString = OESISPipe.GetLatestInstaller(signatureId, 1, Directory.GetCurrentDirectory(),language);                        
-                    }
+                    installDetailString = OESISPipe.GetLatestInstaller(signatureId, 1, Directory.GetCurrentDirectory(), language,isBackgroundInstall); 
+
 
                     InstallerDetail currentDetail = OESISUtil.GetInstallerDetail(installDetailString);
                     index++;
@@ -97,7 +133,12 @@ namespace VAPMAdapter.Tasks
         }
 
 
-        public static ProductInstallResult InstallAndDownload(string signatureId, bool isFreshInstall)
+        public static ProductInstallResult InstallAndDownload(  string signatureId, 
+                                                                bool isFreshInstall, 
+                                                                bool isBackgroundInstall, 
+                                                                bool isValidatorInstaller,
+                                                                bool forceClose,
+                                                                bool usePatchId)
         {
             ProductInstallResult result = new ProductInstallResult();
             result.success = true;
@@ -129,18 +170,30 @@ namespace VAPMAdapter.Tasks
             }
 
 
+            //
+            // Validate the Installer
+            //
+            if(isValidatorInstaller)
+            {
+                if(!ValidateInstaller(signatureId,isFreshInstall))
+                {
+                    result.success = false;
+                    return result;
+                }
+            }
+
 
 
             // Make sure to get the languge of the OS on a Fresh Install.  This will attempt to download the patch
             Logger.Log("Getting Install Details");
-            List<InstallerDetail> installDetailList = GetInstallerDetailList(signatureId,isFreshInstall);
+            List<InstallerDetail> installDetailList = GetInstallerDetailList(signatureId,isFreshInstall,isBackgroundInstall);
             
             foreach (InstallerDetail current in installDetailList)
             {
                 try
                 {
                     Logger.Log("Installing " + current.title);
-                    InstallPatch(signatureId, current);
+                    InstallPatch(signatureId, current, forceClose, isBackgroundInstall, usePatchId);
 
                     //
                     // Cleanup the installer if success

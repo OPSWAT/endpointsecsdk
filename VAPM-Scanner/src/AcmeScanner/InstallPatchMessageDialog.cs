@@ -11,12 +11,16 @@ using System.Windows.Forms;
 
 namespace AcmeScanner
 {
-    internal class CustomMessageDialog : Form, IScannerMessageDialog
+    internal class InstallPatchMessageDialog : Form, IScannerMessageDialog
     {
 
         private MaterialSkin.Controls.MaterialMultiLineTextBox2 tbMessage;
         private MaterialSkin.Controls.MaterialButton btnCancelClose;
         private MaterialSkin.Controls.MaterialButton btnOK;
+        private CheckBox cbBackgroundInstall;
+        private CheckBox cbValidateInstaller;
+        private CheckBox cbForceClose;
+        private CheckBox cbUsePatchId;
         public bool questionResult;
 
         private void InitializeComponent()
@@ -24,6 +28,10 @@ namespace AcmeScanner
             this.tbMessage = new MaterialSkin.Controls.MaterialMultiLineTextBox2();
             this.btnCancelClose = new MaterialSkin.Controls.MaterialButton();
             this.btnOK = new MaterialSkin.Controls.MaterialButton();
+            this.cbBackgroundInstall = new System.Windows.Forms.CheckBox();
+            this.cbValidateInstaller = new System.Windows.Forms.CheckBox();
+            this.cbForceClose = new System.Windows.Forms.CheckBox();
+            this.cbUsePatchId = new System.Windows.Forms.CheckBox();
             this.SuspendLayout();
             // 
             // tbMessage
@@ -45,7 +53,7 @@ namespace AcmeScanner
             this.tbMessage.SelectionLength = 0;
             this.tbMessage.SelectionStart = 0;
             this.tbMessage.ShortcutsEnabled = true;
-            this.tbMessage.Size = new System.Drawing.Size(432, 192);
+            this.tbMessage.Size = new System.Drawing.Size(432, 141);
             this.tbMessage.TabIndex = 0;
             this.tbMessage.TabStop = false;
             this.tbMessage.Text = "tbMessage";
@@ -59,12 +67,12 @@ namespace AcmeScanner
             this.btnCancelClose.Depth = 0;
             this.btnCancelClose.HighEmphasis = true;
             this.btnCancelClose.Icon = null;
-            this.btnCancelClose.Location = new System.Drawing.Point(377, 213);
+            this.btnCancelClose.Location = new System.Drawing.Point(379, 159);
             this.btnCancelClose.Margin = new System.Windows.Forms.Padding(4, 6, 4, 6);
             this.btnCancelClose.MouseState = MaterialSkin.MouseState.HOVER;
             this.btnCancelClose.Name = "btnCancelClose";
             this.btnCancelClose.NoAccentTextColor = System.Drawing.Color.Empty;
-            this.btnCancelClose.Size = new System.Drawing.Size(65, 36);
+            this.btnCancelClose.Size = new System.Drawing.Size(66, 36);
             this.btnCancelClose.TabIndex = 1;
             this.btnCancelClose.Text = "Close";
             this.btnCancelClose.Type = MaterialSkin.Controls.MaterialButton.MaterialButtonType.Contained;
@@ -79,7 +87,7 @@ namespace AcmeScanner
             this.btnOK.Depth = 0;
             this.btnOK.HighEmphasis = true;
             this.btnOK.Icon = null;
-            this.btnOK.Location = new System.Drawing.Point(305, 213);
+            this.btnOK.Location = new System.Drawing.Point(304, 159);
             this.btnOK.Margin = new System.Windows.Forms.Padding(4, 6, 4, 6);
             this.btnOK.MouseState = MaterialSkin.MouseState.HOVER;
             this.btnOK.Name = "btnOK";
@@ -92,22 +100,66 @@ namespace AcmeScanner
             this.btnOK.UseVisualStyleBackColor = true;
             this.btnOK.Click += new System.EventHandler(this.btnOK_Click);
             // 
-            // CustomMessageDialog
+            // cbBackgroundInstall
             // 
-            this.ClientSize = new System.Drawing.Size(456, 261);
+            this.cbBackgroundInstall.AutoSize = true;
+            this.cbBackgroundInstall.Location = new System.Drawing.Point(12, 159);
+            this.cbBackgroundInstall.Name = "cbBackgroundInstall";
+            this.cbBackgroundInstall.Size = new System.Drawing.Size(137, 19);
+            this.cbBackgroundInstall.TabIndex = 3;
+            this.cbBackgroundInstall.Text = "Install in Background";
+            this.cbBackgroundInstall.UseVisualStyleBackColor = true;
+            // 
+            // cbValidateInstaller
+            // 
+            this.cbValidateInstaller.AutoSize = true;
+            this.cbValidateInstaller.Location = new System.Drawing.Point(155, 159);
+            this.cbValidateInstaller.Name = "cbValidateInstaller";
+            this.cbValidateInstaller.Size = new System.Drawing.Size(111, 19);
+            this.cbValidateInstaller.TabIndex = 4;
+            this.cbValidateInstaller.Text = "Validate Installer";
+            this.cbValidateInstaller.UseVisualStyleBackColor = true;
+            // 
+            // cbForceClose
+            // 
+            this.cbForceClose.AutoSize = true;
+            this.cbForceClose.Location = new System.Drawing.Point(12, 177);
+            this.cbForceClose.Name = "cbForceClose";
+            this.cbForceClose.Size = new System.Drawing.Size(87, 19);
+            this.cbForceClose.TabIndex = 5;
+            this.cbForceClose.Text = "Force Close";
+            this.cbForceClose.UseVisualStyleBackColor = true;
+            // 
+            // cbUsePatchId
+            // 
+            this.cbUsePatchId.AutoSize = true;
+            this.cbUsePatchId.Location = new System.Drawing.Point(155, 177);
+            this.cbUsePatchId.Name = "cbUsePatchId";
+            this.cbUsePatchId.Size = new System.Drawing.Size(91, 19);
+            this.cbUsePatchId.TabIndex = 6;
+            this.cbUsePatchId.Text = "Use Patch Id";
+            this.cbUsePatchId.UseVisualStyleBackColor = true;
+            // 
+            // InstallPatchMessageDialog
+            // 
+            this.ClientSize = new System.Drawing.Size(456, 208);
+            this.Controls.Add(this.cbUsePatchId);
+            this.Controls.Add(this.cbForceClose);
+            this.Controls.Add(this.cbValidateInstaller);
+            this.Controls.Add(this.cbBackgroundInstall);
             this.Controls.Add(this.btnOK);
             this.Controls.Add(this.btnCancelClose);
             this.Controls.Add(this.tbMessage);
             this.MaximizeBox = false;
             this.MinimizeBox = false;
-            this.Name = "CustomMessageDialog";
+            this.Name = "InstallPatchMessageDialog";
             this.ShowIcon = false;
             this.ResumeLayout(false);
             this.PerformLayout();
 
         }
 
-        public CustomMessageDialog(string message, bool question)
+        public InstallPatchMessageDialog(string message, bool question)
         {
             InitializeComponent();
             tbMessage.Text = message;
@@ -143,5 +195,26 @@ namespace AcmeScanner
         {
             this.ShowDialog();
         }
+
+        public bool IsBackgroundInstall()
+        {
+            return cbBackgroundInstall.Checked;
+        }
+
+        public bool IsValidateInstaller()
+        {
+            return cbValidateInstaller.Checked;
+        }
+
+        public bool IsForceClose()
+        {
+            return cbForceClose.Checked;
+        }
+
+        public bool UsePatchId()
+        {
+            return cbUsePatchId.Checked;
+        }
+
     }
 }
