@@ -7,7 +7,6 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
 using VAPMAdapater.Log;
-using VAPMAdapater.Updates;
 using VAPMAdapter.OESIS;
 using System.Collections.Generic;
 using System.IO;
@@ -15,7 +14,6 @@ using System;
 using VAPMAdapter.OESIS.POCO;
 using VAPMAdapater;
 using System.Globalization;
-using System.Runtime.CompilerServices;
 
 namespace VAPMAdapter.Tasks
 {
@@ -33,8 +31,9 @@ namespace VAPMAdapter.Tasks
             return result;
         }
 
-        public static void InstallPatch(string signatureId, InstallerDetail installDetail, bool forceClose, bool isBackground, bool usePatchId)
+        public static string InstallPatch(string signatureId, InstallerDetail installDetail, bool forceClose, bool isBackground, bool usePatchId)
         {
+            string result = null;
             string patchId = null;
 
             //
@@ -50,7 +49,8 @@ namespace VAPMAdapter.Tasks
 
 
 
-            OESISPipe.InstallFromFiles(signatureId, installDetail.path,patchId,installDetail.language,forceClose, isBackground);
+            result = OESISPipe.InstallFromFiles(signatureId, installDetail.path,patchId,installDetail.language,forceClose, isBackground);
+            return result;
         }
 
         private static bool ValidateInstaller(string signatureId, bool isFreshInstall)
@@ -193,7 +193,8 @@ namespace VAPMAdapter.Tasks
                 try
                 {
                     Logger.Log("Installing " + current.title);
-                    InstallPatch(signatureId, current, forceClose, isBackgroundInstall, usePatchId);
+                    string installResult = InstallPatch(signatureId, current, forceClose, isBackgroundInstall, usePatchId);
+                    result.installResult = OESISUtil.GetInstallResult(installResult);
 
                     //
                     // Cleanup the installer if success
@@ -201,11 +202,17 @@ namespace VAPMAdapter.Tasks
                     File.Delete(current.path);
 
                 }
-                catch(Exception e)
+                catch (OESISException oe)
+                {
+                    Logger.Log("Failed to apply patch: " + oe);
+                    result.success = false;
+                    result.errorResult = oe.GetErrorResult();
+                }
+                catch (Exception e)
                 {
                     Logger.Log("Failed to apply patch: " + e);
                     result.success = false;
-                    result.errorMessage = e.ToString();
+                    result.message = e.ToString();
                 }
             }
 

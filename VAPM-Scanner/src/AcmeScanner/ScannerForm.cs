@@ -199,11 +199,32 @@ namespace AcmeScanner
 
                 if (productInstallResult.success)
                 {
-                    ShowMessageDialog("Successfully installed latest application.",false);
+                    if (productInstallResult.installResult != null && productInstallResult.installResult.code > 0)
+                    {
+                        if(productInstallResult.installResult.require_restart > 0)
+                        {
+                            ShowMessageDialog("Application installed, but requires restart to be fully patched.", false);
+                        }
+                        else
+                        {
+                            ShowMessageDialog("Successfully installed latest application with result: " + productInstallResult.installResult.code, false);
+                        }
+                    }
+                    else
+                    {
+                        ShowMessageDialog("Successfully installed latest application.", false);
+                    }
                 }
                 else
                 {
-                    ShowMessageDialog("An error occured during install: \n" + productInstallResult.errorMessage , false);
+                    if(productInstallResult.errorResult != null)
+                    {
+                        ShowMessageDialog("An error occured during install: \n\n" + productInstallResult.errorResult.description, false);
+                    }
+                    else
+                    {
+                        ShowMessageDialog("An error occured during install: \n" + productInstallResult.message, false);
+                    }
                 }
             }
             else
