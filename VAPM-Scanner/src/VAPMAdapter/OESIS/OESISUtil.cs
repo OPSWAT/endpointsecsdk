@@ -99,6 +99,25 @@ namespace VAPMAdapter.OESIS
         }
 
         // Expects JSON from GetProductVulnerability Products
+        public static ErrorResult GetErrorResult(string errorResult)
+        {
+            ErrorResult result;
+
+            dynamic jsonOut = JObject.Parse(errorResult);
+            var errorResultJson = jsonOut.error;
+
+            result = new ErrorResult();
+            result.method = errorResultJson.method;
+            result.code = errorResultJson.code;
+            result.description = errorResultJson.description;
+            result.code_description = errorResultJson.define;
+            result.json = errorResult; 
+
+            return result;
+        }
+
+
+        // Expects JSON from GetProductVulnerability Products
         public static List<OnlinePatchDetail> GetOnlinePatchDetail(string version_json, bool installed)
         {
             List<OnlinePatchDetail> result = new List<OnlinePatchDetail>();
@@ -199,16 +218,22 @@ namespace VAPMAdapter.OESIS
 
 
         // Expects JSON from GetLatestInstaller Products
-        public static InstallResults GetInstallResults(string install_results_json)
+        public static InstallResult GetInstallResult(string install_results_json)
         {
-            InstallResults result = new InstallResults();
+            InstallResult result = new InstallResult();
 
             dynamic jsonOut = JObject.Parse(install_results_json);
-            result.result_code = jsonOut.result.code;
-            result.require_restart = jsonOut.result.require_restart;
-            result.version = jsonOut.result.version;
+            dynamic resultJson = jsonOut.result;
+            
+            
+            result.code = resultJson.code;
+            result.require_restart = resultJson.require_restart;
+            result.version = resultJson.version;
+            result.require_restart = resultJson.require_restart;
+            result.require_close_first = resultJson.require_close_first;
+            result.require_uninstall_first = resultJson.require_uninstall_first;
 
-            if (result.result_code >= 0)
+            if (result.code >= 0)
             {
                 result.success = true;
             }

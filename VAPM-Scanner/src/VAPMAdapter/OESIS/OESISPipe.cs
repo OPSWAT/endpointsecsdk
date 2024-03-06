@@ -11,8 +11,7 @@ using System.IO;
 using System.Reflection;
 using System.Text;
 using System.Text.Json.Nodes;
-using VAPMAdapater.Log;
-using VAPMAdapter.Catalog;
+using static System.Net.WebRequestMethods;
 
 namespace VAPMAdapter.OESIS
 {
@@ -26,7 +25,7 @@ namespace VAPMAdapter.OESIS
             //
 
             string path = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
-            string passkey = File.ReadAllText(path + "/pass_key.txt");
+            string passkey = System.IO.File.ReadAllText(path + "/pass_key.txt");
             StringBuilder configString = new StringBuilder();
 
             configString.Append("{");
@@ -329,7 +328,7 @@ namespace VAPMAdapter.OESIS
             int rc = Invoke(json.ToJsonString(), out result);
             if (rc < 0)
             {
-                throw new Exception("InstallFromFiles failed to run correctly.  " + result);
+                throw new OESISException("InstallFromFiles failed to run correctly.", result);
             }
 
             return result;
