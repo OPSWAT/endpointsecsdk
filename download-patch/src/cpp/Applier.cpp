@@ -19,7 +19,7 @@ int DownloadPatch(const json downloadDetails)
 	wstring destinationFile = GetDestinationFile(downloadDetails);
 	string patchName = downloadDetails["title"];
 
-	cout << "Downloading Patch: " << patchName;
+	cout << "Downloading Patch: " << patchName << "\n";
 
 
 	int downloadResult = DownloadFile(downloadUrl, destinationFile);
@@ -62,17 +62,20 @@ int DownloadPatch(const json downloadDetails)
 int LookupAndDownloadPatch(int signatureId, int patchId, wstring token)
 {
 	int result = -1;
+
+	wcout << "Loading SDK...\n";
+
 	SetupOESIS(L"Error");
 
 	json downloadDetails = GetLatestInstaller(signatureId, 0, token, L"", 0, patchId, L"");
 	
-	if (!downloadDetails.contains("error"))
+	if (!downloadDetails.contains("errors"))
 	{
 		int downloadResult = DownloadPatch(downloadDetails);
 
 		if (result == 0)
 		{
-			cout << "Download Complete";
+			cout << "Download Complete\n";
 		}
 		else
 		{
@@ -80,6 +83,7 @@ int LookupAndDownloadPatch(int signatureId, int patchId, wstring token)
 		}
 	}
 
+	TeardownOESIS();
 
-	return 0;
+	return result;
 }
