@@ -412,6 +412,10 @@ namespace AcmeScanner
                     {
                         lviCurrent.SubItems.Add(signature.PatchAssociations[0].PatchAggregation.LatestVersion);
                     }
+                    else
+                    {
+                        lviCurrent.SubItems.Add("");
+                    }
 
                     //
                     // Add the Background and Validate flags

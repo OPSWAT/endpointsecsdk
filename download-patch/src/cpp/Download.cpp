@@ -12,6 +12,9 @@
 using namespace std;
 
 
+//
+// Note this function can be used for tracking the download or cancelling the download
+//
 static size_t write_data(void* ptr, size_t size, size_t nmemb, void* stream) {
     size_t written = fwrite(ptr, size, nmemb, static_cast<FILE*>(stream));
     return written;
@@ -21,6 +24,12 @@ static size_t write_data(void* ptr, size_t size, size_t nmemb, void* stream) {
 int DownloadFile(wstring url, wstring destination )
 {
     int result = -1;
+
+    wcout << L"Downloading from URL:  \n";
+    wcout << url << "\n";
+    wcout << "\n";
+    wcout << L"Writing to file:  \n";
+    wcout << destination << "\n";
 
     // Download the file using curl library into DownloadCURL folder
     if (CURL* curl = curl_easy_init()) {
