@@ -8,6 +8,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
 using Newtonsoft.Json.Linq;
+using System.Windows.Forms;
 
 namespace ComplianceAdapater.OESIS
 {
@@ -90,17 +91,24 @@ namespace ComplianceAdapater.OESIS
             JArray result = new JArray();
 
             dynamic jsonOut = JObject.Parse(product_json);
-            var products = jsonOut.result.detected_products;
-
-            for (int i = 0; i < products.Count; i++)
+            if (jsonOut.result != null)
             {
-                JObject newEntry = JObject.FromObject(new
+                var products = jsonOut.result.detected_products;
+
+                for (int i = 0; i < products.Count; i++)
                 {
-                    signature = (int)products[i].signature,
-                    sig_name = (string)products[i].sig_name,
-                    categories = (JArray)products[i].categories
-                });
-                result.Add(newEntry);
+                    JObject newEntry = JObject.FromObject(new
+                    {
+                        signature = (int)products[i].signature,
+                        sig_name = (string)products[i].sig_name,
+                        categories = (JArray)products[i].categories
+                    });
+                    result.Add(newEntry);
+                }
+            }
+            else
+            {
+                MessageBox.Show(product_json);
             }
 
             return result;

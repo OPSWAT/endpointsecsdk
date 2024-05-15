@@ -34,6 +34,7 @@ namespace OPSWATPosture
         private TaskSecurityScore       taskSecurityScore;
         private List<BrowserPlugins>    browserPluginList = null;
 
+        TaskGeoLocation geolocationValidator = new TaskGeoLocation();
 
 
         //
@@ -148,8 +149,16 @@ namespace OPSWATPosture
         ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         private void validatePolicyWorker_DoWork(object sender, DoWorkEventArgs e)
         {
-            bool valid = taskValidatePolicy.ValidatePolicy();
-            e.Result = valid;
+            try
+            {
+                bool valid = taskValidatePolicy.ValidatePolicy();
+                e.Result = valid;
+            }
+            catch(Exception exception)
+            {
+                MessageBox.Show(exception.ToString());
+                e.Result = false;
+            }
         }
 
         private void validatePolicyWorker_Completed(object sender, RunWorkerCompletedEventArgs e)
@@ -213,7 +222,6 @@ namespace OPSWATPosture
         {
             Cursor.Current = Cursors.WaitCursor;
 
-            TaskGeoLocation geolocationValidator = new TaskGeoLocation();
             geolocationValidator.GetGeolocation();
 
             GeoLocationInfo info = geolocationValidator.GetGeoLocationInfo();
@@ -233,7 +241,6 @@ namespace OPSWATPosture
                 double policyLatitude = double.Parse(tbLatitude.Text);
                 double policyLongitude = double.Parse(tbLongitude.Text);
 
-                TaskGeoLocation geolocationValidator = new TaskGeoLocation();
                 double actualMiles = geolocationValidator.CalculateMiles(policyLatitude, policyLongitude);
                 lblMiles.Text = actualMiles.ToString();
 
