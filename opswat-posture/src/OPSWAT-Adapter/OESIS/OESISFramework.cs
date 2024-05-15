@@ -44,34 +44,41 @@ namespace ComplianceAdapater.OESIS
             string json_out = "{ }";
             if (outPtr != IntPtr.Zero)
             {
-                json_out = XStringMarshaler.PtrToString(outPtr);
 
-                //
-                // Now get the error list
-                //
-                List<SetupErrorDetail> errorList = Util.GetInitializationErrors(json_out);
-                OESISAdapter.wa_api_free(outPtr);
-
-
-                //
-                // Iterate and make sure the license is valid
-                //
-                foreach (SetupErrorDetail errorDetail in errorList)
+                if (rc < 0)
                 {
-                    if(errorDetail.module == "libwalocal.dll") // This is the compliance module
+
+                    json_out = XStringMarshaler.PtrToString(outPtr);
+
+                    //
+                    // Now get the error list
+                    //
+                    List<SetupErrorDetail> errorList = Util.GetInitializationErrors(json_out);
+                    OESISAdapter.wa_api_free(outPtr);
+
+
+                    //
+                    // Iterate and make sure the license is valid
+                    //
+                    foreach (SetupErrorDetail errorDetail in errorList)
                     {
-                        if(errorDetail.code < 0)
+                        if (errorDetail.module == "libwalocal.dll") // This is the compliance module
                         {
-                            if(errorDetail.code == -8)
+                            if (errorDetail.code < 0)
                             {
-                                throw new Exception("Licensing Error.  Check the license to make sure it has not expired");
-                            }
-                            else
-                            {
-                                throw new Exception("Error occurred with Compliance initialization: " + errorDetail.code);
+                                if (errorDetail.code == -8)
+                                {
+                                    throw new Exception("Licensing Error.  Check the license to make sure it has not expired");
+                                }
+                                else
+                                {
+                                    throw new Exception("Error occurred with Compliance initialization: " + errorDetail.code);
+                                }
                             }
                         }
                     }
+
+                    throw new Exception("Failed initilization: " + rc + "\n\n" + json_out);
                 }
 
             }
