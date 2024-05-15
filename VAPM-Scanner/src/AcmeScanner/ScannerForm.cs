@@ -13,6 +13,7 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using VAPMAdapater.Updates;
 using VAPMAdapter.Catalog.POCO;
@@ -27,7 +28,8 @@ namespace AcmeScanner
         static Dictionary<string, ProductScanResult> staticScanResults = new Dictionary<string, ProductScanResult>();
         static Dictionary<string, CatalogSignature> staticSignatureCatalogResults = new Dictionary<string, CatalogSignature>();
         static Dictionary<string, OnlinePatchDetail> staticOrchestrationScanResults = new Dictionary<string, OnlinePatchDetail>();
-        static List<CatalogProduct> staticProductList = null;
+        static List<CatalogProduct>     staticProductList = null;
+        static List<PatchStatus>        staticPatchStatusList = null;
 
 
         private System.ComponentModel.BackgroundWorker scanWorker;
@@ -35,6 +37,8 @@ namespace AcmeScanner
         private System.ComponentModel.BackgroundWorker installVAPMPatchWorker;
         private System.ComponentModel.BackgroundWorker installOnlinePatchWorker;
         private System.ComponentModel.BackgroundWorker loadCatalogWorker;
+        private System.ComponentModel.BackgroundWorker loadStatusWorker;
+
 
 
         public ScannerForm()
@@ -110,6 +114,13 @@ namespace AcmeScanner
                 new RunWorkerCompletedEventHandler(
             loadCatalogWorker_Completed);
 
+            loadStatusWorker = new BackgroundWorker();
+            loadStatusWorker.DoWork +=
+                new DoWorkEventHandler(loadStatusWorker_DoWork);
+            loadStatusWorker.RunWorkerCompleted +=
+                new RunWorkerCompletedEventHandler(
+            loadStatusWorker_Completed);
+
 
         }
 
@@ -179,6 +190,18 @@ namespace AcmeScanner
         }
 
 
+
+        private void loadStatusWorker_DoWork(object sender, DoWorkEventArgs e)
+        {
+            staticPatchStatusList = TaskLoadStatus.Load();
+        }
+
+        private void loadStatusWorker_Completed(object sender, RunWorkerCompletedEventArgs e)
+        {
+            UpdatePatchStatusResults();
+            ShowLoading(false);
+        }
+
         private void installVAPMPatchWorker_DoWork(object sender, DoWorkEventArgs e)
         {
             InstallCommand installCommand = (InstallCommand)e.Argument;
@@ -193,7 +216,7 @@ namespace AcmeScanner
 
         private void installVAPMPatchWorker_Completed(object sender, RunWorkerCompletedEventArgs e)
         {
-            if(e.Result != null && e.Result is ProductInstallResult)
+            if (e.Result != null && e.Result is ProductInstallResult)
             {
                 ProductInstallResult productInstallResult = (ProductInstallResult)e.Result;
 
@@ -201,7 +224,7 @@ namespace AcmeScanner
                 {
                     if (productInstallResult.installResult != null && productInstallResult.installResult.code > 0)
                     {
-                        if(productInstallResult.installResult.require_restart > 0)
+                        if (productInstallResult.installResult.require_restart > 0)
                         {
                             ShowMessageDialog("Application installed, but requires restart to be fully patched.", false);
                         }
@@ -217,7 +240,7 @@ namespace AcmeScanner
                 }
                 else
                 {
-                    if(productInstallResult.errorResult != null)
+                    if (productInstallResult.errorResult != null)
                     {
                         ShowMessageDialog("An error occured during install: \n\n" + productInstallResult.errorResult.description, false);
                     }
@@ -229,7 +252,7 @@ namespace AcmeScanner
             }
             else
             {
-                ShowMessageDialog("Unexpected result occurred installing the product",false);
+                ShowMessageDialog("Unexpected result occurred installing the product", false);
             }
 
 
@@ -408,7 +431,7 @@ namespace AcmeScanner
                         lviCurrent.SubItems.Add("");
                     }
 
-                    if(supportsPatch)
+                    if (supportsPatch)
                     {
                         lviCurrent.SubItems.Add(signature.PatchAssociations[0].PatchAggregation.LatestVersion);
                     }
@@ -443,6 +466,48 @@ namespace AcmeScanner
 
             lvCatalog.Items.Clear();
             lvCatalog.Items.AddRange(resultList.ToArray());
+        }
+
+
+
+        private void UpdatePatchStatusResults()
+        {
+            List<ListViewItem> resultList = new List<ListViewItem>();
+
+            //
+            // Setup the header
+            //
+
+            lvStatus.Columns.Clear();
+            lvStatus.Columns.Add("Status", 80);
+            lvStatus.Columns.Add("Product", 150);
+            lvStatus.Columns.Add("Signature", 150);
+            lvStatus.Columns.Add("Platform", 80);
+            lvStatus.Columns.Add("ProductId", 80);
+            lvStatus.Columns.Add("SignatureId", 80);
+            lvStatus.Columns.Add("LastGood", 80);
+            lvStatus.Columns.Add("LastTested", 80);
+
+            lvStatus.Columns.Add("", 400);
+            lvStatus.View = View.Details;
+            lvStatus.Update();
+
+            foreach (PatchStatus patch in staticPatchStatusList)
+            {
+                ListViewItem lviCurrent = new ListViewItem();
+                lviCurrent.Text = patch.status;
+                lviCurrent.SubItems.Add(patch.productName);
+                lviCurrent.SubItems.Add(patch.signatureName);
+                lviCurrent.SubItems.Add(patch.platform);
+                lviCurrent.SubItems.Add(patch.productId.ToString());
+                lviCurrent.SubItems.Add(patch.signatureId.ToString());
+                lviCurrent.SubItems.Add(patch.lastKnownGood);
+                lviCurrent.SubItems.Add(patch.lastTested);
+                resultList.Add(lviCurrent);
+            }
+
+            lvStatus.Items.Clear();
+            lvStatus.Items.AddRange(resultList.ToArray());
         }
 
 
@@ -596,10 +661,10 @@ namespace AcmeScanner
                             if (ShowMessageDialog(installConfirmation))
                             {
                                 ShowLoading(true);
-                                
-                                InstallCommand installCommand = new InstallCommand( signatureId, 
-                                                                                    false, 
-                                                                                    installConfirmation.IsBackgroundInstall(), 
+
+                                InstallCommand installCommand = new InstallCommand(signatureId,
+                                                                                    false,
+                                                                                    installConfirmation.IsBackgroundInstall(),
                                                                                     installConfirmation.IsValidateInstaller(),
                                                                                     installConfirmation.IsForceClose(),
                                                                                     installConfirmation.UsePatchId());
@@ -810,7 +875,7 @@ namespace AcmeScanner
 
         private void btnUrlCSV_Click(object sender, EventArgs e)
         {
-            if(staticSignatureCatalogResults == null || staticSignatureCatalogResults.Count == 0)
+            if (staticSignatureCatalogResults == null || staticSignatureCatalogResults.Count == 0)
             {
                 ShowMessageDialog("Load the Catalog first to generate the URLs", false);
                 return;
@@ -822,13 +887,13 @@ namespace AcmeScanner
             StringBuilder domainOutput = new StringBuilder();
 
             HashSet<string> domains = new HashSet<string>();
-            foreach(CatalogSignature signature in staticSignatureCatalogResults.Values)
+            foreach (CatalogSignature signature in staticSignatureCatalogResults.Values)
             {
-                foreach(CatalogPatchAssociation association in signature.PatchAssociations)
+                foreach (CatalogPatchAssociation association in signature.PatchAssociations)
                 {
-                    if(association.PatchAggregation != null && association.PatchAggregation.DownloadDetailsList != null)
+                    if (association.PatchAggregation != null && association.PatchAggregation.DownloadDetailsList != null)
                     {
-                        foreach(CatalogDownloadDetails details in association.PatchAggregation.DownloadDetailsList)
+                        foreach (CatalogDownloadDetails details in association.PatchAggregation.DownloadDetailsList)
                         {
                             urlOutput.Append(signature.Name);
                             urlOutput.Append(",");
@@ -863,6 +928,12 @@ namespace AcmeScanner
             ForceWrite(domainOutput, "domains.csv");
 
             ShowMessageDialog("The files \"urls.csv\" and \"domains.csv\" have been created in the working directory.", false);
+        }
+
+        private void btnRefreshStatus_Click(object sender, EventArgs e)
+        {
+            ShowLoading(true);
+            loadStatusWorker.RunWorkerAsync();
         }
     }
 }

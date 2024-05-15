@@ -46,6 +46,12 @@ namespace VAPMAdapater
             return getTokenDownloadURL("analog.zip");    
         }
 
+        public static string getStatusURL()
+        {
+            return getTokenDownloadURL("patch_status.json");
+        }
+
+
         public static string getLocalCatalogDir()
         {
             //

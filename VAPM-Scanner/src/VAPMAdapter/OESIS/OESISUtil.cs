@@ -145,6 +145,32 @@ namespace VAPMAdapter.OESIS
         }
 
 
+        // Expects JSON from GetProductVulnerability Products
+        public static List<PatchStatus> GetPatchStatusList(string patch_status_json)
+        {
+            List<PatchStatus> result = new List<PatchStatus>();
+
+            dynamic jsonOut = JObject.Parse(patch_status_json);
+            var patchList = jsonOut.patch_status;
+
+            for (int i = 0; i < patchList.Count; i++)
+            {
+                PatchStatus patchStatus = new PatchStatus();
+                patchStatus.productId = patchList[i].product_id;
+                patchStatus.productName = patchList[i].product_name;
+                patchStatus.signatureId = patchList[i].signature_id;
+                patchStatus.signatureName = patchList[i].signature_name;
+                patchStatus.status = patchList[i].status;
+                patchStatus.lastTested = patchList[i].last_tested;
+                patchStatus.platform = patchList[i].platform;
+                patchStatus.lastKnownGood = patchList[i].last_known_good;
+                result.Add(patchStatus);
+            }
+
+            return result;
+        }
+
+
 
         // Expects JSON from GetLatestInstaller Products
         public static InstallerDetail GetInstallerDetail(string installer_json)
