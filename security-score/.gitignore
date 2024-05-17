@@ -1,0 +1,13 @@
+src/.vs/
+src/packages/
+src/OPSWAT-Adapter/bin/
+src/OPSWAT-Adapter/obj/
+src/OPSWAT-Adapter/.vs/
+src/OPSWAT-Adapter/AcmeScanner.csproj.user
+
+src/security-score/bin/
+src/security-score/obj/
+src/security-score/.vs/
+src/security-score/VAPMAdapter.csproj.user
+
+bin/*.pdb
