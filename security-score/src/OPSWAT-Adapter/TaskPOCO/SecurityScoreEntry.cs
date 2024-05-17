@@ -1,0 +1,15 @@
+﻿///////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////
+
+using OPSWAT_Adapter.POCO;
+using System.Collections.Generic;
+
+namespace OPSWAT_Adapter.TaskPOCO
+{
+    public class SecurityScoreEntry
+    {
+        public Product   product;
+        public bool      running;
+        public Dictionary<string, string> attributes;
+    }
+}

@@ -1,0 +1,95 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{940B5681-F643-44B4-8FC7-7267DCFC6FCA}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>OPSWAT_Adapter</RootNamespace>
+    <AssemblyName>OPSWAT-Adapter</AssemblyName>
+    <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <Deterministic>true</Deterministic>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.13.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.IO.Compression.FileSystem" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Log\LogEntry.cs" />
+    <Compile Include="Log\Logger.cs" />
+    <Compile Include="OESIS\OESISUtil.cs" />
+    <Compile Include="POCO\BackupState.cs" />
+    <Compile Include="POCO\BrowserPlugins.cs" />
+    <Compile Include="POCO\EncryptionState.cs" />
+    <Compile Include="POCO\FirewallState.cs" />
+    <Compile Include="POCO\GeoLocationInfo.cs" />
+    <Compile Include="OESIS\OESISAdapter.cs" />
+    <Compile Include="OESIS\OESISCompliance.cs" />
+    <Compile Include="OESIS\OESISCore.cs" />
+    <Compile Include="OESIS\OESISFramework.cs" />
+    <Compile Include="POCO\MethodResult.cs" />
+    <Compile Include="POCO\PluginDetail.cs" />
+    <Compile Include="POCO\Product.cs" />
+    <Compile Include="POCO\ProductInfo.cs" />
+    <Compile Include="OESIS\SupportChart.cs" />
+    <Compile Include="OESIS\Util.cs" />
+    <Compile Include="OESIS\XStringMarshaler.cs" />
+    <Compile Include="POCO\RealTimeProtectionState.cs" />
+    <Compile Include="POCO\SetupErrorDetail.cs" />
+    <Compile Include="POCO\Threats.cs" />
+    <Compile Include="Policy\AntimalwarePolicy.cs" />
+    <Compile Include="Policy\EncryptionPolicy.cs" />
+    <Compile Include="Policy\FirewallPolicy.cs" />
+    <Compile Include="SDKSettings.cs" />
+    <Compile Include="TaskPOCO\SecurityScoreEntry.cs" />
+    <Compile Include="TaskPOCO\SecurityScoreModule.cs" />
+    <Compile Include="TaskPOCO\SecurityScoreResult.cs" />
+    <Compile Include="Tasks\TaskGeoLocation.cs" />
+    <Compile Include="Tasks\TaskGetAdvancedSecurityScore.cs" />
+    <Compile Include="Tasks\TaskGetPlugins.cs" />
+    <Compile Include="Tasks\TaskSecurityScore.cs" />
+    <Compile Include="Tasks\TaskValidatePolicy.cs" />
+    <Compile Include="Policy\SecurityPolicy.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Updates\DownloadSDK.cs" />
+    <Compile Include="Updates\ExtractUtils.cs" />
+    <Compile Include="Updates\HttpClientUtils.cs" />
+    <Compile Include="Updates\UpdateSDK.cs" />
+  </ItemGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>
