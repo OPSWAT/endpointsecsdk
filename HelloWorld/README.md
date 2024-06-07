@@ -1,4 +1,4 @@
-# OPSWAT MetaDefender Security Endpoint SDK Samples - Getting Started Samples
+# OPSWAT MetaDefender Security Endpoint SDK - Getting Started Samples
 
 
 ### Compiling the Samples
