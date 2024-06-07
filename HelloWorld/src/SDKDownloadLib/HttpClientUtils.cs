@@ -1,4 +1,12 @@
-﻿using System;
+﻿///////////////////////////////////////////////////////////////////////////////////////////////
+///  Sample Code for Acme Scanner
+///  Reference Implementation using OPSWAT MetaDefender Endpoint Security SDK
+///  
+///  Created by Chris Seiler
+///  OPSWAT OEM Solutions Architect
+///////////////////////////////////////////////////////////////////////////////////////////////
+
+using System;
 using System.IO;
 using System.Net.Http;
 using System.Security.Cryptography;

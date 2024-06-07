@@ -1,8 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿///////////////////////////////////////////////////////////////////////////////////////////////
+///  Sample Code for Acme Scanner
+///  Reference Implementation using OPSWAT MetaDefender Endpoint Security SDK
+///  
+///  Created by Chris Seiler
+///  OPSWAT OEM Solutions Architect
+///////////////////////////////////////////////////////////////////////////////////////////////
 
 namespace Compliance
 {

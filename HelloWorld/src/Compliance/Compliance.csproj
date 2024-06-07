@@ -62,8 +62,8 @@
     <PreBuildEvent>$(SolutionDir)\SDKDownloader\$(OutDir)\SDKDownloader download-copy $(SolutionDir)\lib</PreBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
-    <PostBuildEvent>copy $(SolutionDir)\lib $(ProjectDir)$(OutDir)
-copy $(SolutionDir)\license $(ProjectDir)$(OutDir)
+    <PostBuildEvent>copy $(SolutionDir)\license $(ProjectDir)$(OutDir)
+copy $(SolutionDir)\lib $(ProjectDir)$(OutDir)
 </PostBuildEvent>
   </PropertyGroup>
 </Project>
