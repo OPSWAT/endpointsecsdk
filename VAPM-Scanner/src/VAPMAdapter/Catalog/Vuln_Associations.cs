@@ -113,7 +113,7 @@ namespace VAPMAdapter.Catalog
                 result = new List<CatalogVulnerabilityAssociation>();
 
 
-                foreach (JProperty current in jsonVulnAssociationsList.Properties())
+                foreach (JProperty current in jsonVulnAssociationsList.Properties()) // returning null for some reason
                 {
                     CatalogVulnerabilityAssociation newVulnAssociation = new CatalogVulnerabilityAssociation();
 
