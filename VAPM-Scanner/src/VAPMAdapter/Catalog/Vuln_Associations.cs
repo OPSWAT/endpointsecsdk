@@ -102,27 +102,29 @@ namespace VAPMAdapter.Catalog
         {
             if (vulnAssociationList != null)
             {
-                return (vulnAssociationList);
+                return vulnAssociationList;
             }
 
-            List<CatalogVulnerabilityAssociation> result = null;
+            List<CatalogVulnerabilityAssociation> result = new List<CatalogVulnerabilityAssociation>();
+            JObject jsonVulnAssociationsList = (JObject)getVulnAssociationsListJson();
 
-            if (result == null)
+            if (jsonVulnAssociationsList != null)
             {
-                JObject jsonVulnAssociationsList = (JObject)getVulnAssociationsListJson();
-                result = new List<CatalogVulnerabilityAssociation>();
-
-
                 foreach (JProperty current in jsonVulnAssociationsList.Properties())
                 {
-                    CatalogVulnerabilityAssociation newVulnAssociation = new CatalogVulnerabilityAssociation();
+                    CatalogVulnerabilityAssociation newVulnAssociation = new CatalogVulnerabilityAssociation
+                    {
+                        ID = current.Name,
+                        Cve = (string)jsonVulnAssociationsList[current.Name]["cve"],
+                        Type_id = (string)jsonVulnAssociationsList[current.Name]["type_id"],
+                        Os_type = (string)jsonVulnAssociationsList[current.Name]["os_type"]
+                    };
 
-                    newVulnAssociation.ID = current.Name;
-                    newVulnAssociation.Cve = (string)jsonVulnAssociationsList[current.Name]["cve"];
-                    newVulnAssociation.Type_id = (string)jsonVulnAssociationsList[current.Name]["type_id"];
-                    newVulnAssociation.Os_type = (string)jsonVulnAssociationsList[current.Name]["os_type"];
-                    newVulnAssociation.ProductIdSet = (HashSet<string>)getProductIds((JArray)jsonVulnAssociationsList[current.Name]["v4_pids"]);
-                    newVulnAssociation.RangeList = (List<CatalogRange>)getRanges((JArray)jsonVulnAssociationsList[current.Name]["ranges"]);
+                    JArray v4_pids = (JArray)jsonVulnAssociationsList[current.Name]["v4_pids"];
+                    newVulnAssociation.ProductIdSet = v4_pids != null ? (HashSet<string>)getProductIds(v4_pids) : new HashSet<string>();
+
+                    JArray ranges = (JArray)jsonVulnAssociationsList[current.Name]["ranges"];
+                    newVulnAssociation.RangeList = ranges != null ? (List<CatalogRange>)getRanges(ranges) : new List<CatalogRange>();
 
                     result.Add(newVulnAssociation);
                 }
