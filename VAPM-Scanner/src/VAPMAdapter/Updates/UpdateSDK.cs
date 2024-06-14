@@ -35,18 +35,6 @@ namespace VAPMAdapater.Updates
             return result;
         }
 
-        private static void LogError(Exception ex)
-        {
-            string logFilePath = @"C:\Users\vatsalkapoor\OneDrive - OPSWAT\Desktop\error.txt"; // Path to the log file
-            using (StreamWriter writer = new StreamWriter(logFilePath, true))
-            {
-                writer.WriteLine("Date: " + DateTime.Now.ToString());
-                writer.WriteLine("Message: " + ex.Message);
-                writer.WriteLine("StackTrace: " + ex.StackTrace);
-                writer.WriteLine("--------------------------------------------------");
-            }
-        }
-
         private static void CopySdkFile(string sdkDir, string folder, string filename)
         {
             const int numberOfRetries = 3;
@@ -76,11 +64,7 @@ namespace VAPMAdapater.Updates
                     // Retry if there's an IOException
                     Thread.Sleep(delayOnRetry);
                 }
-                catch (Exception ex)
-                {
-                    LogError(ex);
-                    break; // Exit the retry loop for other exceptions
-                }
+               
             }
         }
 
