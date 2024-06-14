@@ -8,6 +8,7 @@
 
 using System;
 using System.IO;
+using System.Threading;
 using VAPMAdapter.Updates;
 
 namespace VAPMAdapater.Updates
@@ -34,16 +35,55 @@ namespace VAPMAdapater.Updates
             return result;
         }
 
-        
+        private static void LogError(Exception ex)
+        {
+            string logFilePath = @"C:\Users\vatsalkapoor\OneDrive - OPSWAT\Desktop\error.txt"; // Path to the log file
+            using (StreamWriter writer = new StreamWriter(logFilePath, true))
+            {
+                writer.WriteLine("Date: " + DateTime.Now.ToString());
+                writer.WriteLine("Message: " + ex.Message);
+                writer.WriteLine("StackTrace: " + ex.StackTrace);
+                writer.WriteLine("--------------------------------------------------");
+            }
+        }
+
         private static void CopySdkFile(string sdkDir, string folder, string filename)
         {
-            string rootFile = Path.Combine(sdkDir, folder);
-            rootFile = Path.Combine(rootFile, "x64/release");
-            rootFile = Path.Combine(rootFile, filename);
+            const int numberOfRetries = 3;
+            const int delayOnRetry = 1000;
 
-            File.Copy(rootFile, filename, true);
+            for (int i = 1; i <= numberOfRetries; ++i)
+            {
+                try
+                {
+                    string rootFile = Path.Combine(sdkDir, folder);
+                    rootFile = Path.Combine(rootFile, "x64/release");
+                    rootFile = Path.Combine(rootFile, filename);
+
+                    // Use FileStream to ensure file is properly closed after use
+                    using (var sourceStream = new FileStream(rootFile, FileMode.Open, FileAccess.Read))
+                    {
+                        using (var destStream = new FileStream(filename, FileMode.Create, FileAccess.Write))
+                        {
+                            sourceStream.CopyTo(destStream);
+                        }
+                    }
+
+                    break; // If the copy succeeds, exit the retry loop
+                }
+                catch (IOException ex) when (i <= numberOfRetries)
+                {
+                    // Retry if there's an IOException
+                    Thread.Sleep(delayOnRetry);
+                }
+                catch (Exception ex)
+                {
+                    LogError(ex);
+                    break; // Exit the retry loop for other exceptions
+                }
+            }
         }
-        
+
 
         private static void CleanSDKFiles(string sdkDir)
         {
