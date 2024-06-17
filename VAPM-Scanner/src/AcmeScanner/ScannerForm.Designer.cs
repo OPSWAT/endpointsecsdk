@@ -692,6 +692,9 @@ namespace AcmeScanner
             tabPage4.ResumeLayout(false);
             panel6.ResumeLayout(false);
             ResumeLayout(false);
+
+            tbCVE = new MaterialSkin.Controls.MaterialTextBox2();
+            Controls.Add(this.tbCVE);
         }
 
         #endregion
