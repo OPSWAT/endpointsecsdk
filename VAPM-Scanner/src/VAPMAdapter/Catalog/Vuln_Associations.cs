@@ -56,10 +56,11 @@ namespace VAPMAdapter.Catalog
 
             foreach (JObject current in oesisJson.Children<JObject>())
             {
-                if ("vuln_associations" == JsonUtil.GetJObjectName(current))
+                if (current.TryGetValue("vuln_associations", out JToken vulnAssociationsToken))
                 {
-                    return ((JObject)current["vuln_associations"]);
+                    return (JObject)vulnAssociationsToken;
                 }
+
             }
 
             return result;
