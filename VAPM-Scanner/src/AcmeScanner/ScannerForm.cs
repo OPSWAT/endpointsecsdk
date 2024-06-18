@@ -782,7 +782,7 @@ namespace AcmeScanner
 
         private void btnLookupCVE_Click(object sender, EventArgs e)
         {
-            string cve = tbCVE.Text;
+            string cve = materialTextBox21.Text;
 
             string cveJson = TaskLookupCVE.LookupCVE(cve);
             if (!string.IsNullOrEmpty(cveJson))
