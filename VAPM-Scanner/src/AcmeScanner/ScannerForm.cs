@@ -28,8 +28,8 @@ namespace AcmeScanner
         static Dictionary<string, ProductScanResult> staticScanResults = new Dictionary<string, ProductScanResult>();
         static Dictionary<string, CatalogSignature> staticSignatureCatalogResults = new Dictionary<string, CatalogSignature>();
         static Dictionary<string, OnlinePatchDetail> staticOrchestrationScanResults = new Dictionary<string, OnlinePatchDetail>();
-        static List<CatalogProduct>     staticProductList = null;
-        static List<PatchStatus>        staticPatchStatusList = null;
+        static List<CatalogProduct> staticProductList = null;
+        static List<PatchStatus> staticPatchStatusList = null;
 
 
         private System.ComponentModel.BackgroundWorker scanWorker;
@@ -40,10 +40,12 @@ namespace AcmeScanner
         private System.ComponentModel.BackgroundWorker loadStatusWorker;
 
 
-
+        //first method called by the main class
         public ScannerForm()
         {
+            //initializes UI componets
             InitializeComponent();
+            //is used to perform async operations
             InitializeBackgroundWorker();
             CheckLicenseFiles();
             UpdateFilesOnStartup();
@@ -79,11 +81,10 @@ namespace AcmeScanner
         {
             scanWorker = new BackgroundWorker();
             scanWorker.DoWork +=
-                new DoWorkEventHandler(scanWorker_DoWork);
+            new DoWorkEventHandler(scanWorker_DoWork);
             scanWorker.RunWorkerCompleted +=
-                new RunWorkerCompletedEventHandler(
+            new RunWorkerCompletedEventHandler(
             scanWorker_Completed);
-
 
             installVAPMPatchWorker = new BackgroundWorker();
             installVAPMPatchWorker.DoWork +=
@@ -120,8 +121,6 @@ namespace AcmeScanner
             loadStatusWorker.RunWorkerCompleted +=
                 new RunWorkerCompletedEventHandler(
             loadStatusWorker_Completed);
-
-
         }
 
         ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -368,12 +367,14 @@ namespace AcmeScanner
 
         private void UpdateCatalogResults()
         {
+            //initialize a new list to hold ListViewItem objects
             List<ListViewItem> resultList = new List<ListViewItem>();
 
             //
             // Setup the header
             //
 
+            //clear exisiting Columns and replace them with new ones
             lvCatalog.Columns.Clear();
             lvCatalog.Columns.Add("Application", 300);
             lvCatalog.Columns.Add("SigId", 80);
@@ -390,6 +391,7 @@ namespace AcmeScanner
 
             lvCatalog.Columns.Add("", 400);
             lvCatalog.View = View.Details;
+            //update ListView control
             lvCatalog.Update();
 
             int productCount = 0;
@@ -400,6 +402,7 @@ namespace AcmeScanner
             {
                 foreach (CatalogSignature signature in product.SigList)
                 {
+                    //determine if the product supports intallation or if the signature supports fresh install
                     bool supportsPatch = product.SupportsInstall;
                     if (supportsPatch && signature.PatchAssociations.Count == 0)
                     {
@@ -412,7 +415,7 @@ namespace AcmeScanner
                         freshInstall = false;
                     }
 
-
+                    //create a new ListViewItem and populate sub-items
                     ListViewItem lviCurrent = new ListViewItem();
                     lviCurrent.Text = signature.Name;
                     lviCurrent.SubItems.Add(signature.Id);
@@ -422,15 +425,10 @@ namespace AcmeScanner
                     lviCurrent.SubItems.Add(freshInstall ? "Yes" : "");
 
 
-                    if (signature.PatchAssociations != null)
-                    {
-                        lviCurrent.SubItems.Add(signature.PatchAssociations.Count.ToString());
-                    }
-                    else
-                    {
-                        lviCurrent.SubItems.Add("");
-                    }
+                    // Add package count or empty string if null
+                    lviCurrent.SubItems.Add(signature.PatchAssociations != null ? signature.PatchAssociations.Count.ToString() : "");
 
+                    // Add install version or empty string if supportsPatch is false
                     if (supportsPatch)
                     {
                         lviCurrent.SubItems.Add(signature.PatchAssociations[0].PatchAggregation.LatestVersion);
@@ -440,18 +438,19 @@ namespace AcmeScanner
                         lviCurrent.SubItems.Add("");
                     }
 
-                    //
-                    // Add the Background and Validate flags
-                    //
+                    // Add Background and Validate flags
                     lviCurrent.SubItems.Add(signature.BackgroundInstallSupport ? "Yes" : "");
                     lviCurrent.SubItems.Add(signature.ValidateInstallSupport ? "Yes" : "");
 
-
-
+                    // Set Tag to store signature Id
                     lviCurrent.Tag = signature.Id;
+
+                    // Add ListViewItem to the resultList
                     resultList.Add(lviCurrent);
 
+                    // Increment counters
                     productCount++;
+                    //I dont believe catalog signature contains any informaiton about CVEcounts, that is why the count here is not incrementing
                     cveCount += signature.CVECount;
                     if (supportsPatch)
                     {
