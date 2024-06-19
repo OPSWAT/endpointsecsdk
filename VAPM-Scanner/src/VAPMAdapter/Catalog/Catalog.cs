@@ -39,7 +39,10 @@ namespace VAPMAdapter.Catalog
 
         }
 
-
+        /// <summary>
+        /// Loads the catalog using the JSON files in the analog folder's server directory.
+        /// </summary>
+        /// <returns>True if the catalog was loaded successfully, otherwise false.</returns>
         public bool Load(string catalogRoot)
         {
             bool result = false;
@@ -80,7 +83,10 @@ namespace VAPMAdapter.Catalog
             return result;
         }
 
-
+        /// <summary>
+        /// Retrieves a list of products from the "products.json" file.
+        /// </summary>
+        /// <returns>A list of CatalogProduct objects representing the products in the file, or null if there's an error.</returns>
         public List<CatalogProduct> GetProductList()
         {
             return Products.GetList();
@@ -91,7 +97,15 @@ namespace VAPMAdapter.Catalog
             return Vuln_Associations.GetList();
         }
 
-
+        /// <summary>
+        /// Gets a list of vulnerability associations for product IDs.
+        /// 
+        /// This function searches a dictionary (`vulDictionary`) where keys are product IDs and values are lists of vulnerability associations.
+        /// It returns a list containing these vulnerability associations for the provided product ID if it exists as a key in the dictionary.
+        /// If the product ID is not found in the dictionary, the function returns an empty list.
+        /// </summary>
+        /// <param name="productId">The product ID to search for vulnerabilities.</param>
+        /// <returns>A list of vulnerability associations for the product ID if found, otherwise an empty list.</returns>
         public List<CatalogVulnerabilityAssociation> GetVulnerabilityAssociationFromProductId(string productID)
         {
             Dictionary<string, List<CatalogVulnerabilityAssociation>> vulDictionary = vuln_Associations.GetProductVulnerablityDictionary();
@@ -104,6 +118,11 @@ namespace VAPMAdapter.Catalog
             return new List<CatalogVulnerabilityAssociation>();
         }
 
+        /// <summary>
+        /// Gets OS type (Windows, Linux, Mac) from "vuln_associations.json" and sets the corresponding field in a `CatalogOSSupport` object.
+        /// Returns the `CatalogOSSupport` object.
+        /// </summary>
+        /// <returns>A `CatalogOSSupport` object indicating the OS type.</returns>
         public CatalogOSSupport GetOSSupportForProductId(string productId)
         {
             CatalogOSSupport result = new CatalogOSSupport();
@@ -139,7 +158,10 @@ namespace VAPMAdapter.Catalog
             return result;
         }
 
-
+        /// <summary>
+        /// Populates CVE list, count, and patch associations for each CatalogSignature within the catalog.
+        /// Modifies the catalog in-place.
+        /// </summary>
         public void PopulateSignatureVulnerability()
         {
             Dictionary<string, CatalogProduct> productDictionary = Products.GetProductIdDictionary();
@@ -184,6 +206,12 @@ namespace VAPMAdapter.Catalog
             return Cves.GetCVEsFromDate(date);
         }
 
+        /// <summary>
+        /// Gets detailed CVEs (description, severity, ID) for CatalogVulnerabilityAssociations using GETCVEDetail().
+        /// Returns a list of CVEDetail objects.
+        /// </summary>
+        /// <param name="cveList">List of CatalogVulnerabilityAssociation objects.</param>
+        /// <returns>List of CVEDetail objects with detailed CVE information.</returns>
         public List<CVEDetail> GetCVEDetailsList(List<CatalogVulnerabilityAssociation> cveList)
         {
             List<CVEDetail> result = new List<CVEDetail>();
