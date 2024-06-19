@@ -27,6 +27,7 @@ namespace VAPMAdapter.Catalog
             return true;
         }
 
+        //Returns JObject containing JSON present in patch_aggregation.json file
         private JObject getPatchAggregationJsonObject()
         {
             JObject result;
@@ -45,7 +46,7 @@ namespace VAPMAdapter.Catalog
             return result;
         }
 
-
+        //Returns list of JObjects under "patch_aggregations" child of JObject returned by getPatchAggregationJsonObject()
         private List<JObject> getPatchAgregationListJson()
         {
             List<JObject> result = new List<JObject>();
@@ -88,6 +89,7 @@ namespace VAPMAdapter.Catalog
         }
 
         // Note this is not written for multi-thread protection
+        //Goes over each JObject fetched from list returned by getPatchAgregationListJson() and returns new list of CatalogPatchAggregation which contain info fetched from JObject like download_links, fresh_installable etc.
         public List<CatalogPatchAggregation> GetList()
         {
             if (patchAggregationList != null)
@@ -129,6 +131,7 @@ namespace VAPMAdapter.Catalog
 
 
         // Note this is not thread safe
+        //Returns dictionary of patch ids mapped to their CatalogPatchAggregation object from GetList()
         public Dictionary<string, CatalogPatchAggregation> GetPatchIdAggregationsDictionary()
         {
             if (patchIdToPatchAggregation != null)
