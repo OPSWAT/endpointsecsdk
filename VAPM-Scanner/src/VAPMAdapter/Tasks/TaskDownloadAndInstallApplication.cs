@@ -17,20 +17,39 @@ using System.Globalization;
 
 namespace VAPMAdapter.Tasks
 {
+    /// <summary>
+    /// Provides methods for downloading and installing application patches using the OESIS framework.
+    /// </summary>
     public class TaskDownloadAndInstallApplication
     {
 
+        /// <summary>
+        /// Generates the local file path for the installer based on the provided details.
+        /// </summary>
+        /// <param name="installerDetails">An object containing the installer details.</param>
+        /// <returns>The local file path for the installer.</returns>
         private static string getLocalPathForInstaller(InstallerDetail installerDetails)
         {
             string result;
 
             string url = installerDetails.url;
+            //generate a filename based on the hash code of the URL and the file type
             string filename = url.GetHashCode() + "." + installerDetails.fileType;
+            //combine the current directory path with the generated filename
             result = Path.Combine(Directory.GetCurrentDirectory(), filename);
 
             return result;
         }
 
+        /// <summary>
+        /// Installs a patch using the provided details.
+        /// </summary>
+        /// <param name="signatureId">The signature ID for the patch.</param>
+        /// <param name="installDetail">An object containing the installer details.</param>
+        /// <param name="forceClose"> Boolean that indicates whether to force close the application during installation.</param>
+        /// <param name="isBackground">Boolean that indicates whether the installation should run in the background.</param>
+        /// <param name="usePatchId">Boolean that indicates whether to use the patch ID for installation.</param>
+        /// <returns>A string result indicating the outcome of the installation.</returns>
         public static string InstallPatch(string signatureId, InstallerDetail installDetail, bool forceClose, bool isBackground, bool usePatchId)
         {
             string result = null;
@@ -48,11 +67,17 @@ namespace VAPMAdapter.Tasks
             }
 
 
-
+            //perform installation
             result = OESISPipe.InstallFromFiles(signatureId, installDetail.path,patchId,installDetail.language,forceClose, isBackground);
             return result;
         }
 
+        /// <summary>
+        /// Validates the installer using the provided signature ID and installation type.
+        /// </summary>
+        /// <param name="signatureId">The signature ID of the installer to validate.</param>
+        /// <param name="isFreshInstall">Indicates whether this is a fresh installation.</param>
+        /// <returns>A boolean indicating whether the installer is valid.</returns>
         private static bool ValidateInstaller(string signatureId, bool isFreshInstall)
         {
             bool result = false;
@@ -73,6 +98,7 @@ namespace VAPMAdapter.Tasks
             string validateResult = OESISPipe.GetLatestInstaller(signatureId, 2, 0, language,false,true,null);
             InstallerDetail currentDetail = OESISUtil.GetInstallerDetail(validateResult);
 
+            // check the result code and determine if the installer is valid
             int result_code = currentDetail.result_code;
             if(result_code >= 0)
             {
@@ -82,6 +108,13 @@ namespace VAPMAdapter.Tasks
             return result;
         }
 
+        /// <summary>
+        /// Retrieves a list of installer details based on the provided signature ID and installation type.
+        /// </summary>
+        /// <param name="signatureId">The signature ID of the installer to retrieve details for.</param>
+        /// <param name="isFreshInstall">Indicates whether this is a fresh installation.</param>
+        /// <param name="isBackgroundInstall">Indicates whether the installation should run in the background.</param>
+        /// <returns>A list of <see cref="InstallerDetail"/> objects containing installer details.</returns>
         //  Note for patching the language will be automatically detected, but for new install a language needs to be specified
         private static List<InstallerDetail> GetInstallerDetailList(string signatureId, bool isFreshInstall, bool isBackgroundInstall)
         {
@@ -105,13 +138,14 @@ namespace VAPMAdapter.Tasks
                         language = ci.ToString();
                     }
 
-
+                    //retrive the latest installer details
                     installDetailString = OESISPipe.GetLatestInstaller(signatureId, 1, Directory.GetCurrentDirectory(), language,isBackgroundInstall); 
 
-
+                    //parses the installer info from the retrieved strings and stores it into InstallerDetail POCO
                     InstallerDetail currentDetail = OESISUtil.GetInstallerDetail(installDetailString);
                     index++;
 
+                    //check to see if the installer is valid
                     if (currentDetail.result_code != -1039)
                     {
                         result.Add(currentDetail);
@@ -132,7 +166,16 @@ namespace VAPMAdapter.Tasks
             return result;
         }
 
-
+        /// <summary>
+        /// Installs and downloads patches based on the provided parameters.
+        /// </summary>
+        /// <param name="signatureId">The signature ID for the patches.</param>
+        /// <param name="isFreshInstall">Indicates whether this is a fresh installation.</param>
+        /// <param name="isBackgroundInstall">Indicates whether the installation should run in the background.</param>
+        /// <param name="isValidatorInstaller">Indicates whether to validate the installer before proceeding.</param>
+        /// <param name="forceClose">Indicates whether to force close the application during installation.</param>
+        /// <param name="usePatchId">Indicates whether to use the patch ID for installation.</param>
+        /// <returns>A <see cref="ProductInstallResult"/> object containing the result of the installation.</returns>
         public static ProductInstallResult InstallAndDownload(  string signatureId, 
                                                                 bool isFreshInstall, 
                                                                 bool isBackgroundInstall, 
@@ -188,6 +231,7 @@ namespace VAPMAdapter.Tasks
             Logger.Log("Getting Install Details");
             List<InstallerDetail> installDetailList = GetInstallerDetailList(signatureId,isFreshInstall,isBackgroundInstall);
             
+            // install each patch from the retrieved details
             foreach (InstallerDetail current in installDetailList)
             {
                 try
