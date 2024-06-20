@@ -27,10 +27,11 @@ namespace InlineLicense
             }
 
             // Check to makes sure the license is in the directory
-            if (!File.Exists(licensePath))
+            if (File.Exists(licensePath))
             {
-                Console.WriteLine("Could not find a license.cfg file.  Make sure that the license provided during evaluation is in the 'solutionRoot/license' directory.  That will compy the file to each sample code.");
-                throw new Exception("License license.cfg file not found");
+                File.Delete("license.hide");
+                // Doing this to make sure the code does not accidentally load the license on the file system.
+                File.Move(licensePath, "license.hide");
             }
 
        
@@ -42,17 +43,20 @@ namespace InlineLicense
             //
             string passkey = File.ReadAllText(passKeyPath);
 
-            string licenseJson = File.ReadAllText(licensePath);
+            string licenseJson = File.ReadAllText("license.hide");
             dynamic jsonOut = JObject.Parse(licenseJson);
-            string license = jsonOut.license_key;
+            string licenseKey = jsonOut.license_key;
+            string license = jsonOut.license;
 
-            string config = "{ \"config\" : { \"license_key_bytes\":\"" + license + "\",\"passkey_string\": \"" + passkey + "\", \"enable_pretty_print\": true, \"online_mode\": true, \"silent_mode\": true } }";
+       
+            string config = "{ \"config\" : { \"license_bytes\":\"" + license + "\",\"license_key_bytes\":\"" + licenseKey + "\",\"passkey_string\": \"" + passkey + "\", \"enable_pretty_print\": true, \"online_mode\": true, \"silent_mode\": true } }";
 
 
             IntPtr outPtr = IntPtr.Zero;
             // Note if you get a Bad Image exception, that may be because Prefer 32-bit is checked
             int rc = OESISAdapter.wa_api_setup(config, out outPtr);
             string json_out = "{ }";
+                        
             if (outPtr != IntPtr.Zero)
             {
                 json_out = XStringMarshaler.PtrToString(outPtr);
