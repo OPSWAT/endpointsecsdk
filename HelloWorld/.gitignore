@@ -1,7 +1,8 @@
 .vs/
 src/packages/
 src/lib/
-src/license/
+src/license/license.cfg
+src/license/pass_key.txt
 
 src/Compliance/bin/
 src/Compliance/obj/
@@ -23,3 +24,8 @@ src/SDKDownloadLib/bin/
 src/SDKDownloadLib/obj/
 src/SDKDownloadLib/.vs/
 src/SDKDownloadLib/SDKDownloadLib.csproj.user
+
+src/InlineLicense/bin/
+src/InlineLicense/obj/
+src/InlineLicense/.vs/
+src/InlineLicense/InlineLicense.csproj.user
