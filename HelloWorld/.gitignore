@@ -1,10 +1,18 @@
 .vs/
 src/packages/
 src/lib/
+src/license/
+
 src/Compliance/bin/
 src/Compliance/obj/
 src/Compliance/.vs/
 src/Compliance/Compliance.csproj.user
+
+src/Vulnerability/bin/
+src/Vulnerability/obj/
+src/Vulnerability/.vs/
+src/Vulnerability/Vulnerability.csproj.user
+
 
 src/SDKDownloader/bin/
 src/SDKDownloader/obj/
