@@ -56,7 +56,9 @@ namespace VAPMAdapter.Catalog
 
             foreach (JObject current in oesisJson.Children<JObject>())
             {
-                if ("vuln_associations" == JsonUtil.GetJObjectName(current))
+                // Note need to handle to sets of data now
+
+                if (JsonUtil.GetJObjectName(current).Contains("vuln_associations"))
                 {
                     return ((JObject)current["vuln_associations"]);
                 }
