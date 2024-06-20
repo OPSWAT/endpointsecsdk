@@ -88,7 +88,7 @@ namespace VAPMAdapter.Catalog
         ///   - Adds all signatures to the product's `SigList` field.
         /// Finally, the function adds each `CatalogProduct` to a result list and returns the list.
         /// </summary>
-        /// <returns>A list of CatalogProduct objects representing products, or null if retrieval fails.</returns>
+        /// <returns>A list of CatalogProduct objects representing products, or empty list if retrieval fails.</returns>
         public List<CatalogProduct> GetList()
         {
             // Return the cache version
@@ -179,7 +179,7 @@ namespace VAPMAdapter.Catalog
         /// It then iterates through the product list, creating a dictionary that maps product IDs to the corresponding CatalogProduct objects.
         /// Finally, the function returns the constructed dictionary.
         /// </summary>
-        /// <returns>A dictionary mapping product IDs to CatalogProduct objects, or null if retrieval fails.</returns>
+        /// <returns>A dictionary mapping product IDs to CatalogProduct objects, or empty dictionary if retrieval fails.</returns>
         public Dictionary<string, CatalogProduct> GetProductIdDictionary()
         {
             if (productDictionary != null)
