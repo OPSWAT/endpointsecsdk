@@ -30,6 +30,11 @@ namespace VAPMAdapter.Catalog
             return result;
         }
 
+
+        /// <summary>
+        /// Reads "products.json" as a JObject. Throws exception if unsuccessful.
+        /// </summary>
+        /// <returns>A JObject representing the parsed JSON content.</returns>
         private JObject getProductJsonObject()
         {
             JObject result;
@@ -48,7 +53,12 @@ namespace VAPMAdapter.Catalog
             return result;
         }
 
-
+        /// <summary>
+        /// Extracts the JSON content under the "products" header from a provided JObject.
+        /// This function assumes the JObject is retrieved using `getProductJsonObject`.
+        /// Otherwise, the function returns null.
+        /// </summary>
+        /// <returns>A JObject containing product data if found under the "products" header, otherwise null.</returns>
         private JObject getProductsListJson()
         {
             JObject result = null;
@@ -67,8 +77,18 @@ namespace VAPMAdapter.Catalog
             return result;
         }
 
-
         // Note this is not thread safe
+        /// <summary>
+        /// This function prioritizes returning the existing productList if it's not null.
+        /// If productList is null, it retrieves a JObject from getProductsListJson().
+        /// It then iterates through the JObject properties, creating `CatalogProduct` objects for each product:
+        ///   - Extracts values (Id, Name, Vendor) from the JSON content.
+        ///   - Creates a nested loop to process the "signatures" array within each product.
+        ///     - For each signature, it creates a `CatalogSignature` object (FreshInstall, Name, Id).
+        ///   - Adds all signatures to the product's `SigList` field.
+        /// Finally, the function adds each `CatalogProduct` to a result list and returns the list.
+        /// </summary>
+        /// <returns>A list of CatalogProduct objects representing products, or empty list if retrieval fails.</returns>
         public List<CatalogProduct> GetList()
         {
             // Return the cache version
@@ -153,6 +173,13 @@ namespace VAPMAdapter.Catalog
         }
 
         // Note this is not Thread Safe
+        /// <summary> 
+        /// This function prioritizes returning the existing productDictionary if it's not null.
+        /// If productDictionary is null, it assumes GetList() retrieves a list of CatalogProduct objects.
+        /// It then iterates through the product list, creating a dictionary that maps product IDs to the corresponding CatalogProduct objects.
+        /// Finally, the function returns the constructed dictionary.
+        /// </summary>
+        /// <returns>A dictionary mapping product IDs to CatalogProduct objects, or empty dictionary if retrieval fails.</returns>
         public Dictionary<string, CatalogProduct> GetProductIdDictionary()
         {
             if (productDictionary != null)
