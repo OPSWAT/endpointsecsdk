@@ -53,7 +53,6 @@ namespace AcmeScanner
             tabPage3 = new TabPage();
             lvCatalog = new ScannerListView();
             panel5 = new Panel();
-            materialTextBox21 = new MaterialSkin.Controls.MaterialTextBox2();
             btnDomainCSV = new MaterialSkin.Controls.MaterialButton();
             btnFreshInstall = new MaterialSkin.Controls.MaterialButton();
             btnExportCSV = new MaterialSkin.Controls.MaterialButton();
@@ -277,6 +276,7 @@ namespace AcmeScanner
             lvScanResults.TabIndex = 2;
             lvScanResults.UseCompatibleStateImageBehavior = false;
             lvScanResults.View = View.Details;
+            lvScanResults.SelectedIndexChanged += lvScanResults_SelectedIndexChanged;
             // 
             // tabPage2
             // 
@@ -414,7 +414,6 @@ namespace AcmeScanner
             // panel5
             // 
             panel5.BorderStyle = BorderStyle.FixedSingle;
-            panel5.Controls.Add(materialTextBox21);
             panel5.Controls.Add(btnDomainCSV);
             panel5.Controls.Add(btnFreshInstall);
             panel5.Controls.Add(btnExportCSV);
@@ -434,37 +433,6 @@ namespace AcmeScanner
             panel5.Padding = new Padding(21, 25, 21, 25);
             panel5.Size = new System.Drawing.Size(1509, 127);
             panel5.TabIndex = 5;
-            // 
-            // materialTextBox21
-            // 
-            materialTextBox21.AnimateReadOnly = false;
-            materialTextBox21.AutoCompleteMode = AutoCompleteMode.None;
-            materialTextBox21.AutoCompleteSource = AutoCompleteSource.None;
-            materialTextBox21.BackgroundImageLayout = ImageLayout.None;
-            materialTextBox21.CharacterCasing = CharacterCasing.Normal;
-            materialTextBox21.Depth = 0;
-            materialTextBox21.Font = new System.Drawing.Font("Microsoft Sans Serif", 16F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Pixel);
-            materialTextBox21.HideSelection = true;
-            materialTextBox21.LeadingIcon = null;
-            materialTextBox21.Location = new System.Drawing.Point(479, 52);
-            materialTextBox21.MaxLength = 32767;
-            materialTextBox21.MouseState = MaterialSkin.MouseState.OUT;
-            materialTextBox21.Name = "materialTextBox21";
-            materialTextBox21.PasswordChar = '\0';
-            materialTextBox21.PrefixSuffixText = null;
-            materialTextBox21.ReadOnly = false;
-            materialTextBox21.RightToLeft = RightToLeft.No;
-            materialTextBox21.SelectedText = "";
-            materialTextBox21.SelectionLength = 0;
-            materialTextBox21.SelectionStart = 0;
-            materialTextBox21.ShortcutsEnabled = true;
-            materialTextBox21.Size = new System.Drawing.Size(166, 48);
-            materialTextBox21.TabIndex = 14;
-            materialTextBox21.TabStop = false;
-            materialTextBox21.Text = "Enter CVE";
-            materialTextBox21.TextAlign = HorizontalAlignment.Left;
-            materialTextBox21.TrailingIcon = null;
-            materialTextBox21.UseSystemPasswordChar = false;
             // 
             // btnDomainCSV
             // 
@@ -819,6 +787,5 @@ namespace AcmeScanner
         private ScannerListView lvStatus;
         private Panel panel6;
         private MaterialSkin.Controls.MaterialButton btnRefreshStatus;
-        private MaterialSkin.Controls.MaterialTextBox2 materialTextBox21;
     }
 }

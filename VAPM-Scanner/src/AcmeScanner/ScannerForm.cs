@@ -781,19 +781,8 @@ namespace AcmeScanner
 
         private void btnLookupCVE_Click(object sender, EventArgs e)
         {
-            string cve = materialTextBox21.Text;
-
-            string cveJson = TaskLookupCVE.LookupCVE(cve);
-            if (!string.IsNullOrEmpty(cveJson))
-            {
-                TextDialog textDialog = new TextDialog(cveJson);
-                textDialog.StartPosition = FormStartPosition.CenterParent;
-                textDialog.ShowDialog();
-            }
-            else
-            {
-                ShowMessageDialog("CVE Entered is not valid.  Check the value and try again.", false);
-            }
+            LookupCVEBox cb = new LookupCVEBox();
+            cb.ShowDialog();
         }
 
         private void btnExportCSV_Click(object sender, EventArgs e)
@@ -932,6 +921,11 @@ namespace AcmeScanner
         {
             ShowLoading(true);
             loadStatusWorker.RunWorkerAsync();
+        }
+
+        private void lvScanResults_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
         }
     }
 }
