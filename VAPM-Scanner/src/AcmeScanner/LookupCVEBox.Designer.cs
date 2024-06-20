@@ -30,6 +30,7 @@
         {
             TB_CVE = new MaterialSkin.Controls.MaterialTextBox2();
             CallLookup = new MaterialSkin.Controls.MaterialButton();
+            download_json = new MaterialSkin.Controls.MaterialButton();
             SuspendLayout();
             // 
             // TB_CVE
@@ -75,7 +76,7 @@
             CallLookup.MouseState = MaterialSkin.MouseState.HOVER;
             CallLookup.Name = "CallLookup";
             CallLookup.NoAccentTextColor = System.Drawing.Color.Empty;
-            CallLookup.Size = new System.Drawing.Size(77, 36);
+            CallLookup.Size = new System.Drawing.Size(78, 36);
             CallLookup.TabIndex = 1;
             CallLookup.Text = "Lookup";
             CallLookup.Type = MaterialSkin.Controls.MaterialButton.MaterialButtonType.Contained;
@@ -83,11 +84,32 @@
             CallLookup.UseVisualStyleBackColor = true;
             CallLookup.Click += CallLookup_Click;
             // 
+            // download_json
+            // 
+            download_json.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            download_json.Density = MaterialSkin.Controls.MaterialButton.MaterialButtonDensity.Default;
+            download_json.Depth = 0;
+            download_json.HighEmphasis = true;
+            download_json.Icon = null;
+            download_json.Location = new System.Drawing.Point(575, 221);
+            download_json.Margin = new System.Windows.Forms.Padding(4, 6, 4, 6);
+            download_json.MouseState = MaterialSkin.MouseState.HOVER;
+            download_json.Name = "download_json";
+            download_json.NoAccentTextColor = System.Drawing.Color.Empty;
+            download_json.Size = new System.Drawing.Size(158, 36);
+            download_json.TabIndex = 2;
+            download_json.Text = "Download .txt file";
+            download_json.Type = MaterialSkin.Controls.MaterialButton.MaterialButtonType.Contained;
+            download_json.UseAccentColor = false;
+            download_json.UseVisualStyleBackColor = true;
+            download_json.Click += download_json_Click;
+            // 
             // LookupCVEBox
             // 
             AutoScaleDimensions = new System.Drawing.SizeF(10F, 25F);
             AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             ClientSize = new System.Drawing.Size(800, 450);
+            Controls.Add(download_json);
             Controls.Add(CallLookup);
             Controls.Add(TB_CVE);
             Name = "LookupCVEBox";
@@ -100,5 +122,6 @@
 
         private MaterialSkin.Controls.MaterialTextBox2 TB_CVE;
         private MaterialSkin.Controls.MaterialButton CallLookup;
+        private MaterialSkin.Controls.MaterialButton download_json;
     }
 }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -46,6 +47,26 @@ namespace AcmeScanner
                 TextDialog textDialog = new TextDialog(cveJson);
                 textDialog.StartPosition = FormStartPosition.CenterParent;
                 textDialog.ShowDialog();
+            }
+            else
+            {
+                ShowMessageDialog("CVE Entered is not valid.  Check the value and try again.", false);
+            }
+        }
+
+        private void download_json_Click(object sender, EventArgs e)
+        {
+            string cve = TB_CVE.Text;
+            string cveJson = TaskLookupCVE.LookupCVE(cve);
+            if (!string.IsNullOrEmpty(cveJson))
+            {
+                // create a writer and open the file
+                TextWriter tw = new StreamWriter(TB_CVE.Text + ".txt");
+                // write a line of text to the file
+                tw.WriteLine(cveJson);
+                // close the stream
+                tw.Close();
+                MessageBox.Show("Saved to " + TB_CVE.Text + ".txt", "CVE", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             else
             {
