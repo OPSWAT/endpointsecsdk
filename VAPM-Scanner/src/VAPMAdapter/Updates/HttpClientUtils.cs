@@ -16,10 +16,17 @@ using VAPMAdapater.Log;
 
 namespace VAPMAdapater.Updates
 {
+    /// <summary>
+    /// Provides utility methods for downloading files and validating their integrity
+    /// </summary>
     internal static class HttpClientUtils
     {
 
-        // Display the byte array in a readable format.
+        /// <summary>
+        /// Converts a byte array to a string representation.
+        /// </summary>
+        /// <param name="array">The byte array to convert.</param>
+        /// <returns>A string representation of the byte array.</returns>
         public static string ByteArrayToString(byte[] array)
         {
             StringBuilder result = new StringBuilder();
@@ -31,6 +38,12 @@ namespace VAPMAdapater.Updates
             return result.ToString();
         }
 
+        /// <summary>
+        /// Checks the SHA256 hash of a file against an expected hash.
+        /// </summary>
+        /// <param name="file">The file to check.</param>
+        /// <param name="expectedHash">The expected SHA256 hash.</param>
+        /// <returns>True if the hash matches, otherwise false.</returns>
         private static bool CheckSha256(string file, string expectedHash)
         {
             bool result = false;
@@ -72,7 +85,13 @@ namespace VAPMAdapater.Updates
             return result;
         }
 
-
+        /// <summary>
+        /// Downloads a file from the specified URL and validates its SHA256 hash.
+        /// </summary>
+        /// <param name="url">The URL of the file to download.</param>
+        /// <param name="localFilePath">The local file path where the downloaded file will be saved.</param>
+        /// <param name="sha256Hash">The expected SHA256 hash of the file.</param>
+        /// <returns>True if the file was downloaded and validated successfully, otherwise false.</returns>
         public static bool DownloadValidFile(string url, string localFilePath, string sha256Hash)
         {
             bool result = false;
@@ -109,6 +128,11 @@ namespace VAPMAdapater.Updates
             return result;
         }
 
+        /// <summary>
+        /// Downloads a file from the specified URL and saves it to the destination path synchronously.
+        /// </summary>
+        /// <param name="url">The URL of the file to download.</param>
+        /// <param name="destPath">The local file path where the downloaded file will be saved.</param>
         public static void DownloadFileSynchronous(string url, string destPath)
         {
             using (var client = new System.Net.Http.HttpClient()) // WebClient
@@ -130,7 +154,12 @@ namespace VAPMAdapater.Updates
         }
 
 
-
+        /// <summary>
+        /// Asynchronously downloads a file from the specified URI and saves it to the given file name.
+        /// </summary>
+        /// <param name="client">The HttpClient to use for downloading the file.</param>
+        /// <param name="uri">The URI of the file to download.</param>
+        /// <param name="fileName">The local file path where the downloaded file will be saved.</param>
         public static async Task DownloadFileTaskAsync(this HttpClient client, Uri uri, string FileName)
         {
             using (var s = await client.GetStreamAsync(uri))

@@ -39,7 +39,6 @@ namespace AcmeScanner
         private System.ComponentModel.BackgroundWorker loadCatalogWorker;
         private System.ComponentModel.BackgroundWorker loadStatusWorker;
 
-
         //first method called by the main class
         public ScannerForm()
         {
