@@ -33,6 +33,10 @@ namespace AcmeScanner
             components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ScannerForm));
             panel1 = new Panel();
+            label7 = new Label();
+            label6 = new Label();
+            label5 = new Label();
+            label4 = new Label();
             btnUpdate = new MaterialSkin.Controls.MaterialButton();
             btnInstall = new MaterialSkin.Controls.MaterialButton();
             btnCVEJSON = new MaterialSkin.Controls.MaterialButton();
@@ -70,7 +74,8 @@ namespace AcmeScanner
             panel6 = new Panel();
             btnRefreshStatus = new MaterialSkin.Controls.MaterialButton();
             timer1 = new Timer(components);
-            tbCVE = new MaterialSkin.Controls.MaterialTextBox2();
+            label8 = new Label();
+            label9 = new Label();
             panel1.SuspendLayout();
             panel3.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)pbLoading).BeginInit();
@@ -88,6 +93,12 @@ namespace AcmeScanner
             // panel1
             // 
             panel1.BorderStyle = BorderStyle.FixedSingle;
+            panel1.Controls.Add(label9);
+            panel1.Controls.Add(label8);
+            panel1.Controls.Add(label7);
+            panel1.Controls.Add(label6);
+            panel1.Controls.Add(label5);
+            panel1.Controls.Add(label4);
             panel1.Controls.Add(btnUpdate);
             panel1.Controls.Add(btnInstall);
             panel1.Controls.Add(btnCVEJSON);
@@ -100,6 +111,40 @@ namespace AcmeScanner
             panel1.Padding = new Padding(21, 25, 21, 25);
             panel1.Size = new System.Drawing.Size(1509, 127);
             panel1.TabIndex = 1;
+            // 
+            // label7
+            // 
+            label7.AutoSize = true;
+            label7.Location = new System.Drawing.Point(930, 51);
+            label7.Name = "label7";
+            label7.Size = new System.Drawing.Size(0, 25);
+            label7.TabIndex = 8;
+            // 
+            // label6
+            // 
+            label6.AutoSize = true;
+            label6.Location = new System.Drawing.Point(812, 50);
+            label6.Name = "label6";
+            label6.Size = new System.Drawing.Size(112, 25);
+            label6.TabIndex = 7;
+            label6.Text = "SDK Update:";
+            // 
+            // label5
+            // 
+            label5.AutoSize = true;
+            label5.Location = new System.Drawing.Point(941, 23);
+            label5.Name = "label5";
+            label5.Size = new System.Drawing.Size(0, 25);
+            label5.TabIndex = 6;
+            // 
+            // label4
+            // 
+            label4.AutoSize = true;
+            label4.Location = new System.Drawing.Point(812, 25);
+            label4.Name = "label4";
+            label4.Size = new System.Drawing.Size(112, 25);
+            label4.TabIndex = 5;
+            label4.Text = "SDK Version:";
             // 
             // btnUpdate
             // 
@@ -688,36 +733,22 @@ namespace AcmeScanner
             btnRefreshStatus.UseVisualStyleBackColor = true;
             btnRefreshStatus.Click += btnRefreshStatus_Click;
             // 
-            // tbCVE
+            // label8
             // 
-            tbCVE.AnimateReadOnly = false;
-            tbCVE.AutoCompleteMode = AutoCompleteMode.None;
-            tbCVE.AutoCompleteSource = AutoCompleteSource.None;
-            tbCVE.BackgroundImageLayout = ImageLayout.None;
-            tbCVE.CharacterCasing = CharacterCasing.Normal;
-            tbCVE.Depth = 0;
-            tbCVE.Font = new System.Drawing.Font("Microsoft Sans Serif", 16F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Pixel);
-            tbCVE.HideSelection = true;
-            tbCVE.LeadingIcon = null;
-            tbCVE.Location = new System.Drawing.Point(0, 0);
-            tbCVE.Margin = new Padding(4, 5, 4, 5);
-            tbCVE.MaxLength = 32767;
-            tbCVE.MouseState = MaterialSkin.MouseState.OUT;
-            tbCVE.Name = "tbCVE";
-            tbCVE.PasswordChar = '\0';
-            tbCVE.PrefixSuffixText = null;
-            tbCVE.ReadOnly = false;
-            tbCVE.RightToLeft = RightToLeft.No;
-            tbCVE.SelectedText = "";
-            tbCVE.SelectionLength = 0;
-            tbCVE.SelectionStart = 0;
-            tbCVE.ShortcutsEnabled = true;
-            tbCVE.Size = new System.Drawing.Size(357, 48);
-            tbCVE.TabIndex = 3;
-            tbCVE.TabStop = false;
-            tbCVE.TextAlign = HorizontalAlignment.Left;
-            tbCVE.TrailingIcon = null;
-            tbCVE.UseSystemPasswordChar = false;
+            label8.AutoSize = true;
+            label8.Location = new System.Drawing.Point(812, 75);
+            label8.Name = "label8";
+            label8.Size = new System.Drawing.Size(136, 25);
+            label8.TabIndex = 9;
+            label8.Text = "Analog Update:";
+            // 
+            // label9
+            // 
+            label9.AutoSize = true;
+            label9.Location = new System.Drawing.Point(941, 75);
+            label9.Name = "label9";
+            label9.Size = new System.Drawing.Size(0, 25);
+            label9.TabIndex = 10;
             // 
             // ScannerForm
             // 
@@ -725,7 +756,6 @@ namespace AcmeScanner
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new System.Drawing.Size(1569, 1050);
             Controls.Add(panel3);
-            Controls.Add(tbCVE);
             Icon = (System.Drawing.Icon)resources.GetObject("$this.Icon");
             Margin = new Padding(4, 5, 4, 5);
             Name = "ScannerForm";
@@ -787,5 +817,11 @@ namespace AcmeScanner
         private ScannerListView lvStatus;
         private Panel panel6;
         private MaterialSkin.Controls.MaterialButton btnRefreshStatus;
+        private Label label5;
+        private Label label4;
+        private Label label7;
+        private Label label6;
+        private Label label9;
+        private Label label8;
     }
 }

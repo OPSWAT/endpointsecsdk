@@ -9,9 +9,11 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -48,8 +50,21 @@ namespace AcmeScanner
             InitializeBackgroundWorker();
             CheckLicenseFiles();
             UpdateFilesOnStartup();
+            fillSDKlabels();
         }
 
+        private void fillSDKlabels()
+        {
+            FileInfo vmodInfo = new FileInfo("libwavmodapi.dll");
+            FileVersionInfo versionInfo = FileVersionInfo.GetVersionInfo(vmodInfo.FullName);
+            string productVersion = versionInfo.ProductVersion;
+            label5.Text = productVersion;
+            DateTime lastModified = vmodInfo.LastWriteTime.Date;
+            label7.Text = lastModified.ToString("MMMM dd, yyyy");
+            FileInfo dbFileInfo = new FileInfo(@"catalog\analog\server\patch_aggregation.json");
+            DateTime lastModifiedDB = dbFileInfo.LastWriteTime.Date;
+            label9.Text = lastModifiedDB.ToString("MMMM dd, yyyy");
+        }
 
         private void CheckLicenseFiles()
         {
@@ -71,6 +86,7 @@ namespace AcmeScanner
             {
                 ShowLoading(true);
                 updateDBWorker.RunWorkerAsync(false);
+                
             }
         }
 
@@ -293,6 +309,7 @@ namespace AcmeScanner
         private void updateDBWorker_Completed(object sender, RunWorkerCompletedEventArgs e)
         {
             ShowLoading(false);
+            fillSDKlabels();//change sdk labels to current version
         }
 
 

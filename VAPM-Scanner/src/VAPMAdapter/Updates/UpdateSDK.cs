@@ -7,6 +7,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Threading;
 using VAPMAdapter.Updates;
@@ -29,7 +30,6 @@ namespace VAPMAdapater.Updates
             if (File.Exists("libwavmodapi.dll"))
             {
                 FileInfo vmodInfo = new FileInfo("libwavmodapi.dll");
-
                 // Update the SDK every 7 days
                 if (vmodInfo.LastWriteTime > DateTime.Now.AddDays(-7))
                 {
