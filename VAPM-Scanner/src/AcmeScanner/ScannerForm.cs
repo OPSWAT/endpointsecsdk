@@ -61,7 +61,7 @@ namespace AcmeScanner
             label5.Text = productVersion;
             DateTime lastModified = vmodInfo.LastWriteTime.Date;
             label7.Text = lastModified.ToString("MMMM dd, yyyy");
-            FileInfo dbFileInfo = new FileInfo(@"catalog\analog\server\patch_aggregation.json");
+            FileInfo dbFileInfo = new FileInfo("patch.dat");
             DateTime lastModifiedDB = dbFileInfo.LastWriteTime.Date;
             label9.Text = lastModifiedDB.ToString("MMMM dd, yyyy");
         }
@@ -298,12 +298,12 @@ namespace AcmeScanner
         {
             bool sdkOnly = (bool)e.Argument;
 
-            UpdateSDK.DownloadAndInstall_OPSWAT_SDK();
-
             if (!sdkOnly)
             {
                 UpdateDBFiles.DownloadFiles();
             }
+
+            else { UpdateSDK.DownloadAndInstall_OPSWAT_SDK(); }
         }
 
         private void updateDBWorker_Completed(object sender, RunWorkerCompletedEventArgs e)
