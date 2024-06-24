@@ -59,11 +59,28 @@ namespace AcmeScanner
             FileVersionInfo versionInfo = FileVersionInfo.GetVersionInfo(vmodInfo.FullName);
             string productVersion = versionInfo.ProductVersion;
             label5.Text = productVersion;
+            label13.Text = productVersion;
             DateTime lastModified = vmodInfo.LastWriteTime.Date;
+            if ((DateTime.Now - lastModified).TotalDays > 7)
+            {
+                label6.ForeColor = System.Drawing.Color.Red;
+                label7.ForeColor = System.Drawing.Color.Red;
+                label11.ForeColor = System.Drawing.Color.Red;
+                label14.ForeColor = System.Drawing.Color.Red;
+            }
             label7.Text = lastModified.ToString("MMMM dd, yyyy");
+            label14.Text = label7.Text;
             FileInfo dbFileInfo = new FileInfo("patch.dat");
             DateTime lastModifiedDB = dbFileInfo.LastWriteTime.Date;
+            if ((DateTime.Now - lastModifiedDB).TotalDays > 7)
+            {
+                label9.ForeColor = System.Drawing.Color.Red;
+                label8.ForeColor = System.Drawing.Color.Red;
+                label12.ForeColor = System.Drawing.Color.Red;
+                label15.ForeColor = System.Drawing.Color.Red;
+            }
             label9.Text = lastModifiedDB.ToString("MMMM dd, yyyy");
+            label15.Text = label9.Text;
         }
 
         private void CheckLicenseFiles()
@@ -84,9 +101,13 @@ namespace AcmeScanner
         {
             if (!UpdateSDK.isSDKUpdated())
             {
-                ShowLoading(true);
-                updateDBWorker.RunWorkerAsync(false);
-                
+                btnUpdateSDK.UseAccentColor = true;
+
+            }
+            
+            if (!UpdateDBFiles.isDBUpdated())
+            {
+                btnUpdate.UseAccentColor = true;
             }
         }
 
@@ -301,9 +322,22 @@ namespace AcmeScanner
             if (!sdkOnly)
             {
                 UpdateDBFiles.DownloadFiles();
+                btnUpdate.UseAccentColor = false;
+                label8.ForeColor = System.Drawing.Color.Black;
+                label9.ForeColor = System.Drawing.Color.Black;
+                label12.ForeColor = System.Drawing.Color.Black;
+                label15.ForeColor = System.Drawing.Color.Black;
             }
 
-            else { UpdateSDK.DownloadAndInstall_OPSWAT_SDK(); }
+            else 
+            { 
+                UpdateSDK.DownloadAndInstall_OPSWAT_SDK(); 
+                btnUpdateSDK.UseAccentColor = false;
+                label6.ForeColor = System.Drawing.Color.Black;
+                label7.ForeColor = System.Drawing.Color.Black;
+                label11.ForeColor = System.Drawing.Color.Black;
+                label14.ForeColor = System.Drawing.Color.Black;
+            }
         }
 
         private void updateDBWorker_Completed(object sender, RunWorkerCompletedEventArgs e)

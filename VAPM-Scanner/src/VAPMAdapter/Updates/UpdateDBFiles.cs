@@ -9,6 +9,7 @@
 using VAPMAdapater.Updates;
 using VAPMAdapater;
 using System.IO;
+using System;
 
 namespace VAPMAdapter.Updates
 {
@@ -50,6 +51,23 @@ namespace VAPMAdapter.Updates
             DownloadDBFile(destPath, VAPMSettings.WINDOWS_PATCH_DB);
             DownloadDBFile(destPath, VAPMSettings.WINDOWS_VULNERABILITY_DB);
             DownloadDBFile(destPath, VAPMSettings.PATCH_CHECKSUMS_DB);
+        }
+
+        public static bool isDBUpdated()
+        {
+            bool result = false;
+
+            if (File.Exists("patch.dat"))
+            {
+                FileInfo dbFileInfo = new FileInfo("patch.dat");
+                // Update the SDK every 7 days
+                if (dbFileInfo.LastWriteTime > DateTime.Now.AddDays(-7))
+                {
+                    result = true;
+                }
+            }
+
+            return result;
         }
     }
 }

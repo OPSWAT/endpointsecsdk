@@ -33,6 +33,8 @@ namespace AcmeScanner
             components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ScannerForm));
             panel1 = new Panel();
+            label9 = new Label();
+            label8 = new Label();
             label7 = new Label();
             label6 = new Label();
             label5 = new Label();
@@ -74,8 +76,12 @@ namespace AcmeScanner
             panel6 = new Panel();
             btnRefreshStatus = new MaterialSkin.Controls.MaterialButton();
             timer1 = new Timer(components);
-            label8 = new Label();
-            label9 = new Label();
+            label10 = new Label();
+            label11 = new Label();
+            label12 = new Label();
+            label13 = new Label();
+            label14 = new Label();
+            label15 = new Label();
             panel1.SuspendLayout();
             panel3.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)pbLoading).BeginInit();
@@ -112,6 +118,23 @@ namespace AcmeScanner
             panel1.Size = new System.Drawing.Size(1509, 127);
             panel1.TabIndex = 1;
             // 
+            // label9
+            // 
+            label9.AutoSize = true;
+            label9.Location = new System.Drawing.Point(941, 75);
+            label9.Name = "label9";
+            label9.Size = new System.Drawing.Size(0, 25);
+            label9.TabIndex = 10;
+            // 
+            // label8
+            // 
+            label8.AutoSize = true;
+            label8.Location = new System.Drawing.Point(812, 75);
+            label8.Name = "label8";
+            label8.Size = new System.Drawing.Size(136, 25);
+            label8.TabIndex = 9;
+            label8.Text = "Analog Update:";
+            // 
             // label7
             // 
             label7.AutoSize = true;
@@ -132,7 +155,7 @@ namespace AcmeScanner
             // label5
             // 
             label5.AutoSize = true;
-            label5.Location = new System.Drawing.Point(941, 23);
+            label5.Location = new System.Drawing.Point(930, 26);
             label5.Name = "label5";
             label5.Size = new System.Drawing.Size(0, 25);
             label5.TabIndex = 6;
@@ -354,6 +377,12 @@ namespace AcmeScanner
             // panel4
             // 
             panel4.BorderStyle = BorderStyle.FixedSingle;
+            panel4.Controls.Add(label15);
+            panel4.Controls.Add(label14);
+            panel4.Controls.Add(label13);
+            panel4.Controls.Add(label12);
+            panel4.Controls.Add(label11);
+            panel4.Controls.Add(label10);
             panel4.Controls.Add(btnUpdateSDK);
             panel4.Controls.Add(btnInstallOrchestration);
             panel4.Controls.Add(btnScanOrchestration);
@@ -733,22 +762,56 @@ namespace AcmeScanner
             btnRefreshStatus.UseVisualStyleBackColor = true;
             btnRefreshStatus.Click += btnRefreshStatus_Click;
             // 
-            // label8
+            // label10
             // 
-            label8.AutoSize = true;
-            label8.Location = new System.Drawing.Point(812, 75);
-            label8.Name = "label8";
-            label8.Size = new System.Drawing.Size(136, 25);
-            label8.TabIndex = 9;
-            label8.Text = "Analog Update:";
+            label10.AutoSize = true;
+            label10.Location = new System.Drawing.Point(812, 25);
+            label10.Name = "label10";
+            label10.Size = new System.Drawing.Size(112, 25);
+            label10.TabIndex = 5;
+            label10.Text = "SDK Version:";
             // 
-            // label9
+            // label11
             // 
-            label9.AutoSize = true;
-            label9.Location = new System.Drawing.Point(941, 75);
-            label9.Name = "label9";
-            label9.Size = new System.Drawing.Size(0, 25);
-            label9.TabIndex = 10;
+            label11.AutoSize = true;
+            label11.Location = new System.Drawing.Point(812, 50);
+            label11.Name = "label11";
+            label11.Size = new System.Drawing.Size(112, 25);
+            label11.TabIndex = 6;
+            label11.Text = "SDK Update:";
+            // 
+            // label12
+            // 
+            label12.AutoSize = true;
+            label12.Location = new System.Drawing.Point(812, 75);
+            label12.Name = "label12";
+            label12.Size = new System.Drawing.Size(136, 25);
+            label12.TabIndex = 7;
+            label12.Text = "Analog Update:";
+            // 
+            // label13
+            // 
+            label13.AutoSize = true;
+            label13.Location = new System.Drawing.Point(930, 26);
+            label13.Name = "label13";
+            label13.Size = new System.Drawing.Size(0, 25);
+            label13.TabIndex = 8;
+            // 
+            // label14
+            // 
+            label14.AutoSize = true;
+            label14.Location = new System.Drawing.Point(930, 51);
+            label14.Name = "label14";
+            label14.Size = new System.Drawing.Size(0, 25);
+            label14.TabIndex = 9;
+            // 
+            // label15
+            // 
+            label15.AutoSize = true;
+            label15.Location = new System.Drawing.Point(941, 75);
+            label15.Name = "label15";
+            label15.Size = new System.Drawing.Size(0, 25);
+            label15.TabIndex = 10;
             // 
             // ScannerForm
             // 
@@ -769,6 +832,7 @@ namespace AcmeScanner
             tabPage1.ResumeLayout(false);
             tabPage2.ResumeLayout(false);
             panel4.ResumeLayout(false);
+            panel4.PerformLayout();
             tabPage3.ResumeLayout(false);
             panel5.ResumeLayout(false);
             panel5.PerformLayout();
@@ -823,5 +887,11 @@ namespace AcmeScanner
         private Label label6;
         private Label label9;
         private Label label8;
+        private Label label12;
+        private Label label11;
+        private Label label10;
+        private Label label15;
+        private Label label14;
+        private Label label13;
     }
 }
