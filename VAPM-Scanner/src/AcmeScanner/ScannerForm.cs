@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Diagnostics.Eventing.Reader;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -55,32 +56,41 @@ namespace AcmeScanner
 
         private void fillSDKlabels()
         {
+            // Check if libwavmodapi.dll exists
             FileInfo vmodInfo = new FileInfo("libwavmodapi.dll");
-            FileVersionInfo versionInfo = FileVersionInfo.GetVersionInfo(vmodInfo.FullName);
-            string productVersion = versionInfo.ProductVersion;
-            label5.Text = productVersion;
-            label13.Text = productVersion;
-            DateTime lastModified = vmodInfo.LastWriteTime.Date;
-            if ((DateTime.Now - lastModified).TotalDays > 7)
+            if (UpdateSDK.isSDKUpdated())
             {
-                label6.ForeColor = System.Drawing.Color.Red;
-                label7.ForeColor = System.Drawing.Color.Red;
-                label11.ForeColor = System.Drawing.Color.Red;
-                label14.ForeColor = System.Drawing.Color.Red;
+                FileVersionInfo versionInfo = FileVersionInfo.GetVersionInfo(vmodInfo.FullName);
+                string productVersion = versionInfo.ProductVersion;
+                label5.Text = productVersion;
+                label13.Text = productVersion;
+                DateTime lastModified = vmodInfo.LastWriteTime.Date;
+                if ((DateTime.Now - lastModified).TotalDays > 7)
+                {
+                    label6.ForeColor = System.Drawing.Color.Red;
+                    label7.ForeColor = System.Drawing.Color.Red;
+                    label11.ForeColor = System.Drawing.Color.Red;
+                    label14.ForeColor = System.Drawing.Color.Red;
+                }
+                label7.Text = lastModified.ToString("MMMM dd, yyyy");
+                label14.Text = label7.Text;
             }
-            label7.Text = lastModified.ToString("MMMM dd, yyyy");
-            label14.Text = label7.Text;
+
+            // Check if patch.dat exists
             FileInfo dbFileInfo = new FileInfo("patch.dat");
-            DateTime lastModifiedDB = dbFileInfo.LastWriteTime.Date;
-            if ((DateTime.Now - lastModifiedDB).TotalDays > 7)
+            if (UpdateDBFiles.isDBUpdated())
             {
-                label9.ForeColor = System.Drawing.Color.Red;
-                label8.ForeColor = System.Drawing.Color.Red;
-                label12.ForeColor = System.Drawing.Color.Red;
-                label15.ForeColor = System.Drawing.Color.Red;
+                DateTime lastModifiedDB = dbFileInfo.LastWriteTime.Date;
+                if ((DateTime.Now - lastModifiedDB).TotalDays > 7)
+                {
+                    label9.ForeColor = System.Drawing.Color.Red;
+                    label8.ForeColor = System.Drawing.Color.Red;
+                    label12.ForeColor = System.Drawing.Color.Red;
+                    label15.ForeColor = System.Drawing.Color.Red;
+                }
+                label9.Text = lastModifiedDB.ToString("MMMM dd, yyyy");
+                label15.Text = label9.Text;
             }
-            label9.Text = lastModifiedDB.ToString("MMMM dd, yyyy");
-            label15.Text = label9.Text;
         }
 
         private void CheckLicenseFiles()
@@ -367,12 +377,19 @@ namespace AcmeScanner
 
         private void EnableButtons(bool enabled)
         {
-            btnInstall.Enabled = enabled;
+            bool isSDKUpdated = UpdateSDK.isSDKUpdated();
+            bool isDBUpdated = UpdateDBFiles.isDBUpdated();
+
+            //these buttons are still being loaded in and enabeled somewhere else, need to find out where
+            if (isSDKUpdated || isDBUpdated)
+            {
+                btnInstall.Enabled = enabled;
+                btnScan.Enabled = enabled;
+                btnCVEJSON.Enabled = enabled;
+                btnScanOrchestration.Enabled = enabled;
+                btnInstallOrchestration.Enabled = enabled;
+            }
             btnUpdate.Enabled = enabled;
-            btnScan.Enabled = enabled;
-            btnCVEJSON.Enabled = enabled;
-            btnScanOrchestration.Enabled = enabled;
-            btnInstallOrchestration.Enabled = enabled;
             btnUpdateSDK.Enabled = enabled;
         }
 
