@@ -12,6 +12,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Diagnostics.Eventing.Reader;
 using System.Drawing;
+using System.Drawing.Text;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -58,6 +59,7 @@ namespace AcmeScanner
         {
             // Check if libwavmodapi.dll exists
             FileInfo vmodInfo = new FileInfo("libwavmodapi.dll");
+            EnableButtons(true);
             if (UpdateSDK.isSDKUpdated())
             {
                 FileVersionInfo versionInfo = FileVersionInfo.GetVersionInfo(vmodInfo.FullName);
@@ -381,7 +383,15 @@ namespace AcmeScanner
             bool isDBUpdated = UpdateDBFiles.isDBUpdated();
 
             //these buttons are still being loaded in and enabeled somewhere else, need to find out where
-            if (isSDKUpdated || isDBUpdated)
+            if (!isSDKUpdated || !isDBUpdated)
+            {
+                btnInstall.Enabled = false;
+                btnScan.Enabled = false;
+                btnCVEJSON.Enabled = false;
+                btnScanOrchestration.Enabled = false;
+                btnInstallOrchestration.Enabled = false;
+            }
+            else
             {
                 btnInstall.Enabled = enabled;
                 btnScan.Enabled = enabled;
