@@ -760,9 +760,9 @@ namespace AcmeScanner
             btnRefreshStatus.MouseState = MaterialSkin.MouseState.HOVER;
             btnRefreshStatus.Name = "btnRefreshStatus";
             btnRefreshStatus.NoAccentTextColor = System.Drawing.Color.Empty;
-            btnRefreshStatus.Size = new System.Drawing.Size(151, 60);
+            btnRefreshStatus.Size = new System.Drawing.Size(200, 70);
             btnRefreshStatus.TabIndex = 0;
-            btnRefreshStatus.Text = "Refresh";
+            btnRefreshStatus.Text = "Update Patch Status";
             btnRefreshStatus.Type = MaterialSkin.Controls.MaterialButton.MaterialButtonType.Contained;
             btnRefreshStatus.UseAccentColor = false;
             btnRefreshStatus.UseVisualStyleBackColor = true;
