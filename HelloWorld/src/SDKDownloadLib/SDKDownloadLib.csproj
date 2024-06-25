@@ -42,13 +42,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CatalogExtractor.cs" />
+    <Compile Include="ExtractorCatalog.cs" />
     <Compile Include="DownloadCatalog.cs" />
     <Compile Include="DownloadSDK.cs" />
     <Compile Include="HttpClientUtils.cs" />
     <Compile Include="Logger.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SDKExtractor.cs" />
+    <Compile Include="ExtractorSDK.cs" />
     <Compile Include="Util.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

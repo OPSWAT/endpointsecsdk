@@ -45,7 +45,8 @@ namespace SDKDownloadLib
 
         public static void Download(string sdkDir)
         {
-            HttpClientUtils.DownloadFileSynchronous(GetCatalogURL(), sdkDir);
+            string catalogFilePath = Path.Combine(sdkDir, "analog.zip");
+            HttpClientUtils.DownloadFileSynchronous(GetCatalogURL(), catalogFilePath);
         }
 
     }

@@ -10,7 +10,7 @@ using System.IO;
 
 namespace SDKDownloader
 {
-    internal class Util
+    public class Util
     {
         public static void ExtractArchives(string archiveDirectory, string extractDirectory)
         {

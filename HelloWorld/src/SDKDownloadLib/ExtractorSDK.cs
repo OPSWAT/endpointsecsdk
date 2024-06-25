@@ -10,7 +10,7 @@ using System.IO;
 
 namespace SDKDownloader
 {
-    public class SDKExtractor
+    public class ExtractorSDK
     {
        
 
@@ -65,7 +65,7 @@ namespace SDKDownloader
             Util.ExtractArchives(tempArchiveDir, tempSDKDir);
 
 
-            SDKExtractor.CopyAllLibFiles(tempSDKDir, libDir);
+            ExtractorSDK.CopyAllLibFiles(tempSDKDir, libDir);
 
             //
             // Cleanup the temp paths
