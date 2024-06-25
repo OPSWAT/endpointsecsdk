@@ -96,7 +96,7 @@ namespace SDKDownloader
             }
         }
 
-        public static void DownloadAllSDKFiles(string sdkDir)
+        public static void Download(string sdkDir)
         {
             string oesisFilePath = Path.Combine(sdkDir, "OESIS-Descriptior.xml");
             HttpClientUtils.DownloadFileSynchronous(SDK_INDEX_URL, oesisFilePath);
@@ -107,6 +107,8 @@ namespace SDKDownloader
                 DownloadReleases(sdkDir, xmlString);
             }
         }
+
+        
 
     }
 }

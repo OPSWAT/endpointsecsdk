@@ -42,6 +42,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CatalogExtractor.cs" />
+    <Compile Include="DownloadCatalog.cs" />
     <Compile Include="DownloadSDK.cs" />
     <Compile Include="HttpClientUtils.cs" />
     <Compile Include="Logger.cs" />

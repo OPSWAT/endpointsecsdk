@@ -1,21 +1,15 @@
-﻿///////////////////////////////////////////////////////////////////////////////////////////////
-///  Sample Code for Acme Scanner
-///  Reference Implementation using OPSWAT MetaDefender Endpoint Security SDK
-///  
-///  Created by Chris Seiler
-///  OPSWAT OEM Solutions Architect
-///////////////////////////////////////////////////////////////////////////////////////////////
-
+﻿using SDKDownloader;
+using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace SDKDownloader
+namespace SDKDownloadLib
 {
-    public class SDKExtractor
+    internal class CatalogExtractor
     {
-       
-
-        
-
         private static void CopyExtractedFile(string libDir, string sdkDir, string folder, string filename)
         {
             string rootFile = Path.Combine(sdkDir, "sdk");
@@ -29,7 +23,7 @@ namespace SDKDownloader
             File.Copy(rootFile, destFile, true);
         }
 
-        private static void CopySDKFiles(string sdkDir,string libDir)
+        private static void CopyWIndowsClientFiles(string sdkDir, string libDir)
         {
             CopyExtractedFile(libDir, sdkDir, "bin/detection", "libwaaddon.dll");
             CopyExtractedFile(libDir, sdkDir, "bin/detection", "libwaapi.dll");
@@ -41,27 +35,16 @@ namespace SDKDownloader
             CopyExtractedFile(libDir, sdkDir, "bin/vulnerability", "libwavmodapi.dll");
         }
 
-        private static void CopyResourceFiles(string sdkDir, string libDir)
+
+
+
+        public static void DownloadAndCopy(string catalogDir)
         {
-            string destFile = Path.Combine(libDir, "libwaresource.dll");
-            string sourceFile = Path.Combine(sdkDir, "resource/bin/libwaresource.dll");
-            File.Copy(sourceFile, destFile, true);
-        }
-
-        public static void CopyAllLibFiles(string extractDir, string libDir)
-        {
-            CopySDKFiles(extractDir, libDir);
-            CopyResourceFiles(extractDir, libDir);
-        }
+            string tempArchiveDir = Util.GetCleanTempDir("OESIS-CATALOG-ARCHIVE");
+            DownloadCatalog.Download(tempArchiveDir);
 
 
-        public static void DownloadAndCopy(string libDir)
-        {
-            string tempArchiveDir = Util.GetCleanTempDir("OESIS-ARCHIVE");
-            DownloadSDK.Download(tempArchiveDir);
-
-
-            string tempSDKDir = Util.GetCleanTempDir("OESIS-SDK");
+            string tempSDKDir = Util.GetCleanTempDir("OESIS-CATALOG");
             Util.ExtractArchives(tempArchiveDir, tempSDKDir);
 
 
@@ -70,8 +53,8 @@ namespace SDKDownloader
             //
             // Cleanup the temp paths
             //
-            Directory.Delete(tempArchiveDir,true);
-            Directory.Delete(tempSDKDir,true);
+            Directory.Delete(tempArchiveDir, true);
+            Directory.Delete(tempSDKDir, true);
         }
     }
 }
