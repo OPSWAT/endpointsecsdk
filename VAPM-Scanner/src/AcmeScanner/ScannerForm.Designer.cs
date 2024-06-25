@@ -72,6 +72,8 @@ namespace AcmeScanner
             btnListCatalogCVE = new MaterialSkin.Controls.MaterialButton();
             mbLoad = new MaterialSkin.Controls.MaterialButton();
             tabPage4 = new TabPage();
+            //moby
+            tabPage5 = new TabPage();
             lvStatus = new ScannerListView();
             panel6 = new Panel();
             btnRefreshStatus = new MaterialSkin.Controls.MaterialButton();
@@ -93,6 +95,8 @@ namespace AcmeScanner
             tabPage3.SuspendLayout();
             panel5.SuspendLayout();
             tabPage4.SuspendLayout();
+            //moby
+            tabPage5.SuspendLayout();
             panel6.SuspendLayout();
             SuspendLayout();
             // 
@@ -309,6 +313,8 @@ namespace AcmeScanner
             tabCatalog.Controls.Add(tabPage2);
             tabCatalog.Controls.Add(tabPage3);
             tabCatalog.Controls.Add(tabPage4);
+            //moby
+            tabCatalog.Controls.Add(tabPage5);
             tabCatalog.Dock = DockStyle.Fill;
             tabCatalog.Location = new System.Drawing.Point(0, 0);
             tabCatalog.Margin = new Padding(4, 5, 4, 5);
@@ -812,6 +818,17 @@ namespace AcmeScanner
             label15.Name = "label15";
             label15.Size = new System.Drawing.Size(0, 25);
             label15.TabIndex = 10;
+            //
+            // tabPage5 (moby)
+            //
+            tabPage5.Location = new System.Drawing.Point(4, 34);
+            tabPage5.Margin = new Padding(4, 5, 4, 5);
+            tabPage5.Name = "tabPage5";
+            tabPage5.Padding = new Padding(4, 5, 4, 5);
+            tabPage5.Size = new System.Drawing.Size(1517, 960);
+            tabPage5.TabIndex = 4;
+            tabPage5.Text = "Moby";
+            tabPage5.UseVisualStyleBackColor = true;
             // 
             // ScannerForm
             // 
@@ -837,6 +854,7 @@ namespace AcmeScanner
             panel5.ResumeLayout(false);
             panel5.PerformLayout();
             tabPage4.ResumeLayout(false);
+            tabPage5.ResumeLayout(false);
             panel6.ResumeLayout(false);
             ResumeLayout(false);
         }
@@ -878,6 +896,8 @@ namespace AcmeScanner
         private MaterialSkin.Controls.MaterialButton btnFreshInstall;
         private MaterialSkin.Controls.MaterialButton btnDomainCSV;
         private TabPage tabPage4;
+        //moby
+        private TabPage tabPage5;
         private ScannerListView lvStatus;
         private Panel panel6;
         private MaterialSkin.Controls.MaterialButton btnRefreshStatus;

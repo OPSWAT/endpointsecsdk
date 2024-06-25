@@ -391,11 +391,9 @@ namespace AcmeScanner
                 btnScanOrchestration.Enabled = false;
                 btnInstallOrchestration.Enabled = false;
                 btnInstall.Enabled = false;
-                //not sure about this one
                 mbLoad.Enabled = false;
                 btnListCatalogCVE.Enabled = false;
                 btnLookupCVE.Enabled = false;
-                //or this one
                 btnExportCSV.Enabled = false;
                 btnFreshInstall.Enabled = false;
                 btnDomainCSV.Enabled = false;
