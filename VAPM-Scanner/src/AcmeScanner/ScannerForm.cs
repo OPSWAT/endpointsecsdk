@@ -60,38 +60,32 @@ namespace AcmeScanner
             // Check if libwavmodapi.dll exists
             FileInfo vmodInfo = new FileInfo("libwavmodapi.dll");
             EnableButtons(true);
-            if (UpdateSDK.isSDKUpdated())
+            FileVersionInfo versionInfo = FileVersionInfo.GetVersionInfo(vmodInfo.FullName);
+            string productVersion = versionInfo.ProductVersion;
+            label5.Text = productVersion;
+            label13.Text = productVersion;
+            DateTime lastModified = vmodInfo.LastWriteTime.Date;
+            label7.Text = lastModified.ToString("MMMM dd, yyyy");
+            label14.Text = label7.Text;
+            if (!UpdateSDK.isSDKUpdated())
             {
-                FileVersionInfo versionInfo = FileVersionInfo.GetVersionInfo(vmodInfo.FullName);
-                string productVersion = versionInfo.ProductVersion;
-                label5.Text = productVersion;
-                label13.Text = productVersion;
-                DateTime lastModified = vmodInfo.LastWriteTime.Date;
-                if ((DateTime.Now - lastModified).TotalDays > 7)
-                {
-                    label6.ForeColor = System.Drawing.Color.Red;
-                    label7.ForeColor = System.Drawing.Color.Red;
-                    label11.ForeColor = System.Drawing.Color.Red;
-                    label14.ForeColor = System.Drawing.Color.Red;
-                }
-                label7.Text = lastModified.ToString("MMMM dd, yyyy");
-                label14.Text = label7.Text;
+                label6.ForeColor = System.Drawing.Color.Red;
+                label7.ForeColor = System.Drawing.Color.Red;
+                label11.ForeColor = System.Drawing.Color.Red;
+                label14.ForeColor = System.Drawing.Color.Red;
             }
-
             // Check if patch.dat exists
             FileInfo dbFileInfo = new FileInfo("patch.dat");
-            if (UpdateDBFiles.isDBUpdated())
+            DateTime lastModifiedDB = dbFileInfo.LastWriteTime.Date;
+            label9.Text = lastModifiedDB.ToString("MMMM dd, yyyy");
+            label15.Text = label9.Text;
+            
+            if (!UpdateDBFiles.isDBUpdated())
             {
-                DateTime lastModifiedDB = dbFileInfo.LastWriteTime.Date;
-                if ((DateTime.Now - lastModifiedDB).TotalDays > 7)
-                {
-                    label9.ForeColor = System.Drawing.Color.Red;
-                    label8.ForeColor = System.Drawing.Color.Red;
-                    label12.ForeColor = System.Drawing.Color.Red;
-                    label15.ForeColor = System.Drawing.Color.Red;
-                }
-                label9.Text = lastModifiedDB.ToString("MMMM dd, yyyy");
-                label15.Text = label9.Text;
+                label9.ForeColor = System.Drawing.Color.Red;
+                label8.ForeColor = System.Drawing.Color.Red;
+                label12.ForeColor = System.Drawing.Color.Red;
+                label15.ForeColor = System.Drawing.Color.Red;
             }
         }
 
