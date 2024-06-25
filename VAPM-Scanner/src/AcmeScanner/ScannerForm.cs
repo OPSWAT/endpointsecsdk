@@ -390,6 +390,16 @@ namespace AcmeScanner
                 btnCVEJSON.Enabled = false;
                 btnScanOrchestration.Enabled = false;
                 btnInstallOrchestration.Enabled = false;
+                btnInstall.Enabled = false;
+                //not sure about this one
+                mbLoad.Enabled = false;
+                btnListCatalogCVE.Enabled = false;
+                btnLookupCVE.Enabled = false;
+                //or this one
+                btnExportCSV.Enabled = false;
+                btnFreshInstall.Enabled = false;
+                btnDomainCSV.Enabled = false;
+                btnRefreshStatus.Enabled = false;
             }
             else
             {
@@ -398,6 +408,14 @@ namespace AcmeScanner
                 btnCVEJSON.Enabled = enabled;
                 btnScanOrchestration.Enabled = enabled;
                 btnInstallOrchestration.Enabled = enabled;
+                btnInstall.Enabled = enabled;
+                mbLoad.Enabled = enabled;
+                btnListCatalogCVE.Enabled = enabled;
+                btnLookupCVE.Enabled = enabled;
+                btnExportCSV.Enabled = enabled;
+                btnFreshInstall.Enabled = enabled;
+                btnDomainCSV.Enabled = enabled;
+                btnRefreshStatus.Enabled = enabled;
             }
             btnUpdate.Enabled = enabled;
             btnUpdateSDK.Enabled = enabled;
