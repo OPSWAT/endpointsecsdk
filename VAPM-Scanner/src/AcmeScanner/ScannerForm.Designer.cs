@@ -53,6 +53,13 @@ namespace AcmeScanner
             tabPage2 = new TabPage();
             lvOrchestrationScanResult = new ScannerListView();
             panel4 = new Panel();
+            btnOrchestrationView = new MaterialSkin.Controls.MaterialButton();
+            label15 = new Label();
+            label14 = new Label();
+            label13 = new Label();
+            label12 = new Label();
+            label11 = new Label();
+            label10 = new Label();
             btnUpdateSDK = new MaterialSkin.Controls.MaterialButton();
             btnInstallOrchestration = new MaterialSkin.Controls.MaterialButton();
             btnScanOrchestration = new MaterialSkin.Controls.MaterialButton();
@@ -72,18 +79,11 @@ namespace AcmeScanner
             btnListCatalogCVE = new MaterialSkin.Controls.MaterialButton();
             mbLoad = new MaterialSkin.Controls.MaterialButton();
             tabPage4 = new TabPage();
-            //moby
-            tabPage5 = new TabPage();
             lvStatus = new ScannerListView();
             panel6 = new Panel();
             btnRefreshStatus = new MaterialSkin.Controls.MaterialButton();
+            tabPage5 = new TabPage();
             timer1 = new Timer(components);
-            label10 = new Label();
-            label11 = new Label();
-            label12 = new Label();
-            label13 = new Label();
-            label14 = new Label();
-            label15 = new Label();
             panel1.SuspendLayout();
             panel3.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)pbLoading).BeginInit();
@@ -95,8 +95,6 @@ namespace AcmeScanner
             tabPage3.SuspendLayout();
             panel5.SuspendLayout();
             tabPage4.SuspendLayout();
-            //moby
-            tabPage5.SuspendLayout();
             panel6.SuspendLayout();
             SuspendLayout();
             // 
@@ -313,7 +311,6 @@ namespace AcmeScanner
             tabCatalog.Controls.Add(tabPage2);
             tabCatalog.Controls.Add(tabPage3);
             tabCatalog.Controls.Add(tabPage4);
-            //moby
             tabCatalog.Controls.Add(tabPage5);
             tabCatalog.Dock = DockStyle.Fill;
             tabCatalog.Location = new System.Drawing.Point(0, 0);
@@ -383,6 +380,7 @@ namespace AcmeScanner
             // panel4
             // 
             panel4.BorderStyle = BorderStyle.FixedSingle;
+            panel4.Controls.Add(btnOrchestrationView);
             panel4.Controls.Add(label15);
             panel4.Controls.Add(label14);
             panel4.Controls.Add(label13);
@@ -399,6 +397,78 @@ namespace AcmeScanner
             panel4.Padding = new Padding(21, 25, 21, 25);
             panel4.Size = new System.Drawing.Size(1509, 127);
             panel4.TabIndex = 3;
+            // 
+            // btnOrchestrationView
+            // 
+            btnOrchestrationView.AutoSize = false;
+            btnOrchestrationView.AutoSizeMode = AutoSizeMode.GrowAndShrink;
+            btnOrchestrationView.Density = MaterialSkin.Controls.MaterialButton.MaterialButtonDensity.Default;
+            btnOrchestrationView.Depth = 0;
+            btnOrchestrationView.HighEmphasis = true;
+            btnOrchestrationView.Icon = null;
+            btnOrchestrationView.Location = new System.Drawing.Point(209, 35);
+            btnOrchestrationView.Margin = new Padding(6, 10, 6, 10);
+            btnOrchestrationView.MouseState = MaterialSkin.MouseState.HOVER;
+            btnOrchestrationView.Name = "btnOrchestrationView";
+            btnOrchestrationView.NoAccentTextColor = System.Drawing.Color.Empty;
+            btnOrchestrationView.Size = new System.Drawing.Size(151, 60);
+            btnOrchestrationView.TabIndex = 11;
+            btnOrchestrationView.Text = "VIEW";
+            btnOrchestrationView.Type = MaterialSkin.Controls.MaterialButton.MaterialButtonType.Contained;
+            btnOrchestrationView.UseAccentColor = false;
+            btnOrchestrationView.UseVisualStyleBackColor = true;
+            btnOrchestrationView.Click += btnOrchestrationView_Click;
+            // 
+            // label15
+            // 
+            label15.AutoSize = true;
+            label15.Location = new System.Drawing.Point(941, 75);
+            label15.Name = "label15";
+            label15.Size = new System.Drawing.Size(0, 25);
+            label15.TabIndex = 10;
+            // 
+            // label14
+            // 
+            label14.AutoSize = true;
+            label14.Location = new System.Drawing.Point(930, 51);
+            label14.Name = "label14";
+            label14.Size = new System.Drawing.Size(0, 25);
+            label14.TabIndex = 9;
+            // 
+            // label13
+            // 
+            label13.AutoSize = true;
+            label13.Location = new System.Drawing.Point(930, 26);
+            label13.Name = "label13";
+            label13.Size = new System.Drawing.Size(0, 25);
+            label13.TabIndex = 8;
+            // 
+            // label12
+            // 
+            label12.AutoSize = true;
+            label12.Location = new System.Drawing.Point(812, 75);
+            label12.Name = "label12";
+            label12.Size = new System.Drawing.Size(136, 25);
+            label12.TabIndex = 7;
+            label12.Text = "Analog Update:";
+            // 
+            // label11
+            // 
+            label11.AutoSize = true;
+            label11.Location = new System.Drawing.Point(812, 50);
+            label11.Name = "label11";
+            label11.Size = new System.Drawing.Size(112, 25);
+            label11.TabIndex = 6;
+            label11.Text = "SDK Update:";
+            // 
+            // label10
+            // 
+            label10.AutoSize = true;
+            label10.Location = new System.Drawing.Point(812, 25);
+            label10.Name = "label10";
+            label10.Size = new System.Drawing.Size(112, 25);
+            label10.TabIndex = 5;
+            label10.Text = "SDK Version:";
             // 
             // btnUpdateSDK
             // 
@@ -768,59 +838,8 @@ namespace AcmeScanner
             btnRefreshStatus.UseVisualStyleBackColor = true;
             btnRefreshStatus.Click += btnRefreshStatus_Click;
             // 
-            // label10
+            // tabPage5
             // 
-            label10.AutoSize = true;
-            label10.Location = new System.Drawing.Point(812, 25);
-            label10.Name = "label10";
-            label10.Size = new System.Drawing.Size(112, 25);
-            label10.TabIndex = 5;
-            label10.Text = "SDK Version:";
-            // 
-            // label11
-            // 
-            label11.AutoSize = true;
-            label11.Location = new System.Drawing.Point(812, 50);
-            label11.Name = "label11";
-            label11.Size = new System.Drawing.Size(112, 25);
-            label11.TabIndex = 6;
-            label11.Text = "SDK Update:";
-            // 
-            // label12
-            // 
-            label12.AutoSize = true;
-            label12.Location = new System.Drawing.Point(812, 75);
-            label12.Name = "label12";
-            label12.Size = new System.Drawing.Size(136, 25);
-            label12.TabIndex = 7;
-            label12.Text = "Analog Update:";
-            // 
-            // label13
-            // 
-            label13.AutoSize = true;
-            label13.Location = new System.Drawing.Point(930, 26);
-            label13.Name = "label13";
-            label13.Size = new System.Drawing.Size(0, 25);
-            label13.TabIndex = 8;
-            // 
-            // label14
-            // 
-            label14.AutoSize = true;
-            label14.Location = new System.Drawing.Point(930, 51);
-            label14.Name = "label14";
-            label14.Size = new System.Drawing.Size(0, 25);
-            label14.TabIndex = 9;
-            // 
-            // label15
-            // 
-            label15.AutoSize = true;
-            label15.Location = new System.Drawing.Point(941, 75);
-            label15.Name = "label15";
-            label15.Size = new System.Drawing.Size(0, 25);
-            label15.TabIndex = 10;
-            //
-            // tabPage5 (moby)
-            //
             tabPage5.Location = new System.Drawing.Point(4, 34);
             tabPage5.Margin = new Padding(4, 5, 4, 5);
             tabPage5.Name = "tabPage5";
@@ -854,7 +873,6 @@ namespace AcmeScanner
             panel5.ResumeLayout(false);
             panel5.PerformLayout();
             tabPage4.ResumeLayout(false);
-            tabPage5.ResumeLayout(false);
             panel6.ResumeLayout(false);
             ResumeLayout(false);
         }
@@ -913,5 +931,6 @@ namespace AcmeScanner
         private Label label15;
         private Label label14;
         private Label label13;
+        private MaterialSkin.Controls.MaterialButton btnOrchestrationView;
     }
 }

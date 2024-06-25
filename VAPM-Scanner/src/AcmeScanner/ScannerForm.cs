@@ -79,7 +79,7 @@ namespace AcmeScanner
             DateTime lastModifiedDB = dbFileInfo.LastWriteTime.Date;
             label9.Text = lastModifiedDB.ToString("MMMM dd, yyyy");
             label15.Text = label9.Text;
-            
+
             if (!UpdateDBFiles.isDBUpdated())
             {
                 label9.ForeColor = System.Drawing.Color.Red;
@@ -110,7 +110,7 @@ namespace AcmeScanner
                 btnUpdateSDK.UseAccentColor = true;
 
             }
-            
+
             if (!UpdateDBFiles.isDBUpdated())
             {
                 btnUpdate.UseAccentColor = true;
@@ -346,9 +346,9 @@ namespace AcmeScanner
                 label15.ForeColor = System.Drawing.Color.Black;
             }
 
-            else 
-            { 
-                UpdateSDK.DownloadAndInstall_OPSWAT_SDK(); 
+            else
+            {
+                UpdateSDK.DownloadAndInstall_OPSWAT_SDK();
                 btnUpdateSDK.UseAccentColor = false;
                 label6.ForeColor = System.Drawing.Color.Black;
                 label7.ForeColor = System.Drawing.Color.Black;
@@ -403,6 +403,7 @@ namespace AcmeScanner
                 btnFreshInstall.Enabled = false;
                 btnDomainCSV.Enabled = false;
                 btnRefreshStatus.Enabled = false;
+                btnOrchestrationView.Enabled = false;
             }
             else
             {
@@ -419,6 +420,7 @@ namespace AcmeScanner
                 btnFreshInstall.Enabled = enabled;
                 btnDomainCSV.Enabled = enabled;
                 btnRefreshStatus.Enabled = enabled;
+                btnOrchestrationView.Enabled = enabled;
             }
             btnUpdate.Enabled = enabled;
             btnUpdateSDK.Enabled = enabled;
@@ -496,7 +498,7 @@ namespace AcmeScanner
             int productCount = 0;
             int cveCount = 0;
             int installCount = 0;
-            if(sigIds==null || sigIds.Count==0)
+            if (sigIds == null || sigIds.Count == 0)
             {
                 staticScanResults = TaskScanAll.Scan(false);
                 sigIds = getScanResults();
@@ -1040,6 +1042,30 @@ namespace AcmeScanner
         private void lvScanResults_SelectedIndexChanged(object sender, EventArgs e)
         {
 
+        }
+
+        private void btnOrchestrationView_Click(object sender, EventArgs e)
+        {
+            if (lvOrchestrationScanResult.SelectedItems.Count > 0)
+            {
+
+                StringBuilder kbIdBuilder = new StringBuilder();
+                kbIdBuilder.AppendLine("Title:\t\t" + lvOrchestrationScanResult.SelectedItems[0].SubItems[0].Text);
+                kbIdBuilder.AppendLine("Severity:\t" + lvOrchestrationScanResult.SelectedItems[0].SubItems[1].Text);
+                kbIdBuilder.AppendLine("Product:\t" + lvOrchestrationScanResult.SelectedItems[0].SubItems[2].Text);
+                kbIdBuilder.AppendLine("KB:\t\t" + lvOrchestrationScanResult.SelectedItems[0].SubItems[3].Text);
+                kbIdBuilder.AppendLine("Patched:\t" + lvOrchestrationScanResult.SelectedItems[0].SubItems[4].Text);
+                kbIdBuilder.AppendLine("Description:\t" + lvOrchestrationScanResult.SelectedItems[0].SubItems[5].Text);
+
+                string view_full = kbIdBuilder.ToString();
+                TextDialog textDialog = new TextDialog(view_full);
+                textDialog.StartPosition = FormStartPosition.CenterParent;
+                textDialog.ShowDialog();
+            }
+            else
+            {
+                ShowMessageDialog("Select an item to view!!", false);
+            }
         }
     }
 }
