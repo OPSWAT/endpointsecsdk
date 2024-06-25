@@ -34,7 +34,7 @@ namespace AcmeScanner
         static Dictionary<string, OnlinePatchDetail> staticOrchestrationScanResults = new Dictionary<string, OnlinePatchDetail>();
         static List<CatalogProduct> staticProductList = null;
         static List<PatchStatus> staticPatchStatusList = null;
-
+        static List<string> sigIds;
 
         private System.ComponentModel.BackgroundWorker scanWorker;
         private System.ComponentModel.BackgroundWorker updateDBWorker;
@@ -165,6 +165,16 @@ namespace AcmeScanner
             loadStatusWorker_Completed);
         }
 
+        private List<string> getScanResults()
+        {
+            List<String> results = new List<string>();
+            foreach (string item in staticScanResults.Keys)
+            {
+                results.Add(item);
+            }
+            return results;
+        }
+
         ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>
         ///  Worker Threads
@@ -179,6 +189,7 @@ namespace AcmeScanner
                 // Scan Offline
                 bool scanOSCVEs = cbScanOSCVEs.Checked;
                 staticScanResults = TaskScanAll.Scan(scanOSCVEs);
+                sigIds = getScanResults();
             }
             else
             {
@@ -466,6 +477,7 @@ namespace AcmeScanner
             //clear exisiting Columns and replace them with new ones
             lvCatalog.Columns.Clear();
             lvCatalog.Columns.Add("Application", 300);
+            lvCatalog.Columns.Add("Installed", 80);
             lvCatalog.Columns.Add("SigId", 80);
             lvCatalog.Columns.Add("CVE Count", 80);
             lvCatalog.Columns.Add("Installable", 80);
@@ -486,6 +498,11 @@ namespace AcmeScanner
             int productCount = 0;
             int cveCount = 0;
             int installCount = 0;
+            if(sigIds==null || sigIds.Count==0)
+            {
+                staticScanResults = TaskScanAll.Scan(false);
+                sigIds = getScanResults();
+            }
 
             foreach (CatalogProduct product in staticProductList)
             {
@@ -507,6 +524,14 @@ namespace AcmeScanner
                     //create a new ListViewItem and populate sub-items
                     ListViewItem lviCurrent = new ListViewItem();
                     lviCurrent.Text = signature.Name;
+                    if (sigIds.Contains(signature.Id))
+                    {
+                        lviCurrent.SubItems.Add("Yes");
+                    }
+                    else
+                    {
+                        lviCurrent.SubItems.Add("No");
+                    }
                     lviCurrent.SubItems.Add(signature.Id);
                     lviCurrent.SubItems.Add(signature.CVECount.ToString());
                     lviCurrent.SubItems.Add(supportsPatch ? "Yes" : "");
@@ -554,6 +579,7 @@ namespace AcmeScanner
 
             lvCatalog.Items.Clear();
             lvCatalog.Items.AddRange(resultList.ToArray());
+            UpdateScanResults();
         }
 
 
