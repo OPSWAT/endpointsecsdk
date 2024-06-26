@@ -6,14 +6,22 @@
 ///  OPSWAT OEM Solutions Architect
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
+using MessagePack;
 using System;
 
 namespace VAPMAdapter.Catalog.POCO
 {
+    [MessagePackObject]
     public class CatalogCVEDate
     {
+        [Key(0)]
         public string cveID;
-        public DateTime modifiedDate;
-        public DateTime releasedDate;
+
+        [Key(1)]
+        public DateTime modifiedDate { get; set; }
+
+        [Key(2)]
+        public DateTime releasedDate { get; set; }
     }
+
 }

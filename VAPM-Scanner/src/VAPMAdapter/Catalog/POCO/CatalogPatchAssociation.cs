@@ -6,16 +6,24 @@
 ///  OPSWAT OEM Solutions Architect
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
+using MessagePack;
 using System.Collections.Generic;
 
 namespace VAPMAdapter.Catalog.POCO
 {
+    [MessagePackObject]
     public class CatalogPatchAssociation
     {
-        public List<string>             SigIdList;
-        public string                   PatchId;
-        public bool                     IsLatest;
-        public string                   VersionComparer;
-        public CatalogPatchAggregation  PatchAggregation;
+        [Key(0)]
+        public List<string> SigIdList { get; set; }
+        [Key(1)]
+        public string PatchId { get; set; }
+        [Key(2)]
+        public bool IsLatest { get; set; }
+        [Key(3)]
+        public string VersionComparer { get; set; }
+        [Key(4)]
+        public CatalogPatchAggregation PatchAggregation { get; set; }
     }
+
 }

@@ -216,12 +216,51 @@ namespace AcmeScanner
             ShowLoading(false);
         }
 
+        private bool isJsonCatalogChanged()
+        {           
+            string basePath = "catalog\\analog\\server\\";
+
+            string productsPath = Path.Combine(basePath, "products.json");
+            string cvesPath = Path.Combine(basePath, "cves.json");
+            string patchAggregationPath = Path.Combine(basePath, "patch_aggregation.json");
+            string patchAssociationsPath = Path.Combine(basePath, "patch_associations.json");
+            string vulnAssociationsPath = Path.Combine(basePath, "vuln_associations.json");
+            string binaryFilePath = Path.Combine("", "catalog.bin");
+
+            DateTime productsLastModified = File.Exists(productsPath) ? new FileInfo(productsPath).LastWriteTime : DateTime.MinValue;
+            DateTime cvesLastModified = File.Exists(cvesPath) ? new FileInfo(cvesPath).LastWriteTime : DateTime.MinValue;
+            DateTime patchAggregationLastModified = File.Exists(patchAggregationPath) ? new FileInfo(patchAggregationPath).LastWriteTime : DateTime.MinValue;
+            DateTime patchAssociationsLastModified = File.Exists(patchAssociationsPath) ? new FileInfo(patchAssociationsPath).LastWriteTime : DateTime.MinValue;
+            DateTime vulnAssociationsLastModified = File.Exists(vulnAssociationsPath) ? new FileInfo(vulnAssociationsPath).LastWriteTime : DateTime.MinValue;
+            DateTime binaryFileLastModified = File.Exists(binaryFilePath) ? new FileInfo(binaryFilePath).LastWriteTime : DateTime.MinValue;
+            
+            if (productsLastModified > binaryFileLastModified ||
+            cvesLastModified > binaryFileLastModified ||
+            patchAggregationLastModified > binaryFileLastModified ||
+            patchAssociationsLastModified > binaryFileLastModified ||
+            vulnAssociationsLastModified > binaryFileLastModified)
+            {          
+                return true;
+            }
+            else
+            {                
+                return false;
+            }
+        }
+
 
         private void loadCatalogWorker_DoWork(object sender, DoWorkEventArgs e)
         {
-            staticProductList = TaskLoadCatalog.Load();
-            staticSignatureCatalogResults.Clear();
 
+            if (CatalogCache.CachedCatalog != null && !isJsonCatalogChanged())
+            {
+                staticProductList = CatalogCache.CachedCatalog;
+            }
+            else
+            {               
+                staticProductList = TaskLoadCatalog.Load();
+            }
+            staticSignatureCatalogResults.Clear();
             foreach (CatalogProduct product in staticProductList)
             {
                 foreach (CatalogSignature signature in product.SigList)
@@ -229,6 +268,8 @@ namespace AcmeScanner
                     staticSignatureCatalogResults.Add(signature.Id, signature);
                 }
             }
+
+
         }
 
         private void loadCatalogWorker_Completed(object sender, RunWorkerCompletedEventArgs e)
@@ -237,8 +278,10 @@ namespace AcmeScanner
             {
                 UpdateCatalogResults();
             }
-
+            CatalogCache.CachedCatalog = staticProductList;
+            if (CatalogCache.CachedCatalog == null) { Debug.WriteLine("after loading cataog also null"); }
             ShowLoading(false);
+            UpdateScanResults();
         }
 
 
@@ -579,7 +622,7 @@ namespace AcmeScanner
 
             lvCatalog.Items.Clear();
             lvCatalog.Items.AddRange(resultList.ToArray());
-            UpdateScanResults();
+            
         }
 
 
@@ -1066,6 +1109,22 @@ namespace AcmeScanner
             {
                 ShowMessageDialog("Select an item to view!!", false);
             }
+            
+        }
+
+        private void btnLoadPrevious_Click(object sender, EventArgs e)
+        {
+           
+            staticProductList = CatalogCache.CachedCatalog;
+            if (CatalogCache.CachedCatalog == null)
+            {
+                Debug.WriteLine("Cached Catalog null");
+            }
+            if (staticProductList == null)
+                {
+                    Debug.WriteLine("staticproductlist null");
+                }
+            UpdateCatalogResults();
         }
     }
 }

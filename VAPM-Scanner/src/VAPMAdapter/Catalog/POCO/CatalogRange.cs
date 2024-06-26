@@ -1,4 +1,8 @@
 ﻿///////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////
+
+using MessagePack;
+
 ///  Sample Code for Acme Scanner
 ///  Reference Implementation using OPSWAT Endpoint SDK Patch and Vulnerability Modules
 ///  
@@ -8,12 +12,13 @@
 
 namespace VAPMAdapter.Catalog.POCO
 {
+    [MessagePackObject]
     public class CatalogRange
     {
-        string start;
-        string limit;
-
-        public string Start { get => start; set => start = value; }
-        public string Limit { get => limit; set => limit = value; }
+        [Key(0)]
+        public string Start { get; set; }
+        [Key(1)]
+        public string Limit { get; set; }
     }
+
 }
