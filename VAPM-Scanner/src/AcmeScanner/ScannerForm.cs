@@ -7,6 +7,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -17,6 +18,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using VAPMAdapater.Updates;
@@ -508,16 +510,12 @@ namespace AcmeScanner
         }
 
 
-        private void UpdateCatalogResults()
+        private async void UpdateCatalogResults()
         {
-            //initialize a new list to hold ListViewItem objects
-            List<ListViewItem> resultList = new List<ListViewItem>();
+            // Initialize a thread-safe collection to hold ListViewItem objects
+            ConcurrentBag<ListViewItem> concurrentResultList = new ConcurrentBag<ListViewItem>();
 
-            //
             // Setup the header
-            //
-
-            //clear exisiting Columns and replace them with new ones
             lvCatalog.Columns.Clear();
             lvCatalog.Columns.Add("Application", 300);
             lvCatalog.Columns.Add("Installed", 80);
@@ -530,100 +528,79 @@ namespace AcmeScanner
             lvCatalog.Columns.Add("Install Version", 100);
             lvCatalog.Columns.Add("Background", 80);
             lvCatalog.Columns.Add("Validate", 80);
-
-
-
             lvCatalog.Columns.Add("", 400);
             lvCatalog.View = View.Details;
-            //update ListView control
             lvCatalog.Update();
 
+            // Initialize counters
             int productCount = 0;
             int cveCount = 0;
             int installCount = 0;
+
+            // Ensure sigIds is populated
             if (sigIds == null || sigIds.Count == 0)
             {
                 staticScanResults = TaskScanAll.Scan(false);
                 sigIds = getScanResults();
             }
 
-            foreach (CatalogProduct product in staticProductList)
-            {
-                foreach (CatalogSignature signature in product.SigList)
+            await Task.Run(() => {
+                // Parallel processing for staticProductList
+                Parallel.ForEach(staticProductList, product =>
                 {
-                    //determine if the product supports intallation or if the signature supports fresh install
-                    bool supportsPatch = product.SupportsInstall;
-                    if (supportsPatch && signature.PatchAssociations.Count == 0)
+                    bool productSupportsInstall = product.SupportsInstall;
+                    foreach (var signature in product.SigList)
                     {
-                        supportsPatch = false;
+                        bool supportsPatch = productSupportsInstall && signature.PatchAssociations.Count > 0;
+                        bool freshInstall = signature.FreshInstall && signature.PatchAssociations.Count > 0;
+
+                        // Create and populate ListViewItem
+                        ListViewItem lviCurrent = new ListViewItem
+                        {
+                            Text = signature.Name,
+                            Tag = signature.Id
+                        };
+                        lviCurrent.SubItems.Add(sigIds.Contains(signature.Id) ? "Yes" : "No");
+                        lviCurrent.SubItems.Add(signature.Id);
+                        lviCurrent.SubItems.Add(signature.CVECount.ToString());
+                        lviCurrent.SubItems.Add(supportsPatch ? "Yes" : "");
+                        lviCurrent.SubItems.Add(signature.Platform);
+                        lviCurrent.SubItems.Add(freshInstall ? "Yes" : "");
+                        lviCurrent.SubItems.Add(signature.PatchAssociations?.Count.ToString() ?? "");
+                        lviCurrent.SubItems.Add(supportsPatch ? signature.PatchAssociations[0].PatchAggregation.LatestVersion : "");
+                        lviCurrent.SubItems.Add(signature.BackgroundInstallSupport ? "Yes" : "");
+                        lviCurrent.SubItems.Add(signature.ValidateInstallSupport ? "Yes" : "");
+
+                        // Add ListViewItem to the thread-safe collection
+                        concurrentResultList.Add(lviCurrent);
+
+                        // Increment counters in a thread-safe manner
+                        Interlocked.Increment(ref productCount);
+                        Interlocked.Add(ref cveCount, signature.CVECount);
+                        if (supportsPatch)
+                        {
+                            Interlocked.Increment(ref installCount);
+                        }
                     }
+                });
+            });
 
-                    bool freshInstall = signature.FreshInstall;
-                    if (freshInstall && signature.PatchAssociations.Count == 0)
-                    {
-                        freshInstall = false;
-                    }
+            // Update UI with counters on the main thread
+            Invoke(new Action(() =>
+            {
+                lblTotalCVEs.Text = cveCount.ToString();
+                lblTotalProducts.Text = productCount.ToString();
+                lblTotalInstalls.Text = installCount.ToString();
 
-                    //create a new ListViewItem and populate sub-items
-                    ListViewItem lviCurrent = new ListViewItem();
-                    lviCurrent.Text = signature.Name;
-                    if (sigIds.Contains(signature.Id))
-                    {
-                        lviCurrent.SubItems.Add("Yes");
-                    }
-                    else
-                    {
-                        lviCurrent.SubItems.Add("No");
-                    }
-                    lviCurrent.SubItems.Add(signature.Id);
-                    lviCurrent.SubItems.Add(signature.CVECount.ToString());
-                    lviCurrent.SubItems.Add(supportsPatch ? "Yes" : "");
-                    lviCurrent.SubItems.Add(signature.Platform);
-                    lviCurrent.SubItems.Add(freshInstall ? "Yes" : "");
-
-
-                    // Add package count or empty string if null
-                    lviCurrent.SubItems.Add(signature.PatchAssociations != null ? signature.PatchAssociations.Count.ToString() : "");
-
-                    // Add install version or empty string if supportsPatch is false
-                    if (supportsPatch)
-                    {
-                        lviCurrent.SubItems.Add(signature.PatchAssociations[0].PatchAggregation.LatestVersion);
-                    }
-                    else
-                    {
-                        lviCurrent.SubItems.Add("");
-                    }
-
-                    // Add Background and Validate flags
-                    lviCurrent.SubItems.Add(signature.BackgroundInstallSupport ? "Yes" : "");
-                    lviCurrent.SubItems.Add(signature.ValidateInstallSupport ? "Yes" : "");
-
-                    // Set Tag to store signature Id
-                    lviCurrent.Tag = signature.Id;
-
-                    // Add ListViewItem to the resultList
-                    resultList.Add(lviCurrent);
-
-                    // Increment counters
-                    productCount++;
-                    //I dont believe catalog signature contains any informaiton about CVEcounts, that is why the count here is not incrementing
-                    cveCount += signature.CVECount;
-                    if (supportsPatch)
-                    {
-                        installCount++;
-                    }
-                }
-            }
-
-            lblTotalCVEs.Text = cveCount.ToString();
-            lblTotalProducts.Text = productCount.ToString();
-            lblTotalInstalls.Text = installCount.ToString();
-
-            lvCatalog.Items.Clear();
-            lvCatalog.Items.AddRange(resultList.ToArray());
-            
+                // Update ListView control with items
+                lvCatalog.BeginUpdate();
+                lvCatalog.Items.Clear();
+                lvCatalog.Items.AddRange(concurrentResultList.ToArray());
+                lvCatalog.EndUpdate();
+                UpdateScanResults();
+            }));
         }
+
 
 
 
