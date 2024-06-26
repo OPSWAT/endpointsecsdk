@@ -8,6 +8,7 @@
 
 using System.Collections.Generic;
 using System.IO;
+using System.Threading.Tasks;
 using VAPMAdapater;
 using VAPMAdapter.Catalog.POCO;
 using VAPMAdapter.OESIS.POCO;
@@ -20,6 +21,8 @@ namespace VAPMAdapter.Tasks
     /// </summary>
     public class TaskGetCVEDetails
     {
+        private static Catalog.Catalog _catalog;
+        private static readonly object _lock = new object();
 
         /// <summary>
         /// Retrieves a list of CVE details for the given list of vulnerability associations.
@@ -28,21 +31,24 @@ namespace VAPMAdapter.Tasks
         /// <returns>A list of CVE details corresponding to the provided vulnerability associations.</returns>
         public static List<CVEDetail> GetCveDetailList(List<CatalogVulnerabilityAssociation> vulAssociationList)
         {
-            //empty list to store CVE details and an instanceof the catalog class
-            List<CVEDetail> result = new List<CVEDetail>();
-            Catalog.Catalog catalog = new Catalog.Catalog();
+            // Lazy initialization of the catalog
+            if (_catalog == null)
+            {
+                lock (_lock)
+                {
+                    if (_catalog == null)
+                    {
+                        _catalog = new Catalog.Catalog();
+                        string catalogRoot = VAPMSettings.getLocalCatalogDir();
+                        catalogRoot = Path.Combine(catalogRoot, "analog/server");
+                        _catalog.Load(catalogRoot);
+                    }
+                }
+            }
 
-            //retrieve the local catalog directory from settings
-            string catalogRoot = VAPMSettings.getLocalCatalogDir();
-            catalogRoot = Path.Combine(catalogRoot, "analog/server");
-
-            //load catalog root from the specified directory
-            catalog.Load(catalogRoot);
-
-            //return CVE details list using the loaded catalog and the provided vulnerability associations
-            result = catalog.GetCVEDetailsList(vulAssociationList);
-
-            return result;
+            // Retrieve CVE details list using the loaded catalog and the provided vulnerability associations
+            return _catalog.GetCVEDetailsList(vulAssociationList);
         }
     }
+
 }
