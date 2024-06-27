@@ -8,6 +8,10 @@ namespace VAPMAdapter.Moby.POCO
 {
     public class MobyProduct
     {
-
+        public string Id;
+        public string name;
+        public string osType;
+        public List<MobySignature> sigList;
+        public bool cveDetection;
     }
 }
