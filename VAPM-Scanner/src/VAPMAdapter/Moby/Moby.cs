@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -92,16 +93,19 @@ namespace VAPMAdapter.Moby
 
             JObject jsonProductList = (JObject)getProductsListJson();
 
-            foreach (JProperty pName in jsonProductList.Properties())
+            foreach (JProperty product in jsonProductList.Properties())
             {
-                foreach (JProperty current in pName)
+                foreach (JProperty os in ((JObject)product.Value).Properties())
                 {
                     MobyProduct newProduct = new MobyProduct();
-                    newProduct.name = pName.Name +" "+ current.Name;
-                    //newProduct.Id = current.Name["product_id"];
-                }
-                
+                    newProduct.name = product.Name + " " + os.Name;
+                    newProduct.Id = (string)os.Value["product_id"];
+                    newProduct.cveDetection = (bool)os.Value["cve_detection"];
+                    Debug.WriteLine("id=="+ newProduct.Id);
 
+                    result.Add(newProduct);
+
+                }
             }
             return result;
         }

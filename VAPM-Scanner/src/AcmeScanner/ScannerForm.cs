@@ -26,6 +26,7 @@ using VAPMAdapter.Catalog.POCO;
 using VAPMAdapter.OESIS.POCO;
 using VAPMAdapter.Tasks;
 using VAPMAdapter.Updates;
+using VAPMAdapter.Moby.POCO;
 
 namespace AcmeScanner
 {

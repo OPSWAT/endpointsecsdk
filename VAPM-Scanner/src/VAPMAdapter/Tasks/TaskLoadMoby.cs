@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using VAPMAdapater;
 using VAPMAdapter.Catalog.POCO;
 using VAPMAdapter.Moby.POCO;
 
@@ -13,6 +15,11 @@ namespace VAPMAdapter.Tasks
         public static List<MobyProduct> Load()
         {
             List<MobyProduct> result = new List<MobyProduct>();
+            Moby.Moby moby = new Moby.Moby();
+            string catalogRoot = VAPMSettings.getLocalCatalogDir();
+            catalogRoot = Path.Combine(catalogRoot, "analog/server");
+            moby.Load(catalogRoot);
+            result = moby.GetList();
             return result;
         }
     }
