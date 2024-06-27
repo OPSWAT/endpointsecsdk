@@ -35,6 +35,7 @@ namespace AcmeScanner
         static Dictionary<string, CatalogSignature> staticSignatureCatalogResults = new Dictionary<string, CatalogSignature>();
         static Dictionary<string, OnlinePatchDetail> staticOrchestrationScanResults = new Dictionary<string, OnlinePatchDetail>();
         static List<CatalogProduct> staticProductList = null;
+        static List<MobyProduct> staticMobyProductList = null;
         static List<PatchStatus> staticPatchStatusList = null;
         static List<string> sigIds;
 
@@ -43,6 +44,7 @@ namespace AcmeScanner
         private System.ComponentModel.BackgroundWorker installVAPMPatchWorker;
         private System.ComponentModel.BackgroundWorker installOnlinePatchWorker;
         private System.ComponentModel.BackgroundWorker loadCatalogWorker;
+        private System.ComponentModel.BackgroundWorker loadMobyWorker;
         private System.ComponentModel.BackgroundWorker loadStatusWorker;
 
         //first method called by the main class
@@ -165,6 +167,12 @@ namespace AcmeScanner
             loadStatusWorker.RunWorkerCompleted +=
                 new RunWorkerCompletedEventHandler(
             loadStatusWorker_Completed);
+
+            loadMobyWorker = new BackgroundWorker();
+            loadMobyWorker.DoWork += 
+                new DoWorkEventHandler(loadMobyWorker_DoWork);
+            loadMobyWorker.RunWorkerCompleted += 
+                new RunWorkerCompletedEventHandler(loadMobyWorker_Completed);
         }
 
         private List<string> getScanResults()
@@ -219,7 +227,7 @@ namespace AcmeScanner
         }
 
         private bool isJsonCatalogChanged()
-        {           
+        {
             string basePath = "catalog\\analog\\server\\";
 
             string productsPath = Path.Combine(basePath, "products.json");
@@ -235,17 +243,17 @@ namespace AcmeScanner
             DateTime patchAssociationsLastModified = File.Exists(patchAssociationsPath) ? new FileInfo(patchAssociationsPath).LastWriteTime : DateTime.MinValue;
             DateTime vulnAssociationsLastModified = File.Exists(vulnAssociationsPath) ? new FileInfo(vulnAssociationsPath).LastWriteTime : DateTime.MinValue;
             DateTime binaryFileLastModified = File.Exists(binaryFilePath) ? new FileInfo(binaryFilePath).LastWriteTime : DateTime.MinValue;
-            
+
             if (productsLastModified > binaryFileLastModified ||
             cvesLastModified > binaryFileLastModified ||
             patchAggregationLastModified > binaryFileLastModified ||
             patchAssociationsLastModified > binaryFileLastModified ||
             vulnAssociationsLastModified > binaryFileLastModified)
-            {          
+            {
                 return true;
             }
             else
-            {                
+            {
                 return false;
             }
         }
@@ -259,7 +267,7 @@ namespace AcmeScanner
                 staticProductList = CatalogCache.CachedCatalog;
             }
             else
-            {               
+            {
                 staticProductList = TaskLoadCatalog.Load();
             }
             staticSignatureCatalogResults.Clear();
@@ -296,6 +304,17 @@ namespace AcmeScanner
         private void loadStatusWorker_Completed(object sender, RunWorkerCompletedEventArgs e)
         {
             UpdatePatchStatusResults();
+            ShowLoading(false);
+        }
+
+        private void loadMobyWorker_DoWork( object sender, DoWorkEventArgs e)
+        {
+            staticMobyProductList = TaskLoadMoby.Load();
+        }
+
+        private void loadMobyWorker_Completed(object sender, RunWorkerCompletedEventArgs e)
+        {
+            
             ShowLoading(false);
         }
 
@@ -544,7 +563,8 @@ namespace AcmeScanner
                 sigIds = getScanResults();
             }
 
-            await Task.Run(() => {
+            await Task.Run(() =>
+            {
                 // Parallel processing for staticProductList
                 Parallel.ForEach(staticProductList, product =>
                 {
@@ -1086,22 +1106,28 @@ namespace AcmeScanner
             {
                 ShowMessageDialog("Select an item to view!!", false);
             }
-            
+
         }
 
         private void btnLoadPrevious_Click(object sender, EventArgs e)
         {
-           
+
             staticProductList = CatalogCache.CachedCatalog;
             if (CatalogCache.CachedCatalog == null)
             {
                 Debug.WriteLine("Cached Catalog null");
             }
             if (staticProductList == null)
-                {
-                    Debug.WriteLine("staticproductlist null");
-                }
+            {
+                Debug.WriteLine("staticproductlist null");
+            }
             UpdateCatalogResults();
+        }
+
+        private void btnLoadMoby_Click(object sender, EventArgs e)
+        {
+            ShowLoading(true);
+            loadMobyWorker.RunWorkerAsync();
         }
     }
 }

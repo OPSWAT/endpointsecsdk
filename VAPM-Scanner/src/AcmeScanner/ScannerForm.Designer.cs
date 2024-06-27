@@ -83,7 +83,10 @@ namespace AcmeScanner
             panel6 = new Panel();
             btnRefreshStatus = new MaterialSkin.Controls.MaterialButton();
             tabPage5 = new TabPage();
+            panel7 = new Panel();
             timer1 = new Timer(components);
+            btnLoadMoby = new MaterialSkin.Controls.MaterialButton();
+            scannerListView1 = new ScannerListView();
             panel1.SuspendLayout();
             panel3.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)pbLoading).BeginInit();
@@ -96,6 +99,8 @@ namespace AcmeScanner
             panel5.SuspendLayout();
             tabPage4.SuspendLayout();
             panel6.SuspendLayout();
+            tabPage5.SuspendLayout();
+            panel7.SuspendLayout();
             SuspendLayout();
             // 
             // panel1
@@ -840,6 +845,7 @@ namespace AcmeScanner
             // 
             // tabPage5
             // 
+            tabPage5.Controls.Add(panel7);
             tabPage5.Location = new System.Drawing.Point(4, 34);
             tabPage5.Margin = new Padding(4, 5, 4, 5);
             tabPage5.Name = "tabPage5";
@@ -848,6 +854,48 @@ namespace AcmeScanner
             tabPage5.TabIndex = 4;
             tabPage5.Text = "Moby";
             tabPage5.UseVisualStyleBackColor = true;
+            // 
+            // panel7
+            // 
+            panel7.Controls.Add(scannerListView1);
+            panel7.Controls.Add(btnLoadMoby);
+            panel7.Location = new System.Drawing.Point(0, 0);
+            panel7.Name = "panel7";
+            panel7.Size = new System.Drawing.Size(1517, 958);
+            panel7.TabIndex = 0;
+            // 
+            // btnLoadMoby
+            // 
+            btnLoadMoby.AutoSizeMode = AutoSizeMode.GrowAndShrink;
+            btnLoadMoby.Density = MaterialSkin.Controls.MaterialButton.MaterialButtonDensity.Default;
+            btnLoadMoby.Depth = 0;
+            btnLoadMoby.HighEmphasis = true;
+            btnLoadMoby.Icon = null;
+            btnLoadMoby.Location = new System.Drawing.Point(40, 58);
+            btnLoadMoby.Margin = new Padding(4, 6, 4, 6);
+            btnLoadMoby.MouseState = MaterialSkin.MouseState.HOVER;
+            btnLoadMoby.Name = "btnLoadMoby";
+            btnLoadMoby.NoAccentTextColor = System.Drawing.Color.Empty;
+            btnLoadMoby.Size = new System.Drawing.Size(102, 36);
+            btnLoadMoby.TabIndex = 0;
+            btnLoadMoby.Text = "Load Moby";
+            btnLoadMoby.Type = MaterialSkin.Controls.MaterialButton.MaterialButtonType.Contained;
+            btnLoadMoby.UseAccentColor = false;
+            btnLoadMoby.UseVisualStyleBackColor = true;
+            btnLoadMoby.Click += btnLoadMoby_Click;
+            // 
+            // scannerListView1
+            // 
+            scannerListView1.FullRowSelect = true;
+            scannerListView1.GridLines = true;
+            scannerListView1.Location = new System.Drawing.Point(11, 126);
+            scannerListView1.MultiSelect = false;
+            scannerListView1.Name = "scannerListView1";
+            scannerListView1.OwnerDraw = true;
+            scannerListView1.Size = new System.Drawing.Size(1497, 822);
+            scannerListView1.TabIndex = 1;
+            scannerListView1.UseCompatibleStateImageBehavior = false;
+            scannerListView1.View = View.Details;
             // 
             // ScannerForm
             // 
@@ -874,6 +922,9 @@ namespace AcmeScanner
             panel5.PerformLayout();
             tabPage4.ResumeLayout(false);
             panel6.ResumeLayout(false);
+            tabPage5.ResumeLayout(false);
+            panel7.ResumeLayout(false);
+            panel7.PerformLayout();
             ResumeLayout(false);
         }
 
@@ -932,5 +983,8 @@ namespace AcmeScanner
         private Label label14;
         private Label label13;
         private MaterialSkin.Controls.MaterialButton btnOrchestrationView;
+        private Panel panel7;
+        private ScannerListView scannerListView1;
+        private MaterialSkin.Controls.MaterialButton btnLoadMoby;
     }
 }
