@@ -28,6 +28,8 @@ using VAPMAdapter.Tasks;
 using VAPMAdapter.Updates;
 using VAPMAdapter.Moby.POCO;
 using VAPMAdapter.Moby;
+using Newtonsoft.Json;
+
 
 namespace AcmeScanner
 {
@@ -171,9 +173,9 @@ namespace AcmeScanner
             loadStatusWorker_Completed);
 
             loadMobyWorker = new BackgroundWorker();
-            loadMobyWorker.DoWork += 
+            loadMobyWorker.DoWork +=
                 new DoWorkEventHandler(loadMobyWorker_DoWork);
-            loadMobyWorker.RunWorkerCompleted += 
+            loadMobyWorker.RunWorkerCompleted +=
                 new RunWorkerCompletedEventHandler(loadMobyWorker_Completed);
         }
 
@@ -309,7 +311,7 @@ namespace AcmeScanner
             ShowLoading(false);
         }
 
-        private void loadMobyWorker_DoWork( object sender, DoWorkEventArgs e)
+        private void loadMobyWorker_DoWork(object sender, DoWorkEventArgs e)
         {
             staticMobyProductList = TaskLoadMoby.Load();
 
@@ -1185,5 +1187,33 @@ namespace AcmeScanner
             }
             UpdateCatalogResults();
         }
+
+       
+
+        private void btnViewJson_Click(object sender, EventArgs e)
+            {
+                if (scannerListView1.SelectedItems.Count > 0)
+                {
+                    var selectedItem = scannerListView1.SelectedItems[0];
+                    var itemDetails = new
+                    {
+                        Name = selectedItem.SubItems[0].Text,
+                        ID = selectedItem.SubItems[1].Text,
+                        OsType = selectedItem.SubItems[2].Text,
+                        CveDetection = selectedItem.SubItems[3].Text
+                    };
+
+                    string json = JsonConvert.SerializeObject(itemDetails, Formatting.Indented);
+
+                    TextDialog textDialog = new TextDialog(json);
+                    textDialog.StartPosition = FormStartPosition.CenterParent;
+                    textDialog.ShowDialog();
+                }
+                else
+                {
+                    ShowMessageDialog("Select an item to view JSON!!", false);
+                }
     }
+
+}
 }
