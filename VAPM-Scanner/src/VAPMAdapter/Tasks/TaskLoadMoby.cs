@@ -18,8 +18,12 @@ namespace VAPMAdapter.Tasks
             Moby.Moby moby = new Moby.Moby();
             string catalogRoot = VAPMSettings.getLocalCatalogDir();
             catalogRoot = Path.Combine(catalogRoot, "analog/server");
-            moby.Load(catalogRoot);
-            result = moby.GetList();
+            if (moby.Load(catalogRoot))
+            {
+                result = moby.GetList();
+                moby.LoadCounts(); // Load the counts after loading the product list
+            }
+
             return result;
         }
     }
