@@ -110,6 +110,7 @@ namespace VAPMAdapter.Moby
                     newProduct.name = product.Name + " " + os.Name;
                     newProduct.Id = (string)os.Value["product_id"];
                     newProduct.cveDetection = (bool)os.Value["cve_detection"];
+                    newProduct.sigList = new List<MobySignature>();
                     JArray signatures = (JArray)os.Value["signatures"];
                     foreach (JObject currentSig in signatures.Children<JObject>())
                     {
@@ -133,10 +134,10 @@ namespace VAPMAdapter.Moby
                         {
                             newSignature.enabledControls.Add(currentControl);
                         }
-                        foreach (string curr in currentSig["certifications"])
+                        /*foreach (string curr in currentSig["certifications"])
                         {
                             newSignature.certifications.Add(curr);
-                        }
+                        }*/
                         foreach (string curr in currentSig["versions"])
                         {
                             newSignature.versions.Add(curr);
