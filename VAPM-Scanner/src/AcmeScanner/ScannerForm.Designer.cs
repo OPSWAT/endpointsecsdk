@@ -1,4 +1,5 @@
 ﻿using System.Windows.Forms;
+using VAPMAdapter.Moby.POCO;
 
 namespace AcmeScanner
 {
@@ -986,5 +987,6 @@ namespace AcmeScanner
         private Panel panel7;
         private ScannerListView scannerListView1;
         private MaterialSkin.Controls.MaterialButton btnLoadMoby;
+        private MobyTotalCounts mobyCounts;
     }
 }
