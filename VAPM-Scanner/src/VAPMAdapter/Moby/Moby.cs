@@ -101,8 +101,48 @@ namespace VAPMAdapter.Moby
                     newProduct.name = product.Name + " " + os.Name;
                     newProduct.Id = (string)os.Value["product_id"];
                     newProduct.cveDetection = (bool)os.Value["cve_detection"];
-                    Debug.WriteLine("id=="+ newProduct.Id);
+                    JArray signatures = (JArray)os.Value["signatures"];
+                    foreach (JObject currentSig in signatures.Children<JObject>())
+                    {
+                        MobySignature newSignature= new MobySignature();
+                        newSignature.Name = (string)currentSig["signature_name"];
+                        newSignature.Id = (string)currentSig["signature_id"];
+                        newSignature.supportAutoPatching = (bool)currentSig["support_auto_patching"];
+                        newSignature.supportAppRemover = (bool)currentSig["support_app_remover"];
+                        newSignature.validationSupported = (bool)currentSig["validation_supported"];
+                        newSignature.categories=new List<String>();
+                        newSignature.enabledControls = new List<String>();
+                        newSignature.certifications = new List<String>();
+                        newSignature.versions = new List<String>();
+                        newSignature.patchingVersions = new List<String>();
+                        newSignature.vulnerabilityVersions = new List<String>();
+                        foreach (string  currentCategory in currentSig["categories"])
+                        {
+                            newSignature.categories.Add(currentCategory);
+                        }
+                        foreach (string currentControl in currentSig["enabled_controls"])
+                        {
+                            newSignature.enabledControls.Add(currentControl);
+                        }
+                        foreach (string curr in currentSig["certifications"])
+                        {
+                            newSignature.certifications.Add(curr);
+                        }
+                        foreach (string curr in currentSig["versions"])
+                        {
+                            newSignature.versions.Add(curr);
+                        }
+                        foreach (string curr in currentSig["patching_versions"])
+                        {
+                            newSignature.patchingVersions.Add(curr);
+                        }
+                        foreach (string curr in currentSig["vulnerability_versions"])
+                        {
+                            newSignature.vulnerabilityVersions.Add(curr);
+                        }
+                        newProduct.sigList.Add(newSignature);
 
+                    }
                     result.Add(newProduct);
 
                 }
