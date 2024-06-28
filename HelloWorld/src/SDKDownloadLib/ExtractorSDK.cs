@@ -1,5 +1,5 @@
 ﻿///////////////////////////////////////////////////////////////////////////////////////////////
-///  Sample Code for Acme Scanner
+///  Sample Code for HelloWorld
 ///  Reference Implementation using OPSWAT MetaDefender Endpoint Security SDK
 ///  
 ///  Created by Chris Seiler
@@ -55,7 +55,13 @@ namespace SDKDownloader
         }
 
 
-        public static void DownloadAndCopy(string libDir)
+
+        //
+        // Platforms are as follows
+        // 1 - Windows
+        // 2 - Mac
+        // 3 - Linux
+        public static void DownloadAndCopy(string libDir, int platform)
         {
             string tempArchiveDir = Util.GetCleanTempDir("OESIS-ARCHIVE");
             DownloadSDK.Download(tempArchiveDir);
@@ -64,8 +70,19 @@ namespace SDKDownloader
             string tempSDKDir = Util.GetCleanTempDir("OESIS-SDK");
             Util.ExtractArchives(tempArchiveDir, tempSDKDir);
 
+            if (platform == 1)
+            {
+                ExtractorSDK.CopyAllLibFiles(tempSDKDir, libDir);
+            }
+            if (platform == 2)
+            {
+                // TODO: Copy Mac files
+            }
+            if (platform == 3)
+            {
+                // TODO: Copy Windows files
+            }
 
-            ExtractorSDK.CopyAllLibFiles(tempSDKDir, libDir);
 
             //
             // Cleanup the temp paths

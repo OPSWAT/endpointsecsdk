@@ -1,10 +1,13 @@
-﻿using SDKDownloader;
-using System;
-using System.Collections.Generic;
+﻿///////////////////////////////////////////////////////////////////////////////////////////////
+///  Sample Code for HelloWorld
+///  Reference Implementation using OPSWAT MetaDefender Endpoint Security SDK
+///  
+///  Created by Chris Seiler
+///  OPSWAT OEM Solutions Architect
+///////////////////////////////////////////////////////////////////////////////////////////////
+
+using SDKDownloader;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SDKDownloadLib
 {

@@ -1,5 +1,5 @@
 ﻿///////////////////////////////////////////////////////////////////////////////////////////////
-///  Sample Code for Acme Scanner
+///  Sample Code for HelloWorld
 ///  Reference Implementation using OPSWAT MetaDefender Endpoint Security SDK
 ///  
 ///  Created by Chris Seiler

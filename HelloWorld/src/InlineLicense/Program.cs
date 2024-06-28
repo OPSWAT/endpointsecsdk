@@ -1,12 +1,17 @@
-﻿using Compliance;
+﻿///////////////////////////////////////////////////////////////////////////////////////////////
+///  Sample Code for HelloWorld
+///  Reference Implementation using OPSWAT MetaDefender Endpoint Security SDK
+///  
+///  Created by Chris Seiler
+///  OPSWAT OEM Solutions Architect
+///////////////////////////////////////////////////////////////////////////////////////////////
+
+
+using Compliance;
 using Newtonsoft.Json.Linq;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace InlineLicense
 {

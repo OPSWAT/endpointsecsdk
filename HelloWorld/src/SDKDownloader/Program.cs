@@ -1,5 +1,5 @@
 ﻿///////////////////////////////////////////////////////////////////////////////////////////////
-///  Sample Code for Acme Scanner
+///  Sample Code for HelloWorld
 ///  Reference Implementation using OPSWAT MetaDefender Endpoint Security SDK
 ///  
 ///  Created by Chris Seiler
@@ -112,7 +112,7 @@ namespace SDKDownloader
                             }
                             break;
                         }
-                    case "download-copy-vapm":
+                    case "download-copy-vapm-windows":
                         {
                             string libPath = args[1];
                             string checkFilePath = Path.Combine(libPath, "vmod2.dat");
@@ -120,12 +120,12 @@ namespace SDKDownloader
                             if (!IsFileUpdated(checkFilePath))
                             {
                                 Util.CreateCleanDir(libPath);
-                                ExtractorCatalog.DownloadAndCopy(libPath);
+                                ExtractorCatalog.DownloadAndCopy(libPath,1); // Download Windows Platform
                             }
 
                             break;
                         }
-                    case "download-copy":
+                    case "download-copy-windows":
                         {
                             string libPath = args[1];
                             string checkFilePath = Path.Combine(libPath, "libwavmodapi.dll"); 
@@ -133,7 +133,7 @@ namespace SDKDownloader
                             if(!IsFileUpdated(checkFilePath))
                             {
                                 Util.CreateCleanDir(libPath);
-                                ExtractorSDK.DownloadAndCopy(libPath);
+                                ExtractorSDK.DownloadAndCopy(libPath,1);
                             }
 
                             break;

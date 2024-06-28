@@ -1,4 +1,12 @@
-﻿using SDKDownloader;
+﻿///////////////////////////////////////////////////////////////////////////////////////////////
+///  Sample Code for HelloWorld
+///  Reference Implementation using OPSWAT MetaDefender Endpoint Security SDK
+///  
+///  Created by Chris Seiler
+///  OPSWAT OEM Solutions Architect
+///////////////////////////////////////////////////////////////////////////////////////////////
+
+using SDKDownloader;
 using System.IO;
 
 namespace SDKDownloadLib
@@ -23,8 +31,12 @@ namespace SDKDownloadLib
         }
 
 
-
-        public static void DownloadAndCopy(string catalogDir)
+        //
+        // Platforms are as follows
+        // 1 - Windows
+        // 2 - Mac
+        // 3 - Linux
+        public static void DownloadAndCopy(string catalogDir, int platform)
         {
             string tempArchiveDir = Util.GetCleanTempDir("OESIS-CATALOG-ARCHIVE");
             DownloadCatalog.Download(tempArchiveDir);
@@ -33,7 +45,18 @@ namespace SDKDownloadLib
             string archivePath = Path.Combine(tempArchiveDir, "analog.zip");
             System.IO.Compression.ZipFile.ExtractToDirectory(archivePath, tempCatalogDir);
 
-            CopyWindowsClientFiles(tempCatalogDir, catalogDir);
+            if (platform == 1)
+            {
+                CopyWindowsClientFiles(tempCatalogDir, catalogDir);
+            }
+            if(platform == 2)
+            {
+                // TODO: Copy Mac files
+            }
+            if(platform == 3)
+            {
+                // TODO: Copy Windows files
+            }
 
             //
             // Cleanup the temp paths
