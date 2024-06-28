@@ -85,10 +85,10 @@ namespace AcmeScanner
             btnRefreshStatus = new MaterialSkin.Controls.MaterialButton();
             tabPage5 = new TabPage();
             panel7 = new Panel();
+            btnViewJson = new MaterialSkin.Controls.MaterialButton();
             scannerListView1 = new ScannerListView();
             btnLoadMoby = new MaterialSkin.Controls.MaterialButton();
             timer1 = new Timer(components);
-            btnViewJson = new MaterialSkin.Controls.MaterialButton();
             panel1.SuspendLayout();
             panel3.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)pbLoading).BeginInit();
@@ -867,6 +867,26 @@ namespace AcmeScanner
             panel7.Size = new System.Drawing.Size(1517, 958);
             panel7.TabIndex = 0;
             // 
+            // btnViewJson
+            // 
+            btnViewJson.AutoSizeMode = AutoSizeMode.GrowAndShrink;
+            btnViewJson.Density = MaterialSkin.Controls.MaterialButton.MaterialButtonDensity.Default;
+            btnViewJson.Depth = 0;
+            btnViewJson.HighEmphasis = true;
+            btnViewJson.Icon = null;
+            btnViewJson.Location = new System.Drawing.Point(236, 58);
+            btnViewJson.Margin = new Padding(4, 6, 4, 6);
+            btnViewJson.MouseState = MaterialSkin.MouseState.HOVER;
+            btnViewJson.Name = "btnViewJson";
+            btnViewJson.NoAccentTextColor = System.Drawing.Color.Empty;
+            btnViewJson.Size = new System.Drawing.Size(98, 36);
+            btnViewJson.TabIndex = 2;
+            btnViewJson.Text = "View JSON";
+            btnViewJson.Type = MaterialSkin.Controls.MaterialButton.MaterialButtonType.Contained;
+            btnViewJson.UseAccentColor = false;
+            btnViewJson.UseVisualStyleBackColor = true;
+            btnViewJson.Click += btnViewJson_Click;
+            // 
             // scannerListView1
             // 
             scannerListView1.FullRowSelect = true;
@@ -892,33 +912,13 @@ namespace AcmeScanner
             btnLoadMoby.MouseState = MaterialSkin.MouseState.HOVER;
             btnLoadMoby.Name = "btnLoadMoby";
             btnLoadMoby.NoAccentTextColor = System.Drawing.Color.Empty;
-            btnLoadMoby.Size = new System.Drawing.Size(102, 36);
+            btnLoadMoby.Size = new System.Drawing.Size(104, 36);
             btnLoadMoby.TabIndex = 0;
             btnLoadMoby.Text = "Load Moby";
             btnLoadMoby.Type = MaterialSkin.Controls.MaterialButton.MaterialButtonType.Contained;
             btnLoadMoby.UseAccentColor = false;
             btnLoadMoby.UseVisualStyleBackColor = true;
             btnLoadMoby.Click += btnLoadMoby_Click;
-            // 
-            // btnViewJson
-            // 
-            btnViewJson.AutoSizeMode = AutoSizeMode.GrowAndShrink;
-            btnViewJson.Density = MaterialSkin.Controls.MaterialButton.MaterialButtonDensity.Default;
-            btnViewJson.Depth = 0;
-            btnViewJson.HighEmphasis = true;
-            btnViewJson.Icon = null;
-            btnViewJson.Location = new System.Drawing.Point(189, 58);
-            btnViewJson.Margin = new Padding(4, 6, 4, 6);
-            btnViewJson.MouseState = MaterialSkin.MouseState.HOVER;
-            btnViewJson.Name = "btnViewJson";
-            btnViewJson.NoAccentTextColor = System.Drawing.Color.Empty;
-            btnViewJson.Size = new System.Drawing.Size(96, 36);
-            btnViewJson.TabIndex = 2;
-            btnViewJson.Text = "View JSON";
-            btnViewJson.Type = MaterialSkin.Controls.MaterialButton.MaterialButtonType.Contained;
-            btnViewJson.UseAccentColor = false;
-            btnViewJson.UseVisualStyleBackColor = true;
-            btnViewJson.Click += btnViewJson_Click;
             // 
             // ScannerForm
             // 

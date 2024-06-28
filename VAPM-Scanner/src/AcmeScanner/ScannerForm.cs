@@ -1205,7 +1205,7 @@ namespace AcmeScanner
 
                     string json = JsonConvert.SerializeObject(itemDetails, Formatting.Indented);
 
-                    TextDialog textDialog = new TextDialog(json);
+                    ViewMobyJsonDialog textDialog = new ViewMobyJsonDialog(json);                 
                     textDialog.StartPosition = FormStartPosition.CenterParent;
                     textDialog.ShowDialog();
                 }
