@@ -29,6 +29,7 @@ using VAPMAdapter.Updates;
 using VAPMAdapter.Moby.POCO;
 using VAPMAdapter.Moby;
 using Newtonsoft.Json;
+using System.Security.Cryptography.Xml;
 
 
 namespace AcmeScanner
@@ -772,16 +773,6 @@ namespace AcmeScanner
         private void UpdateMobyScanResults()
         {
             List<ListViewItem> resultList = new List<ListViewItem>();
-
-            // Setup the header
-            scannerListView1.Columns.Clear();
-            scannerListView1.Columns.Add("Name", 200);
-            scannerListView1.Columns.Add("ID", 100);
-            scannerListView1.Columns.Add("OS Type", 100);
-            scannerListView1.Columns.Add("CVE Detection", 100);
-            scannerListView1.View = View.Details;
-            scannerListView1.Update();
-
             //add in all the total product counts here
             resultList.Add(CreateCountListViewItem("Total Products", mobyCounts.TotalProductsCount));
             resultList.Add(CreateCountListViewItem("Total Signatures", mobyCounts.TotalSignaturesCount));
@@ -791,21 +782,38 @@ namespace AcmeScanner
             resultList.Add(CreateCountListViewItem("Fresh Installable", mobyCounts.FreshInstallable));
             resultList.Add(CreateCountListViewItem("Validation Supported", mobyCounts.ValidationSupported));
             resultList.Add(CreateCountListViewItem("App Remover", mobyCounts.AppRemover));
-
-            // Adding a separator
             resultList.Add(new ListViewItem(new string[] { "----", "----", "----", "----" }));
-
+            // Setup the header
+            scannerListView1.Columns.Clear();
+            scannerListView1.Columns.Add("Name", 200);
+            scannerListView1.Columns.Add("Signature ID", 100);
+            scannerListView1.Columns.Add("OS Type", 100);
+            scannerListView1.Columns.Add("Supports Auto Patching", 200);
+            scannerListView1.Columns.Add("Validation Supported", 200);
+            scannerListView1.Columns.Add("Supports App Remover", 200);
+            scannerListView1.View = View.Details;
+            scannerListView1.Update();
             foreach (MobyProduct product in staticMobyProductList)
             {
-                ListViewItem lviProduct = new ListViewItem();
-                lviProduct.Text = product.name;
-                lviProduct.SubItems.Add(product.Id);
-                lviProduct.SubItems.Add(product.osType);
-                lviProduct.SubItems.Add(product.cveDetection ? "Yes" : "No");
-                lviProduct.Tag = product.Id;
+                foreach (MobySignature signature in product.sigList)
+                {      
+                    ListViewItem lviCurrent = new ListViewItem();
+                    lviCurrent.Text = signature.Name;
+                    lviCurrent.SubItems.Add(signature.Id);
+                    lviCurrent.SubItems.Add(product.osType);
+                    lviCurrent.SubItems.Add(signature.supportAutoPatching.ToString());
+                    lviCurrent.SubItems.Add(signature.validationSupported.ToString());
+                    lviCurrent.SubItems.Add(signature.supportAppRemover.ToString());              
+                                     
+                    // Set Tag to store signature Id
+                    lviCurrent.Tag = product.Id;
 
-                resultList.Add(lviProduct);
+                    // Add ListViewItem to the resultList
+                    resultList.Add(lviCurrent);
+                }
             }
+
+                 
 
             scannerListView1.Items.Clear();
             scannerListView1.Items.AddRange(resultList.ToArray());
@@ -1192,18 +1200,22 @@ namespace AcmeScanner
 
         private void btnViewJson_Click(object sender, EventArgs e)
             {
+                
                 if (scannerListView1.SelectedItems.Count > 0)
                 {
-                    var selectedItem = scannerListView1.SelectedItems[0];
-                    var itemDetails = new
+                    string sigID = scannerListView1.SelectedItems[0].SubItems[1].Text;
+                    string pID = scannerListView1.SelectedItems[0].Tag.ToString();
+                    MobyProduct selectedProduct = staticMobyProductList.FirstOrDefault(product => product.Id == pID);
+                    MobySignature selectedSignature = selectedProduct.sigList.FirstOrDefault(signature => signature.Id == sigID);
+                    if (selectedSignature.certifications==null)
                     {
-                        Name = selectedItem.SubItems[0].Text,
-                        ID = selectedItem.SubItems[1].Text,
-                        OsType = selectedItem.SubItems[2].Text,
-                        CveDetection = selectedItem.SubItems[3].Text
-                    };
+                        selectedSignature.certifications = new List<string>();
+                        selectedSignature.certifications.Add("");
+                    }
+                    string json = JsonConvert.SerializeObject(selectedSignature, Formatting.Indented);
 
-                    string json = JsonConvert.SerializeObject(itemDetails, Formatting.Indented);
+
+
 
                     ViewMobyJsonDialog textDialog = new ViewMobyJsonDialog(json);                 
                     textDialog.StartPosition = FormStartPosition.CenterParent;

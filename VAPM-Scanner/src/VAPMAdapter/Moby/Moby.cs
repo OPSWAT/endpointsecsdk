@@ -110,6 +110,7 @@ namespace VAPMAdapter.Moby
                     newProduct.name = product.Name + " " + os.Name;
                     newProduct.Id = (string)os.Value["product_id"];
                     newProduct.cveDetection = (bool)os.Value["cve_detection"];
+                    newProduct.osType = os.Name;
                     newProduct.sigList = new List<MobySignature>();
                     JArray signatures = (JArray)os.Value["signatures"];
                     foreach (JObject currentSig in signatures.Children<JObject>())

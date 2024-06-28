@@ -38,6 +38,7 @@
             TB_MOBY_JSON.Location = new System.Drawing.Point(5, 6);
             TB_MOBY_JSON.Multiline = true;
             TB_MOBY_JSON.Name = "TB_MOBY_JSON";
+            TB_MOBY_JSON.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             TB_MOBY_JSON.Size = new System.Drawing.Size(1000, 591);
             TB_MOBY_JSON.TabIndex = 0;
             // 
@@ -53,7 +54,7 @@
             btnDownloadMobyJson.MouseState = MaterialSkin.MouseState.HOVER;
             btnDownloadMobyJson.Name = "btnDownloadMobyJson";
             btnDownloadMobyJson.NoAccentTextColor = System.Drawing.Color.Empty;
-            btnDownloadMobyJson.Size = new System.Drawing.Size(172, 36);
+            btnDownloadMobyJson.Size = new System.Drawing.Size(176, 36);
             btnDownloadMobyJson.TabIndex = 1;
             btnDownloadMobyJson.Text = "Download JSON file";
             btnDownloadMobyJson.Type = MaterialSkin.Controls.MaterialButton.MaterialButtonType.Contained;
@@ -73,7 +74,7 @@
             btnCloseViewJsonDialog.MouseState = MaterialSkin.MouseState.HOVER;
             btnCloseViewJsonDialog.Name = "btnCloseViewJsonDialog";
             btnCloseViewJsonDialog.NoAccentTextColor = System.Drawing.Color.Empty;
-            btnCloseViewJsonDialog.Size = new System.Drawing.Size(65, 36);
+            btnCloseViewJsonDialog.Size = new System.Drawing.Size(66, 36);
             btnCloseViewJsonDialog.TabIndex = 2;
             btnCloseViewJsonDialog.Text = "Close";
             btnCloseViewJsonDialog.Type = MaterialSkin.Controls.MaterialButton.MaterialButtonType.Contained;
