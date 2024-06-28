@@ -315,7 +315,7 @@ namespace AcmeScanner
 
         private void loadMobyWorker_Completed(object sender, RunWorkerCompletedEventArgs e)
         {
-            
+            UpdateMobyScanResults();
             ShowLoading(false);
         }
 
@@ -764,6 +764,42 @@ namespace AcmeScanner
             lvOrchestrationScanResult.Items.AddRange(resultList.ToArray());
         }
 
+        private void UpdateMobyScanResults()
+        {
+            List<ListViewItem> resultList = new List<ListViewItem>();
+
+            // Setup the header
+            scannerListView1.Columns.Clear();
+            scannerListView1.Columns.Add("Name", 200);
+            scannerListView1.Columns.Add("ID", 100);
+            scannerListView1.Columns.Add("OS Type", 100);
+            scannerListView1.Columns.Add("CVE Detection", 100);
+            scannerListView1.View = View.Details;
+            scannerListView1.Update();
+
+            //add in all the total product counts here
+
+            foreach (MobyProduct product in staticMobyProductList)
+            {
+                ListViewItem lviProduct = new ListViewItem();
+                lviProduct.Text = product.name;
+                lviProduct.SubItems.Add(product.Id);
+                lviProduct.SubItems.Add(product.osType);
+                lviProduct.SubItems.Add(product.cveDetection ? "Yes" : "No");
+                lviProduct.Tag = product.Id;
+
+                resultList.Add(lviProduct);
+            }
+
+            scannerListView1.Items.Clear();
+            scannerListView1.Items.AddRange(resultList.ToArray());
+        }
+
+        private void btnLoadMoby_Click(object sender, EventArgs e)
+        {
+            ShowLoading(true);
+            loadMobyWorker.RunWorkerAsync();
+        }
 
         private void btnScan_Click(object sender, EventArgs e)
         {
@@ -1123,12 +1159,6 @@ namespace AcmeScanner
                 Debug.WriteLine("staticproductlist null");
             }
             UpdateCatalogResults();
-        }
-
-        private void btnLoadMoby_Click(object sender, EventArgs e)
-        {
-            ShowLoading(true);
-            loadMobyWorker.RunWorkerAsync();
         }
     }
 }
