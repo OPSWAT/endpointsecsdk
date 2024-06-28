@@ -1,5 +1,5 @@
 ﻿///////////////////////////////////////////////////////////////////////////////////////////////
-///  Sample Code for Acme Scanner
+///  Sample Code for HelloWorld
 ///  Reference Implementation using OPSWAT MetaDefender Endpoint Security SDK
 ///  
 ///  Created by Chris Seiler
@@ -96,7 +96,7 @@ namespace SDKDownloader
             }
         }
 
-        public static void DownloadAllSDKFiles(string sdkDir)
+        public static void Download(string sdkDir)
         {
             string oesisFilePath = Path.Combine(sdkDir, "OESIS-Descriptior.xml");
             HttpClientUtils.DownloadFileSynchronous(SDK_INDEX_URL, oesisFilePath);
@@ -107,6 +107,8 @@ namespace SDKDownloader
                 DownloadReleases(sdkDir, xmlString);
             }
         }
+
+        
 
     }
 }

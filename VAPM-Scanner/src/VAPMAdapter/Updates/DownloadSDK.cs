@@ -15,8 +15,6 @@ namespace VAPMAdapater.Updates
     internal class DownloadSDK
     {
 
-      
-
         private static string getAttribute(XElement element, string key)
         {
             string result = "";

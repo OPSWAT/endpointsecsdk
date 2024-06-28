@@ -1,11 +1,12 @@
 ﻿///////////////////////////////////////////////////////////////////////////////////////////////
-///  Sample Code for Acme Scanner
+///  Sample Code for HelloWorld
 ///  Reference Implementation using OPSWAT MetaDefender Endpoint Security SDK
 ///  
 ///  Created by Chris Seiler
 ///  OPSWAT OEM Solutions Architect
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
+using SDKDownloadLib;
 using System;
 using System.IO;
 
@@ -41,7 +42,10 @@ namespace SDKDownloader
             if(Directory.Exists(dir))
             {
                 string[] fileList = Directory.GetFiles(dir);
-                result = fileList[0];
+                if (fileList != null && fileList.Length > 0)
+                {
+                    result = fileList[0];
+                }
             }
 
             return result;
@@ -91,48 +95,45 @@ namespace SDKDownloader
 
                             if (!IsFileUpdated(firstFile))
                             {
-                                if (Directory.Exists(archivePath))
-                                {
-                                    Directory.Delete(archivePath, true);
-                                }
-                                Directory.CreateDirectory(archivePath);
-
-
-                                DownloadSDK.DownloadAllSDKFiles(archivePath);
+                                Util.CreateCleanDir(archivePath);
+                                DownloadSDK.Download(archivePath);
                             }
-
-                            DownloadSDK.DownloadAllSDKFiles(archivePath);
                             break;
                         }
-                    case "extract":
+                    case "download-vapm":
                         {
                             string archivePath = args[1];
-                            string sdkPath = args[2];
+                            string firstFile = FindFirstFile(archivePath);
 
-                            DownloadSDK.DownloadAllSDKFiles(archivePath);
+                            if (!IsFileUpdated(firstFile))
+                            {
+                                Util.CreateCleanDir(archivePath);
+                                DownloadCatalog.Download(archivePath);
+                            }
                             break;
                         }
-                    case "copylibs":
+                    case "download-copy-vapm-windows":
                         {
-                            string sdkPath = args[1];
-                            string libPath = args[2];
+                            string libPath = args[1];
+                            string checkFilePath = Path.Combine(libPath, "vmod2.dat");
 
-                            SDKExtractor.CopyAllLibFiles(sdkPath, libPath);
+                            if (!IsFileUpdated(checkFilePath))
+                            {
+                                Util.CreateCleanDir(libPath);
+                                ExtractorCatalog.DownloadAndCopy(libPath,1); // Download Windows Platform
+                            }
+
                             break;
                         }
-                    case "download-copy":
+                    case "download-copy-windows":
                         {
                             string libPath = args[1];
                             string checkFilePath = Path.Combine(libPath, "libwavmodapi.dll"); 
 
                             if(!IsFileUpdated(checkFilePath))
                             {
-                                if(!Directory.Exists(libPath))
-                                {
-                                    Directory.CreateDirectory(libPath);
-                                }
-
-                                SDKExtractor.DownloadAndCopy(libPath);
+                                Util.CreateCleanDir(libPath);
+                                ExtractorSDK.DownloadAndCopy(libPath,1);
                             }
 
                             break;
