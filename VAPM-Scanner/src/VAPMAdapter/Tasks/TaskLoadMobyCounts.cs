@@ -5,25 +5,27 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using VAPMAdapater;
-using VAPMAdapter.Catalog.POCO;
 using VAPMAdapter.Moby.POCO;
 
 namespace VAPMAdapter.Tasks
 {
-    public class TaskLoadMoby
+    public class TaskLoadMobyCounts
     {
-        public static List<MobyProduct> Load()
+        public static MobyTotalCounts LoadCounts()
         {
-            List<MobyProduct> result = new List<MobyProduct>();
             Moby.Moby moby = new Moby.Moby();
             string catalogRoot = VAPMSettings.getLocalCatalogDir();
             catalogRoot = Path.Combine(catalogRoot, "analog/server");
+
             if (moby.Load(catalogRoot))
             {
-                result = moby.GetList();
+                return moby.LoadCounts();
             }
-
-            return result;
+            else
+            {
+                // Handle case where loading fails, return null or default counts
+                return null;
+            }
         }
     }
 }

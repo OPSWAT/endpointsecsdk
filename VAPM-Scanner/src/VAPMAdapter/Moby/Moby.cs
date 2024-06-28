@@ -122,12 +122,12 @@ namespace VAPMAdapter.Moby
             return result;
         }
 
-        public void LoadCounts()
+        public MobyTotalCounts LoadCounts()
         {
             JObject jsonObject = getProductJsonObject();
             JObject countsJson = (JObject)jsonObject["counts"];
 
-            counts = new MobyTotalCounts
+            MobyTotalCounts counts = new MobyTotalCounts
             {
                 TotalProductsCount = ParseCounts((JObject)countsJson["total_products_count"]),
                 TotalSignaturesCount = ParseCounts((JObject)countsJson["total_signatures_count"]),
@@ -138,6 +138,7 @@ namespace VAPMAdapter.Moby
                 ValidationSupported = ParseCounts((JObject)countsJson["validation_supported"]),
                 AppRemover = ParseCounts((JObject)countsJson["app_remover"])
             };
+            return counts;
         }
 
         private MobyPlatformCounts ParseCounts(JObject countJson)
@@ -149,11 +150,6 @@ namespace VAPMAdapter.Moby
                 Mac = (int)countJson["platforms"]["mac"],
                 Linux = (int)countJson["platforms"]["linux"]
             };
-        }
-
-        public MobyTotalCounts GetCounts()
-        {
-            return counts;
         }
     }
 }

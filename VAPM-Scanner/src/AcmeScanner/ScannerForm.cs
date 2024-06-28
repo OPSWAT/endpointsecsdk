@@ -27,6 +27,7 @@ using VAPMAdapter.OESIS.POCO;
 using VAPMAdapter.Tasks;
 using VAPMAdapter.Updates;
 using VAPMAdapter.Moby.POCO;
+using VAPMAdapter.Moby;
 
 namespace AcmeScanner
 {
@@ -311,6 +312,8 @@ namespace AcmeScanner
         private void loadMobyWorker_DoWork( object sender, DoWorkEventArgs e)
         {
             staticMobyProductList = TaskLoadMoby.Load();
+
+            mobyCounts = TaskLoadMobyCounts.LoadCounts();
         }
 
         private void loadMobyWorker_Completed(object sender, RunWorkerCompletedEventArgs e)
@@ -778,6 +781,17 @@ namespace AcmeScanner
             scannerListView1.Update();
 
             //add in all the total product counts here
+            resultList.Add(CreateCountListViewItem("Total Products", mobyCounts.TotalProductsCount));
+            resultList.Add(CreateCountListViewItem("Total Signatures", mobyCounts.TotalSignaturesCount));
+            resultList.Add(CreateCountListViewItem("CVE Detection", mobyCounts.CveDetection));
+            resultList.Add(CreateCountListViewItem("Support Auto Patching", mobyCounts.SupportAutoPatching));
+            resultList.Add(CreateCountListViewItem("Background Patching", mobyCounts.BackgroundPatching));
+            resultList.Add(CreateCountListViewItem("Fresh Installable", mobyCounts.FreshInstallable));
+            resultList.Add(CreateCountListViewItem("Validation Supported", mobyCounts.ValidationSupported));
+            resultList.Add(CreateCountListViewItem("App Remover", mobyCounts.AppRemover));
+
+            // Adding a separator
+            resultList.Add(new ListViewItem(new string[] { "----", "----", "----", "----" }));
 
             foreach (MobyProduct product in staticMobyProductList)
             {
@@ -793,6 +807,17 @@ namespace AcmeScanner
 
             scannerListView1.Items.Clear();
             scannerListView1.Items.AddRange(resultList.ToArray());
+        }
+
+        private ListViewItem CreateCountListViewItem(string name, MobyPlatformCounts counts)
+        {
+            ListViewItem lviCounts = new ListViewItem();
+            lviCounts.Text = name;
+            lviCounts.SubItems.Add(counts.Total.ToString());
+            lviCounts.SubItems.Add(counts.Windows.ToString());
+            lviCounts.SubItems.Add(counts.Mac.ToString());
+            lviCounts.SubItems.Add(counts.Linux.ToString());
+            return lviCounts;
         }
 
         private void btnLoadMoby_Click(object sender, EventArgs e)
