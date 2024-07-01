@@ -838,6 +838,11 @@ namespace AcmeScanner
 
         private string GetMobyTotalCountsJson()
         {
+            if (mobyCounts == null)
+            {
+                mobyCounts = TaskLoadMobyCounts.LoadCounts();
+            }
+
             var totalCounts = new
             {
                 TotalProducts = mobyCounts.TotalProductsCount,
