@@ -67,35 +67,41 @@ namespace AcmeScanner
 
         private void fillSDKlabels()
         {
-            // Check if libwavmodapi.dll exists
-            FileInfo vmodInfo = new FileInfo("libwavmodapi.dll");
             EnableButtons(true);
-            FileVersionInfo versionInfo = FileVersionInfo.GetVersionInfo(vmodInfo.FullName);
-            string productVersion = versionInfo.ProductVersion;
-            label5.Text = productVersion;
-            label13.Text = productVersion;
-            DateTime lastModified = vmodInfo.LastWriteTime.Date;
-            label7.Text = lastModified.ToString("MMMM dd, yyyy");
-            label14.Text = label7.Text;
-            if (!UpdateSDK.isSDKUpdated())
+            // Check if libwavmodapi.dll exists
+            if (UpdateSDK.doesSDKExist())
             {
-                label6.ForeColor = System.Drawing.Color.Red;
-                label7.ForeColor = System.Drawing.Color.Red;
-                label11.ForeColor = System.Drawing.Color.Red;
-                label14.ForeColor = System.Drawing.Color.Red;
+                FileInfo vmodInfo = new FileInfo("libwavmodapi.dll");
+                FileVersionInfo versionInfo = FileVersionInfo.GetVersionInfo(vmodInfo.FullName);
+                string productVersion = versionInfo.ProductVersion;
+                label5.Text = productVersion;
+                label13.Text = productVersion;
+                DateTime lastModified = vmodInfo.LastWriteTime.Date;
+                label7.Text = lastModified.ToString("MMMM dd, yyyy");
+                label14.Text = label7.Text;
+                if (!UpdateSDK.isSDKUpdated())
+                {
+                    label6.ForeColor = System.Drawing.Color.Red;
+                    label7.ForeColor = System.Drawing.Color.Red;
+                    label11.ForeColor = System.Drawing.Color.Red;
+                    label14.ForeColor = System.Drawing.Color.Red;
+                }
             }
             // Check if patch.dat exists
-            FileInfo dbFileInfo = new FileInfo("patch.dat");
-            DateTime lastModifiedDB = dbFileInfo.LastWriteTime.Date;
-            label9.Text = lastModifiedDB.ToString("MMMM dd, yyyy");
-            label15.Text = label9.Text;
-
-            if (!UpdateDBFiles.isDBUpdated())
+            if (UpdateDBFiles.doesDBExist())
             {
-                label9.ForeColor = System.Drawing.Color.Red;
-                label8.ForeColor = System.Drawing.Color.Red;
-                label12.ForeColor = System.Drawing.Color.Red;
-                label15.ForeColor = System.Drawing.Color.Red;
+                FileInfo dbFileInfo = new FileInfo("patch.dat");
+                DateTime lastModifiedDB = dbFileInfo.LastWriteTime.Date;
+                label9.Text = lastModifiedDB.ToString("MMMM dd, yyyy");
+                label15.Text = label9.Text;
+
+                if (!UpdateDBFiles.isDBUpdated())
+                {
+                    label9.ForeColor = System.Drawing.Color.Red;
+                    label8.ForeColor = System.Drawing.Color.Red;
+                    label12.ForeColor = System.Drawing.Color.Red;
+                    label15.ForeColor = System.Drawing.Color.Red;
+                }
             }
         }
 
@@ -472,11 +478,11 @@ namespace AcmeScanner
 
         private void EnableButtons(bool enabled)
         {
-            bool isSDKUpdated = UpdateSDK.isSDKUpdated();
-            bool isDBUpdated = UpdateDBFiles.isDBUpdated();
+            bool SDKdownload = UpdateSDK.doesSDKExist();
+            bool DBdownload = UpdateDBFiles.doesDBExist();
 
             //these buttons are still being loaded in and enabeled somewhere else, need to find out where
-            if (!isSDKUpdated || !isDBUpdated)
+            if (!SDKdownload || !DBdownload)
             {
                 btnInstall.Enabled = false;
                 btnScan.Enabled = false;
@@ -855,19 +861,24 @@ namespace AcmeScanner
 
         private string GetMobyTotalCountsJson()
         {
-            var totalCounts = new
-            {
-                TotalProducts = mobyCounts.TotalProductsCount,
-                TotalSignatures = mobyCounts.TotalSignaturesCount,
-                CveDetection = mobyCounts.CveDetection,
-                SupportAutoPatching = mobyCounts.SupportAutoPatching,
-                BackgroundPatching = mobyCounts.BackgroundPatching,
-                FreshInstallable = mobyCounts.FreshInstallable,
-                ValidationSupported = mobyCounts.ValidationSupported,
-                AppRemover = mobyCounts.AppRemover
-            };
+            if (mobyCounts == null)
+    {
+        mobyCounts = TaskLoadMobyCounts.LoadCounts();
+    }
 
-            return JsonConvert.SerializeObject(totalCounts, Formatting.Indented);
+    var totalCounts = new
+    {
+        TotalProducts = mobyCounts.TotalProductsCount,
+        TotalSignatures = mobyCounts.TotalSignaturesCount,
+        CveDetection = mobyCounts.CveDetection,
+        SupportAutoPatching = mobyCounts.SupportAutoPatching,
+        BackgroundPatching = mobyCounts.BackgroundPatching,
+        FreshInstallable = mobyCounts.FreshInstallable,
+        ValidationSupported = mobyCounts.ValidationSupported,
+        AppRemover = mobyCounts.AppRemover
+    };
+
+    return JsonConvert.SerializeObject(totalCounts, Formatting.Indented);
         }
 
 
