@@ -72,6 +72,7 @@ namespace VAPMAdapter.Catalog
 
             foreach (JObject current in oesisJson.Children<JObject>())
             {
+
                 //find child json of oesis whose header name starts with vuln_associations
                 if (current.TryGetValue("vuln_associations", out JToken vulnAssociationsToken))
                 {

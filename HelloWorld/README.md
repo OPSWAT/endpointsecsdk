@@ -30,6 +30,23 @@ This sample will detect the existing Firewall Products installed on the Endpoint
 Program.cs - Contains the main sample code.  Start with the main function.
 OESISAdapter.cs - Provides the .Net Runtime mappings to the Native Code
 XStringMarshaler.cs - Provides the needed string mappings between .Net and Native Code
+Product.cs - Plain object used to map product information
+
+#### InlineLicense - Loads the license into memory
+This sample demonstrates how to load the license.cfg straight from the code.    
+
+Program.cs - Contains the main sample code.  Start with the main function.
+OESISAdapter.cs - Provides the .Net Runtime mappings to the Native Code
+XStringMarshaler.cs - Provides the needed string mappings between .Net and Native Code
+
+
+#### Vulnerability - Scans the system for 3rd Party Vulnerabilitys
+This sample will detect all the products on the system.  Call the GetProductVulnerability method to get the results of any vulnerabilities.  It prints the counts of any vulnerabilities and the more detailed response is written in a results file.    
+
+Program.cs - Contains the main sample code.  Start with the main function.
+OESISAdapter.cs - Provides the .Net Runtime mappings to the Native Code
+XStringMarshaler.cs - Provides the needed string mappings between .Net and Native Code
+Product.cs - Plain object used to map product information
 
 
 #### More Coming soon 

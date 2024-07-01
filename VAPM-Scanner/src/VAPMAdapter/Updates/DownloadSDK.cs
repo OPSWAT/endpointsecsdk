@@ -17,6 +17,7 @@ namespace VAPMAdapater.Updates
     /// </summary>
     internal class DownloadSDK
     {
+
         /// <summary>
         /// Retrieves the value of a specified attribute from an XElement.
         /// </summary>

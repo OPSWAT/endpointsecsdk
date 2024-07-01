@@ -13,6 +13,16 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Compliance", "Compliance\Co
 		{B91CB1E4-F12F-443A-B0B5-6F61190AAB3F} = {B91CB1E4-F12F-443A-B0B5-6F61190AAB3F}
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Vulnerability", "Vulnerability\Vulnerability.csproj", "{4507F5C4-407E-4FC4-A5ED-EBD6F494FB0C}"
+	ProjectSection(ProjectDependencies) = postProject
+		{B91CB1E4-F12F-443A-B0B5-6F61190AAB3F} = {B91CB1E4-F12F-443A-B0B5-6F61190AAB3F}
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InlineLicense", "InlineLicense\InlineLicense.csproj", "{B05A1D3D-85D9-4F8F-B133-CBAD8B62BCE8}"
+	ProjectSection(ProjectDependencies) = postProject
+		{B91CB1E4-F12F-443A-B0B5-6F61190AAB3F} = {B91CB1E4-F12F-443A-B0B5-6F61190AAB3F}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -31,6 +41,14 @@ Global
 		{4700B454-9EBC-4CB6-B25E-0F607CBE0FC8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4700B454-9EBC-4CB6-B25E-0F607CBE0FC8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4700B454-9EBC-4CB6-B25E-0F607CBE0FC8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4507F5C4-407E-4FC4-A5ED-EBD6F494FB0C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4507F5C4-407E-4FC4-A5ED-EBD6F494FB0C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4507F5C4-407E-4FC4-A5ED-EBD6F494FB0C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4507F5C4-407E-4FC4-A5ED-EBD6F494FB0C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B05A1D3D-85D9-4F8F-B133-CBAD8B62BCE8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B05A1D3D-85D9-4F8F-B133-CBAD8B62BCE8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B05A1D3D-85D9-4F8F-B133-CBAD8B62BCE8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B05A1D3D-85D9-4F8F-B133-CBAD8B62BCE8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
