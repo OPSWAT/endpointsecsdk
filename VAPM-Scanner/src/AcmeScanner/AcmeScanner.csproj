@@ -11,11 +11,16 @@
 
   <ItemGroup>
     <PackageReference Include="MaterialSkin.2.RTL" Version="2.3.1.1" />
+    <PackageReference Include="MessagePack" Version="2.5.168" />
+    <PackageReference Include="MessagePack.Annotations" Version="2.5.168" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\VAPMAdapter\VAPMAdapter.csproj" />
   </ItemGroup>
+
+  
+
 
   <ItemGroup>
     <Compile Update="InstallPatchMessageDialog.cs">

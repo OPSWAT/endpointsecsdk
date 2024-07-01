@@ -11,9 +11,16 @@ using VAPMAdapater;
 
 namespace VAPMAdapter.Updates
 {
+
+    /// <summary>
+    /// Provides methods to update the local catalog by downloading and extracting the latest version.
+    /// </summary>
     public class UpdateCatalog
     {
-
+        /// <summary>
+        /// Updates the local catalog by downloading the latest catalog zip file and extracting its contents.
+        /// The catalog is only updated if it is older than one day.
+        /// </summary>
         public static void Update()
         {
             string catalogDir = VAPMSettings.getLocalCatalogDir();
@@ -31,9 +38,13 @@ namespace VAPMAdapter.Updates
             }
             Directory.CreateDirectory(catalogDir);
 
-
+            // Define the path for the downloaded catalog zip file
             string analogFile = Path.Combine(catalogDir, "analog.zip");
+
+            // Download the latest catalog zip file
             DownloadCatalog.Download(analogFile);
+
+            // Extract all zip files in the catalog directory
             ExtractUtils.ExtractZipFiles(catalogDir);
         }
 

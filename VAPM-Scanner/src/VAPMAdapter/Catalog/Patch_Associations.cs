@@ -30,6 +30,11 @@ namespace VAPMAdapter.Catalog
             return true;
         }
 
+        /// <summary>
+        /// Reads the entire JSON content from "patch_associations.json" as a JObject. Throws exception if unsuccessful.
+        /// It retrieves the JSON data from the file.
+        /// </summary>
+        /// <returns>A JObject representing the parsed JSON content from "patch_associations.json".</returns>
         private JObject getPatchAssociationJsonObject()
         {
             JObject result;
@@ -48,7 +53,15 @@ namespace VAPMAdapter.Catalog
             return result;
         }
 
-
+        /// <summary>
+        /// Extracts a list of JObjects representing patch associations.
+        /// 
+        /// This function assumes the JObject is retrieved using getPatchAssociationJsonObject.
+        /// It searches for header named "patch_associations" within the provided JObject.
+        /// If found, it returns a list containing all JObjects under the "patch_associations" element.
+        /// If the element is not found, the function returns an empty list.
+        /// </summary>
+        /// <returns>A list of JObjects representing patch associations, or empty list if not found.</returns>
         private List<JObject> getPatchAssociationsListJson()
         {
             List<JObject> result = new List<JObject>();
@@ -74,6 +87,13 @@ namespace VAPMAdapter.Catalog
 
 
         // Note this is not written for multi-thread protection
+        /// <summary>
+        /// Parses JObjects from getPatchAssociationsListJson() into CatalogPatchAssociation objects filling in their PatchId, SigIdList values.
+        /// If the PatchId for the objects are found as a key in the dictionary returned from GetPatchIdAggregationsDictionary(), 
+        /// then the PatchAggregation value for the object is set to the value for the patch id key in the dictionary.
+        /// Returns a list of these objects.
+        /// </summary>
+        /// <returns>List of CatalogPatchAssociation objects.</returns>
         public List<CatalogPatchAssociation> GetList()
         {
             if (patchAssociationList != null)
@@ -116,6 +136,13 @@ namespace VAPMAdapter.Catalog
 
 
         // Note this is not thread safe
+        /// <summary>
+        /// Creates a dictionary mapping signature IDs to associated CatalogPatchAssociation objects.
+        /// Processes a list of CatalogPatchAssociation objects from GetList() and builds a dictionary using nested loops.
+        /// - Key: Signature ID (extracted from SigIdList within CatalogPatchAssociation objects)
+        /// - Value: List of CatalogPatchAssociation objects associated with the signature ID
+        /// </summary>
+        /// <returns>Dictionary mapping signature IDs to lists of CatalogPatchAssociation objects.</returns>
         public Dictionary<string, List<CatalogPatchAssociation>> GetProductPatchDictionary()
         {
             if (sigIdToPatchAssociation != null)

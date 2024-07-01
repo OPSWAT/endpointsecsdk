@@ -27,6 +27,13 @@ namespace VAPMAdapter.Catalog
             return true;
         }
 
+        /// <summary>
+        /// Reads the entire JSON content from "vuln_associations.json" as a JObject.
+        /// 
+        /// This function attempts to parse the content of "vuln_associations.json" into a JObject.
+        /// It throws an exception if the file is empty or cannot be read.
+        /// </summary>
+        /// <returns>A JObject representing the parsed JSON content, or throws an exception if the file is empty or unreadable.</returns>
         private JObject getVulnAssociationJsonObject()
         {
             JObject result;
@@ -46,6 +53,15 @@ namespace VAPMAdapter.Catalog
         }
 
 
+        /// <summary>
+        /// Gets vulnerability associations as a JObject from the parsed content of "vuln_associations.json".
+        /// 
+        /// This function assumes the complete JSON content is already retrieved using `getVulnAssociationJsonObject`.
+        /// It searches for a header within the JSON data that starts with "vuln_associations".
+        /// If the header is found, it extracts the corresponding value as a JObject representing the vulnerability associations.
+        /// If the header is not found, the function returns null.
+        /// </summary>
+        /// <returns>A JObject containing vulnerability associations, or null if the relevant header is not found.</returns>
 
         private JObject getVulnAssociationsListJson()
         {
@@ -56,18 +72,19 @@ namespace VAPMAdapter.Catalog
 
             foreach (JObject current in oesisJson.Children<JObject>())
             {
-                // Note need to handle to sets of data now
 
-                if (JsonUtil.GetJObjectName(current).Contains("vuln_associations"))
+                //find child json of oesis whose header name starts with vuln_associations
+                if (current.TryGetValue("vuln_associations", out JToken vulnAssociationsToken))
                 {
-                    return ((JObject)current["vuln_associations"]);
+                    return (JObject)vulnAssociationsToken;
                 }
+
             }
 
             return result;
         }
 
-
+        
         private HashSet<string> getProductIds(JArray processList)
         {
             HashSet<string> result = new HashSet<string>();
@@ -100,31 +117,40 @@ namespace VAPMAdapter.Catalog
 
 
         // Note this is not written for multi-thread protection
+        /// <summary>
+        /// Parses JObject from getVulnAssociationsListJson() into CatalogVulnerabilityAssociation objects (ID, type, OS).
+        /// Returns a list of these objects.
+        /// </summary>
+        /// <returns>List of CatalogVulnerabilityAssociation objects.</returns>
+
         public List<CatalogVulnerabilityAssociation> GetList()
         {
             if (vulnAssociationList != null)
             {
-                return (vulnAssociationList);
+                return vulnAssociationList;
             }
 
-            List<CatalogVulnerabilityAssociation> result = null;
+            List<CatalogVulnerabilityAssociation> result = new List<CatalogVulnerabilityAssociation>();
+            JObject jsonVulnAssociationsList = (JObject)getVulnAssociationsListJson();
 
-            if (result == null)
+            if (jsonVulnAssociationsList != null)
             {
-                JObject jsonVulnAssociationsList = (JObject)getVulnAssociationsListJson();
-                result = new List<CatalogVulnerabilityAssociation>();
-
-
+                //Go over all objects within vuln_associations json returned by getVulnAssociationsListJson
                 foreach (JProperty current in jsonVulnAssociationsList.Properties())
                 {
-                    CatalogVulnerabilityAssociation newVulnAssociation = new CatalogVulnerabilityAssociation();
+                    CatalogVulnerabilityAssociation newVulnAssociation = new CatalogVulnerabilityAssociation
+                    {
+                        ID = current.Name,
+                        Cve = (string)jsonVulnAssociationsList[current.Name]["cve"],
+                        Type_id = (string)jsonVulnAssociationsList[current.Name]["type_id"],
+                        Os_type = (string)jsonVulnAssociationsList[current.Name]["os_type"]
+                    };
 
-                    newVulnAssociation.ID = current.Name;
-                    newVulnAssociation.Cve = (string)jsonVulnAssociationsList[current.Name]["cve"];
-                    newVulnAssociation.Type_id = (string)jsonVulnAssociationsList[current.Name]["type_id"];
-                    newVulnAssociation.Os_type = (string)jsonVulnAssociationsList[current.Name]["os_type"];
-                    newVulnAssociation.ProductIdSet = (HashSet<string>)getProductIds((JArray)jsonVulnAssociationsList[current.Name]["v4_pids"]);
-                    newVulnAssociation.RangeList = (List<CatalogRange>)getRanges((JArray)jsonVulnAssociationsList[current.Name]["ranges"]);
+                    JArray v4_pids = (JArray)jsonVulnAssociationsList[current.Name]["v4_pids"];
+                    newVulnAssociation.ProductIdSet = v4_pids != null ? (HashSet<string>)getProductIds(v4_pids) : new HashSet<string>();
+
+                    JArray ranges = (JArray)jsonVulnAssociationsList[current.Name]["ranges"];
+                    newVulnAssociation.RangeList = ranges != null ? (List<CatalogRange>)getRanges(ranges) : new List<CatalogRange>();
 
                     result.Add(newVulnAssociation);
                 }
@@ -137,6 +163,10 @@ namespace VAPMAdapter.Catalog
 
 
         // Note this is not thread safe
+        /// <summary>
+        /// Creates a dictionary mapping product signature IDs (strings) to their corresponding vulnerability associations (represented as a list of CatalogVulnerabilityAssociation objects).
+        /// </summary>
+        /// <returns>A dictionary of type Dictionary<string, List<CatalogVulnerabilityAssociation>>.</returns>
         public Dictionary<string, List<CatalogVulnerabilityAssociation>> GetProductVulnerablityDictionary()
         {
             if (prodIdToVulnAssociation != null)
@@ -163,12 +193,14 @@ namespace VAPMAdapter.Catalog
                             }
 
                             newProductVulnDictionary[signatureId].Add(association);
+                            System.Diagnostics.Debug.WriteLine(signatureId+"\n");
                         }
                     }
                 }
             }
+            
             prodIdToVulnAssociation = newProductVulnDictionary;
-
+            
             return prodIdToVulnAssociation;
         }
     }

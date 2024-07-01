@@ -27,6 +27,11 @@ namespace VAPMAdapter.Catalog
             return true;
         }
 
+        /// <summary>
+        /// Reads the entire JSON content from "patch_aggregation.json" as a JObject. Throws exception if unsuccessful.
+        /// It retrieves the JSON data from the file.
+        /// </summary>
+        /// <returns>A JObject representing the parsed JSON content from "patch_aggregation.json".</returns>
         private JObject getPatchAggregationJsonObject()
         {
             JObject result;
@@ -45,7 +50,15 @@ namespace VAPMAdapter.Catalog
             return result;
         }
 
-
+        /// <summary>
+        /// Extracts a list of JObjects representing patch aggregations.
+        /// 
+        /// This function assumes the JObject is retrieved using getPatchAggregationJsonObject.
+        /// It searches for header named "patch_aggregations" within the provided JObject.
+        /// If found, it returns a list containing all JObjects under the "patch_aggregations" element.
+        /// If the element is not found, the function returns an empty list.
+        /// </summary>
+        /// <returns>A list of JObjects representing patch aggregations, or empty list if not found.</returns>
         private List<JObject> getPatchAgregationListJson()
         {
             List<JObject> result = new List<JObject>();
@@ -69,7 +82,12 @@ namespace VAPMAdapter.Catalog
             return result;
         }
 
-
+        /// <summary>
+        /// Parses JArray of download links into CatalogDownloadDetails objects (Link, Architecture, Language).
+        /// Returns a list of these objects.
+        /// </summary>
+        /// <param name="downloadLinkArrayJson">JArray containing download link data.</param>
+        /// <returns>List of CatalogDownloadDetails objects.</returns>
         private List<CatalogDownloadDetails> parseDownloadDetails(JArray downloadLinkArrayJson)
         {
             List<CatalogDownloadDetails> result = new List<CatalogDownloadDetails>();
@@ -88,6 +106,11 @@ namespace VAPMAdapter.Catalog
         }
 
         // Note this is not written for multi-thread protection
+        /// <summary>
+        /// Parses JObjects from getPatchAgregationListJson() into CatalogPatchAggregation objects filling in their PatchId, DownloadDetailsList, Fresh_Installable etc. values.
+        /// Returns a list of these objects.
+        /// </summary>
+        /// <returns>List of CatalogPatchAggregation objects.</returns>
         public List<CatalogPatchAggregation> GetList()
         {
             if (patchAggregationList != null)
@@ -129,6 +152,12 @@ namespace VAPMAdapter.Catalog
 
 
         // Note this is not thread safe
+        /// <summary>
+        /// Creates a dictionary mapping patch IDs to their corresponding CatalogPatchAggregation objects retrieved from GetList().
+        /// This function processes a list of CatalogPatchAggregation objects obtained through GetList().  It iterates through the list and builds a dictionary.
+        /// The keys in the dictionary are patch IDs. The values for each key are the corresponding CatalogPatchAggregation objects representing those patch IDs.
+        /// </summary>
+        /// <returns>A dictionary mapping patch IDs to CatalogPatchAggregation objects.</returns>
         public Dictionary<string, CatalogPatchAggregation> GetPatchIdAggregationsDictionary()
         {
             if (patchIdToPatchAggregation != null)

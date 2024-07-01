@@ -6,6 +6,7 @@
 ///  OPSWAT OEM Solutions Architect
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
+using MessagePack;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,10 +15,17 @@ using System.Threading.Tasks;
 
 namespace VAPMAdapter.Catalog.POCO
 {
+    [MessagePackObject]
     public class CatalogOSSupport
     {
-        public bool Windows;
-        public bool Mac;
-        public bool Linux;
+        [Key(0)]
+        public bool Windows { get; set; }
+
+        [Key(1)]
+        public bool Mac { get; set; }
+
+        [Key(2)]
+        public bool Linux { get; set; }
     }
+
 }

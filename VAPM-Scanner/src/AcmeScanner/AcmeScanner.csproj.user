@@ -7,6 +7,9 @@
     <Compile Update="CVEListDialog.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Update="LookupCVEBox.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Update="ScannerForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -14,6 +17,9 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Update="TextDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="ViewMobyJsonDialog.cs">
       <SubType>Form</SubType>
     </Compile>
   </ItemGroup>
