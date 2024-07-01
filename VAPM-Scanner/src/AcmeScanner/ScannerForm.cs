@@ -1231,20 +1231,6 @@ namespace AcmeScanner
 
         }
 
-        private void btnLoadPrevious_Click(object sender, EventArgs e)
-        {
-
-            staticProductList = CatalogCache.CachedCatalog;
-            if (CatalogCache.CachedCatalog == null)
-            {
-                Debug.WriteLine("Cached Catalog null");
-            }
-            if (staticProductList == null)
-            {
-                Debug.WriteLine("staticproductlist null");
-            }
-            UpdateCatalogResults();
-        }
 
 
 

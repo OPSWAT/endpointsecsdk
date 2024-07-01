@@ -12,6 +12,7 @@ namespace VAPMAdapter.Catalog.POCO
     {
         private static readonly string FilePath = "catalog.bin";
         private static List<CatalogProduct> _cachedCatalog = null;
+        private static readonly TimeSpan VietnamTimeDifference = TimeSpan.FromHours(11);
 
         public static List<CatalogProduct> CachedCatalog
         {
@@ -31,6 +32,12 @@ namespace VAPMAdapter.Catalog.POCO
                 // Save catalog to file
                 var bytes = MessagePackSerializer.Serialize(_cachedCatalog);
                 File.WriteAllBytes(FilePath, bytes);
+                if (File.Exists(FilePath))
+                {
+                    DateTime currentLastWriteTime = File.GetLastWriteTimeUtc(FilePath);
+                    DateTime adjustedLastWriteTime = currentLastWriteTime.Add(VietnamTimeDifference);
+                    File.SetLastWriteTimeUtc(FilePath, adjustedLastWriteTime);
+                }
             }
         }
     }
