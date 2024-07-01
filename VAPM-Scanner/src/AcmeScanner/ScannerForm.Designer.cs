@@ -935,6 +935,8 @@ namespace AcmeScanner
             btnMobyViewTotals.Type = MaterialSkin.Controls.MaterialButton.MaterialButtonType.Contained;
             btnMobyViewTotals.UseAccentColor = false;
             btnMobyViewTotals.UseVisualStyleBackColor = true;
+            btnMobyViewTotals.Click += btnMobyViewTotals_Click;
+            btnMobyViewTotals.BringToFront();
             // 
             // ScannerForm
             // 
