@@ -46,6 +46,7 @@ namespace AcmeScanner
 
         private System.ComponentModel.BackgroundWorker scanWorker;
         private System.ComponentModel.BackgroundWorker updateDBWorker;
+        private System.ComponentModel.BackgroundWorker updateMobyWorker;
         private System.ComponentModel.BackgroundWorker installVAPMPatchWorker;
         private System.ComponentModel.BackgroundWorker installOnlinePatchWorker;
         private System.ComponentModel.BackgroundWorker loadCatalogWorker;
@@ -158,6 +159,13 @@ namespace AcmeScanner
             updateDBWorker.RunWorkerCompleted +=
                 new RunWorkerCompletedEventHandler(
             updateDBWorker_Completed);
+
+            updateMobyWorker = new BackgroundWorker();
+            updateMobyWorker.DoWork +=
+                new DoWorkEventHandler(updateMobyWorker_DoWork);
+            updateMobyWorker.RunWorkerCompleted +=
+                new RunWorkerCompletedEventHandler(updateMobyWorker_Completed);
+                
 
             loadCatalogWorker = new BackgroundWorker();
             loadCatalogWorker.DoWork +=
@@ -434,6 +442,15 @@ namespace AcmeScanner
             fillSDKlabels();//change sdk labels to current version
         }
 
+        private void updateMobyWorker_DoWork(object sender, DoWorkEventArgs e)
+        {
+            UpdateMobyFile.DownloadMoby();
+        }
+
+        private void updateMobyWorker_Completed(object sender, RunWorkerCompletedEventArgs e)
+        {
+            ShowLoading(false);
+        }
 
         private bool ShowMessageDialog(IScannerMessageDialog messageDialog)
         {
@@ -773,7 +790,7 @@ namespace AcmeScanner
         private void UpdateMobyScanResults()
         {
             List<ListViewItem> resultList = new List<ListViewItem>();
-            
+
             // Setup the header
 
             scannerListView1.Columns.Clear();
@@ -1252,6 +1269,11 @@ namespace AcmeScanner
 
         }
 
-        
+
+        private void btnUpdateMoby_Click(object sender, EventArgs e)
+        {
+            ShowLoading(true);
+            updateMobyWorker.RunWorkerAsync(true);
+        }
     }
 }

@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using VAPMAdapter.Catalog;
 using VAPMAdapter.Catalog.POCO;
 using VAPMAdapter.Moby.POCO;
+using VAPMAdapter.Updates;
 
 namespace VAPMAdapter.Moby
 {
@@ -50,7 +51,12 @@ namespace VAPMAdapter.Moby
             {
                 try
                 {
+                    if (!File.Exists(jsonLocation))
+                    {
+                        UpdateMobyFile.DownloadMoby();
+                    }
                     jsonLocation = catalogRoot + "/moby.json";
+
                     result = true;
                 }
                 catch (Exception e)
