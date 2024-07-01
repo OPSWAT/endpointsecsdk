@@ -480,6 +480,7 @@ namespace AcmeScanner
         {
             bool SDKdownload = UpdateSDK.doesSDKExist();
             bool DBdownload = UpdateDBFiles.doesDBExist();
+            bool MobyDownload = UpdateMobyFile.doesMobyExist();
 
             //these buttons are still being loaded in and enabeled somewhere else, need to find out where
             if (!SDKdownload || !DBdownload)
@@ -516,8 +517,21 @@ namespace AcmeScanner
                 btnRefreshStatus.Enabled = enabled;
                 btnOrchestrationView.Enabled = enabled;
             }
+            if (!MobyDownload)
+            {
+                btnLoadMoby.Enabled = false;
+                btnViewJson.Enabled = false;
+                btnMobyViewTotals.Enabled = false;
+            }
+            else
+            {
+                btnLoadMoby.Enabled = enabled;
+                btnViewJson.Enabled = enabled;
+                btnMobyViewTotals.Enabled = enabled;
+            }
             btnUpdate.Enabled = enabled;
             btnUpdateSDK.Enabled = enabled;
+            btnUpdateMoby.Enabled = enabled;
         }
 
         private void ShowLoading(bool visible)
