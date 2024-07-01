@@ -20,6 +20,20 @@ namespace VAPMAdapater.Updates
     public class UpdateSDK
     {
         /// <summary>
+        /// Checks if the SDK is downloaded
+        /// </summary>
+        /// <returns>True if the SDK is downloaded, otherwise false.</returns>
+        public static bool doesSDKExist()
+        {
+            bool result = false;
+            if (File.Exists("libwavmodapi.dll"))
+            {
+                result = true;
+            }
+            return result;
+        }
+
+        /// <summary>
         /// Checks if the SDK has been updated in the last 7 days.
         /// </summary>
         /// <returns>True if the SDK has been updated in the last 7 days, otherwise false.</returns>

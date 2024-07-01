@@ -53,6 +53,24 @@ namespace VAPMAdapter.Updates
             DownloadDBFile(destPath, VAPMSettings.PATCH_CHECKSUMS_DB);
         }
 
+        /// <summary>
+        /// Checks if the DB is downloaded
+        /// </summary>
+        /// <returns>True if the DB is downloaded, otherwise false.</returns>
+        public static bool doesDBExist()
+        {
+            bool result = false;
+            if (File.Exists("patch.dat"))
+            {
+                result = true;
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// Checks if the DB has been updated in the last 7 days.
+        /// </summary>
+        /// <returns>True if the DB has been updated in the last 7 days, otherwise false.</returns>
         public static bool isDBUpdated()
         {
             bool result = false;
