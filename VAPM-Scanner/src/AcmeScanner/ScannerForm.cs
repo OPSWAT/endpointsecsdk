@@ -784,6 +784,7 @@ namespace AcmeScanner
             resultList.Add(CreateCountListViewItem("App Remover", mobyCounts.AppRemover));
             resultList.Add(new ListViewItem(new string[] { "----", "----", "----", "----" }));
             // Setup the header
+
             scannerListView1.Columns.Clear();
             scannerListView1.Columns.Add("Name", 200);
             scannerListView1.Columns.Add("Signature ID", 100);
@@ -793,6 +794,7 @@ namespace AcmeScanner
             scannerListView1.Columns.Add("Supports App Remover", 200);
             scannerListView1.View = View.Details;
             scannerListView1.Update();
+
             foreach (MobyProduct product in staticMobyProductList)
             {
                 foreach (MobySignature signature in product.sigList)
@@ -840,6 +842,33 @@ namespace AcmeScanner
         {
             ShowLoading(true);
             scanWorker.RunWorkerAsync(true);
+        }
+
+
+        private string GetMobyTotalCountsJson()
+        {
+            var totalCounts = new
+            {
+                TotalProducts = mobyCounts.TotalProductsCount,
+                TotalSignatures = mobyCounts.TotalSignaturesCount,
+                CveDetection = mobyCounts.CveDetection,
+                SupportAutoPatching = mobyCounts.SupportAutoPatching,
+                BackgroundPatching = mobyCounts.BackgroundPatching,
+                FreshInstallable = mobyCounts.FreshInstallable,
+                ValidationSupported = mobyCounts.ValidationSupported,
+                AppRemover = mobyCounts.AppRemover
+            };
+
+            return JsonConvert.SerializeObject(totalCounts, Formatting.Indented);
+        }
+
+
+        private void btnMobyViewTotals_Click(object sender, EventArgs e)
+        {
+            string totalCountsJson = GetMobyTotalCountsJson();
+            ViewMobyJsonDialog textDialog = new ViewMobyJsonDialog(totalCountsJson);
+            textDialog.StartPosition = FormStartPosition.CenterParent;
+            textDialog.ShowDialog();
         }
 
         private void btnCVEJSON_Click(object sender, EventArgs e)
