@@ -89,6 +89,7 @@ namespace AcmeScanner
             scannerListView1 = new ScannerListView();
             btnLoadMoby = new MaterialSkin.Controls.MaterialButton();
             timer1 = new Timer(components);
+            btnMobyViewTotals = new MaterialSkin.Controls.MaterialButton();
             panel1.SuspendLayout();
             panel3.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)pbLoading).BeginInit();
@@ -852,6 +853,7 @@ namespace AcmeScanner
             // 
             // panel7
             // 
+            panel7.Controls.Add(btnMobyViewTotals);
             panel7.Controls.Add(btnViewJson);
             panel7.Controls.Add(scannerListView1);
             panel7.Controls.Add(btnLoadMoby);
@@ -914,6 +916,25 @@ namespace AcmeScanner
             btnLoadMoby.UseAccentColor = false;
             btnLoadMoby.UseVisualStyleBackColor = true;
             btnLoadMoby.Click += btnLoadMoby_Click;
+            // 
+            // btnMobyViewTotals
+            // 
+            btnMobyViewTotals.AutoSizeMode = AutoSizeMode.GrowAndShrink;
+            btnMobyViewTotals.Density = MaterialSkin.Controls.MaterialButton.MaterialButtonDensity.Default;
+            btnMobyViewTotals.Depth = 0;
+            btnMobyViewTotals.HighEmphasis = true;
+            btnMobyViewTotals.Icon = null;
+            btnMobyViewTotals.Location = new System.Drawing.Point(1303, 58);
+            btnMobyViewTotals.Margin = new Padding(4, 6, 4, 6);
+            btnMobyViewTotals.MouseState = MaterialSkin.MouseState.HOVER;
+            btnMobyViewTotals.Name = "btnMobyViewTotals";
+            btnMobyViewTotals.NoAccentTextColor = System.Drawing.Color.Empty;
+            btnMobyViewTotals.Size = new System.Drawing.Size(158, 36);
+            btnMobyViewTotals.TabIndex = 3;
+            btnMobyViewTotals.Text = "view total counts";
+            btnMobyViewTotals.Type = MaterialSkin.Controls.MaterialButton.MaterialButtonType.Contained;
+            btnMobyViewTotals.UseAccentColor = false;
+            btnMobyViewTotals.UseVisualStyleBackColor = true;
             // 
             // ScannerForm
             // 
@@ -1005,5 +1026,6 @@ namespace AcmeScanner
         private MaterialSkin.Controls.MaterialButton btnLoadMoby;
         private MobyTotalCounts mobyCounts;
         private MaterialSkin.Controls.MaterialButton btnViewJson;
+        private MaterialSkin.Controls.MaterialButton btnMobyViewTotals;
     }
 }
