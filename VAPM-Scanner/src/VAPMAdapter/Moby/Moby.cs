@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -51,11 +52,12 @@ namespace VAPMAdapter.Moby
             {
                 try
                 {
+                    jsonLocation = catalogRoot + "/moby.json";
                     if (!File.Exists(jsonLocation))
                     {
                         UpdateMobyFile.DownloadMoby();
                     }
-                    jsonLocation = catalogRoot + "/moby.json";
+                    
 
                     result = true;
                 }
@@ -127,6 +129,8 @@ namespace VAPMAdapter.Moby
                         newSignature.supportAutoPatching = (bool)currentSig["support_auto_patching"];
                         newSignature.supportAppRemover = (bool)currentSig["support_app_remover"];
                         newSignature.validationSupported = (bool)currentSig["validation_supported"];
+                        newSignature.backgroundPatchingSupported = (bool)currentSig["background_patching"];
+                        newSignature.freshInstallable = (bool)currentSig["fresh_installable"];
                         newSignature.categories=new List<String>();
                         newSignature.enabledControls = new List<String>();
                         newSignature.certifications = new List<String>();
@@ -141,10 +145,12 @@ namespace VAPMAdapter.Moby
                         {
                             newSignature.enabledControls.Add(currentControl);
                         }
-                        /*foreach (string curr in currentSig["certifications"])
+                        JArray currentCertifications = (JArray)currentSig["certifications"];
+                        foreach (JObject certification in currentCertifications)
                         {
-                            newSignature.certifications.Add(curr);
-                        }*/
+                            string certString = JsonConvert.SerializeObject(certification, Formatting.None);
+                            newSignature.certifications.Add(certString);
+                        }
                         foreach (string curr in currentSig["versions"])
                         {
                             newSignature.versions.Add(curr);

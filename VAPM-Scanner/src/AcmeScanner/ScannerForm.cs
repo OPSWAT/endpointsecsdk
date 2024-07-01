@@ -820,6 +820,7 @@ namespace AcmeScanner
             scannerListView1.Columns.Add("Supports Auto Patching", 200);
             scannerListView1.Columns.Add("Validation Supported", 200);
             scannerListView1.Columns.Add("Supports App Remover", 200);
+            scannerListView1.Columns.Add("Supports Background Patching", 220);
             scannerListView1.View = View.Details;
             scannerListView1.Update();
 
@@ -834,6 +835,7 @@ namespace AcmeScanner
                     lviCurrent.SubItems.Add(signature.supportAutoPatching.ToString());
                     lviCurrent.SubItems.Add(signature.validationSupported.ToString());
                     lviCurrent.SubItems.Add(signature.supportAppRemover.ToString());
+                    lviCurrent.SubItems.Add(signature.backgroundPatchingSupported.ToString());
 
                     // Set Tag to store signature Id
                     lviCurrent.Tag = product.Id;
@@ -1268,12 +1270,7 @@ namespace AcmeScanner
                 string sigID = scannerListView1.SelectedItems[0].SubItems[1].Text;
                 string pID = scannerListView1.SelectedItems[0].Tag.ToString();
                 MobyProduct selectedProduct = staticMobyProductList.FirstOrDefault(product => product.Id == pID);
-                MobySignature selectedSignature = selectedProduct.sigList.FirstOrDefault(signature => signature.Id == sigID);
-                if (selectedSignature.certifications == null)
-                {
-                    selectedSignature.certifications = new List<string>();
-                    selectedSignature.certifications.Add("");
-                }
+                MobySignature selectedSignature = selectedProduct.sigList.FirstOrDefault(signature => signature.Id == sigID);                
                 string json = JsonConvert.SerializeObject(selectedSignature, Formatting.Indented);
 
 
