@@ -773,16 +773,7 @@ namespace AcmeScanner
         private void UpdateMobyScanResults()
         {
             List<ListViewItem> resultList = new List<ListViewItem>();
-            //add in all the total product counts here
-            resultList.Add(CreateCountListViewItem("Total Products", mobyCounts.TotalProductsCount));
-            resultList.Add(CreateCountListViewItem("Total Signatures", mobyCounts.TotalSignaturesCount));
-            resultList.Add(CreateCountListViewItem("CVE Detection", mobyCounts.CveDetection));
-            resultList.Add(CreateCountListViewItem("Support Auto Patching", mobyCounts.SupportAutoPatching));
-            resultList.Add(CreateCountListViewItem("Background Patching", mobyCounts.BackgroundPatching));
-            resultList.Add(CreateCountListViewItem("Fresh Installable", mobyCounts.FreshInstallable));
-            resultList.Add(CreateCountListViewItem("Validation Supported", mobyCounts.ValidationSupported));
-            resultList.Add(CreateCountListViewItem("App Remover", mobyCounts.AppRemover));
-            resultList.Add(new ListViewItem(new string[] { "----", "----", "----", "----" }));
+            
             // Setup the header
 
             scannerListView1.Columns.Clear();
@@ -866,7 +857,7 @@ namespace AcmeScanner
         private void btnMobyViewTotals_Click(object sender, EventArgs e)
         {
             string totalCountsJson = GetMobyTotalCountsJson();
-            ViewMobyJsonDialog textDialog = new ViewMobyJsonDialog(totalCountsJson);
+            TextDialog textDialog = new TextDialog(totalCountsJson);
             textDialog.StartPosition = FormStartPosition.CenterParent;
             textDialog.ShowDialog();
         }
@@ -1261,9 +1252,6 @@ namespace AcmeScanner
 
         }
 
-        private void btnMobyViewTotals_Click(object sender, EventArgs e)
-        {
-
-        }
+        
     }
 }
