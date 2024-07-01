@@ -34,5 +34,21 @@ namespace VAPMAdapter.Updates
             // Download the specified database files to the destination path
             DownloadDBFile(destPath, "moby.json");
         }
+
+        public static bool doesMobyExist()
+        {
+            // Get the current directory of the executable
+            string basePath = AppDomain.CurrentDomain.BaseDirectory;
+
+            // Define the relative path to the file from the base directory
+            string relativePath = @"catalog\analog\server\moby.json";
+
+
+            // Combine the base path with the relative path
+            string fullPath = Path.GetFullPath(Path.Combine(basePath, relativePath));
+
+            // Check if the file exists at the specified path
+            return File.Exists(fullPath);
+        }
     }
 }
