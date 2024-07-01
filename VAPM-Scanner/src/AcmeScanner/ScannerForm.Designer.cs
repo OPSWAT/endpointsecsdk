@@ -84,12 +84,12 @@ namespace AcmeScanner
             panel6 = new Panel();
             btnRefreshStatus = new MaterialSkin.Controls.MaterialButton();
             tabPage5 = new TabPage();
-            panel7 = new Panel();
-            btnViewJson = new MaterialSkin.Controls.MaterialButton();
             scannerListView1 = new ScannerListView();
+            panel7 = new Panel();
+            btnMobyViewTotals = new MaterialSkin.Controls.MaterialButton();
+            btnViewJson = new MaterialSkin.Controls.MaterialButton();
             btnLoadMoby = new MaterialSkin.Controls.MaterialButton();
             timer1 = new Timer(components);
-            btnMobyViewTotals = new MaterialSkin.Controls.MaterialButton();
             panel1.SuspendLayout();
             panel3.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)pbLoading).BeginInit();
@@ -848,6 +848,7 @@ namespace AcmeScanner
             // 
             // tabPage5
             // 
+            tabPage5.Controls.Add(scannerListView1);
             tabPage5.Controls.Add(panel7);
             tabPage5.Location = new System.Drawing.Point(4, 34);
             tabPage5.Margin = new Padding(4, 5, 4, 5);
@@ -858,16 +859,51 @@ namespace AcmeScanner
             tabPage5.Text = "Moby";
             tabPage5.UseVisualStyleBackColor = true;
             // 
+            // scannerListView1
+            // 
+            scannerListView1.Dock = DockStyle.Fill;
+            scannerListView1.FullRowSelect = true;
+            scannerListView1.GridLines = true;
+            scannerListView1.Location = new System.Drawing.Point(4, 117);
+            scannerListView1.MultiSelect = false;
+            scannerListView1.Name = "scannerListView1";
+            scannerListView1.OwnerDraw = true;
+            scannerListView1.Size = new System.Drawing.Size(1509, 838);
+            scannerListView1.TabIndex = 1;
+            scannerListView1.UseCompatibleStateImageBehavior = false;
+            scannerListView1.View = View.Details;
+            scannerListView1.SelectedIndexChanged += scannerListView1_SelectedIndexChanged;
+            // 
             // panel7
             // 
             panel7.Controls.Add(btnMobyViewTotals);
             panel7.Controls.Add(btnViewJson);
-            panel7.Controls.Add(scannerListView1);
             panel7.Controls.Add(btnLoadMoby);
-            panel7.Location = new System.Drawing.Point(0, 0);
+            panel7.Dock = DockStyle.Top;
+            panel7.Location = new System.Drawing.Point(4, 5);
             panel7.Name = "panel7";
-            panel7.Size = new System.Drawing.Size(1517, 958);
+            panel7.Size = new System.Drawing.Size(1509, 112);
             panel7.TabIndex = 0;
+            // 
+            // btnMobyViewTotals
+            // 
+            btnMobyViewTotals.AutoSizeMode = AutoSizeMode.GrowAndShrink;
+            btnMobyViewTotals.Density = MaterialSkin.Controls.MaterialButton.MaterialButtonDensity.Default;
+            btnMobyViewTotals.Depth = 0;
+            btnMobyViewTotals.HighEmphasis = true;
+            btnMobyViewTotals.Icon = null;
+            btnMobyViewTotals.Location = new System.Drawing.Point(1232, 34);
+            btnMobyViewTotals.Margin = new Padding(4, 6, 4, 6);
+            btnMobyViewTotals.MouseState = MaterialSkin.MouseState.HOVER;
+            btnMobyViewTotals.Name = "btnMobyViewTotals";
+            btnMobyViewTotals.NoAccentTextColor = System.Drawing.Color.Empty;
+            btnMobyViewTotals.Size = new System.Drawing.Size(167, 36);
+            btnMobyViewTotals.TabIndex = 3;
+            btnMobyViewTotals.Text = "view total counts";
+            btnMobyViewTotals.Type = MaterialSkin.Controls.MaterialButton.MaterialButtonType.Contained;
+            btnMobyViewTotals.UseAccentColor = false;
+            btnMobyViewTotals.UseVisualStyleBackColor = true;
+            btnMobyViewTotals.Click += btnMobyViewTotals_Click;
             // 
             // btnViewJson
             // 
@@ -876,7 +912,7 @@ namespace AcmeScanner
             btnViewJson.Depth = 0;
             btnViewJson.HighEmphasis = true;
             btnViewJson.Icon = null;
-            btnViewJson.Location = new System.Drawing.Point(236, 58);
+            btnViewJson.Location = new System.Drawing.Point(242, 34);
             btnViewJson.Margin = new Padding(4, 6, 4, 6);
             btnViewJson.MouseState = MaterialSkin.MouseState.HOVER;
             btnViewJson.Name = "btnViewJson";
@@ -889,19 +925,6 @@ namespace AcmeScanner
             btnViewJson.UseVisualStyleBackColor = true;
             btnViewJson.Click += btnViewJson_Click;
             // 
-            // scannerListView1
-            // 
-            scannerListView1.FullRowSelect = true;
-            scannerListView1.GridLines = true;
-            scannerListView1.Location = new System.Drawing.Point(11, 126);
-            scannerListView1.MultiSelect = false;
-            scannerListView1.Name = "scannerListView1";
-            scannerListView1.OwnerDraw = true;
-            scannerListView1.Size = new System.Drawing.Size(1497, 822);
-            scannerListView1.TabIndex = 1;
-            scannerListView1.UseCompatibleStateImageBehavior = false;
-            scannerListView1.View = View.Details;
-            // 
             // btnLoadMoby
             // 
             btnLoadMoby.AutoSizeMode = AutoSizeMode.GrowAndShrink;
@@ -909,7 +932,7 @@ namespace AcmeScanner
             btnLoadMoby.Depth = 0;
             btnLoadMoby.HighEmphasis = true;
             btnLoadMoby.Icon = null;
-            btnLoadMoby.Location = new System.Drawing.Point(40, 58);
+            btnLoadMoby.Location = new System.Drawing.Point(44, 34);
             btnLoadMoby.Margin = new Padding(4, 6, 4, 6);
             btnLoadMoby.MouseState = MaterialSkin.MouseState.HOVER;
             btnLoadMoby.Name = "btnLoadMoby";
@@ -921,25 +944,6 @@ namespace AcmeScanner
             btnLoadMoby.UseAccentColor = false;
             btnLoadMoby.UseVisualStyleBackColor = true;
             btnLoadMoby.Click += btnLoadMoby_Click;
-            // 
-            // btnMobyViewTotals
-            // 
-            btnMobyViewTotals.AutoSizeMode = AutoSizeMode.GrowAndShrink;
-            btnMobyViewTotals.Density = MaterialSkin.Controls.MaterialButton.MaterialButtonDensity.Default;
-            btnMobyViewTotals.Depth = 0;
-            btnMobyViewTotals.HighEmphasis = true;
-            btnMobyViewTotals.Icon = null;
-            btnMobyViewTotals.Location = new System.Drawing.Point(1303, 58);
-            btnMobyViewTotals.Margin = new Padding(4, 6, 4, 6);
-            btnMobyViewTotals.MouseState = MaterialSkin.MouseState.HOVER;
-            btnMobyViewTotals.Name = "btnMobyViewTotals";
-            btnMobyViewTotals.NoAccentTextColor = System.Drawing.Color.Empty;
-            btnMobyViewTotals.Size = new System.Drawing.Size(158, 36);
-            btnMobyViewTotals.TabIndex = 3;
-            btnMobyViewTotals.Text = "view total counts";
-            btnMobyViewTotals.Type = MaterialSkin.Controls.MaterialButton.MaterialButtonType.Contained;
-            btnMobyViewTotals.UseAccentColor = false;
-            btnMobyViewTotals.UseVisualStyleBackColor = true;
             // 
             // ScannerForm
             // 

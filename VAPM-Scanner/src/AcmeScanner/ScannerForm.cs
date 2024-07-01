@@ -796,15 +796,15 @@ namespace AcmeScanner
             foreach (MobyProduct product in staticMobyProductList)
             {
                 foreach (MobySignature signature in product.sigList)
-                {      
+                {
                     ListViewItem lviCurrent = new ListViewItem();
                     lviCurrent.Text = signature.Name;
                     lviCurrent.SubItems.Add(signature.Id);
                     lviCurrent.SubItems.Add(product.osType);
                     lviCurrent.SubItems.Add(signature.supportAutoPatching.ToString());
                     lviCurrent.SubItems.Add(signature.validationSupported.ToString());
-                    lviCurrent.SubItems.Add(signature.supportAppRemover.ToString());              
-                                     
+                    lviCurrent.SubItems.Add(signature.supportAppRemover.ToString());
+
                     // Set Tag to store signature Id
                     lviCurrent.Tag = product.Id;
 
@@ -813,7 +813,7 @@ namespace AcmeScanner
                 }
             }
 
-                 
+
 
             scannerListView1.Items.Clear();
             scannerListView1.Items.AddRange(resultList.ToArray());
@@ -1196,36 +1196,45 @@ namespace AcmeScanner
             UpdateCatalogResults();
         }
 
-       
+
 
         private void btnViewJson_Click(object sender, EventArgs e)
+        {
+
+            if (scannerListView1.SelectedItems.Count > 0)
             {
-                
-                if (scannerListView1.SelectedItems.Count > 0)
+                string sigID = scannerListView1.SelectedItems[0].SubItems[1].Text;
+                string pID = scannerListView1.SelectedItems[0].Tag.ToString();
+                MobyProduct selectedProduct = staticMobyProductList.FirstOrDefault(product => product.Id == pID);
+                MobySignature selectedSignature = selectedProduct.sigList.FirstOrDefault(signature => signature.Id == sigID);
+                if (selectedSignature.certifications == null)
                 {
-                    string sigID = scannerListView1.SelectedItems[0].SubItems[1].Text;
-                    string pID = scannerListView1.SelectedItems[0].Tag.ToString();
-                    MobyProduct selectedProduct = staticMobyProductList.FirstOrDefault(product => product.Id == pID);
-                    MobySignature selectedSignature = selectedProduct.sigList.FirstOrDefault(signature => signature.Id == sigID);
-                    if (selectedSignature.certifications==null)
-                    {
-                        selectedSignature.certifications = new List<string>();
-                        selectedSignature.certifications.Add("");
-                    }
-                    string json = JsonConvert.SerializeObject(selectedSignature, Formatting.Indented);
-
-
-
-
-                    ViewMobyJsonDialog textDialog = new ViewMobyJsonDialog(json);                 
-                    textDialog.StartPosition = FormStartPosition.CenterParent;
-                    textDialog.ShowDialog();
+                    selectedSignature.certifications = new List<string>();
+                    selectedSignature.certifications.Add("");
                 }
-                else
-                {
-                    ShowMessageDialog("Select an item to view JSON!!", false);
-                }
+                string json = JsonConvert.SerializeObject(selectedSignature, Formatting.Indented);
+
+
+
+
+                ViewMobyJsonDialog textDialog = new ViewMobyJsonDialog(json);
+                textDialog.StartPosition = FormStartPosition.CenterParent;
+                textDialog.ShowDialog();
+            }
+            else
+            {
+                ShowMessageDialog("Select an item to view JSON!!", false);
+            }
+        }
+
+        private void scannerListView1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void btnMobyViewTotals_Click(object sender, EventArgs e)
+        {
+
+        }
     }
-
-}
 }
