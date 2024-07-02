@@ -17,7 +17,7 @@ namespace VAPMAdapter.Tasks
             // Append the script name to the base path for both the script and the executable
             string scriptPath = Path.Combine(_basePath, pythonScript + ".py");
             //check to see if this actually works
-            string exePath = Path.Combine(_basePath, "python.exe");
+            
             string jsonPath = Path.Combine(_basePath, pythonScript + ".json");
 
             // Delete the existing JSON file if it exists
@@ -27,7 +27,7 @@ namespace VAPMAdapter.Tasks
             }
 
             // Create an instance of PythonRunner
-            Moby.MobyPythonRunner pythonRunner = new Moby.MobyPythonRunner(exePath);
+            Moby.MobyPythonRunner pythonRunner = new Moby.MobyPythonRunner(scriptPath);
 
             // Run the script
             pythonRunner.RunScript(scriptPath);
