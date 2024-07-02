@@ -15,7 +15,8 @@ namespace VAPMAdapter.Moby
             //this is what we need to test if it works
             // Create process info
             ProcessStartInfo start = new ProcessStartInfo();
-            start.FileName = scriptPath; // Directly using the script path
+            start.FileName = "python"; // Use 'python' directly assuming it's in the system PATH
+            start.Arguments = scriptPath;
             start.UseShellExecute = false;       // Required to redirect output
             start.RedirectStandardOutput = true; // Capture stdout
             start.RedirectStandardError = true;  // Capture stderr for error handling

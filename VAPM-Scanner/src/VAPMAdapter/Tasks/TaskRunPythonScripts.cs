@@ -9,7 +9,7 @@ using VAPMAdapter.Moby;
 namespace VAPMAdapter.Tasks
 {
     public class TaskRunPythonScripts
-    {        
+    {
         public static string Execute(string pythonScript)
         {
             string _basePath = @"C:\Users\vatsalkapoor\Documents\endpointsecsdk\VAPM-Scanner\src\AcmeScanner\bin\Debug\net6.0-windows";
@@ -41,3 +41,4 @@ namespace VAPMAdapter.Tasks
             }
         }
     }
+}
