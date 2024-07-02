@@ -2,12 +2,17 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using VAPMAdapter.Tasks;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using System.IO;
+using System.Text.Json.Nodes;
 
 namespace AcmeScanner
 {
@@ -15,7 +20,7 @@ namespace AcmeScanner
     {
         private System.ComponentModel.BackgroundWorker runAllChecks;
         private System.ComponentModel.BackgroundWorker runSelectedChecks;
-        private string jsonContent;
+        private JObject jsonContentAutoPatchingCheck;
         private void InitializeBackgroundWorker()
         {
             runAllChecks = new BackgroundWorker();
@@ -34,7 +39,9 @@ namespace AcmeScanner
         }
         private void runAllChecks_DoWork(object sender, DoWorkEventArgs e)
         {
-            jsonContent = TaskRunPythonScripts.Execute("auto_patching_check");
+            jsonContentAutoPatchingCheck = TaskRunPythonScripts.Execute("auto_patching_check");
+            UpdateCheckResults();
+            
         }
 
         private void runAllChecks_Completed(object sender, RunWorkerCompletedEventArgs e)
@@ -52,6 +59,51 @@ namespace AcmeScanner
 
         }
 
+        private void UpdateCheckResults()
+        {
+            this.Invoke((MethodInvoker)delegate
+            {
+                List<ListViewItem> resultList = new List<ListViewItem>();
+                sanityChecksListView.Columns.Clear();
+                sanityChecksListView.Columns.Add("Name", 200);
+                sanityChecksListView.Columns.Add("Signature ID", 100);
+                sanityChecksListView.Columns.Add("Platform", 200);
+                if (!(jsonContentAutoPatchingCheck == null)) { sanityChecksListView.Columns.Add("auto_patching_check Result", 200); }
+                
+                sanityChecksListView.View = View.Details;
+                sanityChecksListView.Update();
+                foreach (var product in jsonContentAutoPatchingCheck)
+                {
+                    string productName = product.Key;
+                    var platforms = (JObject)product.Value;
+
+                    foreach (var platform in platforms)
+                    {
+                        string platformName = platform.Key;
+                        var signatures = (JObject)platform.Value;
+
+                        foreach (var signature in signatures)
+                        {
+                            string signatureId = signature.Key;
+                            bool autoPatchingCheckResult = (bool)signature.Value;
+
+                            // Create a new ListViewItem
+                            ListViewItem item = new ListViewItem(productName);
+                            item.SubItems.Add(signatureId);
+                            item.SubItems.Add(platformName);
+                            if (!autoPatchingCheckResult) { item.SubItems.Add("Fail"); }
+                            else { item.SubItems.Add(""); }
+
+                            // Add the item to the resultList
+                            resultList.Add(item);
+                        }
+                    }
+                }
+
+                // Add the items to the ListView
+                sanityChecksListView.Items.AddRange(resultList.ToArray());
+            });
+        }
 
         public MobySanityCheckDialog()
         {

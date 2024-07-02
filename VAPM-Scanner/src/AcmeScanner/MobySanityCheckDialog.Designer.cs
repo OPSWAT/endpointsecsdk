@@ -33,6 +33,7 @@
             materialCheckbox1 = new MaterialSkin.Controls.MaterialCheckbox();
             materialCheckbox2 = new MaterialSkin.Controls.MaterialCheckbox();
             materialCheckbox3 = new MaterialSkin.Controls.MaterialCheckbox();
+            sanityChecksListView = new ScannerListView();
             SuspendLayout();
             // 
             // btnRunAllChecksMoby
@@ -123,11 +124,25 @@
             materialCheckbox3.Text = "Sanity Check 3";
             materialCheckbox3.UseVisualStyleBackColor = true;
             // 
+            // sanityChecksListView
+            // 
+            sanityChecksListView.FullRowSelect = true;
+            sanityChecksListView.GridLines = true;
+            sanityChecksListView.Location = new System.Drawing.Point(6, 120);
+            sanityChecksListView.MultiSelect = false;
+            sanityChecksListView.Name = "sanityChecksListView";
+            sanityChecksListView.OwnerDraw = true;
+            sanityChecksListView.Size = new System.Drawing.Size(970, 408);
+            sanityChecksListView.TabIndex = 5;
+            sanityChecksListView.UseCompatibleStateImageBehavior = false;
+            sanityChecksListView.View = System.Windows.Forms.View.Details;
+            // 
             // MobySanityCheckDialog
             // 
             AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             ClientSize = new System.Drawing.Size(979, 529);
+            Controls.Add(sanityChecksListView);
             Controls.Add(materialCheckbox3);
             Controls.Add(materialCheckbox2);
             Controls.Add(materialCheckbox1);
@@ -148,5 +163,6 @@
         private MaterialSkin.Controls.MaterialCheckbox materialCheckbox1;
         private MaterialSkin.Controls.MaterialCheckbox materialCheckbox2;
         private MaterialSkin.Controls.MaterialCheckbox materialCheckbox3;
+        private ScannerListView sanityChecksListView;
     }
 }

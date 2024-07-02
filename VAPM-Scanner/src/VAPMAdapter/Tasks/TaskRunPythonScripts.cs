@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -10,7 +11,7 @@ namespace VAPMAdapter.Tasks
 {
     public class TaskRunPythonScripts
     {
-        public static string Execute(string pythonScript)
+        public static JObject Execute(string pythonScript)
         {
             string _basePath = @"C:\Users\vatsalkapoor\Documents\endpointsecsdk\VAPM-Scanner\src\AcmeScanner\bin\Debug\net6.0-windows";
             // Append the script name to the base path for the script
@@ -33,7 +34,8 @@ namespace VAPMAdapter.Tasks
             if (File.Exists(jsonPath))
             {
                 string jsonContent = File.ReadAllText(jsonPath);
-                return jsonContent;
+                JObject jsonObject = JObject.Parse(jsonContent);
+                return jsonObject;
             }
             else
             {
