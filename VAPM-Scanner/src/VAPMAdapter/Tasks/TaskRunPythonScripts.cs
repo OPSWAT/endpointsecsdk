@@ -13,7 +13,7 @@ namespace VAPMAdapter.Tasks
 
         public static string Execute(string pythonScript)
         {
-            string _basePath = "";
+            string _basePath = @"C:\Users\vatsalkapoor\Documents\endpointsecsdk\VAPM-Scanner\src\AcmeScanner\bin\Debug\net6.0-windows";
             // Append the script name to the base path for both the script and the executable
             string scriptPath = Path.Combine(_basePath, pythonScript + ".py");
             //check to see if this actually works
