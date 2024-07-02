@@ -4,20 +4,17 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using VAPMAdapter.Moby;
 
 namespace VAPMAdapter.Tasks
 {
     public class TaskRunPythonScripts
-    {
-        
-
+    {        
         public static string Execute(string pythonScript)
         {
             string _basePath = @"C:\Users\vatsalkapoor\Documents\endpointsecsdk\VAPM-Scanner\src\AcmeScanner\bin\Debug\net6.0-windows";
-            // Append the script name to the base path for both the script and the executable
+            // Append the script name to the base path for the script
             string scriptPath = Path.Combine(_basePath, pythonScript + ".py");
-            //check to see if this actually works
-            
             string jsonPath = Path.Combine(_basePath, pythonScript + ".json");
 
             // Delete the existing JSON file if it exists
@@ -26,8 +23,8 @@ namespace VAPMAdapter.Tasks
                 File.Delete(jsonPath);
             }
 
-            // Create an instance of PythonRunner
-            Moby.MobyPythonRunner pythonRunner = new Moby.MobyPythonRunner(scriptPath);
+            // Create an instance of MobyPythonRunner
+            MobyPythonRunner pythonRunner = new MobyPythonRunner();
 
             // Run the script
             pythonRunner.RunScript(scriptPath);
@@ -44,4 +41,3 @@ namespace VAPMAdapter.Tasks
             }
         }
     }
-}
