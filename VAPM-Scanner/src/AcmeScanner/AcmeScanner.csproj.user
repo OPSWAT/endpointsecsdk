@@ -10,6 +10,9 @@
     <Compile Update="LookupCVEBox.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Update="MobySanityCheckDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Update="ScannerForm.cs">
       <SubType>Form</SubType>
     </Compile>

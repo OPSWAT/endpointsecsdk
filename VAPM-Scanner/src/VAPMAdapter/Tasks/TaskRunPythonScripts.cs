@@ -7,17 +7,13 @@ using System.Threading.Tasks;
 
 namespace VAPMAdapter.Tasks
 {
-    internal class TaskRunPythonScripts
+    public class TaskRunPythonScripts
     {
-        private string _basePath;
+        
 
-        public TaskRunPythonScripts(string basePath)
+        public static string Execute(string pythonScript)
         {
-            _basePath = basePath;
-        }
-
-        public string Execute(string pythonScript)
-        {
+            string _basePath = "";
             // Append the script name to the base path for both the script and the executable
             string scriptPath = Path.Combine(_basePath, pythonScript + ".py");
             //check to see if this actually works

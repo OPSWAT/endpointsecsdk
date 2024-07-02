@@ -171,7 +171,7 @@ namespace AcmeScanner
                 new DoWorkEventHandler(updateMobyWorker_DoWork);
             updateMobyWorker.RunWorkerCompleted +=
                 new RunWorkerCompletedEventHandler(updateMobyWorker_Completed);
-                
+
 
             loadCatalogWorker = new BackgroundWorker();
             loadCatalogWorker.DoWork +=
@@ -878,23 +878,23 @@ namespace AcmeScanner
         private string GetMobyTotalCountsJson()
         {
             if (mobyCounts == null)
-    {
-        mobyCounts = TaskLoadMobyCounts.LoadCounts();
-    }
+            {
+                mobyCounts = TaskLoadMobyCounts.LoadCounts();
+            }
 
-    var totalCounts = new
-    {
-        TotalProducts = mobyCounts.TotalProductsCount,
-        TotalSignatures = mobyCounts.TotalSignaturesCount,
-        CveDetection = mobyCounts.CveDetection,
-        SupportAutoPatching = mobyCounts.SupportAutoPatching,
-        BackgroundPatching = mobyCounts.BackgroundPatching,
-        FreshInstallable = mobyCounts.FreshInstallable,
-        ValidationSupported = mobyCounts.ValidationSupported,
-        AppRemover = mobyCounts.AppRemover
-    };
+            var totalCounts = new
+            {
+                TotalProducts = mobyCounts.TotalProductsCount,
+                TotalSignatures = mobyCounts.TotalSignaturesCount,
+                CveDetection = mobyCounts.CveDetection,
+                SupportAutoPatching = mobyCounts.SupportAutoPatching,
+                BackgroundPatching = mobyCounts.BackgroundPatching,
+                FreshInstallable = mobyCounts.FreshInstallable,
+                ValidationSupported = mobyCounts.ValidationSupported,
+                AppRemover = mobyCounts.AppRemover
+            };
 
-    return JsonConvert.SerializeObject(totalCounts, Formatting.Indented);
+            return JsonConvert.SerializeObject(totalCounts, Formatting.Indented);
         }
 
 
@@ -1256,7 +1256,7 @@ namespace AcmeScanner
                 string sigID = scannerListView1.SelectedItems[0].SubItems[1].Text;
                 string pID = scannerListView1.SelectedItems[0].Tag.ToString();
                 MobyProduct selectedProduct = staticMobyProductList.FirstOrDefault(product => product.Id == pID);
-                MobySignature selectedSignature = selectedProduct.sigList.FirstOrDefault(signature => signature.Id == sigID);                
+                MobySignature selectedSignature = selectedProduct.sigList.FirstOrDefault(signature => signature.Id == sigID);
                 string json = JsonConvert.SerializeObject(selectedSignature, Formatting.Indented);
 
 
@@ -1282,6 +1282,13 @@ namespace AcmeScanner
         {
             ShowLoading(true);
             updateMobyWorker.RunWorkerAsync(true);
+        }
+
+        private void btnRunChecksMoby_Click(object sender, EventArgs e)
+        {
+            MobySanityCheckDialog sanityCheckDialog = new MobySanityCheckDialog();
+            sanityCheckDialog.StartPosition = FormStartPosition.CenterParent;
+            sanityCheckDialog.ShowDialog();
         }
     }
 }
