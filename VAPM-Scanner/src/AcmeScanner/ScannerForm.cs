@@ -497,7 +497,7 @@ namespace AcmeScanner
                 btnExportCSV.Enabled = false;
                 btnFreshInstall.Enabled = false;
                 btnDomainCSV.Enabled = false;
-                btnRefreshStatus.Enabled = false;
+                
                 btnOrchestrationView.Enabled = false;
             }
             else
