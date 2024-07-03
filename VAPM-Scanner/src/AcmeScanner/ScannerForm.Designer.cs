@@ -124,11 +124,12 @@ namespace AcmeScanner
             panel1.Controls.Add(btnScan);
             panel1.Dock = DockStyle.Top;
             panel1.Location = new System.Drawing.Point(3, 3);
-            panel1.Margin = new Padding(15, 15, 15, 15);
+            panel1.Margin = new Padding(15);
             panel1.Name = "panel1";
-            panel1.Padding = new Padding(15, 15, 15, 15);
+            panel1.Padding = new Padding(15);
             panel1.Size = new System.Drawing.Size(1052, 77);
             panel1.TabIndex = 1;
+            //panel1.Paint += panel1_Paint;
             // 
             // label9
             // 
@@ -289,9 +290,9 @@ namespace AcmeScanner
             panel3.Controls.Add(panel2);
             panel3.Dock = DockStyle.Fill;
             panel3.Location = new System.Drawing.Point(0, 0);
-            panel3.Margin = new Padding(15, 15, 15, 15);
+            panel3.Margin = new Padding(15);
             panel3.Name = "panel3";
-            panel3.Padding = new Padding(15, 15, 15, 15);
+            panel3.Padding = new Padding(15);
             panel3.Size = new System.Drawing.Size(1098, 630);
             panel3.TabIndex = 2;
             // 
@@ -338,7 +339,7 @@ namespace AcmeScanner
             tabPage1.Controls.Add(panel1);
             tabPage1.Location = new System.Drawing.Point(4, 24);
             tabPage1.Name = "tabPage1";
-            tabPage1.Padding = new Padding(3, 3, 3, 3);
+            tabPage1.Padding = new Padding(3);
             tabPage1.Size = new System.Drawing.Size(1058, 570);
             tabPage1.TabIndex = 0;
             tabPage1.Text = "Offline";
@@ -365,8 +366,8 @@ namespace AcmeScanner
             tabPage2.Controls.Add(panel4);
             tabPage2.Location = new System.Drawing.Point(4, 24);
             tabPage2.Name = "tabPage2";
-            tabPage2.Padding = new Padding(3, 3, 3, 3);
-            tabPage2.Size = new System.Drawing.Size(1060, 571);
+            tabPage2.Padding = new Padding(3);
+            tabPage2.Size = new System.Drawing.Size(1058, 570);
             tabPage2.TabIndex = 1;
             tabPage2.Text = "Orchestration";
             tabPage2.UseVisualStyleBackColor = true;
@@ -380,7 +381,7 @@ namespace AcmeScanner
             lvOrchestrationScanResult.MultiSelect = false;
             lvOrchestrationScanResult.Name = "lvOrchestrationScanResult";
             lvOrchestrationScanResult.OwnerDraw = true;
-            lvOrchestrationScanResult.Size = new System.Drawing.Size(1054, 488);
+            lvOrchestrationScanResult.Size = new System.Drawing.Size(1052, 487);
             lvOrchestrationScanResult.TabIndex = 4;
             lvOrchestrationScanResult.UseCompatibleStateImageBehavior = false;
             lvOrchestrationScanResult.View = View.Details;
@@ -400,10 +401,10 @@ namespace AcmeScanner
             panel4.Controls.Add(btnScanOrchestration);
             panel4.Dock = DockStyle.Top;
             panel4.Location = new System.Drawing.Point(3, 3);
-            panel4.Margin = new Padding(15, 15, 15, 15);
+            panel4.Margin = new Padding(15);
             panel4.Name = "panel4";
-            panel4.Padding = new Padding(15, 15, 15, 15);
-            panel4.Size = new System.Drawing.Size(1054, 77);
+            panel4.Padding = new Padding(15);
+            panel4.Size = new System.Drawing.Size(1052, 77);
             panel4.TabIndex = 3;
             // 
             // btnOrchestrationView
@@ -553,8 +554,8 @@ namespace AcmeScanner
             tabPage3.Controls.Add(panel5);
             tabPage3.Location = new System.Drawing.Point(4, 24);
             tabPage3.Name = "tabPage3";
-            tabPage3.Padding = new Padding(3, 3, 3, 3);
-            tabPage3.Size = new System.Drawing.Size(1060, 571);
+            tabPage3.Padding = new Padding(3);
+            tabPage3.Size = new System.Drawing.Size(1058, 570);
             tabPage3.TabIndex = 2;
             tabPage3.Text = "Catalog";
             tabPage3.UseVisualStyleBackColor = true;
@@ -568,7 +569,7 @@ namespace AcmeScanner
             lvCatalog.MultiSelect = false;
             lvCatalog.Name = "lvCatalog";
             lvCatalog.OwnerDraw = true;
-            lvCatalog.Size = new System.Drawing.Size(1054, 488);
+            lvCatalog.Size = new System.Drawing.Size(1052, 487);
             lvCatalog.TabIndex = 6;
             lvCatalog.UseCompatibleStateImageBehavior = false;
             lvCatalog.View = View.Details;
@@ -590,10 +591,10 @@ namespace AcmeScanner
             panel5.Controls.Add(mbLoad);
             panel5.Dock = DockStyle.Top;
             panel5.Location = new System.Drawing.Point(3, 3);
-            panel5.Margin = new Padding(15, 15, 15, 15);
+            panel5.Margin = new Padding(15);
             panel5.Name = "panel5";
-            panel5.Padding = new Padding(15, 15, 15, 15);
-            panel5.Size = new System.Drawing.Size(1054, 77);
+            panel5.Padding = new Padding(15);
+            panel5.Size = new System.Drawing.Size(1052, 77);
             panel5.TabIndex = 5;
             // 
             // btnDomainCSV
@@ -777,7 +778,7 @@ namespace AcmeScanner
             mbLoad.NoAccentTextColor = System.Drawing.Color.Empty;
             mbLoad.Size = new System.Drawing.Size(124, 36);
             mbLoad.TabIndex = 0;
-            mbLoad.Text = "Load Latest";
+            mbLoad.Text = "Load Products";
             mbLoad.Type = MaterialSkin.Controls.MaterialButton.MaterialButtonType.Contained;
             mbLoad.UseAccentColor = false;
             mbLoad.UseVisualStyleBackColor = true;
@@ -789,8 +790,8 @@ namespace AcmeScanner
             tabPage4.Controls.Add(panel6);
             tabPage4.Location = new System.Drawing.Point(4, 24);
             tabPage4.Name = "tabPage4";
-            tabPage4.Padding = new Padding(3, 3, 3, 3);
-            tabPage4.Size = new System.Drawing.Size(1060, 571);
+            tabPage4.Padding = new Padding(3);
+            tabPage4.Size = new System.Drawing.Size(1058, 570);
             tabPage4.TabIndex = 3;
             tabPage4.Text = "Status";
             tabPage4.UseVisualStyleBackColor = true;
@@ -804,7 +805,7 @@ namespace AcmeScanner
             lvStatus.MultiSelect = false;
             lvStatus.Name = "lvStatus";
             lvStatus.OwnerDraw = true;
-            lvStatus.Size = new System.Drawing.Size(1054, 488);
+            lvStatus.Size = new System.Drawing.Size(1052, 487);
             lvStatus.TabIndex = 6;
             lvStatus.UseCompatibleStateImageBehavior = false;
             lvStatus.View = View.Details;
@@ -815,10 +816,10 @@ namespace AcmeScanner
             panel6.Controls.Add(btnRefreshStatus);
             panel6.Dock = DockStyle.Top;
             panel6.Location = new System.Drawing.Point(3, 3);
-            panel6.Margin = new Padding(15, 15, 15, 15);
+            panel6.Margin = new Padding(15);
             panel6.Name = "panel6";
-            panel6.Padding = new Padding(15, 15, 15, 15);
-            panel6.Size = new System.Drawing.Size(1054, 77);
+            panel6.Padding = new Padding(15);
+            panel6.Size = new System.Drawing.Size(1052, 77);
             panel6.TabIndex = 5;
             // 
             // btnRefreshStatus
@@ -848,7 +849,7 @@ namespace AcmeScanner
             tabPage5.Controls.Add(panel7);
             tabPage5.Location = new System.Drawing.Point(4, 24);
             tabPage5.Name = "tabPage5";
-            tabPage5.Padding = new Padding(3, 3, 3, 3);
+            tabPage5.Padding = new Padding(3);
             tabPage5.Size = new System.Drawing.Size(1058, 570);
             tabPage5.TabIndex = 4;
             tabPage5.Text = "Moby";
@@ -860,7 +861,7 @@ namespace AcmeScanner
             scannerListView1.FullRowSelect = true;
             scannerListView1.GridLines = true;
             scannerListView1.Location = new System.Drawing.Point(3, 56);
-            scannerListView1.Margin = new Padding(2, 2, 2, 2);
+            scannerListView1.Margin = new Padding(2);
             scannerListView1.MultiSelect = false;
             scannerListView1.Name = "scannerListView1";
             scannerListView1.OwnerDraw = true;
@@ -868,7 +869,7 @@ namespace AcmeScanner
             scannerListView1.TabIndex = 1;
             scannerListView1.UseCompatibleStateImageBehavior = false;
             scannerListView1.View = View.Details;
-            scannerListView1.SelectedIndexChanged += scannerListView1_SelectedIndexChanged;
+            //scannerListView1.SelectedIndexChanged += scannerListView1_SelectedIndexChanged;
             // 
             // panel7
             // 
@@ -879,7 +880,7 @@ namespace AcmeScanner
             panel7.Controls.Add(btnLoadMoby);
             panel7.Dock = DockStyle.Top;
             panel7.Location = new System.Drawing.Point(3, 3);
-            panel7.Margin = new Padding(2, 2, 2, 2);
+            panel7.Margin = new Padding(2);
             panel7.Name = "panel7";
             panel7.Size = new System.Drawing.Size(1052, 53);
             panel7.TabIndex = 0;
