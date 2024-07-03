@@ -498,8 +498,6 @@ namespace AcmeScanner
                 btnExportCSV.Enabled = false;
                 btnFreshInstall.Enabled = false;
                 btnDomainCSV.Enabled = false;
-                
-                
             }
             else
             {
@@ -1288,6 +1286,5 @@ namespace AcmeScanner
             sanityCheckDialog.StartPosition = FormStartPosition.CenterParent;
             sanityCheckDialog.ShowDialog();
         }
-
     }
 }

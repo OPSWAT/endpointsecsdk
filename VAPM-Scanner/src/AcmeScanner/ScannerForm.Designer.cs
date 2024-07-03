@@ -151,7 +151,7 @@ namespace AcmeScanner
             // label7
             // 
             label7.AutoSize = true;
-            label7.Location = new System.Drawing.Point(651, 31);
+            label7.Location = new System.Drawing.Point(659, 31);
             label7.Margin = new Padding(2, 0, 2, 0);
             label7.Name = "label7";
             label7.Size = new System.Drawing.Size(0, 15);
@@ -170,7 +170,7 @@ namespace AcmeScanner
             // label5
             // 
             label5.AutoSize = true;
-            label5.Location = new System.Drawing.Point(651, 16);
+            label5.Location = new System.Drawing.Point(659, 16);
             label5.Margin = new Padding(2, 0, 2, 0);
             label5.Name = "label5";
             label5.Size = new System.Drawing.Size(0, 15);
@@ -416,7 +416,7 @@ namespace AcmeScanner
             // label14
             // 
             label14.AutoSize = true;
-            label14.Location = new System.Drawing.Point(651, 31);
+            label14.Location = new System.Drawing.Point(659, 31);
             label14.Margin = new Padding(2, 0, 2, 0);
             label14.Name = "label14";
             label14.Size = new System.Drawing.Size(0, 15);
@@ -425,7 +425,7 @@ namespace AcmeScanner
             // label13
             // 
             label13.AutoSize = true;
-            label13.Location = new System.Drawing.Point(651, 16);
+            label13.Location = new System.Drawing.Point(659, 16);
             label13.Margin = new Padding(2, 0, 2, 0);
             label13.Name = "label13";
             label13.Size = new System.Drawing.Size(0, 15);
