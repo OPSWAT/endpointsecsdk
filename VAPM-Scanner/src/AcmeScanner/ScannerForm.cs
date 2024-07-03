@@ -529,6 +529,7 @@ namespace AcmeScanner
                 btnLoadMoby.Enabled = enabled;
                 btnViewJson.Enabled = enabled;
                 btnMobyViewTotals.Enabled = enabled;
+                btnRunChecksMoby.Enabled = enabled;
             }
             btnUpdate.Enabled = enabled;
             btnUpdateSDK.Enabled = enabled;
@@ -1273,12 +1274,6 @@ namespace AcmeScanner
             }
         }
 
-        private void scannerListView1_SelectedIndexChanged(object sender, EventArgs e)
-        {
-
-        }
-
-
         private void btnUpdateMoby_Click(object sender, EventArgs e)
         {
             ShowLoading(true);
@@ -1291,5 +1286,6 @@ namespace AcmeScanner
             sanityCheckDialog.StartPosition = FormStartPosition.CenterParent;
             sanityCheckDialog.ShowDialog();
         }
+
     }
 }
