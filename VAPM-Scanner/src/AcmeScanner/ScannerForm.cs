@@ -489,7 +489,7 @@ namespace AcmeScanner
                 btnInstall.Enabled = false;
                 btnScan.Enabled = false;
                 btnCVEJSON.Enabled = false;
-                btnScanOrchestration.Enabled = false;
+                btnScanupdattion.Enabled = false;
                 btnInstallOrchestration.Enabled = false;
                 btnInstall.Enabled = false;
                 mbLoad.Enabled = false;
@@ -499,7 +499,7 @@ namespace AcmeScanner
                 btnFreshInstall.Enabled = false;
                 btnDomainCSV.Enabled = false;
                 
-                btnOrchestrationView.Enabled = false;
+                
             }
             else
             {
@@ -516,7 +516,7 @@ namespace AcmeScanner
                 btnFreshInstall.Enabled = enabled;
                 btnDomainCSV.Enabled = enabled;
                 btnRefreshStatus.Enabled = enabled;
-                btnOrchestrationView.Enabled = enabled;
+                
             }
             if (!MobyDownload)
             {
@@ -1224,7 +1224,7 @@ namespace AcmeScanner
 
         }
 
-        private void btnOrchestrationView_Click(object sender, EventArgs e)
+        public void btnOrchestrationView_Click()
         {
             if (lvOrchestrationScanResult.SelectedItems.Count > 0)
             {
