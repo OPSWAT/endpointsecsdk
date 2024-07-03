@@ -54,7 +54,6 @@ namespace AcmeScanner
             tabPage2 = new TabPage();
             lvOrchestrationScanResult = new ScannerListView();
             panel4 = new Panel();
-            btnOrchestrationView = new MaterialSkin.Controls.MaterialButton();
             label15 = new Label();
             label14 = new Label();
             label13 = new Label();
@@ -388,7 +387,6 @@ namespace AcmeScanner
             // panel4
             // 
             panel4.BorderStyle = BorderStyle.FixedSingle;
-            panel4.Controls.Add(btnOrchestrationView);
             panel4.Controls.Add(label15);
             panel4.Controls.Add(label14);
             panel4.Controls.Add(label13);
@@ -405,27 +403,6 @@ namespace AcmeScanner
             panel4.Padding = new Padding(15);
             panel4.Size = new System.Drawing.Size(1052, 77);
             panel4.TabIndex = 3;
-            // 
-            // btnOrchestrationView
-            // 
-            btnOrchestrationView.AutoSize = false;
-            btnOrchestrationView.AutoSizeMode = AutoSizeMode.GrowAndShrink;
-            btnOrchestrationView.Density = MaterialSkin.Controls.MaterialButton.MaterialButtonDensity.Default;
-            btnOrchestrationView.Depth = 0;
-            btnOrchestrationView.HighEmphasis = true;
-            btnOrchestrationView.Icon = null;
-            btnOrchestrationView.Location = new System.Drawing.Point(146, 21);
-            btnOrchestrationView.Margin = new Padding(4, 6, 4, 6);
-            btnOrchestrationView.MouseState = MaterialSkin.MouseState.HOVER;
-            btnOrchestrationView.Name = "btnOrchestrationView";
-            btnOrchestrationView.NoAccentTextColor = System.Drawing.Color.Empty;
-            btnOrchestrationView.Size = new System.Drawing.Size(106, 36);
-            btnOrchestrationView.TabIndex = 11;
-            btnOrchestrationView.Text = "VIEW";
-            btnOrchestrationView.Type = MaterialSkin.Controls.MaterialButton.MaterialButtonType.Contained;
-            btnOrchestrationView.UseAccentColor = false;
-            btnOrchestrationView.UseVisualStyleBackColor = true;
-            btnOrchestrationView.Click += btnOrchestrationView_Click;
             // 
             // label15
             // 
@@ -1067,7 +1044,6 @@ namespace AcmeScanner
         private Label label15;
         private Label label14;
         private Label label13;
-        private MaterialSkin.Controls.MaterialButton btnOrchestrationView;
         private Panel panel7;
         private ScannerListView scannerListView1;
         private MaterialSkin.Controls.MaterialButton btnLoadMoby;
