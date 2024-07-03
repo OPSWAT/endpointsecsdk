@@ -522,6 +522,7 @@ namespace AcmeScanner
                 btnLoadMoby.Enabled = false;
                 btnViewJson.Enabled = false;
                 btnMobyViewTotals.Enabled = false;
+                btnRunChecksMoby.Enabled = false;
             }
             else
             {
