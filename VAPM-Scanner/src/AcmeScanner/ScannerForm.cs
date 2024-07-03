@@ -489,7 +489,7 @@ namespace AcmeScanner
                 btnInstall.Enabled = false;
                 btnScan.Enabled = false;
                 btnCVEJSON.Enabled = false;
-                btnScanupdattion.Enabled = false;
+                btnScanOrchestration.Enabled = false;
                 btnInstallOrchestration.Enabled = false;
                 btnInstall.Enabled = false;
                 mbLoad.Enabled = false;
@@ -498,8 +498,6 @@ namespace AcmeScanner
                 btnExportCSV.Enabled = false;
                 btnFreshInstall.Enabled = false;
                 btnDomainCSV.Enabled = false;
-
-                btnOrchestrationView.Enabled = false;
             }
             else
             {
