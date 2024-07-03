@@ -522,12 +522,14 @@ namespace AcmeScanner
                 btnLoadMoby.Enabled = false;
                 btnViewJson.Enabled = false;
                 btnMobyViewTotals.Enabled = false;
+                btnRunChecksMoby.Enabled = false;
             }
             else
             {
                 btnLoadMoby.Enabled = enabled;
                 btnViewJson.Enabled = enabled;
                 btnMobyViewTotals.Enabled = enabled;
+                btnRunChecksMoby.Enabled = enabled;
             }
             btnUpdate.Enabled = enabled;
             btnUpdateSDK.Enabled = enabled;
