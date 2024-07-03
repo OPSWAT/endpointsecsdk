@@ -87,9 +87,9 @@
             materialCheckbox1.Name = "materialCheckbox1";
             materialCheckbox1.ReadOnly = false;
             materialCheckbox1.Ripple = true;
-            materialCheckbox1.Size = new System.Drawing.Size(140, 37);
+            materialCheckbox1.Size = new System.Drawing.Size(134, 37);
             materialCheckbox1.TabIndex = 2;
-            materialCheckbox1.Text = "Sanity Check 1";
+            materialCheckbox1.Text = "Auto patching";
             materialCheckbox1.UseVisualStyleBackColor = true;
             // 
             // materialCheckbox2
@@ -103,9 +103,9 @@
             materialCheckbox2.Name = "materialCheckbox2";
             materialCheckbox2.ReadOnly = false;
             materialCheckbox2.Ripple = true;
-            materialCheckbox2.Size = new System.Drawing.Size(140, 37);
+            materialCheckbox2.Size = new System.Drawing.Size(129, 37);
             materialCheckbox2.TabIndex = 3;
-            materialCheckbox2.Text = "Sanity Check 2";
+            materialCheckbox2.Text = "App Remover";
             materialCheckbox2.UseVisualStyleBackColor = true;
             // 
             // materialCheckbox3

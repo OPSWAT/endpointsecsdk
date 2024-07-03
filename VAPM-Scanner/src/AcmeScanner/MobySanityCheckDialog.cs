@@ -21,6 +21,7 @@ namespace AcmeScanner
         private System.ComponentModel.BackgroundWorker runAllChecks;
         private System.ComponentModel.BackgroundWorker runSelectedChecks;
         private JObject jsonContentAutoPatchingCheck;
+        private JObject jsonContentAppRemoverCheck;
         private void InitializeBackgroundWorker()
         {
             runAllChecks = new BackgroundWorker();
@@ -51,12 +52,23 @@ namespace AcmeScanner
 
         private void runSelectedChecks_DoWork(object sender, DoWorkEventArgs e)
         {
-
+            
+            if (materialCheckbox1.Checked)
+            {
+                jsonContentAutoPatchingCheck = TaskRunPythonScripts.Execute("auto_patching_check");
+                UpdateCheckResults();
+            }
+            if (materialCheckbox2.Checked)
+            {
+                jsonContentAppRemoverCheck = TaskRunPythonScripts.Execute("app_remover_check");
+                UpdateCheckResults();
+            }
         }
 
         private void runSelectedChecks_Completed(object sender, RunWorkerCompletedEventArgs e)
         {
-
+            jsonContentAppRemoverCheck = null;
+            jsonContentAutoPatchingCheck = null;
         }
 
         private void UpdateCheckResults()
@@ -65,41 +77,77 @@ namespace AcmeScanner
             {
                 List<ListViewItem> resultList = new List<ListViewItem>();
                 sanityChecksListView.Columns.Clear();
+                sanityChecksListView.Items.Clear();
                 sanityChecksListView.Columns.Add("Name", 200);
                 sanityChecksListView.Columns.Add("Signature ID", 100);
                 sanityChecksListView.Columns.Add("Platform", 200);
                 if (!(jsonContentAutoPatchingCheck == null)) { sanityChecksListView.Columns.Add("auto_patching_check Result", 200); }
+                else if (!(jsonContentAppRemoverCheck == null)) { sanityChecksListView.Columns.Add("app_remover_check Result", 200); }
                 
                 sanityChecksListView.View = View.Details;
                 sanityChecksListView.Update();
-                foreach (var product in jsonContentAutoPatchingCheck)
+                if (!(jsonContentAutoPatchingCheck == null))
                 {
-                    string productName = product.Key;
-                    var platforms = (JObject)product.Value;
-
-                    foreach (var platform in platforms)
+                    foreach (var product in jsonContentAutoPatchingCheck)
                     {
-                        string platformName = platform.Key;
-                        var signatures = (JObject)platform.Value;
+                        string productName = product.Key;
+                        var platforms = (JObject)product.Value;
 
-                        foreach (var signature in signatures)
+                        foreach (var platform in platforms)
                         {
-                            string signatureId = signature.Key;
-                            bool autoPatchingCheckResult = (bool)signature.Value;
+                            string platformName = platform.Key;
+                            var signatures = (JObject)platform.Value;
 
-                            // Create a new ListViewItem
-                            ListViewItem item = new ListViewItem(productName);
-                            item.SubItems.Add(signatureId);
-                            item.SubItems.Add(platformName);
-                            if (!autoPatchingCheckResult) { item.SubItems.Add("Fail"); }
-                            else { item.SubItems.Add(""); }
+                            foreach (var signature in signatures)
+                            {
+                                string signatureId = signature.Key;
+                                bool autoPatchingCheckResult = (bool)signature.Value;
 
-                            // Add the item to the resultList
-                            resultList.Add(item);
+                                // Create a new ListViewItem
+                                ListViewItem item = new ListViewItem(productName);
+                                item.SubItems.Add(signatureId);
+                                item.SubItems.Add(platformName);
+                                if (!autoPatchingCheckResult) { item.SubItems.Add("Fail"); }
+                                else { item.SubItems.Add(""); }
+
+                                // Add the item to the resultList
+                                resultList.Add(item);
+                            }
                         }
                     }
                 }
+                else if (!(jsonContentAppRemoverCheck==null))
+                {
+                    foreach (var product in jsonContentAppRemoverCheck)
+                    {
+                        string productName = product.Key;
+                        var platforms = (JObject)product.Value;
 
+                        foreach (var platform in platforms)
+                        {
+                            string platformName = platform.Key;
+                            var signatures = (JObject)platform.Value;
+
+                            foreach (var signature in signatures)
+                            {
+                                string signatureId = signature.Key;
+                                bool autoPatchingCheckResult = (bool)signature.Value;
+
+                                // Create a new ListViewItem
+                                ListViewItem item = new ListViewItem(productName);
+                                item.SubItems.Add(signatureId);
+                                item.SubItems.Add(platformName);
+                                if (!autoPatchingCheckResult) { item.SubItems.Add("Fail"); }
+                                else { item.SubItems.Add(""); }
+
+                                // Add the item to the resultList
+                                resultList.Add(item);
+                            }
+                        }
+                    }
+                }
+                
+                sanityChecksListView.Items.Clear();
                 // Add the items to the ListView
                 sanityChecksListView.Items.AddRange(resultList.ToArray());
             });
@@ -118,6 +166,7 @@ namespace AcmeScanner
 
         private void btnRunAllChecksMoby_Click(object sender, EventArgs e)
         {
+            
             runAllChecks.RunWorkerAsync();
         }
 
@@ -125,5 +174,6 @@ namespace AcmeScanner
         {
             runSelectedChecks.RunWorkerAsync();
         }
+        
     }
 }

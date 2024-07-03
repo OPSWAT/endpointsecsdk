@@ -194,7 +194,7 @@ namespace AcmeScanner
             btnUpdate.Depth = 0;
             btnUpdate.HighEmphasis = true;
             btnUpdate.Icon = null;
-            btnUpdate.Location = new System.Drawing.Point(925, 21);
+            btnUpdate.Location = new System.Drawing.Point(925, 20);
             btnUpdate.Margin = new Padding(4, 6, 4, 6);
             btnUpdate.MouseState = MaterialSkin.MouseState.HOVER;
             btnUpdate.Name = "btnUpdate";
@@ -215,7 +215,7 @@ namespace AcmeScanner
             btnInstall.Depth = 0;
             btnInstall.HighEmphasis = true;
             btnInstall.Icon = null;
-            btnInstall.Location = new System.Drawing.Point(811, 21);
+            btnInstall.Location = new System.Drawing.Point(811, 20);
             btnInstall.Margin = new Padding(4, 6, 4, 6);
             btnInstall.MouseState = MaterialSkin.MouseState.HOVER;
             btnInstall.Name = "btnInstall";
@@ -1001,7 +1001,7 @@ namespace AcmeScanner
         private TabPage tabPage1;
         private TabPage tabPage2;
         private CheckBox cbScanOSCVEs;
-        private PictureBox pbLoading;
+        public static PictureBox pbLoading;
         private MaterialSkin.Controls.MaterialButton btnUpdate;
         private MaterialSkin.Controls.MaterialButton btnInstall;
         private MaterialSkin.Controls.MaterialButton btnCVEJSON;
