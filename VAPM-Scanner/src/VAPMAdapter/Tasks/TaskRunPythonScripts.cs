@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -13,10 +14,12 @@ namespace VAPMAdapter.Tasks
     {
         public static JObject Execute(string pythonScript)
         {
-            string _basePath = AppDomain.CurrentDomain.BaseDirectory;
+            string basePath = AppDomain.CurrentDomain.BaseDirectory;
+            string targetPath = Path.Combine(basePath, @"..\..\..\SanityChecks");
+            string fullPath = Path.GetFullPath(targetPath);    
             // Append the script name to the base path for the script
-            string scriptPath = Path.Combine(_basePath, pythonScript + ".py");
-            string jsonPath = Path.Combine(_basePath, pythonScript + ".json");
+            string scriptPath = Path.Combine(fullPath, pythonScript + ".py");
+            string jsonPath = Path.Combine(basePath, pythonScript + ".json");
 
             // Delete the existing JSON file if it exists
             if (File.Exists(jsonPath))

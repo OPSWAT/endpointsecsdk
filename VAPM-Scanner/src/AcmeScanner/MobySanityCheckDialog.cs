@@ -42,19 +42,47 @@ namespace AcmeScanner
             new RunWorkerCompletedEventHandler(
             runSelectedChecks_Completed);
         }
+
+        private List<string> getAllScripts()
+        {
+            string basePath = AppDomain.CurrentDomain.BaseDirectory;
+            string targetPath = Path.Combine(basePath, @"..\..\..\SanityChecks");
+            string sanityChecksPath = Path.GetFullPath(targetPath);
+            List<string> fileNames = new List<string>();
+
+            // Check if the directory exists
+            if (Directory.Exists(sanityChecksPath))
+            {
+                // Get all files in the directory
+                string[] files = Directory.GetFiles(sanityChecksPath);
+
+                // Iterate over the files and add their names to the list
+                foreach (string file in files)
+                {
+                    string fileName = Path.GetFileNameWithoutExtension(file);
+                    if (Path.GetExtension(file).Equals(".py", StringComparison.OrdinalIgnoreCase))
+                    {
+                        fileNames.Add(fileName);
+                    }
+                }
+            }
+            else
+            {
+                throw new Exception();
+            }
+            return fileNames;
+        }
+
+
+
         private void runAllChecks_DoWork(object sender, DoWorkEventArgs e)
         {
-            List<(MaterialSkin.Controls.MaterialCheckbox, string)> checkboxScriptPairs = new List<(MaterialSkin.Controls.MaterialCheckbox, string)>
-            {
-                (materialCheckbox1, "auto_patching_check"),
-                (materialCheckbox2, "app_remover_check")
-            };
+            List<string> allScripts = getAllScripts();
             checkedBoxes = new List<string>();
-            hashmap= new Dictionary<string, sanityCheckSignature>();
-            foreach (var (checkbox, script) in checkboxScriptPairs)
+            hashmap = new Dictionary<string, sanityCheckSignature>();
+            foreach (var script in allScripts)
             {
-                
-                checkedBoxes.Add(checkbox.Text);
+                checkedBoxes.Add(script);
                 JObject jsonContent = TaskRunPythonScripts.Execute(script);
                 foreach (var product in jsonContent)
                 {
