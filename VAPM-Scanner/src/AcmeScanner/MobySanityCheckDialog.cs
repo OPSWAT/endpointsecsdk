@@ -22,6 +22,10 @@ namespace AcmeScanner
         private System.ComponentModel.BackgroundWorker runSelectedChecks;
         private JObject jsonContentAutoPatchingCheck;
         private JObject jsonContentAppRemoverCheck;
+        private Dictionary<string, sanityCheckSignature> hashmap;
+        private List<string> checkedBoxes;
+        private List<(MaterialSkin.Controls.MaterialCheckbox, string)> checkboxScriptPairs;
+
         private void InitializeBackgroundWorker()
         {
             runAllChecks = new BackgroundWorker();
@@ -40,7 +44,49 @@ namespace AcmeScanner
         }
         private void runAllChecks_DoWork(object sender, DoWorkEventArgs e)
         {
-            jsonContentAutoPatchingCheck = TaskRunPythonScripts.Execute("auto_patching_check");
+            List<(MaterialSkin.Controls.MaterialCheckbox, string)> checkboxScriptPairs = new List<(MaterialSkin.Controls.MaterialCheckbox, string)>
+            {
+                (materialCheckbox1, "auto_patching_check"),
+                (materialCheckbox2, "app_remover_check")
+            };
+            checkedBoxes = new List<string>();
+            hashmap= new Dictionary<string, sanityCheckSignature>();
+            foreach (var (checkbox, script) in checkboxScriptPairs)
+            {
+                
+                checkedBoxes.Add(checkbox.Text);
+                JObject jsonContent = TaskRunPythonScripts.Execute(script);
+                foreach (var product in jsonContent)
+                {
+                    string productName = product.Key;
+                    var platforms = (JObject)product.Value;
+
+                    foreach (var platform in platforms)
+                    {
+                        string platformName = platform.Key;
+                        var signatures = (JObject)platform.Value;
+
+                        foreach (var signature in signatures)
+                        {
+                            if (hashmap.ContainsKey(signature.Key))
+                            {
+                                hashmap[signature.Key].scripts.Add(script);
+                            }
+                            else
+                            {
+                                hashmap[signature.Key] = new sanityCheckSignature();
+                                hashmap[signature.Key].sigId = signature.Key;
+                                hashmap[signature.Key].name = product.Key;
+                                hashmap[signature.Key].platform = platformName;
+                                hashmap[signature.Key].scripts = new List<string>();
+                                hashmap[signature.Key].scripts.Add(script);
+                            }
+                        }
+
+                    }
+                }
+                
+            }
             UpdateCheckResults();
             
         }
@@ -52,23 +98,59 @@ namespace AcmeScanner
 
         private void runSelectedChecks_DoWork(object sender, DoWorkEventArgs e)
         {
+            List<(MaterialSkin.Controls.MaterialCheckbox, string)> checkboxScriptPairs = new List<(MaterialSkin.Controls.MaterialCheckbox, string)>
+            {
+                (materialCheckbox1, "auto_patching_check"),
+                (materialCheckbox2, "app_remover_check")
+            };
+            checkedBoxes = new List<string>();
+            hashmap = new Dictionary<string, sanityCheckSignature>();
             
-            if (materialCheckbox1.Checked)
+
+            foreach (var (checkbox, script) in checkboxScriptPairs)
             {
-                jsonContentAutoPatchingCheck = TaskRunPythonScripts.Execute("auto_patching_check");
-                UpdateCheckResults();
+                if (checkbox.Checked)
+                {
+                    checkedBoxes.Add(checkbox.Text);
+                    JObject jsonContent = TaskRunPythonScripts.Execute(script);
+                    foreach (var product in jsonContent)
+                    {
+                        string productName = product.Key;
+                        var platforms = (JObject)product.Value;
+
+                        foreach (var platform in platforms)
+                        {
+                            string platformName = platform.Key;
+                            var signatures = (JObject)platform.Value;
+
+                            foreach (var signature in signatures)
+                            {
+                                if (hashmap.ContainsKey(signature.Key))
+                                {
+                                    hashmap[signature.Key].scripts.Add(script);
+                                }
+                                else
+                                {
+                                    hashmap[signature.Key] = new sanityCheckSignature();
+                                    hashmap[signature.Key].sigId = signature.Key;
+                                    hashmap[signature.Key].name = product.Key;
+                                    hashmap[signature.Key].platform = platformName;
+                                    hashmap[signature.Key].scripts = new List<string>();
+                                    hashmap[signature.Key].scripts.Add(script);
+                                }
+                            }
+
+                        }
+                    }
+                }
             }
-            if (materialCheckbox2.Checked)
-            {
-                jsonContentAppRemoverCheck = TaskRunPythonScripts.Execute("app_remover_check");
-                UpdateCheckResults();
-            }
+            UpdateCheckResults();
         }
 
         private void runSelectedChecks_Completed(object sender, RunWorkerCompletedEventArgs e)
         {
-            jsonContentAppRemoverCheck = null;
-            jsonContentAutoPatchingCheck = null;
+            
+            
         }
 
         private void UpdateCheckResults()
@@ -77,75 +159,46 @@ namespace AcmeScanner
             {
                 List<ListViewItem> resultList = new List<ListViewItem>();
                 sanityChecksListView.Columns.Clear();
-                sanityChecksListView.Items.Clear();
-                sanityChecksListView.Columns.Add("Name", 200);
+                //sanityChecksListView.Items.Clear();
                 sanityChecksListView.Columns.Add("Signature ID", 100);
+                sanityChecksListView.Columns.Add("Name", 200);
+                
                 sanityChecksListView.Columns.Add("Platform", 200);
-                if (!(jsonContentAutoPatchingCheck == null)) { sanityChecksListView.Columns.Add("auto_patching_check Result", 200); }
-                else if (!(jsonContentAppRemoverCheck == null)) { sanityChecksListView.Columns.Add("app_remover_check Result", 200); }
+                foreach (string checkedBox in checkedBoxes)
+                {
+                    sanityChecksListView.Columns.Add(checkedBox, 200);
+                }
                 
                 sanityChecksListView.View = View.Details;
                 sanityChecksListView.Update();
-                if (!(jsonContentAutoPatchingCheck == null))
+
+
+                foreach (sanityCheckSignature sigObj in hashmap.Values)
                 {
-                    foreach (var product in jsonContentAutoPatchingCheck)
+                    ListViewItem item = new ListViewItem(sigObj.sigId);
+                    item.SubItems.Add(sigObj.name);
+                    item.SubItems.Add(sigObj.platform);
+                    for (int i = 3; i < sanityChecksListView.Columns.Count; i++)
                     {
-                        string productName = product.Key;
-                        var platforms = (JObject)product.Value;
-
-                        foreach (var platform in platforms)
+                        string columnName = sanityChecksListView.Columns[i].Text;
+                        if (sigObj.scripts.Contains(columnName))
                         {
-                            string platformName = platform.Key;
-                            var signatures = (JObject)platform.Value;
-
-                            foreach (var signature in signatures)
-                            {
-                                string signatureId = signature.Key;
-                                bool autoPatchingCheckResult = (bool)signature.Value;
-
-                                // Create a new ListViewItem
-                                ListViewItem item = new ListViewItem(productName);
-                                item.SubItems.Add(signatureId);
-                                item.SubItems.Add(platformName);
-                                if (!autoPatchingCheckResult) { item.SubItems.Add("Fail"); }
-                                else { item.SubItems.Add(""); }
-
-                                // Add the item to the resultList
-                                resultList.Add(item);
-                            }
+                            item.SubItems.Add("fail");
                         }
-                    }
-                }
-                else if (!(jsonContentAppRemoverCheck==null))
-                {
-                    foreach (var product in jsonContentAppRemoverCheck)
-                    {
-                        string productName = product.Key;
-                        var platforms = (JObject)product.Value;
-
-                        foreach (var platform in platforms)
+                        else
                         {
-                            string platformName = platform.Key;
-                            var signatures = (JObject)platform.Value;
-
-                            foreach (var signature in signatures)
-                            {
-                                string signatureId = signature.Key;
-                                bool autoPatchingCheckResult = (bool)signature.Value;
-
-                                // Create a new ListViewItem
-                                ListViewItem item = new ListViewItem(productName);
-                                item.SubItems.Add(signatureId);
-                                item.SubItems.Add(platformName);
-                                if (!autoPatchingCheckResult) { item.SubItems.Add("Fail"); }
-                                else { item.SubItems.Add(""); }
-
-                                // Add the item to the resultList
-                                resultList.Add(item);
-                            }
+                            item.SubItems.Add("");
                         }
+                        
                     }
+                    resultList.Add(item);
                 }
+
+
+
+
+
+
                 
                 sanityChecksListView.Items.Clear();
                 // Add the items to the ListView
@@ -157,6 +210,7 @@ namespace AcmeScanner
         {
             InitializeComponent();
             InitializeBackgroundWorker();
+            
         }
 
         private void MobySanityCheckDialog_Load(object sender, EventArgs e)
