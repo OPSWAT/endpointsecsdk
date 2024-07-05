@@ -15,8 +15,8 @@ namespace VAPMAdapter.Tasks
         {
             string _basePath = AppDomain.CurrentDomain.BaseDirectory;
             // Append the script name to the base path for the script
-            string scriptPath = Path.Combine(basePath, pythonScript + ".py");
-            string jsonPath = Path.Combine(basePath, pythonScript + ".json");
+            string scriptPath = Path.Combine(_basePath, pythonScript + ".py");
+            string jsonPath = Path.Combine(_basePath, pythonScript + ".json");
 
             // Delete the existing JSON file if it exists
             if (File.Exists(jsonPath))
