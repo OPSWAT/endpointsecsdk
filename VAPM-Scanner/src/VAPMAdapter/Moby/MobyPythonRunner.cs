@@ -10,29 +10,28 @@ namespace VAPMAdapter.Moby
 {
     public class MobyPythonRunner
     {
-        private string _pythonExePath;
-
-        public MobyPythonRunner(string pythonExePath)
+        public void RunScript(string scriptPath)
         {
-            _pythonExePath = pythonExePath;
-        }
-
-        public string RunScript(string scriptPath)
-        {
+            //this is what we need to test if it works
             // Create process info
             ProcessStartInfo start = new ProcessStartInfo();
-            start.FileName = _pythonExePath;
+            start.FileName = "python"; // Use 'python' directly assuming it's in the system PATH
             start.Arguments = scriptPath;
             start.UseShellExecute = false;       // Required to redirect output
             start.RedirectStandardOutput = true; // Capture stdout
+            start.RedirectStandardError = true;  // Capture stderr for error handling
 
             using (Process process = Process.Start(start))
             {
-                // Read the standard output of the script
-                using (StreamReader reader = process.StandardOutput)
+                // Read the standard error of the script to handle errors
+                using (StreamReader errorReader = process.StandardError)
                 {
-                    string result = reader.ReadToEnd();
-                    return result;
+                    string error = errorReader.ReadToEnd();
+
+                    if (!string.IsNullOrEmpty(error))
+                    {
+                        throw new Exception($"Error running script: {error}");
+                    }
                 }
             }
         }

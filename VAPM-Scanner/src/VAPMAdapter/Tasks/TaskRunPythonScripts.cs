@@ -1,28 +1,25 @@
-﻿using System;
+﻿using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using VAPMAdapter.Moby;
 
 namespace VAPMAdapter.Tasks
 {
-    internal class TaskRunPythonScripts
+    public class TaskRunPythonScripts
     {
-        private string _basePath;
-
-        public TaskRunPythonScripts(string basePath)
+        public static JObject Execute(string pythonScript)
         {
-            _basePath = basePath;
-        }
-
-        public string Execute(string pythonScript)
-        {
-            // Append the script name to the base path for both the script and the executable
-            string scriptPath = Path.Combine(_basePath, pythonScript + ".py");
-            //check to see if this actually works
-            string exePath = Path.Combine(_basePath, "python.exe");
-            string jsonPath = Path.Combine(_basePath, pythonScript + ".json");
+            string basePath = AppDomain.CurrentDomain.BaseDirectory;
+            string targetPath = Path.Combine(basePath, @"..\..\..\SanityChecks");
+            string fullPath = Path.GetFullPath(targetPath);    
+            // Append the script name to the base path for the script
+            string scriptPath = Path.Combine(fullPath, pythonScript + ".py");
+            string jsonPath = Path.Combine(basePath, pythonScript + ".json");
 
             // Delete the existing JSON file if it exists
             if (File.Exists(jsonPath))
@@ -30,8 +27,8 @@ namespace VAPMAdapter.Tasks
                 File.Delete(jsonPath);
             }
 
-            // Create an instance of PythonRunner
-            Moby.MobyPythonRunner pythonRunner = new Moby.MobyPythonRunner(exePath);
+            // Create an instance of MobyPythonRunner
+            MobyPythonRunner pythonRunner = new MobyPythonRunner();
 
             // Run the script
             pythonRunner.RunScript(scriptPath);
@@ -40,7 +37,8 @@ namespace VAPMAdapter.Tasks
             if (File.Exists(jsonPath))
             {
                 string jsonContent = File.ReadAllText(jsonPath);
-                return jsonContent;
+                JObject jsonObject = JObject.Parse(jsonContent);
+                return jsonObject;
             }
             else
             {

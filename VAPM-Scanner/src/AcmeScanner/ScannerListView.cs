@@ -6,6 +6,7 @@
 ///  OPSWAT OEM Solutions Architect
 ///////////////////////////////////////////////////////////////////////////////////////////////
 using System.Drawing;
+using System.Text;
 using System.Windows.Forms;
 
 namespace AcmeScanner
@@ -29,6 +30,8 @@ namespace AcmeScanner
             this.GridLines = true;
             this.View = View.Details;
             this.MultiSelect = false;
+            
+            this.MouseClick += ScannerListView_MouseClick;
         }
 
         private void lv_ColumnClick(object sender, ColumnClickEventArgs e)
@@ -111,6 +114,25 @@ namespace AcmeScanner
             DrawListViewSubItemEventArgs e)
         {
             e.DrawDefault = true;
+        }
+        private void ScannerListView_MouseClick(object sender, MouseEventArgs e)
+        {
+            if (this.SelectedItems.Count > 0 && this.Columns[0].Text=="Title")
+            {
+
+                StringBuilder kbIdBuilder = new StringBuilder();
+                kbIdBuilder.AppendLine("Title:\t\t" + this.SelectedItems[0].SubItems[0].Text);
+                kbIdBuilder.AppendLine("Severity:\t" + this.SelectedItems[0].SubItems[1].Text);
+                kbIdBuilder.AppendLine("Product:\t" + this.SelectedItems[0].SubItems[2].Text);
+                kbIdBuilder.AppendLine("KB:\t\t" + this.SelectedItems[0].SubItems[3].Text);
+                kbIdBuilder.AppendLine("Patched:\t" + this.SelectedItems[0].SubItems[4].Text);
+                kbIdBuilder.AppendLine("Description:\t" + this.SelectedItems[0].SubItems[5].Text);
+
+                string view_full = kbIdBuilder.ToString();
+                TextDialog textDialog = new TextDialog(view_full);
+                textDialog.StartPosition = FormStartPosition.CenterParent;
+                textDialog.ShowDialog();
+            }
         }
 
     }

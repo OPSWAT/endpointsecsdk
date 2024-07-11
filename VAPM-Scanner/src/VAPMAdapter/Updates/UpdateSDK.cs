@@ -8,8 +8,10 @@
 
 using System;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Threading;
+using System.Threading.Tasks;
 using VAPMAdapter.Updates;
 
 namespace VAPMAdapater.Updates
@@ -40,6 +42,7 @@ namespace VAPMAdapater.Updates
         public static bool isSDKUpdated()
         {
             bool result = false;
+            //string x=DownloadSDK.getLatestReleaseDate(getLocalSDKDir());
 
             if (File.Exists("libwavmodapi.dll"))
             {
@@ -53,6 +56,39 @@ namespace VAPMAdapater.Updates
 
             return result;
         }
+        public static string getLatestSDKReleaseDate()
+        {
+            string sdkDir = getLocalSDKDir();            
+            string latestReleaseDate = Task.Run(async () =>
+            {
+                try
+                {
+                    return await DownloadSDK.getLatestReleaseDateAsync(sdkDir);
+                }
+                catch (Exception ex)
+                {                    
+                    return "Error fetching date"; 
+                }
+            }).Result;
+                        
+            if (!string.IsNullOrEmpty(latestReleaseDate))
+            {                
+                DateTime lastModified;
+                if (DateTime.TryParseExact(latestReleaseDate, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out lastModified))
+                {                    
+                    return lastModified.ToString("MMMM dd, yyyy");
+                }
+                else
+                {                    
+                    return "Unknown Date";
+                }
+            }
+            else
+            {                
+                return "No Date Available";
+            }
+        }
+
 
         /// <summary>
         /// Copies a specific SDK file from the source directory to the destination directory.

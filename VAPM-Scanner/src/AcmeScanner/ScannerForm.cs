@@ -30,6 +30,7 @@ using VAPMAdapter.Moby.POCO;
 using VAPMAdapter.Moby;
 using Newtonsoft.Json;
 using System.Security.Cryptography.Xml;
+using System.Globalization;
 
 
 namespace AcmeScanner
@@ -63,6 +64,15 @@ namespace AcmeScanner
             CheckLicenseFiles();
             UpdateFilesOnStartup();
             fillSDKlabels();
+            SetTitleWithFileVersion();
+        }
+
+        private void SetTitleWithFileVersion()
+        {
+            string exePath = Assembly.GetExecutingAssembly().Location;
+            var fileVersionInfo = FileVersionInfo.GetVersionInfo(exePath);
+            string fileVersion = fileVersionInfo.FileVersion;
+            this.Text = $"AcmeScanner - Version {fileVersion}";
         }
 
         private void fillSDKlabels()
@@ -76,8 +86,7 @@ namespace AcmeScanner
                 string productVersion = versionInfo.ProductVersion;
                 label5.Text = productVersion;
                 label13.Text = productVersion;
-                DateTime lastModified = vmodInfo.LastWriteTime.Date;
-                label7.Text = lastModified.ToString("MMMM dd, yyyy");
+                label7.Text = UpdateSDK.getLatestSDKReleaseDate();
                 label14.Text = label7.Text;
                 if (!UpdateSDK.isSDKUpdated())
                 {
@@ -171,7 +180,7 @@ namespace AcmeScanner
                 new DoWorkEventHandler(updateMobyWorker_DoWork);
             updateMobyWorker.RunWorkerCompleted +=
                 new RunWorkerCompletedEventHandler(updateMobyWorker_Completed);
-                
+
 
             loadCatalogWorker = new BackgroundWorker();
             loadCatalogWorker.DoWork +=
@@ -451,10 +460,12 @@ namespace AcmeScanner
         private void updateMobyWorker_DoWork(object sender, DoWorkEventArgs e)
         {
             UpdateMobyFile.DownloadMoby();
+
         }
 
         private void updateMobyWorker_Completed(object sender, RunWorkerCompletedEventArgs e)
         {
+            btnUpdateMoby.UseAccentColor = false;
             ShowLoading(false);
         }
 
@@ -497,8 +508,6 @@ namespace AcmeScanner
                 btnExportCSV.Enabled = false;
                 btnFreshInstall.Enabled = false;
                 btnDomainCSV.Enabled = false;
-                btnRefreshStatus.Enabled = false;
-                btnOrchestrationView.Enabled = false;
             }
             else
             {
@@ -515,19 +524,22 @@ namespace AcmeScanner
                 btnFreshInstall.Enabled = enabled;
                 btnDomainCSV.Enabled = enabled;
                 btnRefreshStatus.Enabled = enabled;
-                btnOrchestrationView.Enabled = enabled;
+
             }
             if (!MobyDownload)
             {
+                btnUpdateMoby.UseAccentColor = true;
                 btnLoadMoby.Enabled = false;
                 btnViewJson.Enabled = false;
                 btnMobyViewTotals.Enabled = false;
+                btnRunChecksMoby.Enabled = false;
             }
             else
             {
                 btnLoadMoby.Enabled = enabled;
                 btnViewJson.Enabled = enabled;
                 btnMobyViewTotals.Enabled = enabled;
+                btnRunChecksMoby.Enabled = enabled;
             }
             btnUpdate.Enabled = enabled;
             btnUpdateSDK.Enabled = enabled;
@@ -878,23 +890,23 @@ namespace AcmeScanner
         private string GetMobyTotalCountsJson()
         {
             if (mobyCounts == null)
-    {
-        mobyCounts = TaskLoadMobyCounts.LoadCounts();
-    }
+            {
+                mobyCounts = TaskLoadMobyCounts.LoadCounts();
+            }
 
-    var totalCounts = new
-    {
-        TotalProducts = mobyCounts.TotalProductsCount,
-        TotalSignatures = mobyCounts.TotalSignaturesCount,
-        CveDetection = mobyCounts.CveDetection,
-        SupportAutoPatching = mobyCounts.SupportAutoPatching,
-        BackgroundPatching = mobyCounts.BackgroundPatching,
-        FreshInstallable = mobyCounts.FreshInstallable,
-        ValidationSupported = mobyCounts.ValidationSupported,
-        AppRemover = mobyCounts.AppRemover
-    };
+            var totalCounts = new
+            {
+                TotalProducts = mobyCounts.TotalProductsCount,
+                TotalSignatures = mobyCounts.TotalSignaturesCount,
+                CveDetection = mobyCounts.CveDetection,
+                SupportAutoPatching = mobyCounts.SupportAutoPatching,
+                BackgroundPatching = mobyCounts.BackgroundPatching,
+                FreshInstallable = mobyCounts.FreshInstallable,
+                ValidationSupported = mobyCounts.ValidationSupported,
+                AppRemover = mobyCounts.AppRemover
+            };
 
-    return JsonConvert.SerializeObject(totalCounts, Formatting.Indented);
+            return JsonConvert.SerializeObject(totalCounts, Formatting.Indented);
         }
 
 
@@ -1220,7 +1232,7 @@ namespace AcmeScanner
 
         }
 
-        private void btnOrchestrationView_Click(object sender, EventArgs e)
+        public void btnOrchestrationView_Click()
         {
             if (lvOrchestrationScanResult.SelectedItems.Count > 0)
             {
@@ -1256,7 +1268,7 @@ namespace AcmeScanner
                 string sigID = scannerListView1.SelectedItems[0].SubItems[1].Text;
                 string pID = scannerListView1.SelectedItems[0].Tag.ToString();
                 MobyProduct selectedProduct = staticMobyProductList.FirstOrDefault(product => product.Id == pID);
-                MobySignature selectedSignature = selectedProduct.sigList.FirstOrDefault(signature => signature.Id == sigID);                
+                MobySignature selectedSignature = selectedProduct.sigList.FirstOrDefault(signature => signature.Id == sigID);
                 string json = JsonConvert.SerializeObject(selectedSignature, Formatting.Indented);
 
 
@@ -1272,16 +1284,28 @@ namespace AcmeScanner
             }
         }
 
-        private void scannerListView1_SelectedIndexChanged(object sender, EventArgs e)
-        {
-
-        }
-
-
         private void btnUpdateMoby_Click(object sender, EventArgs e)
         {
             ShowLoading(true);
             updateMobyWorker.RunWorkerAsync(true);
+        }
+
+        private void btnRunChecksMoby_Click(object sender, EventArgs e)
+        {
+            MobySanityCheckDialog sanityCheckDialog = new MobySanityCheckDialog();
+            sanityCheckDialog.StartPosition = FormStartPosition.CenterParent;
+            sanityCheckDialog.ShowDialog();
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            Debug.WriteLine("called button funciton");
+
+        }
+
+        private void btnViewMobySubsets_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }
