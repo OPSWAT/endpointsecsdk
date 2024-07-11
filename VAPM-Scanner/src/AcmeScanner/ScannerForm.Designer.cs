@@ -161,7 +161,7 @@ namespace AcmeScanner
             label6.Name = "label6";
             label6.Size = new System.Drawing.Size(112, 25);
             label6.TabIndex = 7;
-            label6.Text = "SDK Update:";
+            label6.Text = "SDK Date:";
             // 
             // label5
             // 
@@ -446,7 +446,7 @@ namespace AcmeScanner
             label11.Name = "label11";
             label11.Size = new System.Drawing.Size(112, 25);
             label11.TabIndex = 6;
-            label11.Text = "SDK Update:";
+            label11.Text = "SDK Date:";
             // 
             // label10
             // 
