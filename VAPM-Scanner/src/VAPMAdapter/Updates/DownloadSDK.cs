@@ -6,8 +6,13 @@
 ///  OPSWAT OEM Solutions Architect
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
+using System.Net;
+using System.Net.Http;
+using System.Threading.Tasks;
 using System.Xml.Linq;
 
 namespace VAPMAdapater.Updates
@@ -84,7 +89,7 @@ namespace VAPMAdapater.Updates
             {
 
                 // Check if the element is a "Releases" element with the name "OESIS Local V4"
-                if (releaseElement.Name == "Releases" && getAttribute(releaseElement,"Name") == "OESIS Local V4")
+                if (releaseElement.Name == "Releases" && getAttribute(releaseElement, "Name") == "OESIS Local V4")
                 {
                     // Get the latest release element and download its files
                     XElement latestReleaseElement = releaseElement.Element("LatestRelease");
@@ -112,7 +117,7 @@ namespace VAPMAdapater.Updates
                     {
                         // Get the platform name from the platform element
                         string platformName = getAttribute(platformElement, "Name");
-                        
+
                         //
                         // Right now only download Windows Platform
                         //
@@ -131,16 +136,81 @@ namespace VAPMAdapater.Updates
         /// <param name="sdkDir">The directory where the SDK files will be saved.</param>
         public static void DownloadAllSDKFiles(string sdkDir)
         {
-            string oesisFilePath = Path.Combine(sdkDir,"OESIS-Descriptior.xml");
+            string oesisFilePath = Path.Combine(sdkDir, "OESIS-Descriptior.xml");
             HttpClientUtils.DownloadFileSynchronous(VAPMSettings.getSDKURL(), oesisFilePath);
 
             if (File.Exists(oesisFilePath))
             {
                 // Read the content of the XML file and download the releases described in it
                 string xmlString = File.ReadAllText(oesisFilePath);
-                DownloadReleases(sdkDir,xmlString);
+                DownloadReleases(sdkDir, xmlString);
             }
         }
 
+
+        public static async Task<string> getLatestReleaseDateAsync(string sdkDir)
+        {            
+            string oesisFilePath = Path.Combine(sdkDir, "OESIS-Descriptor.xml");           
+
+            try
+            {       
+                using (HttpClient client = new HttpClient())
+                {
+                    HttpResponseMessage response = await client.GetAsync(VAPMSettings.getSDKURL());
+                    response.EnsureSuccessStatusCode();
+
+                    await using (var fs = new FileStream(oesisFilePath, FileMode.Create, FileAccess.Write, FileShare.None))
+                    {
+                        await response.Content.CopyToAsync(fs);
+                    }
+                }                
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Error during download: {ex.Message}");
+                return null;
+            }
+
+            string xmlDescription = File.ReadAllText(oesisFilePath);
+                        
+            XDocument doc = XDocument.Parse(xmlDescription);
+            
+            XElement rootElement = doc.Root;
+            
+            foreach (XElement platformElement in rootElement.Elements("Platform"))
+            {                
+                if (platformElement.Attribute("Name")?.Value == "Windows")
+                {
+                    foreach (XElement releases in platformElement.Elements("Releases"))
+                    {                        
+                        if (releases.Attribute("Name")?.Value == "OESIS Local V4")
+                        {                            
+                            XElement latestRelease = releases.Element("LatestRelease");                            
+                            if (latestRelease != null)
+                            {                               
+                                XAttribute dateAttribute = latestRelease.Attribute("Date");                                
+                                if (dateAttribute != null)
+                                {
+                                    string dateValue = dateAttribute.Value;                                    
+                                    return dateValue;
+                                }
+                                else
+                                {
+                                    Debug.WriteLine("Date attribute not found.");
+                                }
+                            }
+                            else
+                            {
+                                Debug.WriteLine("LatestRelease element not found.");
+                            }
+                        }
+                    }
+                }
+            }
+
+            Debug.WriteLine("No matching elements found.");
+            return string.Empty;
     }
+
+}   
 }

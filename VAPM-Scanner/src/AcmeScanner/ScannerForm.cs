@@ -30,6 +30,7 @@ using VAPMAdapter.Moby.POCO;
 using VAPMAdapter.Moby;
 using Newtonsoft.Json;
 using System.Security.Cryptography.Xml;
+using System.Globalization;
 
 
 namespace AcmeScanner
@@ -63,6 +64,15 @@ namespace AcmeScanner
             CheckLicenseFiles();
             UpdateFilesOnStartup();
             fillSDKlabels();
+            SetTitleWithFileVersion();
+        }
+
+        private void SetTitleWithFileVersion()
+        {
+            string exePath = Assembly.GetExecutingAssembly().Location;
+            var fileVersionInfo = FileVersionInfo.GetVersionInfo(exePath);
+            string fileVersion = fileVersionInfo.FileVersion;
+            this.Text = $"AcmeScanner - Version {fileVersion}";
         }
 
         private void fillSDKlabels()
@@ -76,8 +86,7 @@ namespace AcmeScanner
                 string productVersion = versionInfo.ProductVersion;
                 label5.Text = productVersion;
                 label13.Text = productVersion;
-                DateTime lastModified = vmodInfo.LastWriteTime.Date;
-                label7.Text = lastModified.ToString("MMMM dd, yyyy");
+                label7.Text = UpdateSDK.getLatestSDKReleaseDate();
                 label14.Text = label7.Text;
                 if (!UpdateSDK.isSDKUpdated())
                 {
@@ -451,6 +460,7 @@ namespace AcmeScanner
         private void updateMobyWorker_DoWork(object sender, DoWorkEventArgs e)
         {
             UpdateMobyFile.DownloadMoby();
+
         }
 
         private void updateMobyWorker_Completed(object sender, RunWorkerCompletedEventArgs e)
@@ -514,7 +524,7 @@ namespace AcmeScanner
                 btnFreshInstall.Enabled = enabled;
                 btnDomainCSV.Enabled = enabled;
                 btnRefreshStatus.Enabled = enabled;
-                
+
             }
             if (!MobyDownload)
             {
@@ -1285,6 +1295,17 @@ namespace AcmeScanner
             MobySanityCheckDialog sanityCheckDialog = new MobySanityCheckDialog();
             sanityCheckDialog.StartPosition = FormStartPosition.CenterParent;
             sanityCheckDialog.ShowDialog();
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            Debug.WriteLine("called button funciton");
+
+        }
+
+        private void btnViewMobySubsets_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }

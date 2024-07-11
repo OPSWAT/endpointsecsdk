@@ -91,6 +91,7 @@ namespace AcmeScanner
             btnViewJson = new MaterialSkin.Controls.MaterialButton();
             btnLoadMoby = new MaterialSkin.Controls.MaterialButton();
             timer1 = new Timer(components);
+            btnViewMobySubsets = new MaterialSkin.Controls.MaterialButton();
             panel1.SuspendLayout();
             panel3.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)pbLoading).BeginInit();
@@ -159,9 +160,9 @@ namespace AcmeScanner
             label6.AutoSize = true;
             label6.Location = new System.Drawing.Point(811, 50);
             label6.Name = "label6";
-            label6.Size = new System.Drawing.Size(112, 25);
+            label6.Size = new System.Drawing.Size(91, 25);
             label6.TabIndex = 7;
-            label6.Text = "SDK Update:";
+            label6.Text = "SDK Date:";
             // 
             // label5
             // 
@@ -444,9 +445,9 @@ namespace AcmeScanner
             label11.AutoSize = true;
             label11.Location = new System.Drawing.Point(811, 50);
             label11.Name = "label11";
-            label11.Size = new System.Drawing.Size(112, 25);
+            label11.Size = new System.Drawing.Size(91, 25);
             label11.TabIndex = 6;
-            label11.Text = "SDK Update:";
+            label11.Text = "SDK Date:";
             // 
             // label10
             // 
@@ -854,6 +855,7 @@ namespace AcmeScanner
             // 
             // panel7
             // 
+            panel7.Controls.Add(btnViewMobySubsets);
             panel7.Controls.Add(btnRunChecksMoby);
             panel7.Controls.Add(btnUpdateMoby);
             panel7.Controls.Add(btnMobyViewTotals);
@@ -965,6 +967,26 @@ namespace AcmeScanner
             btnLoadMoby.UseVisualStyleBackColor = true;
             btnLoadMoby.Click += btnLoadMoby_Click;
             // 
+            // btnViewMobySubsets
+            // 
+            btnViewMobySubsets.AutoSizeMode = AutoSizeMode.GrowAndShrink;
+            btnViewMobySubsets.Density = MaterialSkin.Controls.MaterialButton.MaterialButtonDensity.Default;
+            btnViewMobySubsets.Depth = 0;
+            btnViewMobySubsets.HighEmphasis = true;
+            btnViewMobySubsets.Icon = null;
+            btnViewMobySubsets.Location = new System.Drawing.Point(553, 35);
+            btnViewMobySubsets.Margin = new Padding(4, 6, 4, 6);
+            btnViewMobySubsets.MouseState = MaterialSkin.MouseState.HOVER;
+            btnViewMobySubsets.Name = "btnViewMobySubsets";
+            btnViewMobySubsets.NoAccentTextColor = System.Drawing.Color.Empty;
+            btnViewMobySubsets.Size = new System.Drawing.Size(123, 36);
+            btnViewMobySubsets.TabIndex = 6;
+            btnViewMobySubsets.Text = "View Subsets";
+            btnViewMobySubsets.Type = MaterialSkin.Controls.MaterialButton.MaterialButtonType.Contained;
+            btnViewMobySubsets.UseAccentColor = false;
+            btnViewMobySubsets.UseVisualStyleBackColor = true;
+            btnViewMobySubsets.Click += btnViewMobySubsets_Click;
+            // 
             // ScannerForm
             // 
             AutoScaleDimensions = new System.Drawing.SizeF(10F, 25F);
@@ -1058,5 +1080,6 @@ namespace AcmeScanner
         private MaterialSkin.Controls.MaterialButton btnUpdateMoby;
         private MaterialSkin.Controls.MaterialButton btnRunChecksMoby;
         public PictureBox pbLoading;
+        private MaterialSkin.Controls.MaterialButton btnViewMobySubsets;
     }
 }
