@@ -32,7 +32,6 @@ namespace VAPMAdapter.Updates
             // URLs and filenames for all JSON files
             var files = new (string url, string fileName)[]
             {
-            ("https://oesis-downloads-portal.s3.amazonaws.com/moby.json", "moby.json"),
             ("https://oesis-downloads-portal.s3.amazonaws.com/moby_counts.json", "moby_counts.json"),
             ("https://oesis-downloads-portal.s3.amazonaws.com/moby_patching.json", "moby_patching.json"),
             ("https://oesis-downloads-portal.s3.amazonaws.com/moby_vulnerability.json", "moby_vulnerability.json"),
@@ -84,7 +83,6 @@ namespace VAPMAdapter.Updates
             // Filenames for all JSON files
             var fileNames = new string[]
             {
-            "moby.json",
             "moby_counts.json",
             "moby_patching.json",
             "moby_vulnerability.json",
