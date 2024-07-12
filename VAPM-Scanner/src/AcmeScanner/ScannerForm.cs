@@ -55,7 +55,7 @@ namespace AcmeScanner
         private System.ComponentModel.BackgroundWorker loadStatusWorker;
 
         //first method called by the main class
-        public ScannerForm()
+        public ScannerForm(string[] args)
         {
             //initializes UI componets
             InitializeComponent();
@@ -63,8 +63,53 @@ namespace AcmeScanner
             InitializeBackgroundWorker();
             CheckLicenseFiles();
             UpdateFilesOnStartup();
-            fillSDKlabels();
+            FillSDKlabels();
             SetTitleWithFileVersion();
+            SetTabs(args);
+        }
+
+
+
+
+
+        protected override void OnKeyDown(KeyEventArgs e)
+        {
+            base.OnKeyDown(e);
+
+            if(e.KeyCode == Keys.D && e.Control)
+            {
+                ShowDevTabs();
+            }
+        }
+
+        private void ShowDevTabs()
+        {
+            if(tbcMainView.TabPages.Count < 4)
+            {
+                tbcMainView.TabPages.Add(tabStatus);
+                tbcMainView.TabPages.Add(tabMoby);
+            }
+        }
+
+
+        private void SetTabs(string[] args)
+        {
+            tbcMainView.TabPages.Clear();
+            tbcMainView.TabPages.Add(tabOffline);
+            tbcMainView.TabPages.Add(tabOrchestrate);
+            tbcMainView.TabPages.Add(tabCatalog);
+            
+            //
+            // Enable the Moby component here
+            //
+            if (args != null && args.Length > 0)
+            {
+                if (args[0] == "--dev")
+                {
+                    tbcMainView.TabPages.Add(tabStatus);
+                    tbcMainView.TabPages.Add(tabMoby);
+                }
+            }
         }
 
         private void SetTitleWithFileVersion()
@@ -75,7 +120,7 @@ namespace AcmeScanner
             this.Text = $"AcmeScanner - Version {fileVersion}";
         }
 
-        private void fillSDKlabels()
+        private void FillSDKlabels()
         {
             EnableButtons(true);
             // Check if libwavmodapi.dll exists
@@ -454,7 +499,7 @@ namespace AcmeScanner
         private void updateDBWorker_Completed(object sender, RunWorkerCompletedEventArgs e)
         {
             ShowLoading(false);
-            fillSDKlabels();//change sdk labels to current version
+            FillSDKlabels();//change sdk labels to current version
         }
 
         private void updateMobyWorker_DoWork(object sender, DoWorkEventArgs e)
