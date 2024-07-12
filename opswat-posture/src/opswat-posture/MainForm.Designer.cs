@@ -30,9 +30,9 @@ namespace OPSWATPosture
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.ListViewItem listViewItem3 = new System.Windows.Forms.ListViewItem("");
+            System.Windows.Forms.ListViewItem listViewItem1 = new System.Windows.Forms.ListViewItem("");
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
-            System.Windows.Forms.ListViewItem listViewItem4 = new System.Windows.Forms.ListViewItem("");
+            System.Windows.Forms.ListViewItem listViewItem2 = new System.Windows.Forms.ListViewItem("");
             this.GeolocationTab = new System.Windows.Forms.TabControl();
             this.tabPolicyCheck = new System.Windows.Forms.TabPage();
             this.lvPolicy = new System.Windows.Forms.ListView();
@@ -103,13 +103,13 @@ namespace OPSWATPosture
             this.cblBrowsers = new System.Windows.Forms.CheckedListBox();
             this.label20 = new System.Windows.Forms.Label();
             this.clbBlockedPlugins = new System.Windows.Forms.CheckedListBox();
+            this.lvPlugins = new OPSWATPosture.PostureListView();
             this.btnCheckPlugins = new System.Windows.Forms.Button();
             this.pbPluginStatus = new System.Windows.Forms.PictureBox();
             this.label12 = new System.Windows.Forms.Label();
             this.label13 = new System.Windows.Forms.Label();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.pbLoader = new System.Windows.Forms.PictureBox();
-            this.lvPlugins = new OPSWATPosture.PostureListView();
             this.GeolocationTab.SuspendLayout();
             this.tabPolicyCheck.SuspendLayout();
             this.gbEncryption.SuspendLayout();
@@ -146,6 +146,7 @@ namespace OPSWATPosture
             // 
             // tabPolicyCheck
             // 
+            this.tabPolicyCheck.Controls.Add(this.pbLoader);
             this.tabPolicyCheck.Controls.Add(this.lvPolicy);
             this.tabPolicyCheck.Controls.Add(this.gbEncryption);
             this.tabPolicyCheck.Controls.Add(this.gbFirewall);
@@ -170,7 +171,7 @@ namespace OPSWATPosture
             this.lvPolicy.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.None;
             this.lvPolicy.HideSelection = false;
             this.lvPolicy.Items.AddRange(new System.Windows.Forms.ListViewItem[] {
-            listViewItem3});
+            listViewItem1});
             this.lvPolicy.Location = new System.Drawing.Point(14, 243);
             this.lvPolicy.Name = "lvPolicy";
             this.lvPolicy.Size = new System.Drawing.Size(774, 119);
@@ -419,7 +420,7 @@ namespace OPSWATPosture
             this.lvSecurityScore.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.None;
             this.lvSecurityScore.HideSelection = false;
             this.lvSecurityScore.Items.AddRange(new System.Windows.Forms.ListViewItem[] {
-            listViewItem4});
+            listViewItem2});
             this.lvSecurityScore.Location = new System.Drawing.Point(14, 178);
             this.lvSecurityScore.Name = "lvSecurityScore";
             this.lvSecurityScore.Size = new System.Drawing.Size(774, 182);
@@ -880,6 +881,20 @@ namespace OPSWATPosture
             this.clbBlockedPlugins.Size = new System.Drawing.Size(310, 94);
             this.clbBlockedPlugins.TabIndex = 12;
             // 
+            // lvPlugins
+            // 
+            this.lvPlugins.FullRowSelect = true;
+            this.lvPlugins.GridLines = true;
+            this.lvPlugins.HideSelection = false;
+            this.lvPlugins.Location = new System.Drawing.Point(14, 149);
+            this.lvPlugins.MultiSelect = false;
+            this.lvPlugins.Name = "lvPlugins";
+            this.lvPlugins.OwnerDraw = true;
+            this.lvPlugins.Size = new System.Drawing.Size(774, 214);
+            this.lvPlugins.TabIndex = 11;
+            this.lvPlugins.UseCompatibleStateImageBehavior = false;
+            this.lvPlugins.View = System.Windows.Forms.View.Details;
+            // 
             // btnCheckPlugins
             // 
             this.btnCheckPlugins.Location = new System.Drawing.Point(14, 120);
@@ -932,33 +947,18 @@ namespace OPSWATPosture
             // pbLoader
             // 
             this.pbLoader.Image = global::OPSWATPosture.Properties.Resources.progressbar;
-            this.pbLoader.Location = new System.Drawing.Point(325, -3);
+            this.pbLoader.Location = new System.Drawing.Point(14, 29);
             this.pbLoader.Name = "pbLoader";
-            this.pbLoader.Size = new System.Drawing.Size(104, 80);
+            this.pbLoader.Size = new System.Drawing.Size(89, 80);
             this.pbLoader.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
             this.pbLoader.TabIndex = 5;
             this.pbLoader.TabStop = false;
-            // 
-            // lvPlugins
-            // 
-            this.lvPlugins.FullRowSelect = true;
-            this.lvPlugins.GridLines = true;
-            this.lvPlugins.HideSelection = false;
-            this.lvPlugins.Location = new System.Drawing.Point(14, 149);
-            this.lvPlugins.MultiSelect = false;
-            this.lvPlugins.Name = "lvPlugins";
-            this.lvPlugins.OwnerDraw = true;
-            this.lvPlugins.Size = new System.Drawing.Size(774, 214);
-            this.lvPlugins.TabIndex = 11;
-            this.lvPlugins.UseCompatibleStateImageBehavior = false;
-            this.lvPlugins.View = System.Windows.Forms.View.Details;
             // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(834, 503);
-            this.Controls.Add(this.pbLoader);
             this.Controls.Add(this.label13);
             this.Controls.Add(this.label12);
             this.Controls.Add(this.GeolocationTab);

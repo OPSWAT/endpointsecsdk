@@ -45,10 +45,12 @@ namespace OPSWAT_Adapter.Tasks
             foreach(int signature in browserProducts)
             {
                 BrowserPlugins plugin = OESISCompliance.GetBrowserPlugin(signature.ToString());
-                ProductInfo productInfo = OESISCore.GetProductInfo(plugin.signatureId);
-                plugin.browserName = productInfo.name;
-
-                result.Add(plugin);
+                if (plugin != null && plugin.signatureId != null)
+                {
+                    ProductInfo productInfo = OESISCore.GetProductInfo(plugin.signatureId);
+                    plugin.browserName = productInfo.name;
+                    result.Add(plugin);
+                }
             }
 
             OESISFramework.TearDown();

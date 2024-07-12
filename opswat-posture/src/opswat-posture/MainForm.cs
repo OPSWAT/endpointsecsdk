@@ -156,7 +156,7 @@ namespace OPSWATPosture
             }
             catch(Exception exception)
             {
-                MessageBox.Show(exception.ToString());
+                MessageBox.Show(exception.Message);
                 e.Result = false;
             }
         }
@@ -186,31 +186,47 @@ namespace OPSWATPosture
         ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         private void getSecurityScoreWorker_DoWork(object sender, DoWorkEventArgs e)
         {
-            taskSecurityScore = new TaskSecurityScore();
-            int securityScore = taskSecurityScore.GetSecurityScore();
+            try
+            {
+                taskSecurityScore = new TaskSecurityScore();
+                int securityScore = taskSecurityScore.GetSecurityScore();
 
-            e.Result = securityScore;
+                e.Result = securityScore;
+            }
+            catch (Exception exception)
+            {
+                MessageBox.Show(exception.Message);
+                e.Result = null;
+            }
+
         }
 
         private void getSecurityScoreWorker_Completed(object sender, RunWorkerCompletedEventArgs e)
         {
-            lvSecurityScore.Items.Clear();
-            PrintLogEntries(lvSecurityScore, taskSecurityScore.GetLogger());
-
-            int securityScore = (int)e.Result; 
-            
-            lblCurrentSecurityScore.Text = securityScore.ToString();
-            if (tbSecurityScore.Value <= securityScore)
+            if (e.Result != null)
             {
-                pbScoreImage.Image = Properties.Resources.GreenLight;
+                lvSecurityScore.Items.Clear();
+                PrintLogEntries(lvSecurityScore, taskSecurityScore.GetLogger());
+
+                int securityScore = (int)e.Result;
+
+                lblCurrentSecurityScore.Text = securityScore.ToString();
+                if (tbSecurityScore.Value <= securityScore)
+                {
+                    pbScoreImage.Image = Properties.Resources.GreenLight;
+                }
+                else
+                {
+                    pbScoreImage.Image = Properties.Resources.RedLight;
+                }
+
+                Cursor.Current = Cursors.Default;
+                btnGetSecurityScore.Enabled = true;
             }
             else
             {
                 pbScoreImage.Image = Properties.Resources.RedLight;
             }
-
-            Cursor.Current = Cursors.Default;
-            btnGetSecurityScore.Enabled = true;
         }
 
         ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -222,68 +238,83 @@ namespace OPSWATPosture
         {
             Cursor.Current = Cursors.WaitCursor;
 
-            geolocationValidator.GetGeolocation();
+            try
+            {
+                geolocationValidator.GetGeolocation();
 
-            GeoLocationInfo info = geolocationValidator.GetGeoLocationInfo();
-            e.Result = info;
+                GeoLocationInfo info = geolocationValidator.GetGeoLocationInfo();
+                e.Result = info;
+            }
+            catch(Exception exception)
+            {
+                MessageBox.Show(exception.Message);
+                e.Result = null;
+            }
         }
 
         private void geoLocationWorker_Completed(object sender, RunWorkerCompletedEventArgs e)
         {
-            GeoLocationInfo info = (GeoLocationInfo)e.Result;
 
-            if(info.longitude != null)
+            if (e.Result != null)
             {
-                lblLatitude.Text = info.latitude;
-                lblLongitude.Text = info.longitude;
-                lblCountry.Text = info.countryName;
+                GeoLocationInfo info = (GeoLocationInfo)e.Result;
 
-                double policyLatitude = double.Parse(tbLatitude.Text);
-                double policyLongitude = double.Parse(tbLongitude.Text);
-
-                double actualMiles = geolocationValidator.CalculateMiles(policyLatitude, policyLongitude);
-                lblMiles.Text = actualMiles.ToString();
-
-                bool deviceIsValid = false;
-                if (rbDistanceInMiles.Checked)
+                if (info.longitude != null)
                 {
-                    double policyMiles = double.Parse(tbMiles.Text);
+                    lblLatitude.Text = info.latitude;
+                    lblLongitude.Text = info.longitude;
+                    lblCountry.Text = info.countryName;
 
-                    if (policyMiles > actualMiles)
+                    double policyLatitude = double.Parse(tbLatitude.Text);
+                    double policyLongitude = double.Parse(tbLongitude.Text);
+
+                    double actualMiles = geolocationValidator.CalculateMiles(policyLatitude, policyLongitude);
+                    lblMiles.Text = actualMiles.ToString();
+
+                    bool deviceIsValid = false;
+                    if (rbDistanceInMiles.Checked)
                     {
-                        deviceIsValid = true;
-                    }
-                }
-                else if (rbAllowedCountries.Checked)
-                {
-                    for (int i = 0; i < cbAllowedCountries.CheckedItems.Count; i++)
-                    {
-                        if ((string)cbAllowedCountries.CheckedItems[i] == info.countryName)
+                        double policyMiles = double.Parse(tbMiles.Text);
+
+                        if (policyMiles > actualMiles)
                         {
                             deviceIsValid = true;
-                            break;
                         }
                     }
-                }
+                    else if (rbAllowedCountries.Checked)
+                    {
+                        for (int i = 0; i < cbAllowedCountries.CheckedItems.Count; i++)
+                        {
+                            if ((string)cbAllowedCountries.CheckedItems[i] == info.countryName)
+                            {
+                                deviceIsValid = true;
+                                break;
+                            }
+                        }
+                    }
 
-                if (deviceIsValid)
-                {
-                    pbGeoFenceResult.Image = Properties.Resources.GreenLight;
+                    if (deviceIsValid)
+                    {
+                        pbGeoFenceResult.Image = Properties.Resources.GreenLight;
+                    }
+                    else
+                    {
+                        pbGeoFenceResult.Image = Properties.Resources.RedLight;
+                    }
+
+                    linkGeolocation.Text = new Uri("https://www.google.com/maps/search/?api=1&map_action=map&query=" + info.latitude + "%2C" + info.longitude).ToString();
+                    linkOrigin.Text = new Uri("https://www.google.com/maps/search/?api=1&map_action=map&query=" + policyLatitude + "%2C" + policyLongitude).ToString();
                 }
                 else
                 {
+                    MessageBox.Show("Unable to retrieve location.  Check license and make sure location services is enabled.");
                     pbGeoFenceResult.Image = Properties.Resources.RedLight;
                 }
-
-                linkGeolocation.Text = new Uri("https://www.google.com/maps/search/?api=1&map_action=map&query=" + info.latitude + "%2C" + info.longitude).ToString();
-                linkOrigin.Text = new Uri("https://www.google.com/maps/search/?api=1&map_action=map&query=" + policyLatitude + "%2C" + policyLongitude).ToString();
             }
             else
             {
-                MessageBox.Show("Unable to retrieve location.  Check license and make sure location services is enabled.");
                 pbGeoFenceResult.Image = Properties.Resources.RedLight;
             }
-
 
             Cursor.Current = Cursors.Default;
             btnGetLocation.Enabled = true;
@@ -315,14 +346,26 @@ namespace OPSWATPosture
         ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         private void checkPlugins_Worker_DoWork(object sender, DoWorkEventArgs e)
         {
-            checkPlugins();
+            try
+            {
+                checkPlugins();
+                e.Result = true;
+            }
+            catch(Exception exception)
+            {
+                MessageBox.Show(exception.Message);
+                e.Result = null;
+            }
         }
 
         private void checkPlugins_Worker_Completed(object sender, RunWorkerCompletedEventArgs e)
         {
-            updatePluginUI();
-            pbLoader.SendToBack();
-            btnCheckPlugins.Enabled = true;
+            if (e.Result != null)
+            {
+                updatePluginUI();
+                pbLoader.SendToBack();
+                btnCheckPlugins.Enabled = true;
+            }
 
             pbLoader.Visible = false;
         }
