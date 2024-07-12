@@ -96,6 +96,10 @@ namespace AcmeScanner
                     label14.ForeColor = System.Drawing.Color.Red;
                 }
             }
+            else
+            {
+                btnUpdateSDK.Text = "Download SDK";
+            }
             // Check if patch.dat exists
             if (UpdateDBFiles.doesDBExist())
             {
@@ -111,6 +115,10 @@ namespace AcmeScanner
                     label12.ForeColor = System.Drawing.Color.Red;
                     label15.ForeColor = System.Drawing.Color.Red;
                 }
+            }
+            else
+            {
+                btnUpdate.Text = "Download DB";
             }
         }
 
@@ -438,6 +446,7 @@ namespace AcmeScanner
                 label9.ForeColor = System.Drawing.Color.Black;
                 label12.ForeColor = System.Drawing.Color.Black;
                 label15.ForeColor = System.Drawing.Color.Black;
+                btnUpdate.Text = "Update DB";
             }
 
             else
@@ -448,6 +457,7 @@ namespace AcmeScanner
                 label7.ForeColor = System.Drawing.Color.Black;
                 label11.ForeColor = System.Drawing.Color.Black;
                 label14.ForeColor = System.Drawing.Color.Black;
+                btnUpdateSDK.Text = "Update SDK";
             }
         }
 
