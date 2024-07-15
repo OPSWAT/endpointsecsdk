@@ -1318,27 +1318,14 @@ namespace AcmeScanner
         //need to rework this panel
         private void LoadMobySubsets()
         {
-            /*
-            // Get the dictionary of JSON file names and timestamps
-            Dictionary<string, string> mobyFileTimestamps = DownloadMobySubsets.GetMobyFileTimestamps();
-
-            // Create a formatted string for the TextDialog
-            StringBuilder formattedString = new StringBuilder();
-            formattedString.AppendLine(string.Format("{0,-40} {1}", "JSON File Name", "Timestamp"));
-            formattedString.AppendLine(new string('-', 60));
-
-            foreach (var entry in mobyFileTimestamps)
-            {
-                formattedString.AppendLine(string.Format("{0,-40} {1}", entry.Key, entry.Value));
-            }
-
-            // Display the formatted string in the TextDialog
-            TextDialog textDialog = new TextDialog(formattedString.ToString());
-            textDialog.StartPosition = FormStartPosition.CenterParent;
-            textDialog.ShowDialog();
-            */
-
-            // Hide the other panel
+            //need to hide the other panels when this panel opens up, so you can only see this one, then reopen them when this panel is closed
+            panel1.Visible = false;
+            panel2.Visible = false;
+            panel3.Visible = false;
+            panel4.Visible = false;
+            panel5.Visible = false;
+            panel6.Visible = false;
+            panel7.Visible = false;
 
             // Get the dictionary of JSON file names and timestamps
             Dictionary<string, string> mobyFileTimestamps = DownloadMobySubsets.GetMobyFileTimestamps();
@@ -1372,6 +1359,13 @@ namespace AcmeScanner
         private void BtnMobysubsetClose_Click(object sender, EventArgs e)
         {
             mobySubsetsPanel.Visible = false;  // Hide the panel
+            panel1.Visible = true;
+            panel2.Visible = true;
+            panel3.Visible = true;
+            panel4.Visible = true;
+            panel5.Visible = true;
+            panel6.Visible = true;
+            panel7.Visible = true;
         }
     }
 }

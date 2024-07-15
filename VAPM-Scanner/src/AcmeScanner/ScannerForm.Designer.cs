@@ -1022,7 +1022,7 @@ namespace AcmeScanner
             mobySubsetsPanel = new Panel
             {
                 BorderStyle = BorderStyle.FixedSingle,
-                Dock = DockStyle.Top,
+                Dock = DockStyle.Fill,
                 Padding = new Padding(21, 25, 21, 25),
                 Size = new System.Drawing.Size(1509, 300), // Adjust size as needed
                 Visible = false  // Initially hidden
@@ -1041,7 +1041,8 @@ namespace AcmeScanner
             Button btnClose = new Button
             {
                 Text = "Close",
-                Dock = DockStyle.Right,
+                Size = new Size(75, 30),  // Set a specific size for the button
+                Dock = DockStyle.Top,  // Keep it at the top of the panel
                 Margin = new Padding(5)
             };
             btnClose.Click += BtnMobysubsetClose_Click;  // Event handler for closing the panel
@@ -1053,7 +1054,8 @@ namespace AcmeScanner
                 Dock = DockStyle.Fill,
                 View = View.Details,
                 FullRowSelect = true,
-                GridLines = true
+                GridLines = true,
+                Margin = new Padding(30, 30, 30, 30)
             };
 
             // Add columns to the ListView
