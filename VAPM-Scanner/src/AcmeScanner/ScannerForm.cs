@@ -141,6 +141,10 @@ namespace AcmeScanner
                     label14.ForeColor = System.Drawing.Color.Red;
                 }
             }
+            else
+            {
+                btnUpdateSDK.Text = "Download SDK";
+            }
             // Check if patch.dat exists
             if (UpdateDBFiles.doesDBExist())
             {
@@ -156,6 +160,10 @@ namespace AcmeScanner
                     label12.ForeColor = System.Drawing.Color.Red;
                     label15.ForeColor = System.Drawing.Color.Red;
                 }
+            }
+            else
+            {
+                btnUpdate.Text = "Download DB";
             }
         }
 
@@ -483,6 +491,7 @@ namespace AcmeScanner
                 label9.ForeColor = System.Drawing.Color.Black;
                 label12.ForeColor = System.Drawing.Color.Black;
                 label15.ForeColor = System.Drawing.Color.Black;
+                btnUpdate.Text = "Update DB";
             }
 
             else
@@ -493,6 +502,7 @@ namespace AcmeScanner
                 label7.ForeColor = System.Drawing.Color.Black;
                 label11.ForeColor = System.Drawing.Color.Black;
                 label14.ForeColor = System.Drawing.Color.Black;
+                btnUpdateSDK.Text = "Update SDK";
             }
         }
 
@@ -578,6 +588,7 @@ namespace AcmeScanner
                 btnViewJson.Enabled = false;
                 btnMobyViewTotals.Enabled = false;
                 btnRunChecksMoby.Enabled = false;
+                btnViewMobySubsets.Enabled = false;
             }
             else
             {
@@ -585,6 +596,7 @@ namespace AcmeScanner
                 btnViewJson.Enabled = enabled;
                 btnMobyViewTotals.Enabled = enabled;
                 btnRunChecksMoby.Enabled = enabled;
+                btnViewMobySubsets.Enabled = enabled;
             }
             btnUpdate.Enabled = enabled;
             btnUpdateSDK.Enabled = enabled;
@@ -1348,9 +1360,63 @@ namespace AcmeScanner
 
         }
 
-        private void btnViewMobySubsets_Click(object sender, EventArgs e)
+        //need to rework this panel
+        private void LoadMobySubsets()
         {
+            /*
+            // Get the dictionary of JSON file names and timestamps
+            Dictionary<string, string> mobyFileTimestamps = DownloadMobySubsets.GetMobyFileTimestamps();
 
+            // Create a formatted string for the TextDialog
+            StringBuilder formattedString = new StringBuilder();
+            formattedString.AppendLine(string.Format("{0,-40} {1}", "JSON File Name", "Timestamp"));
+            formattedString.AppendLine(new string('-', 60));
+
+            foreach (var entry in mobyFileTimestamps)
+            {
+                formattedString.AppendLine(string.Format("{0,-40} {1}", entry.Key, entry.Value));
+            }
+
+            // Display the formatted string in the TextDialog
+            TextDialog textDialog = new TextDialog(formattedString.ToString());
+            textDialog.StartPosition = FormStartPosition.CenterParent;
+            textDialog.ShowDialog();
+            */
+
+            // Hide the other panel
+
+            // Get the dictionary of JSON file names and timestamps
+            Dictionary<string, string> mobyFileTimestamps = DownloadMobySubsets.GetMobyFileTimestamps();
+
+            // Clear previous controls from the ListView
+            ListView listView = mobySubsetsPanel.Controls.OfType<ListView>().FirstOrDefault();
+            if (listView != null)
+            {
+                listView.Items.Clear();
+
+                // Add items to the ListView
+                foreach (var entry in mobyFileTimestamps)
+                {
+                    ListViewItem listViewItem = new ListViewItem(entry.Key);
+                    listViewItem.SubItems.Add(entry.Value);
+                    listView.Items.Add(listViewItem);
+                }
+
+                // Show the panel
+                mobySubsetsPanel.Visible = true;
+            }
+        }
+
+        private async void btnViewMobySubsets_Click(object sender, EventArgs e)
+        {
+            await DownloadMobySubsets.DownloadMobyFilesAsync();
+
+            LoadMobySubsets();
+        }
+
+        private void BtnMobysubsetClose_Click(object sender, EventArgs e)
+        {
+            mobySubsetsPanel.Visible = false;  // Hide the panel
         }
     }
 }

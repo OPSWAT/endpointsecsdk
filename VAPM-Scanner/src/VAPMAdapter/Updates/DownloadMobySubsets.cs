@@ -6,25 +6,31 @@ using System.Text;
 using System.Threading.Tasks;
 using VAPMAdapater.Updates;
 using VAPMAdapater;
+using Newtonsoft.Json.Linq;
+using System.Net.Http;
 
 namespace VAPMAdapter.Updates
 {
-    internal class DownloadMobySubsets
+    public class DownloadMobySubsets
     {
-        private static void DownloadDBFile(string destPath, string fileName, string downloadURL)
+        private static async Task DownloadDBFileAsync(string destPath, string fileName, string downloadURL)
         {
             string newFilePath = Path.Combine(destPath, fileName);
 
-            if (File.Exists(destPath))
+            if (File.Exists(newFilePath))
             {
-                File.Delete(destPath);
+                File.Delete(newFilePath);
             }
 
-            // Download the file synchronously from the specified URL
-            HttpClientUtils.DownloadFileSynchronous(downloadURL, newFilePath);
+            using (HttpClient client = new HttpClient())
+            {
+                // Download the file asynchronously from the specified URL
+                byte[] fileBytes = await client.GetByteArrayAsync(downloadURL);
+                await File.WriteAllBytesAsync(newFilePath, fileBytes);
+            }
         }
 
-        public static void DownloadMobyFiles()
+        public static async Task DownloadMobyFilesAsync()
         {
             string destPath = VAPMSettings.getLocalCatalogDir();
             destPath = Path.Combine(destPath, "analog/server");
@@ -56,13 +62,18 @@ namespace VAPMAdapter.Updates
             ("https://oesis-downloads-portal.s3.amazonaws.com/moby_firewall.json", "moby_firewall.json")
             };
 
-            // Download all JSON files
+            // Create a list of download tasks
+            List<Task> downloadTasks = new List<Task>();
             foreach (var (url, fileName) in files)
             {
-                DownloadDBFile(destPath, fileName, url);
+                downloadTasks.Add(DownloadDBFileAsync(destPath, fileName, url));
             }
+
+            // Wait for all download tasks to complete
+            await Task.WhenAll(downloadTasks);
         }
 
+        /*
         public static bool DoesMobyFileExist(string fileName)
         {
             // Get the current directory of the executable
@@ -117,6 +128,60 @@ namespace VAPMAdapter.Updates
             }
 
             return true;
+        }
+        */
+
+        public static Dictionary<string, string> GetMobyFileTimestamps()
+        {
+            // Filenames for all JSON files
+            var fileNames = new string[]
+            {
+            "moby_counts.json",
+            "moby_patching.json",
+            "moby_vulnerability.json",
+            "moby_uninstall.json",
+            "moby_antimalware.json",
+            "moby_patch_management.json",
+            "moby_p2p_agent.json",
+            "moby_messenger.json",
+            "moby_cloud_storage.json",
+            "moby_health_agent.json",
+            "moby_backup.json",
+            "moby_web_conference.json",
+            "moby_vpn_client.json",
+            "moby_virtual_machine.json",
+            "moby_remote_desktop_control.json",
+            "moby_unclassified.json",
+            "moby_antiphishing.json",
+            "moby_browser.json",
+            "moby_public_file_sharing.json",
+            "moby_encryption.json",
+            "moby_data_loss_prevention.json",
+            "moby_firewall.json"
+            };
+
+            var timestamps = new Dictionary<string, string>();
+            string basePath = AppDomain.CurrentDomain.BaseDirectory;
+            string destPath = Path.Combine(basePath, "catalog", "analog", "server");
+
+            foreach (var fileName in fileNames)
+            {
+                string fullPath = Path.Combine(destPath, fileName);
+
+                if (File.Exists(fullPath))
+                {
+                    string jsonContent = File.ReadAllText(fullPath);
+                    JObject jsonObject = JObject.Parse(jsonContent);
+                    string timestamp = jsonObject["timestamp"]?.ToString();
+
+                    if (timestamp != null)
+                    {
+                        timestamps[fileName] = timestamp;
+                    }
+                }
+            }
+
+            return timestamps;
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.Windows.Forms;
+﻿using System.Drawing;
+using System.Windows.Forms;
 using VAPMAdapter.Moby.POCO;
 
 namespace AcmeScanner
@@ -1011,9 +1012,57 @@ namespace AcmeScanner
             panel7.ResumeLayout(false);
             panel7.PerformLayout();
             ResumeLayout(false);
+
+            //mobysubsets
+            mobySubsetsPanel = new Panel
+            {
+                BorderStyle = BorderStyle.FixedSingle,
+                Dock = DockStyle.Top,
+                Padding = new Padding(21, 25, 21, 25),
+                Size = new System.Drawing.Size(1509, 300), // Adjust size as needed
+                Visible = false  // Initially hidden
+            };
+
+            // Add labels or any controls you need
+            Label labelTitle = new Label
+            {
+                Text = "Moby Subsets",
+                Dock = DockStyle.Top,
+                Font = new Font("Arial", 14, FontStyle.Bold)
+            };
+            mobySubsetsPanel.Controls.Add(labelTitle);
+
+            // Close Button
+            Button btnClose = new Button
+            {
+                Text = "Close",
+                Dock = DockStyle.Right,
+                Margin = new Padding(5)
+            };
+            btnClose.Click += BtnMobysubsetClose_Click;  // Event handler for closing the panel
+            mobySubsetsPanel.Controls.Add(btnClose);
+
+            // You can add a ListView or any other controls here
+            ListView listView = new ListView
+            {
+                Dock = DockStyle.Fill,
+                View = View.Details,
+                FullRowSelect = true,
+                GridLines = true
+            };
+
+            // Add columns to the ListView
+            listView.Columns.Add("JSON File Name", 200);
+            listView.Columns.Add("Timestamp", 200);
+            mobySubsetsPanel.Controls.Add(listView);
+
+            // Add the panel to the form's controls
+            this.Controls.Add(mobySubsetsPanel);
+
         }
 
         #endregion
+        private Panel mobySubsetsPanel;
         private Panel panel1;
         private Panel panel3;
         private Panel panel2;
