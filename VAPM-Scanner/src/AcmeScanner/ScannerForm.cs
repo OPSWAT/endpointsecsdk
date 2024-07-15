@@ -1318,6 +1318,7 @@ namespace AcmeScanner
         //need to rework this panel
         private void LoadMobySubsets()
         {
+            /*
             // Get the dictionary of JSON file names and timestamps
             Dictionary<string, string> mobyFileTimestamps = DownloadMobySubsets.GetMobyFileTimestamps();
 
@@ -1335,6 +1336,30 @@ namespace AcmeScanner
             TextDialog textDialog = new TextDialog(formattedString.ToString());
             textDialog.StartPosition = FormStartPosition.CenterParent;
             textDialog.ShowDialog();
+            */
+
+            // Hide the other panel
+
+            // Get the dictionary of JSON file names and timestamps
+            Dictionary<string, string> mobyFileTimestamps = DownloadMobySubsets.GetMobyFileTimestamps();
+
+            // Clear previous controls from the ListView
+            ListView listView = mobySubsetsPanel.Controls.OfType<ListView>().FirstOrDefault();
+            if (listView != null)
+            {
+                listView.Items.Clear();
+
+                // Add items to the ListView
+                foreach (var entry in mobyFileTimestamps)
+                {
+                    ListViewItem listViewItem = new ListViewItem(entry.Key);
+                    listViewItem.SubItems.Add(entry.Value);
+                    listView.Items.Add(listViewItem);
+                }
+
+                // Show the panel
+                mobySubsetsPanel.Visible = true;
+            }
         }
 
         private async void btnViewMobySubsets_Click(object sender, EventArgs e)
@@ -1342,6 +1367,11 @@ namespace AcmeScanner
             await DownloadMobySubsets.DownloadMobyFilesAsync();
 
             LoadMobySubsets();
+        }
+
+        private void BtnMobysubsetClose_Click(object sender, EventArgs e)
+        {
+            mobySubsetsPanel.Visible = false;  // Hide the panel
         }
     }
 }
