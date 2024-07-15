@@ -533,6 +533,7 @@ namespace AcmeScanner
                 btnViewJson.Enabled = false;
                 btnMobyViewTotals.Enabled = false;
                 btnRunChecksMoby.Enabled = false;
+                btnViewMobySubsets.Enabled = false;
             }
             else
             {
@@ -540,6 +541,7 @@ namespace AcmeScanner
                 btnViewJson.Enabled = enabled;
                 btnMobyViewTotals.Enabled = enabled;
                 btnRunChecksMoby.Enabled = enabled;
+                btnViewMobySubsets.Enabled = enabled;
             }
             btnUpdate.Enabled = enabled;
             btnUpdateSDK.Enabled = enabled;
@@ -1303,9 +1305,33 @@ namespace AcmeScanner
 
         }
 
-        private void btnViewMobySubsets_Click(object sender, EventArgs e)
+        //need to rework this panel
+        private void LoadMobySubsets()
         {
+            // Get the dictionary of JSON file names and timestamps
+            Dictionary<string, string> mobyFileTimestamps = DownloadMobySubsets.GetMobyFileTimestamps();
 
+            // Create a formatted string for the TextDialog
+            StringBuilder formattedString = new StringBuilder();
+            formattedString.AppendLine(string.Format("{0,-40} {1}", "JSON File Name", "Timestamp"));
+            formattedString.AppendLine(new string('-', 60));
+
+            foreach (var entry in mobyFileTimestamps)
+            {
+                formattedString.AppendLine(string.Format("{0,-40} {1}", entry.Key, entry.Value));
+            }
+
+            // Display the formatted string in the TextDialog
+            TextDialog textDialog = new TextDialog(formattedString.ToString());
+            textDialog.StartPosition = FormStartPosition.CenterParent;
+            textDialog.ShowDialog();
+        }
+
+        private async void btnViewMobySubsets_Click(object sender, EventArgs e)
+        {
+            await DownloadMobySubsets.DownloadMobyFilesAsync();
+
+            LoadMobySubsets();
         }
     }
 }
