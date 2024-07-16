@@ -29,7 +29,7 @@ namespace VAPMAdapater.Updates
         /// <param name="element">The XElement from which to get the attribute value.</param>
         /// <param name="key">The key of the attribute.</param>
         /// <returns>The value of the attribute as a string, or an empty string if the attribute is not found.</returns>
-        private static string getAttribute(XElement element, string key)
+        private static string GetAttribute(XElement element, string key)
         {
             string result = "";
 
@@ -60,8 +60,8 @@ namespace VAPMAdapater.Updates
                     {
 
                         // Get the file URL and SHA256 hash from the package element
-                        string fileUrl = getAttribute(packageElement, "Link");
-                        string sha256Hash = getAttribute(packageElement, "sha256");
+                        string fileUrl = GetAttribute(packageElement, "Link");
+                        string sha256Hash = GetAttribute(packageElement, "sha256");
 
                         // Extract the file name from the URL and determine the local file path
                         string fileName = Path.GetFileName(fileUrl);
@@ -89,7 +89,7 @@ namespace VAPMAdapater.Updates
             {
 
                 // Check if the element is a "Releases" element with the name "OESIS Local V4"
-                if (releaseElement.Name == "Releases" && getAttribute(releaseElement, "Name") == "OESIS Local V4")
+                if (releaseElement.Name == "Releases" && GetAttribute(releaseElement, "Name") == "OESIS Local V4")
                 {
                     // Get the latest release element and download its files
                     XElement latestReleaseElement = releaseElement.Element("LatestRelease");
@@ -116,7 +116,7 @@ namespace VAPMAdapater.Updates
                     foreach (XElement platformElement in element.Elements())
                     {
                         // Get the platform name from the platform element
-                        string platformName = getAttribute(platformElement, "Name");
+                        string platformName = GetAttribute(platformElement, "Name");
 
                         //
                         // Right now only download Windows Platform
@@ -137,7 +137,7 @@ namespace VAPMAdapater.Updates
         public static void DownloadAllSDKFiles(string sdkDir)
         {
             string oesisFilePath = Path.Combine(sdkDir, "OESIS-Descriptior.xml");
-            HttpClientUtils.DownloadFileSynchronous(VAPMSettings.getSDKURL(), oesisFilePath);
+            HttpClientUtils.DownloadFileSynchronous(VAPMSettings.GetSDKURL(), oesisFilePath);
 
             if (File.Exists(oesisFilePath))
             {
@@ -148,7 +148,7 @@ namespace VAPMAdapater.Updates
         }
 
 
-        public static async Task<string> getLatestReleaseDateAsync(string sdkDir)
+        public static async Task<string> GetLatestReleaseDateAsync(string sdkDir)
         {            
             string oesisFilePath = Path.Combine(sdkDir, "OESIS-Descriptor.xml");           
 
@@ -156,7 +156,7 @@ namespace VAPMAdapater.Updates
             {       
                 using (HttpClient client = new HttpClient())
                 {
-                    HttpResponseMessage response = await client.GetAsync(VAPMSettings.getSDKURL());
+                    HttpResponseMessage response = await client.GetAsync(VAPMSettings.GetSDKURL());
                     response.EnsureSuccessStatusCode();
 
                     await using (var fs = new FileStream(oesisFilePath, FileMode.Create, FileAccess.Write, FileShare.None))

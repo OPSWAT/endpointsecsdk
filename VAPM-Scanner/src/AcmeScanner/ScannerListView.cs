@@ -25,7 +25,7 @@ namespace AcmeScanner
 
             lvwColumnSorter = new ListViewColumnSorter();
             this.ListViewItemSorter = lvwColumnSorter;
-            this.ColumnClick += lv_ColumnClick;
+            this.ColumnClick += Lv_ColumnClick;
             this.FullRowSelect = true;
             this.GridLines = true;
             this.View = View.Details;
@@ -34,7 +34,7 @@ namespace AcmeScanner
             this.MouseClick += ScannerListView_MouseClick;
         }
 
-        private void lv_ColumnClick(object sender, ColumnClickEventArgs e)
+        private void Lv_ColumnClick(object sender, ColumnClickEventArgs e)
         {
             // Determine if clicked column is already the column that is being sorted.
             if (e.Column == lvwColumnSorter.SortColumn)

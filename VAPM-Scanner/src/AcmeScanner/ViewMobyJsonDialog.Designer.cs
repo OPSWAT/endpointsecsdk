@@ -60,7 +60,7 @@
             btnDownloadMobyJson.Type = MaterialSkin.Controls.MaterialButton.MaterialButtonType.Contained;
             btnDownloadMobyJson.UseAccentColor = false;
             btnDownloadMobyJson.UseVisualStyleBackColor = true;
-            btnDownloadMobyJson.Click += btnDownloadMobyJson_Click;
+            btnDownloadMobyJson.Click += BtnDownloadMobyJson_Click;
             // 
             // btnCloseViewJsonDialog
             // 
@@ -80,7 +80,7 @@
             btnCloseViewJsonDialog.Type = MaterialSkin.Controls.MaterialButton.MaterialButtonType.Contained;
             btnCloseViewJsonDialog.UseAccentColor = false;
             btnCloseViewJsonDialog.UseVisualStyleBackColor = true;
-            btnCloseViewJsonDialog.Click += btnCloseViewJsonDialog_Click;
+            btnCloseViewJsonDialog.Click += BtnCloseViewJsonDialog_Click;
             // 
             // ViewMobyJsonDialog
             // 

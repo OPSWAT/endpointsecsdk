@@ -32,7 +32,7 @@ namespace VAPMAdapter.Updates
 
         public static async Task DownloadMobyFilesAsync()
         {
-            string destPath = VAPMSettings.getLocalCatalogDir();
+            string destPath = VAPMSettings.GetLocalCatalogDir();
             destPath = Path.Combine(destPath, "analog/server");
 
             // URLs and filenames for all JSON files

@@ -32,7 +32,7 @@ namespace VAPMAdapter.Catalog
         /// It retrieves the JSON data from the file.
         /// </summary>
         /// <returns>A JObject representing the parsed JSON content from "patch_aggregation.json".</returns>
-        private JObject getPatchAggregationJsonObject()
+        private JObject GetPatchAggregationJsonObject()
         {
             JObject result;
             string jsonString = File.ReadAllText(jsonLocation);
@@ -59,11 +59,11 @@ namespace VAPMAdapter.Catalog
         /// If the element is not found, the function returns an empty list.
         /// </summary>
         /// <returns>A list of JObjects representing patch aggregations, or empty list if not found.</returns>
-        private List<JObject> getPatchAgregationListJson()
+        private List<JObject> GetPatchAgregationListJson()
         {
             List<JObject> result = new List<JObject>();
 
-            JObject patchAssociationsJsonObject = getPatchAggregationJsonObject();
+            JObject patchAssociationsJsonObject = GetPatchAggregationJsonObject();
             JArray oesisJson = (JArray)patchAssociationsJsonObject["oesis"];
 
 
@@ -88,7 +88,7 @@ namespace VAPMAdapter.Catalog
         /// </summary>
         /// <param name="downloadLinkArrayJson">JArray containing download link data.</param>
         /// <returns>List of CatalogDownloadDetails objects.</returns>
-        private List<CatalogDownloadDetails> parseDownloadDetails(JArray downloadLinkArrayJson)
+        private List<CatalogDownloadDetails> ParseDownloadDetails(JArray downloadLinkArrayJson)
         {
             List<CatalogDownloadDetails> result = new List<CatalogDownloadDetails>();
 
@@ -122,7 +122,7 @@ namespace VAPMAdapter.Catalog
 
             if (result == null)
             {
-                List<JObject> aggregations = getPatchAgregationListJson();
+                List<JObject> aggregations = GetPatchAgregationListJson();
                 result = new List<CatalogPatchAggregation>();
 
                 foreach (JObject jsonPatchAggregationList in aggregations)
@@ -132,7 +132,7 @@ namespace VAPMAdapter.Catalog
                         CatalogPatchAggregation newPatchAggregation = new CatalogPatchAggregation();
 
                         newPatchAggregation.PatchId = (string)jsonPatchAggregationList[current.Name]["_id"];
-                        newPatchAggregation.DownloadDetailsList = parseDownloadDetails((JArray)jsonPatchAggregationList[current.Name]["download_links"]);
+                        newPatchAggregation.DownloadDetailsList = ParseDownloadDetails((JArray)jsonPatchAggregationList[current.Name]["download_links"]);
                         newPatchAggregation.Fresh_Installable = (string)jsonPatchAggregationList[current.Name]["fresh_installable"];
                         newPatchAggregation.ReleaseNoteLink = (string)jsonPatchAggregationList[current.Name]["release_note_link"];
                         newPatchAggregation.Release_Date = (string)jsonPatchAggregationList[current.Name]["release_date"];
