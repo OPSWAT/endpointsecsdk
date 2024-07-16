@@ -1016,7 +1016,7 @@ namespace AcmeScanner
             btnViewMobySubsets.Type = MaterialSkin.Controls.MaterialButton.MaterialButtonType.Contained;
             btnViewMobySubsets.UseAccentColor = false;
             btnViewMobySubsets.UseVisualStyleBackColor = true;
-            btnViewMobySubsets.Click += BtnViewMobySubsets_Click;
+            btnViewMobySubsets.Click += btnViewMobySubsets_Click;
             // 
             // ScannerForm
             // 
