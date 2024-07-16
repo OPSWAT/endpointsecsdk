@@ -39,7 +39,7 @@ namespace VAPMAdapter.Tasks
                     if (_catalog == null)
                     {
                         _catalog = new Catalog.Catalog();
-                        string catalogRoot = VAPMSettings.getLocalCatalogDir();
+                        string catalogRoot = VAPMSettings.GetLocalCatalogDir();
                         catalogRoot = Path.Combine(catalogRoot, "analog/server");
                         _catalog.Load(catalogRoot);
                     }
