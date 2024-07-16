@@ -337,16 +337,16 @@ namespace AcmeScanner
             // 
             // tabOffline
             // 
-            tabPage1.Controls.Add(lvScanResults);
-            tabPage1.Controls.Add(panel1);
-            tabPage1.Location = new System.Drawing.Point(4, 34);
-            tabPage1.Margin = new Padding(4, 5, 4, 5);
-            tabPage1.Name = "tabPage1";
-            tabPage1.Padding = new Padding(4, 5, 4, 5);
-            tabPage1.Size = new System.Drawing.Size(1517, 960);
-            tabPage1.TabIndex = 0;
-            tabPage1.Text = "Offline";
-            tabPage1.UseVisualStyleBackColor = true;
+            tabOffline.Controls.Add(lvScanResults);
+            tabOffline.Controls.Add(panel1);
+            tabOffline.Location = new System.Drawing.Point(4, 34);
+            tabOffline.Margin = new Padding(4, 5, 4, 5);
+            tabOffline.Name = "tabPage1";
+            tabOffline.Padding = new Padding(4, 5, 4, 5);
+            tabOffline.Size = new System.Drawing.Size(1517, 960);
+            tabOffline.TabIndex = 0;
+            tabOffline.Text = "Offline";
+            tabOffline.UseVisualStyleBackColor = true;
             // 
             // lvScanResults
             // 
@@ -366,16 +366,16 @@ namespace AcmeScanner
             // 
             // tabOrchestration
             // 
-            tabPage2.Controls.Add(lvOrchestrationScanResult);
-            tabPage2.Controls.Add(panel4);
-            tabPage2.Location = new System.Drawing.Point(4, 34);
-            tabPage2.Margin = new Padding(4, 5, 4, 5);
-            tabPage2.Name = "tabPage2";
-            tabPage2.Padding = new Padding(4, 5, 4, 5);
-            tabPage2.Size = new System.Drawing.Size(1517, 960);
-            tabPage2.TabIndex = 1;
-            tabPage2.Text = "Orchestration";
-            tabPage2.UseVisualStyleBackColor = true;
+            tabOrchestration.Controls.Add(lvOrchestrationScanResult);
+            tabOrchestration.Controls.Add(panel4);
+            tabOrchestration.Location = new System.Drawing.Point(4, 34);
+            tabOrchestration.Margin = new Padding(4, 5, 4, 5);
+            tabOrchestration.Name = "tabPage2";
+            tabOrchestration.Padding = new Padding(4, 5, 4, 5);
+            tabOrchestration.Size = new System.Drawing.Size(1517, 960);
+            tabOrchestration.TabIndex = 1;
+            tabOrchestration.Text = "Orchestration";
+            tabOrchestration.UseVisualStyleBackColor = true;
             // 
             // lvOrchestrationScanResult
             // 
@@ -528,16 +528,16 @@ namespace AcmeScanner
             // 
             // tabCatalogProducts
             // 
-            tabPage3.Controls.Add(lvCatalog);
-            tabPage3.Controls.Add(panel5);
-            tabPage3.Location = new System.Drawing.Point(4, 34);
-            tabPage3.Margin = new Padding(4, 5, 4, 5);
-            tabPage3.Name = "tabPage3";
-            tabPage3.Padding = new Padding(4, 5, 4, 5);
-            tabPage3.Size = new System.Drawing.Size(1517, 960);
-            tabPage3.TabIndex = 2;
-            tabPage3.Text = "Catalog";
-            tabPage3.UseVisualStyleBackColor = true;
+            tabCatalogProducts.Controls.Add(lvCatalog);
+            tabCatalogProducts.Controls.Add(panel5);
+            tabCatalogProducts.Location = new System.Drawing.Point(4, 34);
+            tabCatalogProducts.Margin = new Padding(4, 5, 4, 5);
+            tabCatalogProducts.Name = "tabPage3";
+            tabCatalogProducts.Padding = new Padding(4, 5, 4, 5);
+            tabCatalogProducts.Size = new System.Drawing.Size(1517, 960);
+            tabCatalogProducts.TabIndex = 2;
+            tabCatalogProducts.Text = "Catalog";
+            tabCatalogProducts.UseVisualStyleBackColor = true;
             // 
             // lvCatalog
             // 
@@ -772,16 +772,16 @@ namespace AcmeScanner
             // 
             // tabStatus
             // 
-            tabPage4.Controls.Add(lvStatus);
-            tabPage4.Controls.Add(panel6);
-            tabPage4.Location = new System.Drawing.Point(4, 34);
-            tabPage4.Margin = new Padding(4, 5, 4, 5);
-            tabPage4.Name = "tabPage4";
-            tabPage4.Padding = new Padding(4, 5, 4, 5);
-            tabPage4.Size = new System.Drawing.Size(1517, 960);
-            tabPage4.TabIndex = 3;
-            tabPage4.Text = "Status";
-            tabPage4.UseVisualStyleBackColor = true;
+            tabStatus.Controls.Add(lvStatus);
+            tabStatus.Controls.Add(panel6);
+            tabStatus.Location = new System.Drawing.Point(4, 34);
+            tabStatus.Margin = new Padding(4, 5, 4, 5);
+            tabStatus.Name = "tabPage4";
+            tabStatus.Padding = new Padding(4, 5, 4, 5);
+            tabStatus.Size = new System.Drawing.Size(1517, 960);
+            tabStatus.TabIndex = 3;
+            tabStatus.Text = "Status";
+            tabStatus.UseVisualStyleBackColor = true;
             // 
             // lvStatus
             // 
@@ -833,16 +833,16 @@ namespace AcmeScanner
             // 
             // tabMoby
             // 
-            tabPage5.Controls.Add(scannerListView1);
-            tabPage5.Controls.Add(panel7);
-            tabPage5.Location = new System.Drawing.Point(4, 34);
-            tabPage5.Margin = new Padding(4, 5, 4, 5);
-            tabPage5.Name = "tabPage5";
-            tabPage5.Padding = new Padding(4, 5, 4, 5);
-            tabPage5.Size = new System.Drawing.Size(1517, 960);
-            tabPage5.TabIndex = 4;
-            tabPage5.Text = "Moby";
-            tabPage5.UseVisualStyleBackColor = true;
+            tabMoby.Controls.Add(scannerListView1);
+            tabMoby.Controls.Add(panel7);
+            tabMoby.Location = new System.Drawing.Point(4, 34);
+            tabMoby.Margin = new Padding(4, 5, 4, 5);
+            tabMoby.Name = "tabPage5";
+            tabMoby.Padding = new Padding(4, 5, 4, 5);
+            tabMoby.Size = new System.Drawing.Size(1517, 960);
+            tabMoby.TabIndex = 4;
+            tabMoby.Text = "Moby";
+            tabMoby.UseVisualStyleBackColor = true;
             // 
             // scannerListView1
             // 
@@ -975,20 +975,14 @@ namespace AcmeScanner
             // 
             // mobySubsetsPanel
             // 
-            mobySubsetsPanel.Controls.Add(labelTitle);
+           
             mobySubsetsPanel.Controls.Add(btnClose);
             mobySubsetsPanel.Controls.Add(listView);
             mobySubsetsPanel.Location = new Point(0, 0);
             mobySubsetsPanel.Name = "mobySubsetsPanel";
             mobySubsetsPanel.Size = new Size(200, 100);
             mobySubsetsPanel.TabIndex = 3;
-            // 
-            // labelTitle
-            // 
-            labelTitle.Location = new Point(0, 0);
-            labelTitle.Name = "labelTitle";
-            labelTitle.Size = new Size(100, 23);
-            labelTitle.TabIndex = 0;
+            
             // 
             // btnClose
             // 
@@ -1016,7 +1010,7 @@ namespace AcmeScanner
             btnViewMobySubsets.Type = MaterialSkin.Controls.MaterialButton.MaterialButtonType.Contained;
             btnViewMobySubsets.UseAccentColor = false;
             btnViewMobySubsets.UseVisualStyleBackColor = true;
-            btnViewMobySubsets.Click += btnViewMobySubsets_Click;
+            btnViewMobySubsets.Click += BtnViewMobySubsets_Click;
             // 
             // ScannerForm
             // 
