@@ -1326,6 +1326,7 @@ namespace AcmeScanner
             panel5.Visible = false;
             panel6.Visible = false;
             panel7.Visible = false;
+            
 
             // Get the dictionary of JSON file names and timestamps
             Dictionary<string, string> mobyFileTimestamps = DownloadMobySubsets.GetMobyFileTimestamps();
@@ -1366,6 +1367,7 @@ namespace AcmeScanner
             panel5.Visible = true;
             panel6.Visible = true;
             panel7.Visible = true;
+            
         }
     }
 }

@@ -1052,7 +1052,7 @@ namespace AcmeScanner
 
             // Add columns to the ListView
             listView.Columns.Add("JSON File Name", 200);
-            listView.Columns.Add("Timestamp", 200);
+            listView.Columns.Add("Timestamp (GMT 0 Time)", 200);
             mobySubsetsPanel.Controls.Add(listView);
 
             // Add the panel to the form's controls
