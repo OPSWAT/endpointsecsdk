@@ -113,10 +113,10 @@ namespace AcmeScanner
 
                     }
                 }
-                
+
             }
             UpdateCheckResults();
-            
+
         }
 
         private void runAllChecks_Completed(object sender, RunWorkerCompletedEventArgs e)
@@ -133,7 +133,7 @@ namespace AcmeScanner
             };
             checkedBoxes = new List<string>();
             hashmap = new Dictionary<string, sanityCheckSignature>();
-            
+
 
             foreach (var (checkbox, script) in checkboxScriptPairs)
             {
@@ -177,8 +177,8 @@ namespace AcmeScanner
 
         private void runSelectedChecks_Completed(object sender, RunWorkerCompletedEventArgs e)
         {
-            
-            
+
+
         }
 
         private void UpdateCheckResults()
@@ -190,13 +190,13 @@ namespace AcmeScanner
                 //sanityChecksListView.Items.Clear();
                 sanityChecksListView.Columns.Add("Signature ID", 100);
                 sanityChecksListView.Columns.Add("Name", 200);
-                
+
                 sanityChecksListView.Columns.Add("Platform", 200);
                 foreach (string checkedBox in checkedBoxes)
                 {
                     sanityChecksListView.Columns.Add(checkedBox, 200);
                 }
-                
+
                 sanityChecksListView.View = View.Details;
                 sanityChecksListView.Update();
 
@@ -217,7 +217,7 @@ namespace AcmeScanner
                         {
                             item.SubItems.Add("");
                         }
-                        
+
                     }
                     resultList.Add(item);
                 }
@@ -227,7 +227,7 @@ namespace AcmeScanner
 
 
 
-                
+
                 sanityChecksListView.Items.Clear();
                 // Add the items to the ListView
                 sanityChecksListView.Items.AddRange(resultList.ToArray());
@@ -238,7 +238,7 @@ namespace AcmeScanner
         {
             InitializeComponent();
             InitializeBackgroundWorker();
-            
+
         }
 
         private void MobySanityCheckDialog_Load(object sender, EventArgs e)
@@ -248,7 +248,7 @@ namespace AcmeScanner
 
         private void btnRunAllChecksMoby_Click(object sender, EventArgs e)
         {
-            
+
             runAllChecks.RunWorkerAsync();
         }
 
@@ -256,6 +256,10 @@ namespace AcmeScanner
         {
             runSelectedChecks.RunWorkerAsync();
         }
-        
+
+        private void sanityChecksListView_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
+        }
     }
 }

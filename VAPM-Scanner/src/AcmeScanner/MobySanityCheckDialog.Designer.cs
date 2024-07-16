@@ -136,6 +136,7 @@
             sanityChecksListView.TabIndex = 5;
             sanityChecksListView.UseCompatibleStateImageBehavior = false;
             sanityChecksListView.View = System.Windows.Forms.View.Details;
+            sanityChecksListView.SelectedIndexChanged += sanityChecksListView_SelectedIndexChanged;
             // 
             // MobySanityCheckDialog
             // 

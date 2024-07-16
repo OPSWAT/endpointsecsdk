@@ -1326,7 +1326,7 @@ namespace AcmeScanner
             panel5.Visible = false;
             panel6.Visible = false;
             panel7.Visible = false;
-            
+
 
             // Get the dictionary of JSON file names and timestamps
             Dictionary<string, string> mobyFileTimestamps = DownloadMobySubsets.GetMobyFileTimestamps();
@@ -1336,6 +1336,10 @@ namespace AcmeScanner
             if (listView != null)
             {
                 listView.Items.Clear();
+                listView.Columns.Clear();
+
+                listView.Columns.Add("JSON File Name", 200);
+                listView.Columns.Add("Timestamp (GMT 0 Time)", 200);
 
                 // Add items to the ListView
                 foreach (var entry in mobyFileTimestamps)
@@ -1367,7 +1371,12 @@ namespace AcmeScanner
             panel5.Visible = true;
             panel6.Visible = true;
             panel7.Visible = true;
-            
+
+        }
+
+        private void scannerListView1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
         }
     }
 }
