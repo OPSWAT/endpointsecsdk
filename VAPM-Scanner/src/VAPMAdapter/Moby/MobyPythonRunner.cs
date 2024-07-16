@@ -10,7 +10,7 @@ namespace VAPMAdapter.Moby
 {
     public class MobyPythonRunner
     {
-        public void RunScript(string scriptPath)
+        public static void RunScript(string scriptPath)
         {
             //this is what we need to test if it works
             // Create process info

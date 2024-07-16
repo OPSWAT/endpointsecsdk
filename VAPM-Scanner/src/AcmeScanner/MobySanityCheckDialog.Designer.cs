@@ -54,7 +54,7 @@
             btnRunAllChecksMoby.Type = MaterialSkin.Controls.MaterialButton.MaterialButtonType.Contained;
             btnRunAllChecksMoby.UseAccentColor = false;
             btnRunAllChecksMoby.UseVisualStyleBackColor = true;
-            btnRunAllChecksMoby.Click += btnRunAllChecksMoby_Click;
+            btnRunAllChecksMoby.Click += BtnRunAllChecksMoby_Click;
             // 
             // btnRunSelectedChecksMoby
             // 
@@ -74,7 +74,7 @@
             btnRunSelectedChecksMoby.Type = MaterialSkin.Controls.MaterialButton.MaterialButtonType.Contained;
             btnRunSelectedChecksMoby.UseAccentColor = false;
             btnRunSelectedChecksMoby.UseVisualStyleBackColor = true;
-            btnRunSelectedChecksMoby.Click += btnRunSelectedChecksMoby_Click;
+            btnRunSelectedChecksMoby.Click += BtnRunSelectedChecksMoby_Click;
             // 
             // materialCheckbox1
             // 

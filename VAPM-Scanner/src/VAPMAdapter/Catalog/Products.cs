@@ -35,7 +35,7 @@ namespace VAPMAdapter.Catalog
         /// Reads "products.json" as a JObject. Throws exception if unsuccessful.
         /// </summary>
         /// <returns>A JObject representing the parsed JSON content.</returns>
-        private JObject getProductJsonObject()
+        private JObject GetProductJsonObject()
         {
             JObject result;
             string jsonString = File.ReadAllText(jsonLocation);
@@ -59,11 +59,11 @@ namespace VAPMAdapter.Catalog
         /// Otherwise, the function returns null.
         /// </summary>
         /// <returns>A JObject containing product data if found under the "products" header, otherwise null.</returns>
-        private JObject getProductsListJson()
+        private JObject GetProductsListJson()
         {
             JObject result = null;
 
-            JObject productJsonObject = getProductJsonObject();
+            JObject productJsonObject = GetProductJsonObject();
             JArray oesisJson = (JArray)productJsonObject["oesis"];
 
             foreach (JObject current in oesisJson.Children<JObject>())
@@ -99,7 +99,7 @@ namespace VAPMAdapter.Catalog
 
             List<CatalogProduct> result = new List<CatalogProduct>();
 
-            JObject jsonProductList = (JObject)getProductsListJson();
+            JObject jsonProductList = (JObject)GetProductsListJson();
 
             foreach (JProperty current in jsonProductList.Properties())
             {

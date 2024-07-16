@@ -30,20 +30,20 @@ namespace AcmeScanner
         {
             runAllChecks = new BackgroundWorker();
             runAllChecks.DoWork +=
-            new DoWorkEventHandler(runAllChecks_DoWork);
+            new DoWorkEventHandler(RunAllChecks_DoWork);
             runAllChecks.RunWorkerCompleted +=
             new RunWorkerCompletedEventHandler(
-            runAllChecks_Completed);
+            RunAllChecks_Completed);
 
             runSelectedChecks = new BackgroundWorker();
             runSelectedChecks.DoWork +=
-            new DoWorkEventHandler(runSelectedChecks_DoWork);
+            new DoWorkEventHandler(RunSelectedChecks_DoWork);
             runSelectedChecks.RunWorkerCompleted +=
             new RunWorkerCompletedEventHandler(
-            runSelectedChecks_Completed);
+            RunSelectedChecks_Completed);
         }
 
-        private List<string> getAllScripts()
+        private static List<string> GetAllScripts()
         {
             string basePath = AppDomain.CurrentDomain.BaseDirectory;
             string targetPath = Path.Combine(basePath, @"..\..\..\SanityChecks");
@@ -75,9 +75,9 @@ namespace AcmeScanner
 
 
 
-        private void runAllChecks_DoWork(object sender, DoWorkEventArgs e)
+        private void RunAllChecks_DoWork(object sender, DoWorkEventArgs e)
         {
-            List<string> allScripts = getAllScripts();
+            List<string> allScripts = GetAllScripts();
             checkedBoxes = new List<string>();
             hashmap = new Dictionary<string, sanityCheckSignature>();
             foreach (var script in allScripts)
@@ -119,12 +119,12 @@ namespace AcmeScanner
 
         }
 
-        private void runAllChecks_Completed(object sender, RunWorkerCompletedEventArgs e)
+        private void RunAllChecks_Completed(object sender, RunWorkerCompletedEventArgs e)
         {
 
         }
 
-        private void runSelectedChecks_DoWork(object sender, DoWorkEventArgs e)
+        private void RunSelectedChecks_DoWork(object sender, DoWorkEventArgs e)
         {
             List<(MaterialSkin.Controls.MaterialCheckbox, string)> checkboxScriptPairs = new List<(MaterialSkin.Controls.MaterialCheckbox, string)>
             {
@@ -175,7 +175,7 @@ namespace AcmeScanner
             UpdateCheckResults();
         }
 
-        private void runSelectedChecks_Completed(object sender, RunWorkerCompletedEventArgs e)
+        private void RunSelectedChecks_Completed(object sender, RunWorkerCompletedEventArgs e)
         {
 
 
@@ -246,13 +246,13 @@ namespace AcmeScanner
 
         }
 
-        private void btnRunAllChecksMoby_Click(object sender, EventArgs e)
+        private void BtnRunAllChecksMoby_Click(object sender, EventArgs e)
         {
 
             runAllChecks.RunWorkerAsync();
         }
 
-        private void btnRunSelectedChecksMoby_Click(object sender, EventArgs e)
+        private void BtnRunSelectedChecksMoby_Click(object sender, EventArgs e)
         {
             runSelectedChecks.RunWorkerAsync();
         }

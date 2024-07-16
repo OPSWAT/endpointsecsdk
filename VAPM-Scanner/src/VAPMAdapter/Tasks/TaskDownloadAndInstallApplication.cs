@@ -28,7 +28,7 @@ namespace VAPMAdapter.Tasks
         /// </summary>
         /// <param name="installerDetails">An object containing the installer details.</param>
         /// <returns>The local file path for the installer.</returns>
-        private static string getLocalPathForInstaller(InstallerDetail installerDetails)
+        private static string GetLocalPathForInstaller(InstallerDetail installerDetails)
         {
             string result;
 

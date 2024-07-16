@@ -31,7 +31,7 @@ namespace VAPMAdapter.Tasks
             MobyPythonRunner pythonRunner = new MobyPythonRunner();
 
             // Run the script
-            pythonRunner.RunScript(scriptPath);
+            MobyPythonRunner.RunScript(scriptPath);
 
             // Read and return the contents of the produced JSON file
             if (File.Exists(jsonPath))

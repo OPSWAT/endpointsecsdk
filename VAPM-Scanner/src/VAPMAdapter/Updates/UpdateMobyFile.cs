@@ -27,7 +27,7 @@ namespace VAPMAdapter.Updates
         }
         public static void DownloadMoby()
         {
-            string destPath = VAPMSettings.getLocalCatalogDir();
+            string destPath = VAPMSettings.GetLocalCatalogDir();
             destPath = Path.Combine(destPath, "analog/server");
 
 
@@ -35,7 +35,7 @@ namespace VAPMAdapter.Updates
             DownloadDBFile(destPath, "moby.json");
         }
 
-        public static bool doesMobyExist()
+        public static bool DoesMobyExist()
         {
             // Get the current directory of the executable
             string basePath = AppDomain.CurrentDomain.BaseDirectory;

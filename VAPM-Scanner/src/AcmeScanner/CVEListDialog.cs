@@ -78,7 +78,7 @@ namespace AcmeScanner
             this.btnClose.Type = MaterialSkin.Controls.MaterialButton.MaterialButtonType.Contained;
             this.btnClose.UseAccentColor = false;
             this.btnClose.UseVisualStyleBackColor = true;
-            this.btnClose.Click += new System.EventHandler(this.btnClose_Click);
+            this.btnClose.Click += new System.EventHandler(this.BtnClose_Click);
             // 
             // btnDetails
             // 
@@ -98,7 +98,7 @@ namespace AcmeScanner
             this.btnDetails.Type = MaterialSkin.Controls.MaterialButton.MaterialButtonType.Contained;
             this.btnDetails.UseAccentColor = false;
             this.btnDetails.UseVisualStyleBackColor = true;
-            this.btnDetails.Click += new System.EventHandler(this.btnDetails_Click);
+            this.btnDetails.Click += new System.EventHandler(this.BtnDetails_Click);
             // 
             // lblApplication
             // 
@@ -133,10 +133,10 @@ namespace AcmeScanner
 
             lblApplication.Text = "Application:  " + productName;
 
-            populateList();
+            PopulateList();
         }
 
-        private void populateList()
+        private void PopulateList()
         {
             lvCVEList.Columns.Add("CVE", 150);
             lvCVEList.Columns.Add("Severity", 100);
@@ -153,12 +153,12 @@ namespace AcmeScanner
             }
         }
 
-        private void btnClose_Click(object sender, EventArgs e)
+        private void BtnClose_Click(object sender, EventArgs e)
         {
             this.Close();
         }
 
-        private void btnDetails_Click(object sender, EventArgs e)
+        private void BtnDetails_Click(object sender, EventArgs e)
         {
             StringBuilder cveJson = new StringBuilder();
 

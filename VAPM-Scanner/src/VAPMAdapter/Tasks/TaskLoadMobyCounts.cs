@@ -14,7 +14,7 @@ namespace VAPMAdapter.Tasks
         public static MobyTotalCounts LoadCounts()
         {
             Moby.Moby moby = new Moby.Moby();
-            string catalogRoot = VAPMSettings.getLocalCatalogDir();
+            string catalogRoot = VAPMSettings.GetLocalCatalogDir();
             catalogRoot = Path.Combine(catalogRoot, "analog/server");
 
             if (moby.Load(catalogRoot))

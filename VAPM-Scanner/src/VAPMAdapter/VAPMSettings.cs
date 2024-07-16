@@ -29,30 +29,30 @@ namespace VAPMAdapater
         public static string PATCH_CHECKSUMS_DB             = "ap_checksum.dat";
 
 
-        public static string getTokenDownloadURL(string fileName)
+        public static string GetTokenDownloadURL(string fileName)
         {
             string result = VCR_URL.Replace("%token%", DOWNLOAD_TOKEN);
             result = result.Replace("%file%", fileName);
             return result;
         }
 
-        public static string getSDKURL()
+        public static string GetSDKURL()
         {
             return SDK_INDEX_URL;
         }
 
-        public static string getCatalogURL()
+        public static string GetCatalogURL()
         {
-            return getTokenDownloadURL("analog.zip");    
+            return GetTokenDownloadURL("analog.zip");    
         }
 
-        public static string getStatusURL()
+        public static string GetStatusURL()
         {
-            return getTokenDownloadURL("patch_status.json");
+            return GetTokenDownloadURL("patch_status.json");
         }
 
 
-        public static string getLocalCatalogDir()
+        public static string GetLocalCatalogDir()
         {
             //
             // First delete the SDK directory if it exists
