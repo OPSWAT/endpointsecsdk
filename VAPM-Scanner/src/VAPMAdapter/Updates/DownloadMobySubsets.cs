@@ -60,7 +60,8 @@ namespace VAPMAdapter.Updates
             ("https://oesis-downloads-portal.s3.amazonaws.com/moby_public_file_sharing.json", "moby_public_file_sharing.json"),
             ("https://oesis-downloads-portal.s3.amazonaws.com/moby_encryption.json", "moby_encryption.json"),
             ("https://oesis-downloads-portal.s3.amazonaws.com/moby_data_loss_prevention.json", "moby_data_loss_prevention.json"),
-            ("https://oesis-downloads-portal.s3.amazonaws.com/moby_firewall.json", "moby_firewall.json")
+            ("https://oesis-downloads-portal.s3.amazonaws.com/moby_firewall.json", "moby_firewall.json"),
+            ("https://oesis-downloads-portal.s3.amazonaws.com/moby_certification.json", "moby_certification.json")
             };
 
             // Create a list of download tasks
@@ -159,7 +160,8 @@ namespace VAPMAdapter.Updates
             "moby_public_file_sharing.json",
             "moby_encryption.json",
             "moby_data_loss_prevention.json",
-            "moby_firewall.json"
+            "moby_firewall.json",
+            "moby_certification.json"
             };
 
             var timestamps = new Dictionary<string, string>();
