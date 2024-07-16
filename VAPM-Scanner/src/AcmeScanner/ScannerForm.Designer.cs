@@ -842,12 +842,12 @@ namespace AcmeScanner
             scannerListView1.Dock = DockStyle.Fill;
             scannerListView1.FullRowSelect = true;
             scannerListView1.GridLines = true;
-            scannerListView1.Location = new Point(3, 75);
+            scannerListView1.Location = new Point(3, 85);
             scannerListView1.Margin = new Padding(2);
             scannerListView1.MultiSelect = false;
             scannerListView1.Name = "scannerListView1";
             scannerListView1.OwnerDraw = true;
-            scannerListView1.Size = new Size(1052, 492);
+            scannerListView1.Size = new Size(1052, 482);
             scannerListView1.TabIndex = 1;
             scannerListView1.UseCompatibleStateImageBehavior = false;
             scannerListView1.View = View.Details;
@@ -865,7 +865,7 @@ namespace AcmeScanner
             panel7.Location = new Point(3, 3);
             panel7.Margin = new Padding(2);
             panel7.Name = "panel7";
-            panel7.Size = new Size(1052, 72);
+            panel7.Size = new Size(1052, 82);
             panel7.TabIndex = 0;
             // 
             // btnViewMobySubsets
@@ -875,7 +875,7 @@ namespace AcmeScanner
             btnViewMobySubsets.Depth = 0;
             btnViewMobySubsets.HighEmphasis = true;
             btnViewMobySubsets.Icon = null;
-            btnViewMobySubsets.Location = new Point(387, 21);
+            btnViewMobySubsets.Location = new Point(366, 21);
             btnViewMobySubsets.Margin = new Padding(3, 4, 3, 4);
             btnViewMobySubsets.MouseState = MaterialSkin.MouseState.HOVER;
             btnViewMobySubsets.Name = "btnViewMobySubsets";
@@ -895,7 +895,7 @@ namespace AcmeScanner
             btnRunChecksMoby.Depth = 0;
             btnRunChecksMoby.HighEmphasis = true;
             btnRunChecksMoby.Icon = null;
-            btnRunChecksMoby.Location = new Point(508, 21);
+            btnRunChecksMoby.Location = new Point(518, 21);
             btnRunChecksMoby.Margin = new Padding(3, 4, 3, 4);
             btnRunChecksMoby.MouseState = MaterialSkin.MouseState.HOVER;
             btnRunChecksMoby.Name = "btnRunChecksMoby";
