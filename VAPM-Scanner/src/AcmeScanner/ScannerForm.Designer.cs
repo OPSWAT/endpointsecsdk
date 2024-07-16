@@ -1028,25 +1028,17 @@ namespace AcmeScanner
                 Visible = false  // Initially hidden
             };
 
-            // Add labels or any controls you need
-            Label labelTitle = new Label
-            {
-                Text = "Moby Subsets",
-                Dock = DockStyle.Top,
-                Font = new Font("Arial", 14, FontStyle.Bold)
-            };
-            mobySubsetsPanel.Controls.Add(labelTitle);
-
             // Close Button
             Button btnClose = new Button
             {
                 Text = "Close",
                 Size = new Size(75, 30),  // Set a specific size for the button
-                Dock = DockStyle.Top,  // Keep it at the top of the panel
+                Dock = DockStyle.Bottom,  // Keep it at the top of the panel
                 Margin = new Padding(5)
             };
             btnClose.Click += BtnMobysubsetClose_Click;  // Event handler for closing the panel
             mobySubsetsPanel.Controls.Add(btnClose);
+            
 
             // You can add a ListView or any other controls here
             ListView listView = new ListView
