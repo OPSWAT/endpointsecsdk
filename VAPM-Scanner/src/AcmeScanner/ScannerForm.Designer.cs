@@ -132,9 +132,9 @@ namespace AcmeScanner
             panel1.Controls.Add(btnScan);
             panel1.Dock = DockStyle.Top;
             panel1.Location = new Point(3, 3);
-            panel1.Margin = new Padding(15);
+            panel1.Margin = new Padding(15, 15, 15, 15);
             panel1.Name = "panel1";
-            panel1.Padding = new Padding(15);
+            panel1.Padding = new Padding(15, 15, 15, 15);
             panel1.Size = new Size(1052, 77);
             panel1.TabIndex = 1;
             // 
@@ -297,9 +297,9 @@ namespace AcmeScanner
             panel3.Controls.Add(panel2);
             panel3.Dock = DockStyle.Fill;
             panel3.Location = new Point(0, 0);
-            panel3.Margin = new Padding(15);
+            panel3.Margin = new Padding(15, 15, 15, 15);
             panel3.Name = "panel3";
-            panel3.Padding = new Padding(15);
+            panel3.Padding = new Padding(15, 15, 15, 15);
             panel3.Size = new Size(1098, 630);
             panel3.TabIndex = 2;
             // 
@@ -346,7 +346,7 @@ namespace AcmeScanner
             tabPage1.Controls.Add(panel1);
             tabPage1.Location = new Point(4, 24);
             tabPage1.Name = "tabPage1";
-            tabPage1.Padding = new Padding(3);
+            tabPage1.Padding = new Padding(3, 3, 3, 3);
             tabPage1.Size = new Size(1058, 570);
             tabPage1.TabIndex = 0;
             tabPage1.Text = "Offline";
@@ -373,8 +373,8 @@ namespace AcmeScanner
             tabPage2.Controls.Add(panel4);
             tabPage2.Location = new Point(4, 24);
             tabPage2.Name = "tabPage2";
-            tabPage2.Padding = new Padding(3);
-            tabPage2.Size = new Size(1058, 570);
+            tabPage2.Padding = new Padding(3, 3, 3, 3);
+            tabPage2.Size = new Size(1060, 571);
             tabPage2.TabIndex = 1;
             tabPage2.Text = "Orchestration";
             tabPage2.UseVisualStyleBackColor = true;
@@ -388,7 +388,7 @@ namespace AcmeScanner
             lvOrchestrationScanResult.MultiSelect = false;
             lvOrchestrationScanResult.Name = "lvOrchestrationScanResult";
             lvOrchestrationScanResult.OwnerDraw = true;
-            lvOrchestrationScanResult.Size = new Size(1052, 487);
+            lvOrchestrationScanResult.Size = new Size(1054, 488);
             lvOrchestrationScanResult.TabIndex = 4;
             lvOrchestrationScanResult.UseCompatibleStateImageBehavior = false;
             lvOrchestrationScanResult.View = View.Details;
@@ -407,10 +407,10 @@ namespace AcmeScanner
             panel4.Controls.Add(btnScanOrchestration);
             panel4.Dock = DockStyle.Top;
             panel4.Location = new Point(3, 3);
-            panel4.Margin = new Padding(15);
+            panel4.Margin = new Padding(15, 15, 15, 15);
             panel4.Name = "panel4";
-            panel4.Padding = new Padding(15);
-            panel4.Size = new Size(1052, 77);
+            panel4.Padding = new Padding(15, 15, 15, 15);
+            panel4.Size = new Size(1054, 77);
             panel4.TabIndex = 3;
             // 
             // label15
@@ -539,8 +539,8 @@ namespace AcmeScanner
             tabPage3.Controls.Add(panel5);
             tabPage3.Location = new Point(4, 24);
             tabPage3.Name = "tabPage3";
-            tabPage3.Padding = new Padding(3);
-            tabPage3.Size = new Size(1058, 570);
+            tabPage3.Padding = new Padding(3, 3, 3, 3);
+            tabPage3.Size = new Size(1060, 571);
             tabPage3.TabIndex = 2;
             tabPage3.Text = "Catalog";
             tabPage3.UseVisualStyleBackColor = true;
@@ -554,7 +554,7 @@ namespace AcmeScanner
             lvCatalog.MultiSelect = false;
             lvCatalog.Name = "lvCatalog";
             lvCatalog.OwnerDraw = true;
-            lvCatalog.Size = new Size(1052, 487);
+            lvCatalog.Size = new Size(1054, 488);
             lvCatalog.TabIndex = 6;
             lvCatalog.UseCompatibleStateImageBehavior = false;
             lvCatalog.View = View.Details;
@@ -576,10 +576,10 @@ namespace AcmeScanner
             panel5.Controls.Add(mbLoad);
             panel5.Dock = DockStyle.Top;
             panel5.Location = new Point(3, 3);
-            panel5.Margin = new Padding(15);
+            panel5.Margin = new Padding(15, 15, 15, 15);
             panel5.Name = "panel5";
-            panel5.Padding = new Padding(15);
-            panel5.Size = new Size(1052, 77);
+            panel5.Padding = new Padding(15, 15, 15, 15);
+            panel5.Size = new Size(1054, 77);
             panel5.TabIndex = 5;
             // 
             // btnDomainCSV
@@ -775,7 +775,7 @@ namespace AcmeScanner
             tabPage4.Controls.Add(panel6);
             tabPage4.Location = new Point(4, 24);
             tabPage4.Name = "tabPage4";
-            tabPage4.Padding = new Padding(3);
+            tabPage4.Padding = new Padding(3, 3, 3, 3);
             tabPage4.Size = new Size(1058, 570);
             tabPage4.TabIndex = 3;
             tabPage4.Text = "Status";
@@ -801,9 +801,9 @@ namespace AcmeScanner
             panel6.Controls.Add(btnRefreshStatus);
             panel6.Dock = DockStyle.Top;
             panel6.Location = new Point(3, 3);
-            panel6.Margin = new Padding(15);
+            panel6.Margin = new Padding(15, 15, 15, 15);
             panel6.Name = "panel6";
-            panel6.Padding = new Padding(15);
+            panel6.Padding = new Padding(15, 15, 15, 15);
             panel6.Size = new Size(1052, 77);
             panel6.TabIndex = 5;
             // 
@@ -834,7 +834,7 @@ namespace AcmeScanner
             tabPage5.Controls.Add(panel7);
             tabPage5.Location = new Point(4, 24);
             tabPage5.Name = "tabPage5";
-            tabPage5.Padding = new Padding(3);
+            tabPage5.Padding = new Padding(3, 3, 3, 3);
             tabPage5.Size = new Size(1058, 570);
             tabPage5.TabIndex = 4;
             tabPage5.Text = "Moby";
@@ -845,12 +845,12 @@ namespace AcmeScanner
             scannerListView1.Dock = DockStyle.Fill;
             scannerListView1.FullRowSelect = true;
             scannerListView1.GridLines = true;
-            scannerListView1.Location = new Point(3, 86);
+            scannerListView1.Location = new Point(3, 80);
             scannerListView1.Margin = new Padding(1);
             scannerListView1.MultiSelect = false;
             scannerListView1.Name = "scannerListView1";
             scannerListView1.OwnerDraw = true;
-            scannerListView1.Size = new Size(1052, 481);
+            scannerListView1.Size = new Size(1052, 487);
             scannerListView1.TabIndex = 1;
             scannerListView1.UseCompatibleStateImageBehavior = false;
             scannerListView1.View = View.Details;
@@ -868,9 +868,9 @@ namespace AcmeScanner
             panel7.Controls.Add(btnLoadMoby);
             panel7.Dock = DockStyle.Top;
             panel7.Location = new Point(3, 3);
-            panel7.Margin = new Padding(2);
+            panel7.Margin = new Padding(2, 2, 2, 2);
             panel7.Name = "panel7";
-            panel7.Size = new Size(1052, 83);
+            panel7.Size = new Size(1052, 77);
             panel7.TabIndex = 0;
             // 
             // mobyTimestampData
@@ -900,11 +900,11 @@ namespace AcmeScanner
             btnViewMobySubsets.HighEmphasis = true;
             btnViewMobySubsets.Icon = null;
             btnViewMobySubsets.Location = new Point(352, 21);
-            btnViewMobySubsets.Margin = new Padding(2);
+            btnViewMobySubsets.Margin = new Padding(3, 4, 3, 4);
             btnViewMobySubsets.MouseState = MaterialSkin.MouseState.HOVER;
             btnViewMobySubsets.Name = "btnViewMobySubsets";
             btnViewMobySubsets.NoAccentTextColor = Color.Empty;
-            btnViewMobySubsets.Size = new Size(123, 36);
+            btnViewMobySubsets.Size = new Size(121, 36);
             btnViewMobySubsets.TabIndex = 6;
             btnViewMobySubsets.Text = "View Subsets";
             btnViewMobySubsets.Type = MaterialSkin.Controls.MaterialButton.MaterialButtonType.Contained;
@@ -920,11 +920,11 @@ namespace AcmeScanner
             btnRunChecksMoby.HighEmphasis = true;
             btnRunChecksMoby.Icon = null;
             btnRunChecksMoby.Location = new Point(479, 21);
-            btnRunChecksMoby.Margin = new Padding(2);
+            btnRunChecksMoby.Margin = new Padding(3, 4, 3, 4);
             btnRunChecksMoby.MouseState = MaterialSkin.MouseState.HOVER;
             btnRunChecksMoby.Name = "btnRunChecksMoby";
             btnRunChecksMoby.NoAccentTextColor = Color.Empty;
-            btnRunChecksMoby.Size = new Size(111, 36);
+            btnRunChecksMoby.Size = new Size(109, 36);
             btnRunChecksMoby.TabIndex = 5;
             btnRunChecksMoby.Text = "Run checks";
             btnRunChecksMoby.Type = MaterialSkin.Controls.MaterialButton.MaterialButtonType.Contained;
@@ -940,11 +940,11 @@ namespace AcmeScanner
             btnUpdateMoby.HighEmphasis = true;
             btnUpdateMoby.Icon = null;
             btnUpdateMoby.Location = new Point(908, 21);
-            btnUpdateMoby.Margin = new Padding(2);
+            btnUpdateMoby.Margin = new Padding(3, 4, 3, 4);
             btnUpdateMoby.MouseState = MaterialSkin.MouseState.HOVER;
             btnUpdateMoby.Name = "btnUpdateMoby";
             btnUpdateMoby.NoAccentTextColor = Color.Empty;
-            btnUpdateMoby.Size = new Size(122, 36);
+            btnUpdateMoby.Size = new Size(120, 36);
             btnUpdateMoby.TabIndex = 4;
             btnUpdateMoby.Text = "update moby";
             btnUpdateMoby.Type = MaterialSkin.Controls.MaterialButton.MaterialButtonType.Contained;
@@ -960,11 +960,11 @@ namespace AcmeScanner
             btnMobyViewTotals.HighEmphasis = true;
             btnMobyViewTotals.Icon = null;
             btnMobyViewTotals.Location = new Point(594, 21);
-            btnMobyViewTotals.Margin = new Padding(2);
+            btnMobyViewTotals.Margin = new Padding(3, 4, 3, 4);
             btnMobyViewTotals.MouseState = MaterialSkin.MouseState.HOVER;
             btnMobyViewTotals.Name = "btnMobyViewTotals";
             btnMobyViewTotals.NoAccentTextColor = Color.Empty;
-            btnMobyViewTotals.Size = new Size(167, 36);
+            btnMobyViewTotals.Size = new Size(165, 36);
             btnMobyViewTotals.TabIndex = 3;
             btnMobyViewTotals.Text = "view total counts";
             btnMobyViewTotals.Type = MaterialSkin.Controls.MaterialButton.MaterialButtonType.Contained;
@@ -980,11 +980,11 @@ namespace AcmeScanner
             btnViewJson.HighEmphasis = true;
             btnViewJson.Icon = null;
             btnViewJson.Location = new Point(804, 21);
-            btnViewJson.Margin = new Padding(2);
+            btnViewJson.Margin = new Padding(3, 4, 3, 4);
             btnViewJson.MouseState = MaterialSkin.MouseState.HOVER;
             btnViewJson.Name = "btnViewJson";
             btnViewJson.NoAccentTextColor = Color.Empty;
-            btnViewJson.Size = new Size(98, 36);
+            btnViewJson.Size = new Size(96, 36);
             btnViewJson.TabIndex = 2;
             btnViewJson.Text = "View JSON";
             btnViewJson.Type = MaterialSkin.Controls.MaterialButton.MaterialButtonType.Contained;
@@ -1004,7 +1004,7 @@ namespace AcmeScanner
             btnLoadMoby.MouseState = MaterialSkin.MouseState.HOVER;
             btnLoadMoby.Name = "btnLoadMoby";
             btnLoadMoby.NoAccentTextColor = Color.Empty;
-            btnLoadMoby.Size = new Size(104, 36);
+            btnLoadMoby.Size = new Size(102, 36);
             btnLoadMoby.TabIndex = 0;
             btnLoadMoby.Text = "Load Moby";
             btnLoadMoby.Type = MaterialSkin.Controls.MaterialButton.MaterialButtonType.Contained;
@@ -1020,7 +1020,7 @@ namespace AcmeScanner
             mobySubsetsPanel.Controls.Add(MobySubsetsLabel);
             mobySubsetsPanel.Dock = DockStyle.Fill;
             mobySubsetsPanel.Location = new Point(0, 0);
-            mobySubsetsPanel.Margin = new Padding(2);
+            mobySubsetsPanel.Margin = new Padding(2, 2, 2, 2);
             mobySubsetsPanel.Name = "mobySubsetsPanel";
             mobySubsetsPanel.Size = new Size(1098, 630);
             mobySubsetsPanel.TabIndex = 4;
@@ -1030,7 +1030,7 @@ namespace AcmeScanner
             listView.FullRowSelect = true;
             listView.GridLines = true;
             listView.Location = new Point(10, 50);
-            listView.Margin = new Padding(2);
+            listView.Margin = new Padding(2, 2, 2, 2);
             listView.Name = "listView";
             listView.Size = new Size(1098, 630);
             listView.TabIndex = 1;
@@ -1041,7 +1041,7 @@ namespace AcmeScanner
             // btnClose
             // 
             btnClose.Location = new Point(901, 10);
-            btnClose.Margin = new Padding(2);
+            btnClose.Margin = new Padding(2, 2, 2, 2);
             btnClose.Name = "btnClose";
             btnClose.Size = new Size(100, 30);
             btnClose.TabIndex = 0;
@@ -1052,7 +1052,8 @@ namespace AcmeScanner
             // 
             MobySubsetsLabel.AutoSize = true;
             MobySubsetsLabel.Font = new Font("Arial", 12F, FontStyle.Bold, GraphicsUnit.Point);
-            MobySubsetsLabel.Location = new Point(10, 10);
+            MobySubsetsLabel.Location = new Point(7, 6);
+            MobySubsetsLabel.Margin = new Padding(2, 0, 2, 0);
             MobySubsetsLabel.Name = "MobySubsetsLabel";
             MobySubsetsLabel.Size = new Size(353, 19);
             MobySubsetsLabel.TabIndex = 2;
