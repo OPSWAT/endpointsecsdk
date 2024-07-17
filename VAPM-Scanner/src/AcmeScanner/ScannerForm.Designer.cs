@@ -881,7 +881,6 @@ namespace AcmeScanner
             mobyTimestampData.Name = "mobyTimestampData";
             mobyTimestampData.Size = new Size(0, 15);
             mobyTimestampData.TabIndex = 8;
-            mobyTimestampData.Click += label17_Click;
             // 
             // mobyTimestamp
             // 
@@ -892,7 +891,6 @@ namespace AcmeScanner
             mobyTimestamp.Size = new Size(69, 15);
             mobyTimestamp.TabIndex = 7;
             mobyTimestamp.Text = "Timestamp:";
-            mobyTimestamp.Click += mobyTimestamp_Click;
             // 
             // btnViewMobySubsets
             // 
