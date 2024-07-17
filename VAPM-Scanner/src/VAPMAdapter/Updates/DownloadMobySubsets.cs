@@ -75,6 +75,7 @@ namespace VAPMAdapter.Updates
             await Task.WhenAll(downloadTasks);
         }
 
+        //could utalize get timestamp method from updateMoby class
         public static Dictionary<string, string> GetMobyFileTimestamps()
         {
             // Filenames for all JSON files
