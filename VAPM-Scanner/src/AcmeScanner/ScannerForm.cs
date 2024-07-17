@@ -632,11 +632,11 @@ namespace AcmeScanner
             int installCount = 0;
 
             // Ensure sigIds is populated
-            if (sigIds == null || sigIds.Count == 0)
+            /*if (sigIds == null || sigIds.Count == 0)
             {
                 staticScanResults = TaskScanAll.Scan(false);
                 sigIds = GetScanResults();
-            }
+            }*/
 
             await Task.Run(() =>
             {
@@ -655,7 +655,7 @@ namespace AcmeScanner
                             Text = signature.Name,
                             Tag = signature.Id
                         };
-                        lviCurrent.SubItems.Add(sigIds.Contains(signature.Id) ? "Yes" : "No");
+                        //lviCurrent.SubItems.Add(sigIds.Contains(signature.Id) ? "Yes" : "No");
                         lviCurrent.SubItems.Add(signature.Id);
                         lviCurrent.SubItems.Add(signature.CVECount.ToString());
                         lviCurrent.SubItems.Add(supportsPatch ? "Yes" : "");
@@ -1320,6 +1320,27 @@ namespace AcmeScanner
         {
             Debug.WriteLine("called button funciton");
 
+        }
+
+        public static string ProductInfoForSignatureId(string sigId)
+        {
+            int i = 0;
+            foreach (CatalogProduct prod in staticProductList)
+            {
+                foreach (CatalogSignature sig in prod.SigList)
+                {
+                    if (sig.Id == sigId)
+                    {
+                        break;
+                    }
+                }
+                Debug.WriteLine(i);
+                i += 1;
+            }
+            
+            CatalogProduct finalProduct = staticProductList[i];
+            string json = JsonConvert.SerializeObject(finalProduct, Formatting.Indented);
+            return json;
         }
 
         //need to rework this panel
