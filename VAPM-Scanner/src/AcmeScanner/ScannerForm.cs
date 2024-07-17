@@ -1381,18 +1381,18 @@ namespace AcmeScanner
 
         }
 
-        private void ListView_ItemActivate(object sender, EventArgs e)
+        private void ListView_ItemActivateMobySubsetTable(object sender, EventArgs e)
         {
             ListView listView = sender as ListView;
             if (listView != null && listView.SelectedItems.Count > 0)
             {
                 string fileName = listView.SelectedItems[0].Text;
-                ShowJsonContent(fileName);
+                ShowJsonContentMobySubset(fileName);
             }
         }
 
         // Method to show JSON content in a text dialog
-        private void ShowJsonContent(string filename)
+        private void ShowJsonContentMobySubset(string filename)
         {
             string jsonContent = DownloadMobySubsets.GetJsonContent(filename);
             ViewMobyJsonDialog textDialog = new ViewMobyJsonDialog(jsonContent);

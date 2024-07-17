@@ -1038,7 +1038,7 @@ namespace AcmeScanner
             listView.TabIndex = 1;
             listView.UseCompatibleStateImageBehavior = false;
             listView.View = View.Details;
-            listView.ItemActivate += ListView_ItemActivate;
+            listView.ItemActivate += ListView_ItemActivateMobySubsetTable;
             // 
             // btnClose
             // 
