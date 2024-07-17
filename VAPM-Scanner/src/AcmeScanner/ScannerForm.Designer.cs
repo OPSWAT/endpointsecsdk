@@ -98,6 +98,7 @@ namespace AcmeScanner
             mobySubsetsPanel = new Panel();
             listView = new ListView();
             btnClose = new Button();
+            MobySubsetsLabel = new Label();
             panel1.SuspendLayout();
             panel3.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)pbLoading).BeginInit();
@@ -844,12 +845,12 @@ namespace AcmeScanner
             scannerListView1.Dock = DockStyle.Fill;
             scannerListView1.FullRowSelect = true;
             scannerListView1.GridLines = true;
-            scannerListView1.Location = new Point(3, 80);
+            scannerListView1.Location = new Point(3, 86);
             scannerListView1.Margin = new Padding(1);
             scannerListView1.MultiSelect = false;
             scannerListView1.Name = "scannerListView1";
             scannerListView1.OwnerDraw = true;
-            scannerListView1.Size = new Size(1052, 487);
+            scannerListView1.Size = new Size(1052, 481);
             scannerListView1.TabIndex = 1;
             scannerListView1.UseCompatibleStateImageBehavior = false;
             scannerListView1.View = View.Details;
@@ -869,7 +870,7 @@ namespace AcmeScanner
             panel7.Location = new Point(3, 3);
             panel7.Margin = new Padding(2);
             panel7.Name = "panel7";
-            panel7.Size = new Size(1052, 77);
+            panel7.Size = new Size(1052, 83);
             panel7.TabIndex = 0;
             // 
             // mobyTimestampData
@@ -1016,6 +1017,7 @@ namespace AcmeScanner
             mobySubsetsPanel.BorderStyle = BorderStyle.FixedSingle;
             mobySubsetsPanel.Controls.Add(listView);
             mobySubsetsPanel.Controls.Add(btnClose);
+            mobySubsetsPanel.Controls.Add(MobySubsetsLabel);
             mobySubsetsPanel.Dock = DockStyle.Fill;
             mobySubsetsPanel.Location = new Point(0, 0);
             mobySubsetsPanel.Margin = new Padding(2);
@@ -1046,6 +1048,16 @@ namespace AcmeScanner
             btnClose.Text = "Close";
             btnClose.Click += BtnMobysubsetClose_Click;
             // 
+            // MobySubsetsLabel
+            // 
+            MobySubsetsLabel.AutoSize = true;
+            MobySubsetsLabel.Font = new Font("Arial", 12F, FontStyle.Bold, GraphicsUnit.Point);
+            MobySubsetsLabel.Location = new Point(10, 10);
+            MobySubsetsLabel.Name = "MobySubsetsLabel";
+            MobySubsetsLabel.Size = new Size(353, 19);
+            MobySubsetsLabel.TabIndex = 2;
+            MobySubsetsLabel.Text = "Double-click a JSON name to view its content";
+            // 
             // ScannerForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -1075,6 +1087,7 @@ namespace AcmeScanner
             panel7.ResumeLayout(false);
             panel7.PerformLayout();
             mobySubsetsPanel.ResumeLayout(false);
+            mobySubsetsPanel.PerformLayout();
             ResumeLayout(false);
         }
 
@@ -1146,5 +1159,6 @@ namespace AcmeScanner
         private ListView listView;
         private Label mobyTimestampData;
         private Label mobyTimestamp;
+        private Label MobySubsetsLabel;
     }
 }
