@@ -19,6 +19,9 @@
     <Compile Update="ScannerListView.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Update="testDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Update="TextDialog.cs">
       <SubType>Form</SubType>
     </Compile>

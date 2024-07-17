@@ -15,7 +15,7 @@ namespace VAPMAdapter.Tasks
         public static JObject Execute(string pythonScript)
         {
             string basePath = AppDomain.CurrentDomain.BaseDirectory;
-            string targetPath = Path.Combine(basePath, @"..\..\..\SanityChecks");
+            string targetPath = Path.Combine(basePath, @"SanityChecks");
             string fullPath = Path.GetFullPath(targetPath);    
             // Append the script name to the base path for the script
             string scriptPath = Path.Combine(fullPath, pythonScript + ".py");
