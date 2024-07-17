@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Newtonsoft.Json.Linq;
 using VAPMAdapater;
 using VAPMAdapater.Updates;
 
@@ -49,6 +50,34 @@ namespace VAPMAdapter.Updates
 
             // Check if the file exists at the specified path
             return File.Exists(fullPath);
+        }
+
+        public static string GetMobyTimestamp()
+        {
+            try
+            {
+                if(!DoesMobyExist())
+                {
+                    return "";
+                }
+
+                // Read the JSON file
+                string jsonData = File.ReadAllText(@"catalog\analog\server\moby.json");
+
+                // Parse the JSON data
+                JObject jsonObject = JObject.Parse(jsonData);
+
+                // Get the timestamp value
+                string timestamp = (string)jsonObject["timestamp"];
+
+                return timestamp;
+            }
+            catch (Exception ex)
+            {
+                // Handle any exceptions that occur
+                Console.WriteLine("An error occurred: " + ex.Message);
+                return null;
+            }
         }
     }
 }

@@ -64,6 +64,7 @@ namespace AcmeScanner
             CheckLicenseFiles();
             UpdateFilesOnStartup();
             FillSDKlabels();
+            FillMobyLabels();
             SetTitleWithFileVersion();
         }
 
@@ -73,6 +74,11 @@ namespace AcmeScanner
             var fileVersionInfo = FileVersionInfo.GetVersionInfo(exePath);
             string fileVersion = fileVersionInfo.FileVersion;
             this.Text = $"AcmeScanner - Version {fileVersion}";
+        }
+
+        private void FillMobyLabels()
+        {
+            mobyTimestampData.Text = UpdateMobyFile.GetMobyTimestamp();
         }
 
         private void FillSDKlabels()
