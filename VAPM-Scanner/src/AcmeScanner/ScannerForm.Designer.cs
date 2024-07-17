@@ -851,7 +851,6 @@ namespace AcmeScanner
             scannerListView1.TabIndex = 1;
             scannerListView1.UseCompatibleStateImageBehavior = false;
             scannerListView1.View = View.Details;
-            scannerListView1.SelectedIndexChanged += scannerListView1_SelectedIndexChanged;
             // 
             // panel7
             // 
@@ -1011,6 +1010,7 @@ namespace AcmeScanner
             listView.TabIndex = 1;
             listView.UseCompatibleStateImageBehavior = false;
             listView.View = View.Details;
+            listView.ItemActivate += ListView_ItemActivate;
             // 
             // btnClose
             // 

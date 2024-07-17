@@ -31,6 +31,7 @@ using VAPMAdapter.Moby;
 using Newtonsoft.Json;
 using System.Security.Cryptography.Xml;
 using System.Globalization;
+using System.Net.Http.Json;
 
 
 namespace AcmeScanner
@@ -1374,9 +1375,23 @@ namespace AcmeScanner
 
         }
 
-        private void scannerListView1_SelectedIndexChanged(object sender, EventArgs e)
+        private void ListView_ItemActivate(object sender, EventArgs e)
         {
+            ListView listView = sender as ListView;
+            if (listView != null && listView.SelectedItems.Count > 0)
+            {
+                string fileName = listView.SelectedItems[0].Text;
+                ShowJsonContent(fileName);
+            }
+        }
 
+        // Method to show JSON content in a text dialog
+        private void ShowJsonContent(string filename)
+        {
+            string jsonContent = DownloadMobySubsets.GetJsonContent(filename);
+            ViewMobyJsonDialog textDialog = new ViewMobyJsonDialog(jsonContent);
+            textDialog.StartPosition = FormStartPosition.CenterParent;
+            textDialog.ShowDialog();
         }
     }
 }

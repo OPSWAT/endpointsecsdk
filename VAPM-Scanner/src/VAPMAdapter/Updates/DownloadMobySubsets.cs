@@ -129,5 +129,34 @@ namespace VAPMAdapter.Updates
 
             return timestamps;
         }
+
+        public static string GetJsonContent(string fileName)
+        {
+            // Get the current directory
+            string currentDirectory = AppDomain.CurrentDomain.BaseDirectory;
+
+            // Construct the base directory based on the current environment
+            string baseDirectory = Path.Combine(currentDirectory, @"catalog\analog\server");
+
+            // Search for the file in the base directory and its subdirectories
+            string[] files = Directory.GetFiles(baseDirectory, fileName, SearchOption.AllDirectories);
+
+            if (files.Length > 0)
+            {
+                // Read the JSON content from the file
+                string jsonContent = File.ReadAllText(files[0]);
+
+                // Parse the JSON content into a JObject
+                JObject jsonObject = JObject.Parse(jsonContent);
+
+                // Return the formatted JSON string
+                return jsonObject.ToString(Newtonsoft.Json.Formatting.Indented);
+            }
+            else
+            {
+                // Handle the case where the file is not found
+                throw new FileNotFoundException($"Could not find file '{fileName}' in directory '{baseDirectory}' and its subdirectories.");
+            }
+        }
     }
 }
