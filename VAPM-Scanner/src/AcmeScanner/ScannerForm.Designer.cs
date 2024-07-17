@@ -86,6 +86,8 @@ namespace AcmeScanner
             tabPage5 = new TabPage();
             scannerListView1 = new ScannerListView();
             panel7 = new Panel();
+            mobyTimestampData = new Label();
+            mobyTimestamp = new Label();
             btnViewMobySubsets = new MaterialSkin.Controls.MaterialButton();
             btnRunChecksMoby = new MaterialSkin.Controls.MaterialButton();
             btnUpdateMoby = new MaterialSkin.Controls.MaterialButton();
@@ -215,8 +217,8 @@ namespace AcmeScanner
             btnInstall.Depth = 0;
             btnInstall.HighEmphasis = true;
             btnInstall.Icon = null;
-            btnInstall.Location = new Point(1159, 33);
-            btnInstall.Margin = new Padding(6, 10, 6, 10);
+            btnInstall.Location = new Point(811, 21);
+            btnInstall.Margin = new Padding(4, 6, 4, 6);
             btnInstall.MouseState = MaterialSkin.MouseState.HOVER;
             btnInstall.Name = "btnInstall";
             btnInstall.NoAccentTextColor = Color.Empty;
@@ -471,8 +473,8 @@ namespace AcmeScanner
             btnUpdateSDK.Depth = 0;
             btnUpdateSDK.HighEmphasis = true;
             btnUpdateSDK.Icon = null;
-            btnUpdateSDK.Location = new Point(1321, 35);
-            btnUpdateSDK.Margin = new Padding(6, 10, 6, 10);
+            btnUpdateSDK.Location = new Point(925, 20);
+            btnUpdateSDK.Margin = new Padding(4, 6, 4, 6);
             btnUpdateSDK.MouseState = MaterialSkin.MouseState.HOVER;
             btnUpdateSDK.Name = "btnUpdateSDK";
             btnUpdateSDK.NoAccentTextColor = Color.Empty;
@@ -585,8 +587,8 @@ namespace AcmeScanner
             btnDomainCSV.Depth = 0;
             btnDomainCSV.HighEmphasis = true;
             btnDomainCSV.Icon = null;
-            btnDomainCSV.Location = new Point(654, 35);
-            btnDomainCSV.Margin = new Padding(6, 10, 6, 10);
+            btnDomainCSV.Location = new Point(453, 20);
+            btnDomainCSV.Margin = new Padding(4, 6, 4, 6);
             btnDomainCSV.MouseState = MaterialSkin.MouseState.HOVER;
             btnDomainCSV.Name = "btnDomainCSV";
             btnDomainCSV.NoAccentTextColor = Color.Empty;
@@ -607,8 +609,8 @@ namespace AcmeScanner
             btnFreshInstall.Depth = 0;
             btnFreshInstall.HighEmphasis = true;
             btnFreshInstall.Icon = null;
-            btnFreshInstall.Location = new Point(991, 35);
-            btnFreshInstall.Margin = new Padding(6, 10, 6, 10);
+            btnFreshInstall.Location = new Point(689, 20);
+            btnFreshInstall.Margin = new Padding(4, 6, 4, 6);
             btnFreshInstall.MouseState = MaterialSkin.MouseState.HOVER;
             btnFreshInstall.Name = "btnFreshInstall";
             btnFreshInstall.NoAccentTextColor = Color.Empty;
@@ -628,12 +630,12 @@ namespace AcmeScanner
             btnExportCSV.Depth = 0;
             btnExportCSV.HighEmphasis = true;
             btnExportCSV.Icon = null;
-            btnExportCSV.Location = new Point(1329, 35);
-            btnExportCSV.Margin = new Padding(6, 10, 6, 10);
+            btnExportCSV.Location = new Point(925, 20);
+            btnExportCSV.Margin = new Padding(4, 6, 4, 6);
             btnExportCSV.MouseState = MaterialSkin.MouseState.HOVER;
             btnExportCSV.Name = "btnExportCSV";
             btnExportCSV.NoAccentTextColor = Color.Empty;
-            btnExportCSV.Size = new Size(157, 60);
+            btnExportCSV.Size = new Size(106, 36);
             btnExportCSV.TabIndex = 11;
             btnExportCSV.Text = "Export CSV";
             btnExportCSV.Type = MaterialSkin.Controls.MaterialButton.MaterialButtonType.Contained;
@@ -693,8 +695,8 @@ namespace AcmeScanner
             btnLookupCVE.Depth = 0;
             btnLookupCVE.HighEmphasis = true;
             btnLookupCVE.Icon = null;
-            btnLookupCVE.Location = new Point(823, 35);
-            btnLookupCVE.Margin = new Padding(6, 10, 6, 10);
+            btnLookupCVE.Location = new Point(571, 20);
+            btnLookupCVE.Margin = new Padding(4, 6, 4, 6);
             btnLookupCVE.MouseState = MaterialSkin.MouseState.HOVER;
             btnLookupCVE.Name = "btnLookupCVE";
             btnLookupCVE.NoAccentTextColor = Color.Empty;
@@ -736,8 +738,8 @@ namespace AcmeScanner
             btnListCatalogCVE.Depth = 0;
             btnListCatalogCVE.HighEmphasis = true;
             btnListCatalogCVE.Icon = null;
-            btnListCatalogCVE.Location = new Point(1160, 35);
-            btnListCatalogCVE.Margin = new Padding(6, 10, 6, 10);
+            btnListCatalogCVE.Location = new Point(807, 20);
+            btnListCatalogCVE.Margin = new Padding(4, 6, 4, 6);
             btnListCatalogCVE.MouseState = MaterialSkin.MouseState.HOVER;
             btnListCatalogCVE.Name = "btnListCatalogCVE";
             btnListCatalogCVE.NoAccentTextColor = Color.Empty;
@@ -849,11 +851,12 @@ namespace AcmeScanner
             scannerListView1.Dock = DockStyle.Fill;
             scannerListView1.FullRowSelect = true;
             scannerListView1.GridLines = true;
-            scannerListView1.Location = new Point(4, 125);
+            scannerListView1.Location = new Point(3, 80);
+            scannerListView1.Margin = new Padding(2);
             scannerListView1.MultiSelect = false;
             scannerListView1.Name = "scannerListView1";
             scannerListView1.OwnerDraw = true;
-            scannerListView1.Size = new Size(1509, 830);
+            scannerListView1.Size = new Size(1052, 487);
             scannerListView1.TabIndex = 1;
             scannerListView1.UseCompatibleStateImageBehavior = false;
             scannerListView1.View = View.Details;
@@ -861,6 +864,9 @@ namespace AcmeScanner
             // 
             // panel7
             // 
+            panel7.BorderStyle = BorderStyle.FixedSingle;
+            panel7.Controls.Add(mobyTimestampData);
+            panel7.Controls.Add(mobyTimestamp);
             panel7.Controls.Add(btnViewMobySubsets);
             panel7.Controls.Add(btnRunChecksMoby);
             panel7.Controls.Add(btnUpdateMoby);
@@ -870,8 +876,27 @@ namespace AcmeScanner
             panel7.Dock = DockStyle.Top;
             panel7.Location = new Point(4, 5);
             panel7.Name = "panel7";
-            panel7.Size = new Size(1509, 120);
+            panel7.Size = new Size(1052, 77);
             panel7.TabIndex = 0;
+            // 
+            // mobyTimestampData
+            // 
+            mobyTimestampData.AutoSize = true;
+            mobyTimestampData.Location = new Point(195, 32);
+            mobyTimestampData.Margin = new Padding(2, 0, 2, 0);
+            mobyTimestampData.Name = "mobyTimestampData";
+            mobyTimestampData.Size = new Size(0, 15);
+            mobyTimestampData.TabIndex = 8;
+            // 
+            // mobyTimestamp
+            // 
+            mobyTimestamp.AutoSize = true;
+            mobyTimestamp.Location = new Point(128, 32);
+            mobyTimestamp.Margin = new Padding(2, 0, 2, 0);
+            mobyTimestamp.Name = "mobyTimestamp";
+            mobyTimestamp.Size = new Size(69, 15);
+            mobyTimestamp.TabIndex = 7;
+            mobyTimestamp.Text = "Timestamp:";
             // 
             // btnViewMobySubsets
             // 
@@ -880,8 +905,8 @@ namespace AcmeScanner
             btnViewMobySubsets.Depth = 0;
             btnViewMobySubsets.HighEmphasis = true;
             btnViewMobySubsets.Icon = null;
-            btnViewMobySubsets.Location = new Point(553, 35);
-            btnViewMobySubsets.Margin = new Padding(4, 7, 4, 7);
+            btnViewMobySubsets.Location = new Point(362, 21);
+            btnViewMobySubsets.Margin = new Padding(3, 4, 3, 4);
             btnViewMobySubsets.MouseState = MaterialSkin.MouseState.HOVER;
             btnViewMobySubsets.Name = "btnViewMobySubsets";
             btnViewMobySubsets.NoAccentTextColor = Color.Empty;
@@ -900,8 +925,8 @@ namespace AcmeScanner
             btnRunChecksMoby.Depth = 0;
             btnRunChecksMoby.HighEmphasis = true;
             btnRunChecksMoby.Icon = null;
-            btnRunChecksMoby.Location = new Point(726, 35);
-            btnRunChecksMoby.Margin = new Padding(4, 7, 4, 7);
+            btnRunChecksMoby.Location = new Point(664, 21);
+            btnRunChecksMoby.Margin = new Padding(3, 4, 3, 4);
             btnRunChecksMoby.MouseState = MaterialSkin.MouseState.HOVER;
             btnRunChecksMoby.Name = "btnRunChecksMoby";
             btnRunChecksMoby.NoAccentTextColor = Color.Empty;
@@ -920,8 +945,8 @@ namespace AcmeScanner
             btnUpdateMoby.Depth = 0;
             btnUpdateMoby.HighEmphasis = true;
             btnUpdateMoby.Icon = null;
-            btnUpdateMoby.Location = new Point(1206, 35);
-            btnUpdateMoby.Margin = new Padding(4, 7, 4, 7);
+            btnUpdateMoby.Location = new Point(908, 21);
+            btnUpdateMoby.Margin = new Padding(3, 4, 3, 4);
             btnUpdateMoby.MouseState = MaterialSkin.MouseState.HOVER;
             btnUpdateMoby.Name = "btnUpdateMoby";
             btnUpdateMoby.NoAccentTextColor = Color.Empty;
@@ -940,8 +965,8 @@ namespace AcmeScanner
             btnMobyViewTotals.Depth = 0;
             btnMobyViewTotals.HighEmphasis = true;
             btnMobyViewTotals.Icon = null;
-            btnMobyViewTotals.Location = new Point(937, 35);
-            btnMobyViewTotals.Margin = new Padding(4, 7, 4, 7);
+            btnMobyViewTotals.Location = new Point(491, 21);
+            btnMobyViewTotals.Margin = new Padding(3, 4, 3, 4);
             btnMobyViewTotals.MouseState = MaterialSkin.MouseState.HOVER;
             btnMobyViewTotals.Name = "btnMobyViewTotals";
             btnMobyViewTotals.NoAccentTextColor = Color.Empty;
@@ -960,8 +985,8 @@ namespace AcmeScanner
             btnViewJson.Depth = 0;
             btnViewJson.HighEmphasis = true;
             btnViewJson.Icon = null;
-            btnViewJson.Location = new Point(216, 35);
-            btnViewJson.Margin = new Padding(4, 7, 4, 7);
+            btnViewJson.Location = new Point(804, 21);
+            btnViewJson.Margin = new Padding(3, 4, 3, 4);
             btnViewJson.MouseState = MaterialSkin.MouseState.HOVER;
             btnViewJson.Name = "btnViewJson";
             btnViewJson.NoAccentTextColor = Color.Empty;
@@ -1123,5 +1148,7 @@ namespace AcmeScanner
         private MaterialSkin.Controls.MaterialButton btnViewMobySubsets;
         private Button btnClose;
         private ListView listView;
+        private Label mobyTimestampData;
+        private Label mobyTimestamp;
     }
 }
