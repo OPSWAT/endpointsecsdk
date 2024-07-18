@@ -416,11 +416,6 @@ namespace AcmeScanner
                 ShowMessageDialog("Unexpected result occurred installing the product", false);
             }
 
-
-
-            // Do a scan again
-            //lvScanResults.Items.Clear();
-            //scanWorker.RunWorkerAsync(true);
             ShowLoading(false);
         }
 
@@ -1437,6 +1432,10 @@ namespace AcmeScanner
             ViewMobyJsonDialog textDialog = new ViewMobyJsonDialog(jsonContent);
             textDialog.StartPosition = FormStartPosition.CenterParent;
             textDialog.ShowDialog();
+        }
+        private void BtnLoadCVEs_Click(object sender, EventArgs e)
+        {
+            //just a place holder
         }
     }
 }

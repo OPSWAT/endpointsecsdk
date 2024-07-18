@@ -53,6 +53,7 @@ namespace AcmeScanner
             tabPage1 = new TabPage();
             lvScanResults = new ScannerListView();
             tabPage2 = new TabPage();
+            VulnerabilitiesTab = new TabPage();
             lvOrchestrationScanResult = new ScannerListView();
             panel4 = new Panel();
             label15 = new Label();
@@ -99,6 +100,9 @@ namespace AcmeScanner
             listView = new ListView();
             btnClose = new Button();
             MobySubsetsLabel = new Label();
+            lvVulnerabilities = new ScannerListView();
+            panel8 = new Panel();
+            btnLoadCVEs = new MaterialSkin.Controls.MaterialButton();
             panel1.SuspendLayout();
             panel3.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)pbLoading).BeginInit();
@@ -333,6 +337,7 @@ namespace AcmeScanner
             tabCatalog.Controls.Add(tabPage3);
             tabCatalog.Controls.Add(tabPage4);
             tabCatalog.Controls.Add(tabPage5);
+            tabCatalog.Controls.Add(VulnerabilitiesTab);
             tabCatalog.Dock = DockStyle.Fill;
             tabCatalog.Location = new Point(0, 0);
             tabCatalog.Name = "tabCatalog";
@@ -1058,6 +1063,65 @@ namespace AcmeScanner
             MobySubsetsLabel.Size = new Size(353, 19);
             MobySubsetsLabel.TabIndex = 2;
             MobySubsetsLabel.Text = "Double-click a JSON name to view its content";
+            //
+            // VulnerabilitiesTab
+            //
+            VulnerabilitiesTab.Controls.Add(lvVulnerabilities);
+            VulnerabilitiesTab.Controls.Add(panel8);
+            VulnerabilitiesTab.Location = new Point(4, 24);
+            VulnerabilitiesTab.Name = "VulnerabilitiesTab";
+            VulnerabilitiesTab.Padding = new Padding(3);
+            VulnerabilitiesTab.Size = new Size(1058, 570);
+            VulnerabilitiesTab.TabIndex = 5;
+            VulnerabilitiesTab.Text = "Vulnerabilities";
+            VulnerabilitiesTab.UseVisualStyleBackColor = true;
+            //
+            // lvVulnerabilities
+            //
+            lvVulnerabilities.Dock = DockStyle.Fill;
+            lvVulnerabilities.FullRowSelect = true;
+            lvVulnerabilities.GridLines = true;
+            lvVulnerabilities.Location = new Point(3, 80);
+            lvVulnerabilities.MultiSelect = false;
+            lvVulnerabilities.Name = "lvVulnerabilities";
+            lvVulnerabilities.OwnerDraw = true;
+            lvVulnerabilities.Size = new Size(1052, 487);
+            lvVulnerabilities.TabIndex = 6;
+            lvVulnerabilities.UseCompatibleStateImageBehavior = false;
+            lvVulnerabilities.View = View.Details;
+            // 
+            // panel8
+            // 
+            panel8.BorderStyle = BorderStyle.FixedSingle;
+            panel8.Controls.Add(btnLoadCVEs);
+            panel8.Dock = DockStyle.Top;
+            panel8.Location = new Point(3, 3);
+            panel8.Margin = new Padding(15);
+            panel8.Name = "panel8";
+            panel8.Padding = new Padding(15);
+            panel8.Size = new Size(1052, 77);
+            panel8.TabIndex = 5;
+            // 
+            // btnLoadCVEs
+            // 
+            btnLoadCVEs.AutoSize = false;
+            btnLoadCVEs.AutoSizeMode = AutoSizeMode.GrowAndShrink;
+            btnLoadCVEs.Density = MaterialSkin.Controls.MaterialButton.MaterialButtonDensity.Default;
+            btnLoadCVEs.Depth = 0;
+            btnLoadCVEs.HighEmphasis = true;
+            btnLoadCVEs.Icon = null;
+            btnLoadCVEs.Location = new Point(19, 21);
+            btnLoadCVEs.Margin = new Padding(4, 6, 4, 6);
+            btnLoadCVEs.MouseState = MaterialSkin.MouseState.HOVER;
+            btnLoadCVEs.Name = "btnLoadCVEs";
+            btnLoadCVEs.NoAccentTextColor = Color.Empty;
+            btnLoadCVEs.Size = new Size(124, 36);
+            btnLoadCVEs.TabIndex = 0;
+            btnLoadCVEs.Text = "Load CVEs";
+            btnLoadCVEs.Type = MaterialSkin.Controls.MaterialButton.MaterialButtonType.Contained;
+            btnLoadCVEs.UseAccentColor = false;
+            btnLoadCVEs.UseVisualStyleBackColor = true;
+            btnLoadCVEs.Click += BtnLoadCVEs_Click;
             // 
             // ScannerForm
             // 
@@ -1129,8 +1193,8 @@ namespace AcmeScanner
         private MaterialSkin.Controls.MaterialButton btnFreshInstall;
         private MaterialSkin.Controls.MaterialButton btnDomainCSV;
         private TabPage tabPage4;
-        //moby
         private TabPage tabPage5;
+        private TabPage VulnerabilitiesTab;
         private ScannerListView lvStatus;
         private Panel panel6;
         private MaterialSkin.Controls.MaterialButton btnRefreshStatus;
@@ -1161,5 +1225,9 @@ namespace AcmeScanner
         private Label mobyTimestampData;
         private Label mobyTimestamp;
         private Label MobySubsetsLabel;
+        private ScannerListView lvVulnerabilities;
+        //vulnerabilities panel
+        private Panel panel8;
+        private MaterialSkin.Controls.MaterialButton btnLoadCVEs;
     }
 }
