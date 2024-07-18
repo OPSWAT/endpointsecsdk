@@ -13,6 +13,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.IO;
 using System.Text.Json.Nodes;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace AcmeScanner
 {
@@ -43,10 +44,11 @@ namespace AcmeScanner
             RunSelectedChecks_Completed);
         }
 
-        private static List<string> GetAllScripts()
+        public static List<string> GetAllScripts()
         {
             string basePath = AppDomain.CurrentDomain.BaseDirectory;
-            string targetPath = Path.Combine(basePath, @"..\..\..\SanityChecks");
+            Debug.WriteLine(basePath);
+            string targetPath = Path.Combine(basePath, @"SanityChecks");
             string sanityChecksPath = Path.GetFullPath(targetPath);
             List<string> fileNames = new List<string>();
 
@@ -126,51 +128,48 @@ namespace AcmeScanner
 
         private void RunSelectedChecks_DoWork(object sender, DoWorkEventArgs e)
         {
-            List<(MaterialSkin.Controls.MaterialCheckbox, string)> checkboxScriptPairs = new List<(MaterialSkin.Controls.MaterialCheckbox, string)>
-            {
-                (materialCheckbox1, "auto_patching_check"),
-                (materialCheckbox2, "app_remover_check")
-            };
+            testDialog textDialog = new testDialog();
+            textDialog.StartPosition = FormStartPosition.CenterParent;
+            List<string> allScripts = textDialog.AddCheckboxes();
+            textDialog.ShowDialog();
+            
+            
             checkedBoxes = new List<string>();
             hashmap = new Dictionary<string, sanityCheckSignature>();
-
-
-            foreach (var (checkbox, script) in checkboxScriptPairs)
+            foreach (var script in allScripts)
             {
-                if (checkbox.Checked)
+                checkedBoxes.Add(script);
+                JObject jsonContent = TaskRunPythonScripts.Execute(script);
+                foreach (var product in jsonContent)
                 {
-                    checkedBoxes.Add(checkbox.Text);
-                    JObject jsonContent = TaskRunPythonScripts.Execute(script);
-                    foreach (var product in jsonContent)
+                    string productName = product.Key;
+                    var platforms = (JObject)product.Value;
+
+                    foreach (var platform in platforms)
                     {
-                        string productName = product.Key;
-                        var platforms = (JObject)product.Value;
+                        string platformName = platform.Key;
+                        var signatures = (JObject)platform.Value;
 
-                        foreach (var platform in platforms)
+                        foreach (var signature in signatures)
                         {
-                            string platformName = platform.Key;
-                            var signatures = (JObject)platform.Value;
-
-                            foreach (var signature in signatures)
+                            if (hashmap.ContainsKey(signature.Key))
                             {
-                                if (hashmap.ContainsKey(signature.Key))
-                                {
-                                    hashmap[signature.Key].scripts.Add(script);
-                                }
-                                else
-                                {
-                                    hashmap[signature.Key] = new sanityCheckSignature();
-                                    hashmap[signature.Key].sigId = signature.Key;
-                                    hashmap[signature.Key].name = product.Key;
-                                    hashmap[signature.Key].platform = platformName;
-                                    hashmap[signature.Key].scripts = new List<string>();
-                                    hashmap[signature.Key].scripts.Add(script);
-                                }
+                                hashmap[signature.Key].scripts.Add(script);
                             }
-
+                            else
+                            {
+                                hashmap[signature.Key] = new sanityCheckSignature();
+                                hashmap[signature.Key].sigId = signature.Key;
+                                hashmap[signature.Key].name = product.Key;
+                                hashmap[signature.Key].platform = platformName;
+                                hashmap[signature.Key].scripts = new List<string>();
+                                hashmap[signature.Key].scripts.Add(script);
+                            }
                         }
+
                     }
                 }
+
             }
             UpdateCheckResults();
         }
@@ -255,6 +254,8 @@ namespace AcmeScanner
         private void BtnRunSelectedChecksMoby_Click(object sender, EventArgs e)
         {
             runSelectedChecks.RunWorkerAsync();
+            
+            
         }
 
         private void sanityChecksListView_SelectedIndexChanged(object sender, EventArgs e)

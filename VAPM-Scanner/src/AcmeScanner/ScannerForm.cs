@@ -478,6 +478,7 @@ namespace AcmeScanner
         private void UpdateMobyWorker_Completed(object sender, RunWorkerCompletedEventArgs e)
         {
             btnUpdateMoby.UseAccentColor = false;
+            btnUpdateMoby.Text = "Update Moby";
             ShowLoading(false);
         }
 
@@ -541,6 +542,7 @@ namespace AcmeScanner
             if (!MobyDownload)
             {
                 btnUpdateMoby.UseAccentColor = true;
+                btnUpdateMoby.Text = "Download Moby";
                 btnLoadMoby.Enabled = false;
                 btnViewJson.Enabled = false;
                 btnMobyViewTotals.Enabled = false;
