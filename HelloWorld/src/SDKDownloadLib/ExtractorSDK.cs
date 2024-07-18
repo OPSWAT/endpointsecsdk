@@ -39,6 +39,7 @@ namespace SDKDownloader
             CopyExtractedFile(libDir, sdkDir, "bin/manageability", "wa_3rd_party_host_32.exe");
             CopyExtractedFile(libDir, sdkDir, "bin/manageability", "wa_3rd_party_host_64.exe");
             CopyExtractedFile(libDir, sdkDir, "bin/vulnerability", "libwavmodapi.dll");
+            CopyExtractedFile(libDir, sdkDir, "bin/deviceinfo", "libwadeviceinfo.dll");
         }
 
         private static void CopyResourceFiles(string sdkDir, string libDir)

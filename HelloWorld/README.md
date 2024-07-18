@@ -48,6 +48,14 @@ OESISAdapter.cs - Provides the .Net Runtime mappings to the Native Code
 XStringMarshaler.cs - Provides the needed string mappings between .Net and Native Code
 Product.cs - Plain object used to map product information
 
+#### Patch - An example of the workflow to install a patch
+This sample will install Firefox.  Will patch current version or install a fresh install of FireFox. Calls GetLatestInstaller and InstallFromFiles.  Will download the file using Windows download methodes and does a Checksum Validation.    
+
+Program.cs - Contains the main sample code.  Start with the main function.
+OESISAdapter.cs - Provides the .Net Runtime mappings to the Native Code
+XStringMarshaler.cs - Provides the needed string mappings between .Net and Native Code
+InstallDetails.cs - Plain object used to map the URL and other information needed to download and install the content
+HttpClientUtils.cs - Interfaces with the Native HTTP Download code and the Checksum validatiors
 
 #### More Coming soon 
 

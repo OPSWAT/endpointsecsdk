@@ -9,7 +9,7 @@
 using System;
 using System.Runtime.InteropServices;
 
-namespace Compliance
+namespace Vulnerability
 {
     internal class OESISAdapter
     {
