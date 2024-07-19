@@ -12,10 +12,6 @@ namespace SDKDownloader
 {
     public class ExtractorSDK
     {
-       
-
-        
-
         private static void CopyExtractedFile(string libDir, string sdkDir, string folder, string filename)
         {
             string rootFile = Path.Combine(sdkDir, "sdk");
