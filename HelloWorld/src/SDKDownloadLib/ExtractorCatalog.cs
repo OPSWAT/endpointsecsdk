@@ -30,7 +30,6 @@ namespace SDKDownloadLib
             CopyExtractedFile(tempCatalogDir, clientDBDir, "analog/client", "wuo.dat");
         }
 
-
         //
         // Platforms are as follows
         // 1 - Windows

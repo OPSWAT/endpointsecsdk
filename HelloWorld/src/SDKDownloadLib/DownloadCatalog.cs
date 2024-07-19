@@ -11,8 +11,6 @@ using System.IO;
 
 namespace SDKDownloadLib
 {
-
-
     public class DownloadCatalog
     {
 
