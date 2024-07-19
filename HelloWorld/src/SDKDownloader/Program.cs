@@ -9,6 +9,7 @@
 using SDKDownloadLib;
 using System;
 using System.IO;
+using System.Threading;
 
 namespace SDKDownloader
 {
@@ -80,8 +81,9 @@ namespace SDKDownloader
         }
 
 
-        static void Main(string[] args)
+        static int Main(string[] args)
         {
+            Console.WriteLine("SDKDownloader Started");
             if(ValidateCommandLine(args))
             {
                 string command = args[0];
@@ -114,8 +116,9 @@ namespace SDKDownloader
                         }
                     case "download-copy-vapm-windows":
                         {
+                            Console.WriteLine("Copying vapm files");
                             string libPath = args[1];
-                            string checkFilePath = Path.Combine(libPath, "vmod2.dat");
+                            string checkFilePath = Path.Combine(libPath, "v2mod.dat");
 
                             if (!IsFileUpdated(checkFilePath))
                             {
@@ -127,6 +130,7 @@ namespace SDKDownloader
                         }
                     case "download-copy-windows":
                         {
+                            Console.WriteLine("Copying windows files");
                             string libPath = args[1];
                             string checkFilePath = Path.Combine(libPath, "libwavmodapi.dll"); 
 
@@ -140,6 +144,8 @@ namespace SDKDownloader
                         }
                 }
             }
+
+            return 0;
         }
     }
 }
