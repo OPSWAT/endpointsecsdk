@@ -63,9 +63,7 @@
     </PreBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
-    <PostBuildEvent>START /WAIT cmd /c $(SolutionDir)\SDKDownloader\$(OutDir)\SDKDownloader.exe download-copy-windows $(SolutionDir)\lib
-copy $(SolutionDir)\license $(ProjectDir)$(OutDir)
-copy $(SolutionDir)\lib $(ProjectDir)$(OutDir)
-</PostBuildEvent>
+    <PostBuildEvent>
+    </PostBuildEvent>
   </PropertyGroup>
 </Project>
