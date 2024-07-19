@@ -65,8 +65,6 @@
   <PropertyGroup>
     <PostBuildEvent>$(SolutionDir)\SDKDownloader\$(OutDir)\SDKDownloader.exe download-copy-windows $(SolutionDir)\lib
 $(SolutionDir)\SDKDownloader\$(OutDir)\SDKDownloader.exe download-copy-vapm-windows $(SolutionDir)\vapm
-copy $(SolutionDir)\license $(ProjectDir)$(OutDir)
-copy $(SolutionDir)\lib $(ProjectDir)$(OutDir)
-copy $(SolutionDir)\vapm $(ProjectDir)$(OutDir)</PostBuildEvent>
+</PostBuildEvent>
   </PropertyGroup>
 </Project>

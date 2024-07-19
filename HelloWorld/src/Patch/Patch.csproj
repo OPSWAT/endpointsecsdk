@@ -64,7 +64,8 @@
     </PreBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
-    <PostBuildEvent>
-    </PostBuildEvent>
+    <PostBuildEvent>copy $(SolutionDir)\license $(ProjectDir)$(OutDir)
+copy $(SolutionDir)\lib $(ProjectDir)$(OutDir)
+copy $(SolutionDir)\vapm $(ProjectDir)$(OutDir)</PostBuildEvent>
   </PropertyGroup>
 </Project>
