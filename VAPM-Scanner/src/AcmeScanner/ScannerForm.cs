@@ -32,6 +32,8 @@ using Newtonsoft.Json;
 using System.Security.Cryptography.Xml;
 using System.Globalization;
 using System.Net.Http.Json;
+using Newtonsoft.Json.Linq;
+using VAPMAdapter.Catalog;
 
 
 namespace AcmeScanner
@@ -54,6 +56,7 @@ namespace AcmeScanner
         private System.ComponentModel.BackgroundWorker loadCatalogWorker;
         private System.ComponentModel.BackgroundWorker loadMobyWorker;
         private System.ComponentModel.BackgroundWorker loadStatusWorker;
+        private System.ComponentModel.BackgroundWorker loadVulnerabilitiesWorker;
 
         //first method called by the main class
         public ScannerForm()
@@ -216,6 +219,12 @@ namespace AcmeScanner
                 new DoWorkEventHandler(LoadMobyWorker_DoWork);
             loadMobyWorker.RunWorkerCompleted +=
                 new RunWorkerCompletedEventHandler(LoadMobyWorker_Completed);
+
+            loadVulnerabilitiesWorker = new BackgroundWorker();
+            loadVulnerabilitiesWorker.DoWork +=
+                new DoWorkEventHandler(loadVulnerabilitiesWorker_DoWork);
+            loadVulnerabilitiesWorker.RunWorkerCompleted +=
+                new RunWorkerCompletedEventHandler(loadVulnerabilitiesWorker_Completed);
         }
 
         private List<string> GetScanResults()
@@ -479,6 +488,16 @@ namespace AcmeScanner
         {
             btnUpdateMoby.UseAccentColor = false;
             btnUpdateMoby.Text = "Update Moby";
+            ShowLoading(false);
+        }
+
+        private void loadVulnerabilitiesWorker_DoWork(Object sender, DoWorkEventArgs e)
+        {
+            LoadVulnerabilities();
+        }
+
+        private void loadVulnerabilitiesWorker_Completed(Object sender, RunWorkerCompletedEventArgs e)
+        {
             ShowLoading(false);
         }
 
@@ -1435,9 +1454,94 @@ namespace AcmeScanner
             textDialog.StartPosition = FormStartPosition.CenterParent;
             textDialog.ShowDialog();
         }
+
+        private async void LoadVulnerabilities()
+        {
+            // Ensure all UI updates are performed on the UI thread
+            if (lvVulnerabilities.InvokeRequired)
+            {
+                lvVulnerabilities.Invoke(new Action(LoadVulnerabilities));
+                return;
+            }
+
+            // Initialize a thread-safe collection to hold ListViewItem objects
+            ConcurrentBag<ListViewItem> concurrentResultList = new ConcurrentBag<ListViewItem>();
+
+            // Clear any existing items and columns
+            lvVulnerabilities.Items.Clear();
+            lvVulnerabilities.Columns.Clear();
+
+            // Add columns to the ListView
+            lvVulnerabilities.Columns.Add("CVE ID", 200);
+            lvVulnerabilities.Columns.Add("CWE", 200);
+            lvVulnerabilities.Columns.Add("Published Date", 200);
+            lvVulnerabilities.Columns.Add("Last Modified Date", 200);
+            lvVulnerabilities.View = View.Details;
+            lvVulnerabilities.Update();
+
+            // Instantiate the Catalog class and load the data
+            Catalog catalog = new Catalog();
+            string currentDirectory = Environment.CurrentDirectory;
+            string catalogRoot = Path.Combine(currentDirectory, "catalog", "analog", "server");
+            bool isLoaded = catalog.Load(catalogRoot); // Load from the current directory
+
+            if (!isLoaded)
+            {
+                Console.WriteLine("Failed to load catalog.");
+                return;
+            }
+
+            List<CVEDetail> cveDetails = new List<CVEDetail>();
+
+            // Use a Task to process CVEs in parallel
+            await Task.Run(() =>
+            {
+                // Assuming you're using the GetVulnerabilityAssociationList to get all the CVEs and then fetching details for each CVE
+                List<CatalogVulnerabilityAssociation> vulnAssociations = catalog.GetVulnerabilityAssociationList();
+                cveDetails = catalog.GetCVEDetailsList(vulnAssociations);
+
+                Parallel.ForEach(cveDetails, cveDetail =>
+                {
+                    // Create a new ListViewItem
+                    ListViewItem item = new ListViewItem(cveDetail.cveId);
+
+                    // Add additional subitems (e.g., CWE, published date, last modified date)
+                    JObject cveJson = JObject.Parse(cveDetail.rawData);
+                    item.SubItems.Add(cveJson["cwe"]?.ToString() ?? "N/A");
+                    item.SubItems.Add(GetDateFromEpoch((long?)cveJson["published_epoch"]));
+                    item.SubItems.Add(GetDateFromEpoch((long?)cveJson["last_modified_epoch"]));
+
+                    // Add the item to the thread-safe collection
+                    concurrentResultList.Add(item);
+                });
+            });
+
+            // Add items from the thread-safe collection to the ListView
+            lvVulnerabilities.Items.AddRange(concurrentResultList.ToArray());
+            lvVulnerabilities.Update();
+
+            // Add the ListView to the VulnerabilitiesTab if not already added
+            if (!VulnerabilitiesTab.Controls.Contains(lvVulnerabilities))
+            {
+                VulnerabilitiesTab.Controls.Add(lvVulnerabilities);
+            }
+
+        }
+
+        private string GetDateFromEpoch(long? epoch)
+        {
+            if (epoch.HasValue)
+            {
+                DateTime dateTime = DateTimeOffset.FromUnixTimeSeconds(epoch.Value).DateTime;
+                return dateTime.ToString("yyyy-MM-dd HH:mm:ss");
+            }
+            return "N/A";
+        }
+
         private void BtnLoadCVEs_Click(object sender, EventArgs e)
         {
-            //just a place holder
+            ShowLoading(true);
+            loadVulnerabilitiesWorker.RunWorkerAsync(true);
         }
     }
 }
