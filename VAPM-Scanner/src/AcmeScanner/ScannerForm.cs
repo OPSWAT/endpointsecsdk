@@ -1476,6 +1476,9 @@ namespace AcmeScanner
             lvVulnerabilities.Columns.Add("CWE", 200);
             lvVulnerabilities.Columns.Add("Published Date", 200);
             lvVulnerabilities.Columns.Add("Last Modified Date", 200);
+            lvVulnerabilities.Columns.Add("Severity", 100);
+            lvVulnerabilities.Columns.Add("CVSS 2.0 Score", 200);
+            lvVulnerabilities.Columns.Add("CVSS 3.0 Score", 200);
             lvVulnerabilities.View = View.Details;
             lvVulnerabilities.Update();
 
@@ -1510,6 +1513,9 @@ namespace AcmeScanner
                     item.SubItems.Add(cveJson["cwe"]?.ToString() ?? "N/A");
                     item.SubItems.Add(GetDateFromEpoch((long?)cveJson["published_epoch"]));
                     item.SubItems.Add(GetDateFromEpoch((long?)cveJson["last_modified_epoch"]));
+                    item.SubItems.Add(cveJson["severity"]?.ToString() ?? "N/A");
+                    item.SubItems.Add(cveJson["cvss_2_0"]?["score"]?.ToString() ?? "N/A");
+                    item.SubItems.Add(cveJson["cvss_3_0"]?["base_score"]?.ToString() ?? "N/A");
 
                     // Add the item to the thread-safe collection
                     concurrentResultList.Add(item);
@@ -1525,7 +1531,6 @@ namespace AcmeScanner
             {
                 VulnerabilitiesTab.Controls.Add(lvVulnerabilities);
             }
-
         }
 
         private string GetDateFromEpoch(long? epoch)
