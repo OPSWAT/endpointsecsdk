@@ -43,6 +43,7 @@ namespace AcmeScanner
         static Dictionary<string, ProductScanResult> staticScanResults = new Dictionary<string, ProductScanResult>();
         static Dictionary<string, CatalogSignature> staticSignatureCatalogResults = new Dictionary<string, CatalogSignature>();
         static Dictionary<string, OnlinePatchDetail> staticOrchestrationScanResults = new Dictionary<string, OnlinePatchDetail>();
+        private CVEDetailsManager cveDetailsManager = new CVEDetailsManager();
         static List<CatalogProduct> staticProductList = null;
         static List<MobyProduct> staticMobyProductList = null;
         static List<PatchStatus> staticPatchStatusList = null;
@@ -140,8 +141,6 @@ namespace AcmeScanner
                 Close();
             }
         }
-
-
 
         //
         // Update SDK if needed
