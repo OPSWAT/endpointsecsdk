@@ -492,8 +492,8 @@ namespace AcmeScanner
         }
 
         private void loadVulnerabilitiesWorker_DoWork(Object sender, DoWorkEventArgs e)
-        {
-            LoadVulnerabilities(); 
+        {            
+            LoadVulnerabilities();
         }
 
         private void loadVulnerabilitiesWorker_Completed(Object sender, RunWorkerCompletedEventArgs e)
@@ -1495,14 +1495,14 @@ namespace AcmeScanner
             }
 
             List<CVEDetail> cveDetails = new List<CVEDetail>();
-
+            int cveCount = 0;
             // Use a Task to process CVEs in parallel
             await Task.Run(() =>
             {
                 // Assuming you're using the GetVulnerabilityAssociationList to get all the CVEs and then fetching details for each CVE
                 List<CatalogVulnerabilityAssociation> vulnAssociations = catalog.GetVulnerabilityAssociationList();
                 cveDetails = catalog.GetCVEDetailsList(vulnAssociations);
-
+                
                 Parallel.ForEach(cveDetails, cveDetail =>
                 {
                     // Create a new ListViewItem
@@ -1516,7 +1516,7 @@ namespace AcmeScanner
                     item.SubItems.Add(cveJson["severity"]?.ToString() ?? "N/A");
                     item.SubItems.Add(cveJson["cvss_2_0"]?["score"]?.ToString() ?? "N/A");
                     item.SubItems.Add(cveJson["cvss_3_0"]?["base_score"]?.ToString() ?? "N/A");
-
+                    cveCount++;
                     // Add the item to the thread-safe collection
                     concurrentResultList.Add(item);
                 });
@@ -1525,7 +1525,7 @@ namespace AcmeScanner
             // Add items from the thread-safe collection to the ListView
             lvVulnerabilities.Items.AddRange(concurrentResultList.ToArray());
             lvVulnerabilities.Update();
-
+            label17.Text = cveCount.ToString();            
             // Add the ListView to the VulnerabilitiesTab if not already added
             if (!VulnerabilitiesTab.Controls.Contains(lvVulnerabilities))
             {
