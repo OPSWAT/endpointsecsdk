@@ -5,9 +5,12 @@
 ///  Created by Chris Seiler
 ///  OPSWAT OEM Solutions Architect
 ///////////////////////////////////////////////////////////////////////////////////////////////
+using Newtonsoft.Json.Linq;
+using System;
 using System.Drawing;
 using System.Text;
 using System.Windows.Forms;
+using VAPMAdapter.Catalog;
 
 namespace AcmeScanner
 {
@@ -15,7 +18,7 @@ namespace AcmeScanner
     public class ScannerListView : ListView
     {
         private ListViewColumnSorter lvwColumnSorter;
-
+        private CVEDetailsManager cveDetailsManager;
         public ScannerListView() : base()
         {
             this.OwnerDraw = true;
@@ -143,6 +146,25 @@ namespace AcmeScanner
             textDialog.ShowDialog();
         }
 
+        private void CveClickHandler(object sender, MouseEventArgs e)
+        {
+            CVEDetailsManager cveDetailsManager = new CVEDetailsManager();
+            if (cveDetailsManager == null)
+            {
+                MessageBox.Show("CVE Details Manager is not initialized.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            if (this.SelectedItems.Count > 0)
+            {
+                string cveId = this.SelectedItems[0].SubItems[0].Text;
+                string cveContent = cveDetailsManager.GetCveJsonContentById(cveId);
+                TextDialog textDialog = new TextDialog(cveContent);
+                textDialog.StartPosition = FormStartPosition.CenterParent;
+                textDialog.ShowDialog();
+            }
+        }
+
         private void ScannerListView_MouseClick(object sender, MouseEventArgs e)
         {
             if (this.SelectedItems.Count > 0 && this.Columns[0].Text=="Title")
@@ -153,7 +175,10 @@ namespace AcmeScanner
             {
                 CatalogClickHandler(sender, e);
             }
+            else if (this.Columns[0].Text == "CVE ID")
+            {
+                CveClickHandler(sender, e);
+            }
         }
-
     }
 }

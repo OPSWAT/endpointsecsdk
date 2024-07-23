@@ -1052,7 +1052,6 @@ namespace AcmeScanner
             lvVulnerabilities.TabIndex = 6;
             lvVulnerabilities.UseCompatibleStateImageBehavior = false;
             lvVulnerabilities.View = View.Details;
-            lvVulnerabilities.ItemActivate += ListView_ItemActivate;
             // 
             // panel8
             // 
