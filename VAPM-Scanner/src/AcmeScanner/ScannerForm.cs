@@ -71,6 +71,8 @@ namespace AcmeScanner
             FillSDKlabels();
             FillMobyLabels();
             SetTitleWithFileVersion();
+            tabCatalog.TabPages.Remove(VulnerabilitiesTab);           
+            
         }
 
         private void SetTitleWithFileVersion()
