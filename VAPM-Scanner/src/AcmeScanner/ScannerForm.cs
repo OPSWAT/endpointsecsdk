@@ -48,6 +48,7 @@ namespace AcmeScanner
         static List<CatalogProduct> staticProductList = null;
         static List<MobyProduct> staticMobyProductList = null;
         static List<PatchStatus> staticPatchStatusList = null;
+        static bool isCatalogUpdated = false;
         static List<string> sigIds;
 
         private System.ComponentModel.BackgroundWorker scanWorker;
@@ -343,6 +344,7 @@ namespace AcmeScanner
             CatalogCache.CachedCatalog = staticProductList;
             if (CatalogCache.CachedCatalog == null) { Debug.WriteLine("after loading cataog also null"); }
             ShowLoading(false);
+            searchCatalog.Enabled = true;
             UpdateScanResults();
         }
 
@@ -736,6 +738,7 @@ namespace AcmeScanner
                 lvCatalog.Items.Clear();
                 lvCatalog.Items.AddRange(concurrentResultList.ToArray());
                 lvCatalog.EndUpdate();
+                isCatalogUpdated = true;
                 UpdateScanResults();
             }));
         }
@@ -1548,16 +1551,22 @@ namespace AcmeScanner
         }
         private void searchCatalogClicked(object sender, EventArgs e)
         {
+            if (staticProductList == null)
+            {
+                searchCatalog.Enabled = false;
+                return;
+            }
             if (searchCatalog.Text == "Search")
             {
                 searchCatalog.Text = "";
             }
+
         }
 
         private void searchCatalog_TextChanged(object sender, EventArgs e)
         {
 
-            if (searchCatalog.Text == "")
+            if (!isCatalogUpdated)
             {
                 UpdateCatalogResults();
             }
@@ -1612,6 +1621,7 @@ namespace AcmeScanner
             lvCatalog.Items.Clear();
             lvCatalog.Items.AddRange(resultListCatalog.ToArray());
             lvCatalog.EndUpdate();
+            isCatalogUpdated = false;
         }
 
         private void searchCatalogEnter(object sender, KeyEventArgs e)
