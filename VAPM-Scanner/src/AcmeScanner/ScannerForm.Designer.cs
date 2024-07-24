@@ -105,6 +105,7 @@ namespace AcmeScanner
             listView = new ListView();
             btnClose = new Button();
             MobySubsetsLabel = new Label();
+            searchCatalog = new TextBox();
             panel1.SuspendLayout();
             panel3.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)pbLoading).BeginInit();
@@ -569,6 +570,7 @@ namespace AcmeScanner
             // panel5
             // 
             panel5.BorderStyle = BorderStyle.FixedSingle;
+            panel5.Controls.Add(searchCatalog);
             panel5.Controls.Add(btnDomainCSV);
             panel5.Controls.Add(btnFreshInstall);
             panel5.Controls.Add(btnExportCSV);
@@ -919,7 +921,7 @@ namespace AcmeScanner
             btnViewMobySubsets.MouseState = MaterialSkin.MouseState.HOVER;
             btnViewMobySubsets.Name = "btnViewMobySubsets";
             btnViewMobySubsets.NoAccentTextColor = Color.Empty;
-            btnViewMobySubsets.Size = new Size(123, 36);
+            btnViewMobySubsets.Size = new Size(121, 36);
             btnViewMobySubsets.TabIndex = 6;
             btnViewMobySubsets.Text = "View Subsets";
             btnViewMobySubsets.Type = MaterialSkin.Controls.MaterialButton.MaterialButtonType.Contained;
@@ -939,7 +941,7 @@ namespace AcmeScanner
             btnRunChecksMoby.MouseState = MaterialSkin.MouseState.HOVER;
             btnRunChecksMoby.Name = "btnRunChecksMoby";
             btnRunChecksMoby.NoAccentTextColor = Color.Empty;
-            btnRunChecksMoby.Size = new Size(111, 36);
+            btnRunChecksMoby.Size = new Size(109, 36);
             btnRunChecksMoby.TabIndex = 5;
             btnRunChecksMoby.Text = "Run checks";
             btnRunChecksMoby.Type = MaterialSkin.Controls.MaterialButton.MaterialButtonType.Contained;
@@ -959,7 +961,7 @@ namespace AcmeScanner
             btnUpdateMoby.MouseState = MaterialSkin.MouseState.HOVER;
             btnUpdateMoby.Name = "btnUpdateMoby";
             btnUpdateMoby.NoAccentTextColor = Color.Empty;
-            btnUpdateMoby.Size = new Size(122, 36);
+            btnUpdateMoby.Size = new Size(120, 36);
             btnUpdateMoby.TabIndex = 4;
             btnUpdateMoby.Text = "update moby";
             btnUpdateMoby.Type = MaterialSkin.Controls.MaterialButton.MaterialButtonType.Contained;
@@ -979,7 +981,7 @@ namespace AcmeScanner
             btnMobyViewTotals.MouseState = MaterialSkin.MouseState.HOVER;
             btnMobyViewTotals.Name = "btnMobyViewTotals";
             btnMobyViewTotals.NoAccentTextColor = Color.Empty;
-            btnMobyViewTotals.Size = new Size(167, 36);
+            btnMobyViewTotals.Size = new Size(165, 36);
             btnMobyViewTotals.TabIndex = 3;
             btnMobyViewTotals.Text = "view total counts";
             btnMobyViewTotals.Type = MaterialSkin.Controls.MaterialButton.MaterialButtonType.Contained;
@@ -999,7 +1001,7 @@ namespace AcmeScanner
             btnViewJson.MouseState = MaterialSkin.MouseState.HOVER;
             btnViewJson.Name = "btnViewJson";
             btnViewJson.NoAccentTextColor = Color.Empty;
-            btnViewJson.Size = new Size(98, 36);
+            btnViewJson.Size = new Size(96, 36);
             btnViewJson.TabIndex = 2;
             btnViewJson.Text = "View JSON";
             btnViewJson.Type = MaterialSkin.Controls.MaterialButton.MaterialButtonType.Contained;
@@ -1019,7 +1021,7 @@ namespace AcmeScanner
             btnLoadMoby.MouseState = MaterialSkin.MouseState.HOVER;
             btnLoadMoby.Name = "btnLoadMoby";
             btnLoadMoby.NoAccentTextColor = Color.Empty;
-            btnLoadMoby.Size = new Size(104, 36);
+            btnLoadMoby.Size = new Size(102, 36);
             btnLoadMoby.TabIndex = 0;
             btnLoadMoby.Text = "Load Moby";
             btnLoadMoby.Type = MaterialSkin.Controls.MaterialButton.MaterialButtonType.Contained;
@@ -1152,6 +1154,17 @@ namespace AcmeScanner
             MobySubsetsLabel.TabIndex = 2;
             MobySubsetsLabel.Text = "Double-click a JSON name to view its content";
             // 
+            // searchCatalog
+            // 
+            searchCatalog.Location = new Point(497, 39);
+            searchCatalog.Name = "searchCatalog";
+            searchCatalog.Size = new Size(129, 31);
+            searchCatalog.TabIndex = 14;
+            searchCatalog.Text = "Search";
+            searchCatalog.Click += searchCatalogClicked;
+            searchCatalog.TextChanged += searchCatalog_TextChanged;
+            searchCatalog.KeyDown += searchCatalogEnter;
+            // 
             // ScannerForm
             // 
             AutoScaleDimensions = new SizeF(10F, 25F);
@@ -1263,5 +1276,6 @@ namespace AcmeScanner
         private MaterialSkin.Controls.MaterialButton btnLoadCVEs;
         private Label label17;
         private Label label16;
+        private TextBox searchCatalog;
     }
 }

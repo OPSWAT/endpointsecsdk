@@ -34,6 +34,7 @@ using System.Globalization;
 using System.Net.Http.Json;
 using Newtonsoft.Json.Linq;
 using VAPMAdapter.Catalog;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 
 namespace AcmeScanner
@@ -493,7 +494,7 @@ namespace AcmeScanner
         {
             e.Result = LoadVulnerabilities();
         }
-       
+
         private void loadVulnerabilitiesWorker_Completed(Object sender, RunWorkerCompletedEventArgs e)
         {
             if (e.Error == null)
@@ -511,8 +512,8 @@ namespace AcmeScanner
                     lvVulnerabilities.Columns.Add("CVSS 3.0 Score", 200);
                     lvVulnerabilities.View = View.Details;
                     lvVulnerabilities.Items.AddRange(resultList.ToArray());
-                    lvVulnerabilities.Update(); 
-                    label17.Text = resultList.Count.ToString();                    
+                    lvVulnerabilities.Update();
+                    label17.Text = resultList.Count.ToString();
                     if (!VulnerabilitiesTab.Controls.Contains(lvVulnerabilities))
                     {
                         VulnerabilitiesTab.Controls.Add(lvVulnerabilities);
@@ -708,7 +709,7 @@ namespace AcmeScanner
                         lviCurrent.SubItems.Add(supportsPatch ? signature.PatchAssociations[0].PatchAggregation.LatestVersion : "");
                         lviCurrent.SubItems.Add(signature.BackgroundInstallSupport ? "Yes" : "");
                         lviCurrent.SubItems.Add(signature.ValidateInstallSupport ? "Yes" : "");
-
+                        
                         // Add ListViewItem to the thread-safe collection
                         concurrentResultList.Add(lviCurrent);
 
@@ -1376,16 +1377,16 @@ namespace AcmeScanner
                 foreach (CatalogSignature sig in prod.SigList)
                 {
                     if (sig.Id == sigId)
-                    {                       
+                    {
                         found = true;
                         break;
                     }
                     foundId += 1;
                 }
-                if (found) { break; }                
+                if (found) { break; }
                 i += 1;
             }
-            
+
             CatalogProduct finalProduct = staticProductList[i];
             CatalogSignature finalSignature = finalProduct.SigList[foundId];
             var productWithSingleSignature = new
@@ -1421,7 +1422,8 @@ namespace AcmeScanner
             Dictionary<string, string> mobyFileTimestamps = DownloadMobySubsets.GetMobyFileTimestamps();
 
             // Clear previous controls from the ListView
-            ListView listView = mobySubsetsPanel.Controls.OfType<ListView>().FirstOrDefault();
+            System.Windows.Forms.ListView listView = mobySubsetsPanel.Controls.OfType<System.Windows.Forms.ListView>().FirstOrDefault();
+
             if (listView != null)
             {
                 listView.Items.Clear();
@@ -1465,7 +1467,8 @@ namespace AcmeScanner
 
         private void ListView_ItemActivateMobySubsetTable(object sender, EventArgs e)
         {
-            ListView listView = sender as ListView;
+            System.Windows.Forms.ListView listView = sender as System.Windows.Forms.ListView;
+
             if (listView != null && listView.SelectedItems.Count > 0)
             {
                 string fileName = listView.SelectedItems[0].Text;
