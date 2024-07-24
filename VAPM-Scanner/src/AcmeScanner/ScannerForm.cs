@@ -73,8 +73,6 @@ namespace AcmeScanner
             FillSDKlabels();
             FillMobyLabels();
             SetTitleWithFileVersion();
-            tabCatalog.TabPages.Remove(VulnerabilitiesTab);
-
         }
 
         private void SetTitleWithFileVersion()
@@ -1492,57 +1490,65 @@ namespace AcmeScanner
 
         private List<ListViewItem> LoadVulnerabilities()
         {
+            string filePath = "";
+
             List<ListViewItem> resultList = new List<ListViewItem>();
-            Catalog catalog = new Catalog();
-            string currentDirectory = Environment.CurrentDirectory;
-            string catalogRoot = Path.Combine(currentDirectory, "catalog", "analog", "server");
-            bool isLoaded = catalog.Load(catalogRoot);
 
-            if (!isLoaded)
+            // Read the file and process each line
+            var lines = File.ReadAllLines(filePath);
+
+            foreach (var line in lines)
             {
-                return resultList;
-            }
+                // Assuming each line is formatted as "ProductName SigID"
+                var parts = line.Split(' ');
+                if (parts.Length < 2) continue;
 
-            List<CVEDetail> cveDetails = new List<CVEDetail>();
-            List<CatalogVulnerabilityAssociation> vulnAssociations = catalog.GetVulnerabilityAssociationList();
-            cveDetails = catalog.GetCVEDetailsList(vulnAssociations);
+                string productName = parts[0];
+                string sigID = parts[1];
 
-            foreach (var cveDetail in cveDetails)
-            {
-                ListViewItem item = new ListViewItem(cveDetail.cveId);
-                JObject cveJson = JObject.Parse(cveDetail.rawData);
-                item.SubItems.Add(cveJson["cwe"]?.ToString() ?? "N/A");
-                item.SubItems.Add(GetDateFromEpoch((long?)cveJson["published_epoch"]));
-                item.SubItems.Add(GetDateFromEpoch((long?)cveJson["last_modified_epoch"]));
-                item.SubItems.Add(cveJson["severity"]?.ToString() ?? "N/A");
-                item.SubItems.Add(cveJson["cvss_2_0"]?["score"]?.ToString() ?? "N/A");
-                item.SubItems.Add(cveJson["cvss_3_0"]?["base_score"]?.ToString() ?? "N/A");
+                // Get the JSON string for the product vulnerabilities
+                string productVulJson = TaskGetProductVulnerabilities.MapPatchData(sigID);
 
-                resultList.Add(item);
+                if (!string.IsNullOrEmpty(productVulJson))
+                {
+                    // Parse the JSON
+                    JObject cveJson = JObject.Parse(productVulJson);
+
+                    ListViewItem item = new ListViewItem(productName);
+                    item.SubItems.Add(sigID);
+                    item.SubItems.Add("Double click to view CVEs and resolutions");
+
+                    // Store the JSON content in the Tag property for easy access later
+                    item.Tag = productVulJson;
+
+                    resultList.Add(item);
+                }
             }
 
             return resultList;
         }
 
-
-        private string GetDateFromEpoch(long? epoch)
+        private void LvVulnerabilities_DoubleClick(object sender, EventArgs e)
         {
-            if (epoch.HasValue)
+            if (lvVulnerabilities.SelectedItems.Count > 0)
             {
-                DateTime dateTime = DateTimeOffset.FromUnixTimeSeconds(epoch.Value).DateTime;
-                return dateTime.ToString("yyyy-MM-dd HH:mm:ss");
-            }
-            return "N/A";
-        }
+                ListViewItem selectedItem = lvVulnerabilities.SelectedItems[0];
+                string jsonContent = selectedItem.Tag as string;
 
+                if (!string.IsNullOrEmpty(jsonContent))
+                {
+                    ViewMobyJsonDialog textDialog = new ViewMobyJsonDialog(jsonContent);
+                    textDialog.StartPosition = FormStartPosition.CenterParent;
+                    textDialog.ShowDialog();
+                }
+            }
+        }
 
         private void BtnLoadCVEs_Click(object sender, EventArgs e)
         {
             ShowLoading(true);
             loadVulnerabilitiesWorker.RunWorkerAsync();
         }
-
-
         private void searchCatalogClicked(object sender, EventArgs e)
         {
             if (staticProductList == null)
@@ -1557,7 +1563,6 @@ namespace AcmeScanner
 
         }
 
-
         private void searchCatalog_TextChanged(object sender, EventArgs e)
         {
 
@@ -1565,7 +1570,7 @@ namespace AcmeScanner
             {
                 UpdateCatalogResults();
             }
-            
+
         }
         private List<CatalogSignature> searchResult(string signatureName)
         {
@@ -1579,11 +1584,11 @@ namespace AcmeScanner
                     if (sig.Name.ToLower().Contains(signatureName.ToLower()))
                     {
                         result.Add(sig);
-                        
+
                     }
 
                 }
-            }   
+            }
             return result;
         }
 
@@ -1594,12 +1599,12 @@ namespace AcmeScanner
             bool found = false;
             while (intIndex < lvCatalog.Items.Count)
             {
-                
+
                 string line = lvCatalog.Items[intIndex].SubItems[2].Text;
                 foreach (CatalogSignature sig in resultList)
                 {
                     if (line == sig.Id)
-                    {                        
+                    {
                         found = true;
                         break;
                     }
@@ -1610,7 +1615,7 @@ namespace AcmeScanner
                 }
                 intIndex++;
                 found = false;
-                
+
             }
             lvCatalog.BeginUpdate();
             lvCatalog.Items.Clear();
@@ -1623,10 +1628,10 @@ namespace AcmeScanner
         {
             if (e.KeyCode == Keys.Enter)
             {
-                List<CatalogSignature> resultList= searchResult(searchCatalog.Text);
-                UpdateSearchCatalogResults (resultList);
-                
+                List<CatalogSignature> resultList = searchResult(searchCatalog.Text);
+                UpdateSearchCatalogResults(resultList);
+
             }
         }
-}
+    }
 }

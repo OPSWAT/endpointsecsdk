@@ -1054,6 +1054,10 @@ namespace AcmeScanner
             lvVulnerabilities.TabIndex = 6;
             lvVulnerabilities.UseCompatibleStateImageBehavior = false;
             lvVulnerabilities.View = View.Details;
+            lvVulnerabilities.DoubleClick += LvVulnerabilities_DoubleClick;
+            lvVulnerabilities.Columns.Add("Product Name", 200);
+            lvVulnerabilities.Columns.Add("SigID", 150);
+            lvVulnerabilities.Columns.Add("Details", 300);
             // 
             // panel8
             // 
