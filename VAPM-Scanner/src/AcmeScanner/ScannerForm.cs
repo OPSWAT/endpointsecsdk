@@ -1490,24 +1490,26 @@ namespace AcmeScanner
 
         private List<ListViewItem> LoadVulnerabilities()
         {
-            string filePath = "";
+            string JsonFilePath = Directory.GetCurrentDirectory();
+            string JsonName = "T1Applications.json";
+            string FilePath = Path.Combine(JsonFilePath, JsonName);
 
             List<ListViewItem> resultList = new List<ListViewItem>();
 
-            // Read the file and process each line
-            var lines = File.ReadAllLines(filePath);
+            // Read and parse the JSON file
+            var jsonContent = File.ReadAllText(FilePath);
+            var productList = JArray.Parse(jsonContent);
 
-            foreach (var line in lines)
+            foreach (var product in productList)
             {
-                // Assuming each line is formatted as "ProductName SigID"
-                var parts = line.Split(' ');
-                if (parts.Length < 2) continue;
+                string productName = product["name"]?.ToString();
+                string productID = product["productID"]?.ToString();
 
-                string productName = parts[0];
-                string sigID = parts[1];
+                if (string.IsNullOrEmpty(productName) || string.IsNullOrEmpty(productID))
+                    continue;
 
                 // Get the JSON string for the product vulnerabilities
-                string productVulJson = TaskGetProductVulnerabilities.MapPatchData(sigID);
+                string productVulJson = TaskGetProductVulnerabilities.MapPatchData(productID);
 
                 if (!string.IsNullOrEmpty(productVulJson))
                 {
@@ -1515,7 +1517,7 @@ namespace AcmeScanner
                     JObject cveJson = JObject.Parse(productVulJson);
 
                     ListViewItem item = new ListViewItem(productName);
-                    item.SubItems.Add(sigID);
+                    item.SubItems.Add(productID);
                     item.SubItems.Add("Double click to view CVEs and resolutions");
 
                     // Store the JSON content in the Tag property for easy access later

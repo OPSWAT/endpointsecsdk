@@ -32,7 +32,7 @@ namespace VAPMAdapter.Tasks
             OESISPipe.Teardown();
 
 
-            return "";
+            return ProductVulJson;
         }
 
     }
