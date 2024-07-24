@@ -1541,11 +1541,87 @@ namespace AcmeScanner
             }
         }
 
-
         private void BtnLoadCVEs_Click(object sender, EventArgs e)
         {
             ShowLoading(true);
             loadVulnerabilitiesWorker.RunWorkerAsync();
-        }      
+        }
+        private void searchCatalogClicked(object sender, EventArgs e)
+        {
+            if (searchCatalog.Text == "Search")
+            {
+                searchCatalog.Text = "";
+            }
+        }
+
+        private void searchCatalog_TextChanged(object sender, EventArgs e)
+        {
+
+            if (searchCatalog.Text == "")
+            {
+                UpdateCatalogResults();
+            }
+
+        }
+        private List<CatalogSignature> searchResult(string signatureName)
+        {
+            List<CatalogSignature> result = new List<CatalogSignature>();
+
+            foreach (CatalogProduct prod in staticProductList)
+            {
+
+                foreach (CatalogSignature sig in prod.SigList)
+                {
+                    if (sig.Name.ToLower().Contains(signatureName.ToLower()))
+                    {
+                        result.Add(sig);
+
+                    }
+
+                }
+            }
+            return result;
+        }
+
+        private void UpdateSearchCatalogResults(List<CatalogSignature> resultList)
+        {
+            List<ListViewItem> resultListCatalog = new List<ListViewItem>();
+            int intIndex = 0;
+            bool found = false;
+            while (intIndex < lvCatalog.Items.Count)
+            {
+
+                string line = lvCatalog.Items[intIndex].SubItems[2].Text;
+                foreach (CatalogSignature sig in resultList)
+                {
+                    if (line == sig.Id)
+                    {
+                        found = true;
+                        break;
+                    }
+                }
+                if (found)
+                {
+                    resultListCatalog.Add(lvCatalog.Items[intIndex]);
+                }
+                intIndex++;
+                found = false;
+
+            }
+            lvCatalog.BeginUpdate();
+            lvCatalog.Items.Clear();
+            lvCatalog.Items.AddRange(resultListCatalog.ToArray());
+            lvCatalog.EndUpdate();
+        }
+
+        private void searchCatalogEnter(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+            {
+                List<CatalogSignature> resultList = searchResult(searchCatalog.Text);
+                UpdateSearchCatalogResults(resultList);
+
+            }
+        }
     }
 }
