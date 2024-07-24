@@ -1567,8 +1567,8 @@ namespace AcmeScanner
         {
 
             if (!isCatalogUpdated)
-            {
-                UpdateCatalogResults();
+            {                
+                UpdateCatalogResults();                
             }
 
         }
