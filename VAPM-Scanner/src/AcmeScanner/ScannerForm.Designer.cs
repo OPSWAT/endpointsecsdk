@@ -67,6 +67,7 @@ namespace AcmeScanner
             tabPage3 = new TabPage();
             lvCatalog = new ScannerListView();
             panel5 = new Panel();
+            searchCatalog = new TextBox();
             btnDomainCSV = new MaterialSkin.Controls.MaterialButton();
             btnFreshInstall = new MaterialSkin.Controls.MaterialButton();
             btnExportCSV = new MaterialSkin.Controls.MaterialButton();
@@ -105,7 +106,6 @@ namespace AcmeScanner
             listView = new ListView();
             btnClose = new Button();
             MobySubsetsLabel = new Label();
-            searchCatalog = new TextBox();
             panel1.SuspendLayout();
             panel3.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)pbLoading).BeginInit();
@@ -591,6 +591,17 @@ namespace AcmeScanner
             panel5.Size = new Size(1509, 127);
             panel5.TabIndex = 5;
             // 
+            // searchCatalog
+            // 
+            searchCatalog.Location = new Point(545, 62);
+            searchCatalog.Name = "searchCatalog";
+            searchCatalog.Size = new Size(129, 31);
+            searchCatalog.TabIndex = 14;
+            searchCatalog.Text = "Search";
+            searchCatalog.Click += searchCatalogClicked;
+            searchCatalog.TextChanged += searchCatalog_TextChanged;
+            searchCatalog.KeyDown += searchCatalogEnter;
+            // 
             // btnDomainCSV
             // 
             btnDomainCSV.AutoSize = false;
@@ -599,7 +610,7 @@ namespace AcmeScanner
             btnDomainCSV.Depth = 0;
             btnDomainCSV.HighEmphasis = true;
             btnDomainCSV.Icon = null;
-            btnDomainCSV.Location = new Point(647, 33);
+            btnDomainCSV.Location = new Point(681, 33);
             btnDomainCSV.Margin = new Padding(4, 7, 4, 7);
             btnDomainCSV.MouseState = MaterialSkin.MouseState.HOVER;
             btnDomainCSV.Name = "btnDomainCSV";
@@ -621,7 +632,7 @@ namespace AcmeScanner
             btnFreshInstall.Depth = 0;
             btnFreshInstall.HighEmphasis = true;
             btnFreshInstall.Icon = null;
-            btnFreshInstall.Location = new Point(984, 33);
+            btnFreshInstall.Location = new Point(1011, 33);
             btnFreshInstall.Margin = new Padding(4, 7, 4, 7);
             btnFreshInstall.MouseState = MaterialSkin.MouseState.HOVER;
             btnFreshInstall.Name = "btnFreshInstall";
@@ -642,7 +653,7 @@ namespace AcmeScanner
             btnExportCSV.Depth = 0;
             btnExportCSV.HighEmphasis = true;
             btnExportCSV.Icon = null;
-            btnExportCSV.Location = new Point(1321, 33);
+            btnExportCSV.Location = new Point(1341, 32);
             btnExportCSV.Margin = new Padding(4, 7, 4, 7);
             btnExportCSV.MouseState = MaterialSkin.MouseState.HOVER;
             btnExportCSV.Name = "btnExportCSV";
@@ -707,7 +718,7 @@ namespace AcmeScanner
             btnLookupCVE.Depth = 0;
             btnLookupCVE.HighEmphasis = true;
             btnLookupCVE.Icon = null;
-            btnLookupCVE.Location = new Point(816, 33);
+            btnLookupCVE.Location = new Point(846, 33);
             btnLookupCVE.Margin = new Padding(4, 7, 4, 7);
             btnLookupCVE.MouseState = MaterialSkin.MouseState.HOVER;
             btnLookupCVE.Name = "btnLookupCVE";
@@ -750,7 +761,7 @@ namespace AcmeScanner
             btnListCatalogCVE.Depth = 0;
             btnListCatalogCVE.HighEmphasis = true;
             btnListCatalogCVE.Icon = null;
-            btnListCatalogCVE.Location = new Point(1153, 33);
+            btnListCatalogCVE.Location = new Point(1176, 33);
             btnListCatalogCVE.Margin = new Padding(4, 7, 4, 7);
             btnListCatalogCVE.MouseState = MaterialSkin.MouseState.HOVER;
             btnListCatalogCVE.Name = "btnListCatalogCVE";
@@ -1055,9 +1066,6 @@ namespace AcmeScanner
             lvVulnerabilities.UseCompatibleStateImageBehavior = false;
             lvVulnerabilities.View = View.Details;
             lvVulnerabilities.DoubleClick += LvVulnerabilities_DoubleClick;
-            lvVulnerabilities.Columns.Add("Product Name", 200);
-            lvVulnerabilities.Columns.Add("SigID", 150);
-            lvVulnerabilities.Columns.Add("Details", 300);
             // 
             // panel8
             // 
@@ -1153,17 +1161,6 @@ namespace AcmeScanner
             MobySubsetsLabel.Size = new Size(534, 29);
             MobySubsetsLabel.TabIndex = 2;
             MobySubsetsLabel.Text = "Double-click a JSON name to view its content";
-            // 
-            // searchCatalog
-            // 
-            searchCatalog.Location = new Point(497, 39);
-            searchCatalog.Name = "searchCatalog";
-            searchCatalog.Size = new Size(129, 31);
-            searchCatalog.TabIndex = 14;
-            searchCatalog.Text = "Search";
-            searchCatalog.Click += searchCatalogClicked;
-            searchCatalog.TextChanged += searchCatalog_TextChanged;
-            searchCatalog.KeyDown += searchCatalogEnter;
             // 
             // ScannerForm
             // 
