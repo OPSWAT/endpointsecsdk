@@ -505,13 +505,9 @@ namespace AcmeScanner
                 lvVulnerabilities.BeginInvoke(new Action(() =>
                 {
                     lvVulnerabilities.Columns.Clear();
-                    lvVulnerabilities.Columns.Add("CVE ID", 200);
-                    lvVulnerabilities.Columns.Add("CWE", 200);
-                    lvVulnerabilities.Columns.Add("Published Date", 200);
-                    lvVulnerabilities.Columns.Add("Last Modified Date", 200);
-                    lvVulnerabilities.Columns.Add("Severity", 100);
-                    lvVulnerabilities.Columns.Add("CVSS 2.0 Score", 200);
-                    lvVulnerabilities.Columns.Add("CVSS 3.0 Score", 200);
+                    lvVulnerabilities.Columns.Add("Application Name", 200);
+                    lvVulnerabilities.Columns.Add("SigID", 200);
+                    lvVulnerabilities.Columns.Add("Info", 300);
                     lvVulnerabilities.View = View.Details;
                     lvVulnerabilities.Items.AddRange(resultList.ToArray());
                     lvVulnerabilities.Update();
@@ -1494,6 +1490,7 @@ namespace AcmeScanner
             string FilePath = Path.Combine(JsonFilePath, JsonName);
 
             List<ListViewItem> resultList = new List<ListViewItem>();
+            Dictionary<string, string> productDictionary = new Dictionary<string, string>();
 
             // Read and parse the JSON file
             var jsonContent = File.ReadAllText(FilePath);
@@ -1507,52 +1504,59 @@ namespace AcmeScanner
                 if (string.IsNullOrEmpty(productName) || string.IsNullOrEmpty(productID))
                     continue;
 
-                // Get the JSON string for the product vulnerabilities
-                string productVulJson = TaskGetProductVulnerabilities.MapPatchData(productID);
+                // Populate the dictionary with productID as the key and productName as the value
+                productDictionary[productID] = productName;
+            }
 
-                if (!string.IsNullOrEmpty(productVulJson))
+            // Pass the dictionary to MapPatchData to get vulnerabilities
+            var vulnerabilities = TaskGetProductVulnerabilities.MapPatchData(productDictionary);
+
+            foreach (var kvp in vulnerabilities)
+            {
+                string productID = kvp.Key;
+                string productVulJson = kvp.Value;
+                string productName = productDictionary[productID];
+
+                if (productVulJson == "Install app to see data")
                 {
-                    if (productVulJson == "Install app to see data")
+                    ListViewItem item = new ListViewItem(productName);
+                    item.SubItems.Add(productID);
+                    item.SubItems.Add(productVulJson); // Use the error message directly
+
+                    // Optionally store an empty JSON or a message in the Tag property
+                    item.Tag = productVulJson;
+
+                    resultList.Add(item);
+                }
+                else
+                {
+                    try
                     {
+                        // Try to parse the JSON
+                        JObject cveJson = JObject.Parse(productVulJson);
+
                         ListViewItem item = new ListViewItem(productName);
                         item.SubItems.Add(productID);
-                        item.SubItems.Add(productVulJson); // Use the error message directly
+                        item.SubItems.Add("Double click to view CVEs and resolutions");
 
-                        // Optionally store an empty JSON or a message in the Tag property
+                        // Store the JSON content in the Tag property for easy access later
                         item.Tag = productVulJson;
 
                         resultList.Add(item);
                     }
-                    else
+                    catch (JsonReaderException ex)
                     {
-                        try
-                        {
-                            // Try to parse the JSON
-                            JObject cveJson = JObject.Parse(productVulJson);
+                        // Handle JSON parsing error
+                        Console.WriteLine($"Error parsing JSON for productID {productID}: {ex.Message}");
+                        // Optionally add an item with an error message
+                        ListViewItem item = new ListViewItem(productName);
+                        item.SubItems.Add(productID);
+                        item.SubItems.Add("Error parsing product vulnerabilities");
 
-                            ListViewItem item = new ListViewItem(productName);
-                            item.SubItems.Add(productID);
-                            item.SubItems.Add("Double click to view CVEs and resolutions");
+                        // Optionally store the error message or invalid JSON in the Tag property
+                        item.Tag = productVulJson;
 
-                            // Store the JSON content in the Tag property for easy access later
-                            item.Tag = productVulJson;
-
-                            resultList.Add(item);
-                        }
-                        catch (JsonReaderException ex)
-                        {
-                            // Handle JSON parsing error
-                            Console.WriteLine($"Error parsing JSON for productID {productID}: {ex.Message}");
-                            // Optionally add an item with an error message
-                            ListViewItem item = new ListViewItem(productName);
-                            item.SubItems.Add(productID);
-                            item.SubItems.Add("Error parsing product vulnerabilities");
-
-                            // Optionally store the error message or invalid JSON in the Tag property
-                            item.Tag = productVulJson;
-
-                            resultList.Add(item);
-                        }
+                        resultList.Add(item);
                     }
                 }
             }
@@ -1569,9 +1573,22 @@ namespace AcmeScanner
 
                 if (!string.IsNullOrEmpty(jsonContent))
                 {
-                    ViewMobyJsonDialog textDialog = new ViewMobyJsonDialog(jsonContent);
-                    textDialog.StartPosition = FormStartPosition.CenterParent;
-                    textDialog.ShowDialog();
+                    try
+                    {
+                        // Parse and format the JSON string
+                        var parsedJson = JToken.Parse(jsonContent);
+                        string formattedJson = parsedJson.ToString(Formatting.Indented);
+
+                        // Pass the formatted JSON string to the dialog
+                        ViewMobyJsonDialog textDialog = new ViewMobyJsonDialog(formattedJson);
+                        textDialog.StartPosition = FormStartPosition.CenterParent;
+                        textDialog.ShowDialog();
+                    }
+                    catch (JsonReaderException ex)
+                    {
+                        // Handle JSON parsing error
+                        MessageBox.Show($"Error parsing JSON: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
                 }
             }
         }

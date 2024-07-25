@@ -12,21 +12,18 @@ namespace VAPMAdapter.Tasks
 {
     public class TaskGetProductVulnerabilities
     {
-        public static string MapPatchData(string SigID)
+        //could speed up this process by saving a hask map of sigID, and iterating through it and only initializing the framework once. Not initializing it over and over.
+        public static Dictionary<string, string> MapPatchData(Dictionary<string, string> productDictionary)
         {
-            string ProductVulJson = "";
+            Dictionary<string, string> result = new Dictionary<string, string>();
             string Database = "v2mod.dat";
             string DetectedProducts = "";
 
-            // 
             // Check to make sure that vmod.dat is available in the working directory
-            //
             OESISUtil.ValidateDatabaseFiles();
 
-            //
             // First initialize the OESIS Framework
-            // Always enable debugging on an install.  Clean this up on a success, but save this on a failure
-            //
+            // Always enable debugging on an install. Clean this up on a success, but save this on a failure
             OESISPipe.InitializeFramework(true);
 
             OESISPipe.ConsumeOfflineVmodDatabase(Database);
@@ -35,27 +32,34 @@ namespace VAPMAdapter.Tasks
 
             OESISUtil.GetProductList(DetectedProducts);
 
-            try
+            foreach (var kvp in productDictionary)
             {
-                ProductVulJson = OESISPipe.GetProductVulnerability(SigID);
-            }
-            catch (Exception ex)
-            {
-                if (ex.Message.Contains("-1005"))
+                string productID = kvp.Key;
+                string ProductVulJson = "";
+
+                try
                 {
-                    ProductVulJson = "Install app to see data";
+                    ProductVulJson = OESISPipe.GetProductVulnerability(productID);
                 }
-                else
+                catch (Exception ex)
                 {
-                    throw;
+                    if (ex.Message.Contains("-1005"))
+                    {
+                        ProductVulJson = "Install app to see data";
+                    }
+                    else
+                    {
+                        throw;
+                    }
                 }
+
+                result[productID] = ProductVulJson;
             }
 
-            //Teardown the framework
+            // Teardown the framework
             OESISPipe.Teardown();
 
-
-            return ProductVulJson;
+            return result;
         }
 
     }
