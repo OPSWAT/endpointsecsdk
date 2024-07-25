@@ -37,20 +37,16 @@ namespace VAPMAdapter.Tasks
                 string productID = kvp.Key;
                 string ProductVulJson = "";
 
-                try
+                // Get the vulnerability string for the product ID
+                string vulnerabilityResult = OESISPipe.GetProductVulnerability(productID);
+
+                if (vulnerabilityResult == "-1005")
                 {
-                    ProductVulJson = OESISPipe.GetProductVulnerability(productID);
+                    ProductVulJson = "Install app to see data";
                 }
-                catch (Exception ex)
+                else
                 {
-                    if (ex.Message.Contains("-1005"))
-                    {
-                        ProductVulJson = "Install app to see data";
-                    }
-                    else
-                    {
-                        throw;
-                    }
+                    ProductVulJson = vulnerabilityResult;
                 }
 
                 result[productID] = ProductVulJson;
