@@ -171,7 +171,15 @@ namespace VAPMAdapter.OESIS
             int rc = Invoke(json_in, out result);
             if (rc < 0)
             {
-                throw new Exception("GetProductVulnerability failed to run correctly.  " + result);
+                if (rc == -1005)
+                {
+                    // Return a specific message for the -1005 error code
+                    return "-1005";
+                }
+                else
+                {
+                    throw new Exception("GetProductVulnerability failed to run correctly.  " + result);
+                }
             }
 
             return result;

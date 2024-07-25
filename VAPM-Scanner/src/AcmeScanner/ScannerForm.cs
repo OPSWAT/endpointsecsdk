@@ -521,7 +521,6 @@ namespace AcmeScanner
                         VulnerabilitiesTab.Controls.Add(lvVulnerabilities);
                     }
                     ShowLoading(false);
-                    lvVulnerabilities.Hide();
                 }));
             }
             else
@@ -1513,17 +1512,48 @@ namespace AcmeScanner
 
                 if (!string.IsNullOrEmpty(productVulJson))
                 {
-                    // Parse the JSON
-                    JObject cveJson = JObject.Parse(productVulJson);
+                    if (productVulJson == "Install app to see data")
+                    {
+                        ListViewItem item = new ListViewItem(productName);
+                        item.SubItems.Add(productID);
+                        item.SubItems.Add(productVulJson); // Use the error message directly
 
-                    ListViewItem item = new ListViewItem(productName);
-                    item.SubItems.Add(productID);
-                    item.SubItems.Add("Double click to view CVEs and resolutions");
+                        // Optionally store an empty JSON or a message in the Tag property
+                        item.Tag = productVulJson;
 
-                    // Store the JSON content in the Tag property for easy access later
-                    item.Tag = productVulJson;
+                        resultList.Add(item);
+                    }
+                    else
+                    {
+                        try
+                        {
+                            // Try to parse the JSON
+                            JObject cveJson = JObject.Parse(productVulJson);
 
-                    resultList.Add(item);
+                            ListViewItem item = new ListViewItem(productName);
+                            item.SubItems.Add(productID);
+                            item.SubItems.Add("Double click to view CVEs and resolutions");
+
+                            // Store the JSON content in the Tag property for easy access later
+                            item.Tag = productVulJson;
+
+                            resultList.Add(item);
+                        }
+                        catch (JsonReaderException ex)
+                        {
+                            // Handle JSON parsing error
+                            Console.WriteLine($"Error parsing JSON for productID {productID}: {ex.Message}");
+                            // Optionally add an item with an error message
+                            ListViewItem item = new ListViewItem(productName);
+                            item.SubItems.Add(productID);
+                            item.SubItems.Add("Error parsing product vulnerabilities");
+
+                            // Optionally store the error message or invalid JSON in the Tag property
+                            item.Tag = productVulJson;
+
+                            resultList.Add(item);
+                        }
+                    }
                 }
             }
 
