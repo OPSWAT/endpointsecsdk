@@ -1593,10 +1593,10 @@ namespace AcmeScanner
                         textDialog.StartPosition = FormStartPosition.CenterParent;
                         textDialog.ShowDialog();
                     }
-                    catch (JsonReaderException ex)
+                    catch
                     {
                         // Handle JSON parsing error
-                        MessageBox.Show($"Error parsing JSON: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        MessageBox.Show($"Error", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     }
                 }
             }
