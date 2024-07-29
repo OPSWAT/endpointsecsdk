@@ -511,7 +511,7 @@ namespace AcmeScanner
                     lvVulnerabilities.View = View.Details;
                     lvVulnerabilities.Items.AddRange(resultList.ToArray());
                     lvVulnerabilities.Update();
-                    label17.Text = resultList.Count.ToString();
+                    
                     if (!VulnerabilitiesTab.Controls.Contains(lvVulnerabilities))
                     {
                         VulnerabilitiesTab.Controls.Add(lvVulnerabilities);
@@ -1485,6 +1485,7 @@ namespace AcmeScanner
 
         private List<ListViewItem> LoadVulnerabilities()
         {
+            int cveCount=0;
             string JsonFilePath = Directory.GetCurrentDirectory();
             string JsonName = "T1Applications.json";
             string FilePath = Path.Combine(JsonFilePath, JsonName);
@@ -1532,8 +1533,10 @@ namespace AcmeScanner
                 {
                     try
                     {
+                        
                         // Try to parse the JSON
                         JObject cveJson = JObject.Parse(productVulJson);
+                        cveCount += cveJson["result"]["cves"].Count();
 
                         ListViewItem item = new ListViewItem(productName);
                         item.SubItems.Add(productID);
@@ -1560,7 +1563,13 @@ namespace AcmeScanner
                     }
                 }
             }
-
+            if (InvokeRequired)
+            {                 
+                this.Invoke(new MethodInvoker(delegate {
+                    label17.Text = cveCount.ToString();
+                }));                
+            }
+            
             return resultList;
         }
 
