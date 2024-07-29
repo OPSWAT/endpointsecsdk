@@ -507,6 +507,7 @@ namespace AcmeScanner
                 {
                     lvVulnerabilities.Columns.Clear();
                     lvVulnerabilities.Columns.Add("Application Name", 200);
+                    lvVulnerabilities.Columns.Add("Platform", 200);
                     lvVulnerabilities.Columns.Add("SigID", 200);
                     lvVulnerabilities.Columns.Add("Info", 300);
                     lvVulnerabilities.View = View.Details;
@@ -1532,9 +1533,20 @@ namespace AcmeScanner
                 string productVulJson = kvp.Value;
                 string productName = productDictionary[productID];
 
+                string platform = "Windows"; // Default platform
+                if (productName.Contains("macOS", StringComparison.OrdinalIgnoreCase))
+                {
+                    platform = "Mac";
+                }
+                else if (productName.Contains("Linux", StringComparison.OrdinalIgnoreCase))
+                {
+                    platform = "Linux";
+                }
+
                 if (productVulJson == "Install app to see data")
                 {
                     ListViewItem item = new ListViewItem(productName);
+                    item.SubItems.Add(platform); // Add platform information
                     item.SubItems.Add(productID);
                     item.SubItems.Add(productVulJson); // Use the error message directly
 
@@ -1547,12 +1559,12 @@ namespace AcmeScanner
                 {
                     try
                     {
-
                         // Try to parse the JSON
                         JObject cveJson = JObject.Parse(productVulJson);
                         cveCount += cveJson["result"]["cves"].Count();
 
                         ListViewItem item = new ListViewItem(productName);
+                        item.SubItems.Add(platform);
                         item.SubItems.Add(productID);
                         item.SubItems.Add("Double click to view CVEs and resolutions");
 
@@ -1567,6 +1579,7 @@ namespace AcmeScanner
                         Console.WriteLine($"Error parsing JSON for productID {productID}: {ex.Message}");
                         // Optionally add an item with an error message
                         ListViewItem item = new ListViewItem(productName);
+                        item.SubItems.Add(platform); // Add platform information
                         item.SubItems.Add(productID);
                         item.SubItems.Add("Error parsing product vulnerabilities");
 
@@ -1577,6 +1590,7 @@ namespace AcmeScanner
                     }
                 }
             }
+
             if (InvokeRequired)
             {
                 this.Invoke(new MethodInvoker(delegate
@@ -1587,6 +1601,7 @@ namespace AcmeScanner
 
             return resultList;
         }
+
 
         private void LvVulnerabilities_DoubleClick(object sender, EventArgs e)
         {
