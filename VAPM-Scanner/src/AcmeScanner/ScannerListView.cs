@@ -171,7 +171,7 @@ namespace AcmeScanner
             {
                 OrchestrationClickHandler(sender, e);
             }
-            else if (this.SelectedItems.Count > 0 && this.Columns[0].Text=="Application")
+            else if (this.SelectedItems.Count > 0 && this.Columns[0].Text=="Application"&& this.Columns[1].Text=="Installed")
             {
                 CatalogClickHandler(sender, e);
             }
