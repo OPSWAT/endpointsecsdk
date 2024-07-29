@@ -33,10 +33,12 @@ namespace AcmeScanner
             this.GridLines = true;
             this.View = View.Details;
             this.MultiSelect = false;
-            
-            this.MouseDoubleClick += ScannerListView_MouseClick;
+            this.MouseClick += ScannerListView_MouseClick;
+            this.MouseDoubleClick += ScannerListView_MouseDoubleClick;
            
         }
+
+        
 
         private void Lv_ColumnClick(object sender, ColumnClickEventArgs e)
         {
@@ -166,6 +168,15 @@ namespace AcmeScanner
         }
 
         private void ScannerListView_MouseClick(object sender, MouseEventArgs e)
+        {
+            if (this.SelectedItems.Count > 0 && this.Columns[0].Text == "Application" && this.Columns[1].Text == "Installed")
+            {
+                ScannerForm formObject = (ScannerForm)((ScannerListView)sender).Tag;
+                formObject.EnableButtons(true);
+            }
+        }
+
+        private void ScannerListView_MouseDoubleClick(object sender, MouseEventArgs e)
         {
             if (this.SelectedItems.Count > 0 && this.Columns[0].Text=="Title")
             {

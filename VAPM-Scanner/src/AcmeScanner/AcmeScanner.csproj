@@ -6,7 +6,7 @@
     <UseWindowsForms>true</UseWindowsForms>
     <PlatformTarget>x64</PlatformTarget>
     <ApplicationManifest>app.manifest</ApplicationManifest>
-    <Version>1.0.0.211</Version>
+    <Version>1.0.0.271</Version>
   </PropertyGroup>
   <Target Name="UpdateVersion" BeforeTargets="BeforeBuild">
     <Exec Command="powershell -ExecutionPolicy Bypass -File UpdateVersion.ps1 $(MSBuildProjectDirectory)\$(MSBuildProjectName).csproj" />

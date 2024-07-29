@@ -73,7 +73,9 @@ namespace AcmeScanner
             FillSDKlabels();
             FillMobyLabels();
             SetTitleWithFileVersion();
+            ;
         }
+
 
         private void SetTitleWithFileVersion()
         {
@@ -342,7 +344,6 @@ namespace AcmeScanner
                 UpdateCatalogResults();
             }
             CatalogCache.CachedCatalog = staticProductList;
-            if (CatalogCache.CachedCatalog == null) { Debug.WriteLine("after loading cataog also null"); }
             ShowLoading(false);
             searchCatalog.Enabled = true;
             UpdateScanResults();
@@ -511,7 +512,7 @@ namespace AcmeScanner
                     lvVulnerabilities.View = View.Details;
                     lvVulnerabilities.Items.AddRange(resultList.ToArray());
                     lvVulnerabilities.Update();
-                    
+
                     if (!VulnerabilitiesTab.Controls.Contains(lvVulnerabilities))
                     {
                         VulnerabilitiesTab.Controls.Add(lvVulnerabilities);
@@ -544,7 +545,7 @@ namespace AcmeScanner
             return ShowMessageDialog(messageDialog);
         }
 
-        private void EnableButtons(bool enabled)
+        public void EnableButtons(bool enabled)
         {
             bool SDKdownload = UpdateSDK.DoesSDKExist();
             bool DBdownload = UpdateDBFiles.DoesDBExist();
@@ -600,6 +601,18 @@ namespace AcmeScanner
                 btnMobyViewTotals.Enabled = enabled;
                 btnRunChecksMoby.Enabled = enabled;
                 btnViewMobySubsets.Enabled = enabled;
+            }
+            if (staticProductList == null)
+            {
+                btnDomainCSV.Enabled = false;
+                btnFreshInstall.Enabled = false;
+                btnListCatalogCVE.Enabled = false;
+                btnExportCSV.Enabled = false;
+            }
+            if (lvCatalog != null && lvCatalog.SelectedItems.Count == 0)
+            {
+                btnListCatalogCVE.Enabled = false;
+                btnFreshInstall.Enabled = false;
             }
             btnUpdate.Enabled = enabled;
             btnUpdateSDK.Enabled = enabled;
@@ -664,6 +677,7 @@ namespace AcmeScanner
             lvCatalog.Columns.Add("Background", 80);
             lvCatalog.Columns.Add("Validate", 80);
             lvCatalog.Columns.Add("", 400);
+            lvCatalog.Tag = this;
             lvCatalog.View = View.Details;
             lvCatalog.Update();
 
@@ -706,7 +720,7 @@ namespace AcmeScanner
                         lviCurrent.SubItems.Add(supportsPatch ? signature.PatchAssociations[0].PatchAggregation.LatestVersion : "");
                         lviCurrent.SubItems.Add(signature.BackgroundInstallSupport ? "Yes" : "");
                         lviCurrent.SubItems.Add(signature.ValidateInstallSupport ? "Yes" : "");
-                        
+
                         // Add ListViewItem to the thread-safe collection
                         concurrentResultList.Add(lviCurrent);
 
@@ -1485,7 +1499,7 @@ namespace AcmeScanner
 
         private List<ListViewItem> LoadVulnerabilities()
         {
-            int cveCount=0;
+            int cveCount = 0;
             string JsonFilePath = Directory.GetCurrentDirectory();
             string JsonName = "T1Applications.json";
             string FilePath = Path.Combine(JsonFilePath, JsonName);
@@ -1533,7 +1547,7 @@ namespace AcmeScanner
                 {
                     try
                     {
-                        
+
                         // Try to parse the JSON
                         JObject cveJson = JObject.Parse(productVulJson);
                         cveCount += cveJson["result"]["cves"].Count();
@@ -1564,12 +1578,13 @@ namespace AcmeScanner
                 }
             }
             if (InvokeRequired)
-            {                 
-                this.Invoke(new MethodInvoker(delegate {
+            {
+                this.Invoke(new MethodInvoker(delegate
+                {
                     label17.Text = cveCount.ToString();
-                }));                
+                }));
             }
-            
+
             return resultList;
         }
 
@@ -1614,7 +1629,7 @@ namespace AcmeScanner
                 searchCatalog.Enabled = false;
                 return;
             }
-            if (searchCatalog.Text == "Search")
+            if (searchCatalog.Text == "Search Products")
             {
                 searchCatalog.Text = "";
             }
@@ -1625,8 +1640,8 @@ namespace AcmeScanner
         {
 
             if (!isCatalogUpdated)
-            {                
-                UpdateCatalogResults();                
+            {
+                UpdateCatalogResults();
             }
 
         }
@@ -1691,5 +1706,7 @@ namespace AcmeScanner
 
             }
         }
+
+        
     }
 }
