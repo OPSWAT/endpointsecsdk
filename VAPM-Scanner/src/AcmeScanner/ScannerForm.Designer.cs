@@ -387,7 +387,7 @@ namespace AcmeScanner
             tabPage2.Padding = new Padding(4, 5, 4, 5);
             tabPage2.Size = new Size(1517, 960);
             tabPage2.TabIndex = 1;
-            tabPage2.Text = "Orchestration";
+            tabPage2.Text = "Patches";
             tabPage2.UseVisualStyleBackColor = true;
             // 
             // lvOrchestrationScanResult
