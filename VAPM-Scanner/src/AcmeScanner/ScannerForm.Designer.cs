@@ -667,7 +667,7 @@ namespace AcmeScanner
             btnListCatalogCVE.NoAccentTextColor = Color.Empty;
             btnListCatalogCVE.Size = new Size(110, 32);
             btnListCatalogCVE.TabIndex = 1;
-            btnListCatalogCVE.Text = "Product CVES";
+            btnListCatalogCVE.Text = "View CVES";
             btnListCatalogCVE.Type = MaterialSkin.Controls.MaterialButton.MaterialButtonType.Contained;
             btnListCatalogCVE.UseAccentColor = false;
             btnListCatalogCVE.UseVisualStyleBackColor = true;
