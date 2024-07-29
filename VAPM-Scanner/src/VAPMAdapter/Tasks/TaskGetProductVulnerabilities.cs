@@ -26,10 +26,13 @@ namespace VAPMAdapter.Tasks
             // Always enable debugging on an install. Clean this up on a success, but save this on a failure
             OESISPipe.InitializeFramework(true);
 
+            //load the database
             OESISPipe.ConsumeOfflineVmodDatabase(Database);
 
+            //detects products on your device
             DetectedProducts = OESISPipe.DetectProducts();
 
+            //updates the cache of the detected products
             OESISUtil.GetProductList(DetectedProducts);
 
             foreach (var kvp in productDictionary)
