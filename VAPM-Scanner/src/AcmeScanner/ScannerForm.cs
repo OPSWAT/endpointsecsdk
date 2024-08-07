@@ -73,10 +73,10 @@ namespace AcmeScanner
             FillSDKlabels();
             FillMobyLabels();
             SetTitleWithFileVersion();
-            ;
+
         }
 
-
+        //
         private void SetTitleWithFileVersion()
         {
             string exePath = Assembly.GetExecutingAssembly().Location;
@@ -460,7 +460,6 @@ namespace AcmeScanner
                 label9.ForeColor = System.Drawing.Color.Black;
                 label12.ForeColor = System.Drawing.Color.Black;
                 label15.ForeColor = System.Drawing.Color.Black;
-                btnUpdate.Text = "Update DB";
             }
 
             else
@@ -471,7 +470,6 @@ namespace AcmeScanner
                 label7.ForeColor = System.Drawing.Color.Black;
                 label11.ForeColor = System.Drawing.Color.Black;
                 label14.ForeColor = System.Drawing.Color.Black;
-                btnUpdateSDK.Text = "Update SDK";
             }
         }
 
@@ -590,7 +588,6 @@ namespace AcmeScanner
                 btnUpdateMoby.UseAccentColor = true;
                 btnUpdateMoby.Text = "Download Moby";
                 btnLoadMoby.Enabled = false;
-                btnViewJson.Enabled = false;
                 btnMobyViewTotals.Enabled = false;
                 btnRunChecksMoby.Enabled = false;
                 btnViewMobySubsets.Enabled = false;
@@ -598,7 +595,6 @@ namespace AcmeScanner
             else
             {
                 btnLoadMoby.Enabled = enabled;
-                btnViewJson.Enabled = enabled;
                 btnMobyViewTotals.Enabled = enabled;
                 btnRunChecksMoby.Enabled = enabled;
                 btnViewMobySubsets.Enabled = enabled;
@@ -1717,7 +1713,5 @@ namespace AcmeScanner
 
             }
         }
-
-        
     }
 }

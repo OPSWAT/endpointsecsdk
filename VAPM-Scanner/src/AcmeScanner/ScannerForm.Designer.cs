@@ -95,7 +95,6 @@ namespace AcmeScanner
             btnRunChecksMoby = new MaterialSkin.Controls.MaterialButton();
             btnUpdateMoby = new MaterialSkin.Controls.MaterialButton();
             btnMobyViewTotals = new MaterialSkin.Controls.MaterialButton();
-            btnViewJson = new MaterialSkin.Controls.MaterialButton();
             btnLoadMoby = new MaterialSkin.Controls.MaterialButton();
             VulnerabilitiesTab = new TabPage();
             lvVulnerabilities = new ScannerListView();
@@ -154,7 +153,8 @@ namespace AcmeScanner
             // label9
             // 
             label9.AutoSize = true;
-            label9.Location = new Point(941, 75);
+            label9.Location = new Point(850, 47);
+            label9.Margin = new Padding(2, 0, 2, 0);
             label9.Name = "label9";
             label9.Size = new Size(0, 25);
             label9.TabIndex = 10;
@@ -162,7 +162,8 @@ namespace AcmeScanner
             // label8
             // 
             label8.AutoSize = true;
-            label8.Location = new Point(811, 75);
+            label8.Location = new Point(757, 47);
+            label8.Margin = new Padding(2, 0, 2, 0);
             label8.Name = "label8";
             label8.Size = new Size(136, 25);
             label8.TabIndex = 9;
@@ -171,7 +172,8 @@ namespace AcmeScanner
             // label7
             // 
             label7.AutoSize = true;
-            label7.Location = new Point(941, 52);
+            label7.Location = new Point(819, 32);
+            label7.Margin = new Padding(2, 0, 2, 0);
             label7.Name = "label7";
             label7.Size = new Size(0, 25);
             label7.TabIndex = 8;
@@ -179,7 +181,8 @@ namespace AcmeScanner
             // label6
             // 
             label6.AutoSize = true;
-            label6.Location = new Point(811, 50);
+            label6.Location = new Point(757, 32);
+            label6.Margin = new Padding(2, 0, 2, 0);
             label6.Name = "label6";
             label6.Size = new Size(91, 25);
             label6.TabIndex = 7;
@@ -188,7 +191,8 @@ namespace AcmeScanner
             // label5
             // 
             label5.AutoSize = true;
-            label5.Location = new Point(941, 27);
+            label5.Location = new Point(833, 15);
+            label5.Margin = new Padding(2, 0, 2, 0);
             label5.Name = "label5";
             label5.Size = new Size(0, 25);
             label5.TabIndex = 6;
@@ -196,7 +200,8 @@ namespace AcmeScanner
             // label4
             // 
             label4.AutoSize = true;
-            label4.Location = new Point(811, 25);
+            label4.Location = new Point(757, 15);
+            label4.Margin = new Padding(2, 0, 2, 0);
             label4.Name = "label4";
             label4.Size = new Size(112, 25);
             label4.TabIndex = 5;
@@ -210,14 +215,14 @@ namespace AcmeScanner
             btnUpdate.Depth = 0;
             btnUpdate.HighEmphasis = true;
             btnUpdate.Icon = null;
-            btnUpdate.Location = new Point(1321, 33);
-            btnUpdate.Margin = new Padding(6, 10, 6, 10);
+            btnUpdate.Location = new Point(570, 20);
+            btnUpdate.Margin = new Padding(4, 6, 4, 6);
             btnUpdate.MouseState = MaterialSkin.MouseState.HOVER;
             btnUpdate.Name = "btnUpdate";
             btnUpdate.NoAccentTextColor = Color.Empty;
-            btnUpdate.Size = new Size(151, 60);
+            btnUpdate.Size = new Size(104, 36);
             btnUpdate.TabIndex = 4;
-            btnUpdate.Text = "Update DB";
+            btnUpdate.Text = "Download Latest DB";
             btnUpdate.Type = MaterialSkin.Controls.MaterialButton.MaterialButtonType.Contained;
             btnUpdate.UseAccentColor = false;
             btnUpdate.UseVisualStyleBackColor = true;
@@ -231,14 +236,14 @@ namespace AcmeScanner
             btnInstall.Depth = 0;
             btnInstall.HighEmphasis = true;
             btnInstall.Icon = null;
-            btnInstall.Location = new Point(1159, 35);
-            btnInstall.Margin = new Padding(4, 7, 4, 7);
+            btnInstall.Location = new Point(442, 20);
+            btnInstall.Margin = new Padding(3, 4, 3, 4);
             btnInstall.MouseState = MaterialSkin.MouseState.HOVER;
             btnInstall.Name = "btnInstall";
             btnInstall.NoAccentTextColor = Color.Empty;
-            btnInstall.Size = new Size(151, 60);
+            btnInstall.Size = new Size(109, 36);
             btnInstall.TabIndex = 3;
-            btnInstall.Text = "Install";
+            btnInstall.Text = "Install APP";
             btnInstall.Type = MaterialSkin.Controls.MaterialButton.MaterialButtonType.Contained;
             btnInstall.UseAccentColor = false;
             btnInstall.UseVisualStyleBackColor = true;
@@ -252,8 +257,8 @@ namespace AcmeScanner
             btnCVEJSON.Depth = 0;
             btnCVEJSON.HighEmphasis = true;
             btnCVEJSON.Icon = null;
-            btnCVEJSON.Location = new Point(637, 35);
-            btnCVEJSON.Margin = new Padding(6, 10, 6, 10);
+            btnCVEJSON.Location = new Point(314, 20);
+            btnCVEJSON.Margin = new Padding(4, 6, 4, 6);
             btnCVEJSON.MouseState = MaterialSkin.MouseState.HOVER;
             btnCVEJSON.Name = "btnCVEJSON";
             btnCVEJSON.NoAccentTextColor = Color.Empty;
@@ -285,14 +290,14 @@ namespace AcmeScanner
             btnScan.Depth = 0;
             btnScan.HighEmphasis = true;
             btnScan.Icon = null;
-            btnScan.Location = new Point(27, 35);
-            btnScan.Margin = new Padding(6, 10, 6, 10);
+            btnScan.Location = new Point(19, 20);
+            btnScan.Margin = new Padding(4, 6, 4, 6);
             btnScan.MouseState = MaterialSkin.MouseState.HOVER;
             btnScan.Name = "btnScan";
             btnScan.NoAccentTextColor = Color.Empty;
-            btnScan.Size = new Size(151, 60);
+            btnScan.Size = new Size(105, 36);
             btnScan.TabIndex = 0;
-            btnScan.Text = "Scan";
+            btnScan.Text = "Scan Offline APPs";
             btnScan.Type = MaterialSkin.Controls.MaterialButton.MaterialButtonType.Contained;
             btnScan.UseAccentColor = false;
             btnScan.UseVisualStyleBackColor = true;
@@ -432,7 +437,8 @@ namespace AcmeScanner
             // label15
             // 
             label15.AutoSize = true;
-            label15.Location = new Point(941, 75);
+            label15.Location = new Point(558, 45);
+            label15.Margin = new Padding(2, 0, 2, 0);
             label15.Name = "label15";
             label15.Size = new Size(0, 25);
             label15.TabIndex = 10;
@@ -440,7 +446,8 @@ namespace AcmeScanner
             // label14
             // 
             label14.AutoSize = true;
-            label14.Location = new Point(941, 52);
+            label14.Location = new Point(527, 30);
+            label14.Margin = new Padding(2, 0, 2, 0);
             label14.Name = "label14";
             label14.Size = new Size(0, 25);
             label14.TabIndex = 9;
@@ -448,7 +455,8 @@ namespace AcmeScanner
             // label13
             // 
             label13.AutoSize = true;
-            label13.Location = new Point(941, 27);
+            label13.Location = new Point(541, 15);
+            label13.Margin = new Padding(2, 0, 2, 0);
             label13.Name = "label13";
             label13.Size = new Size(0, 25);
             label13.TabIndex = 8;
@@ -456,7 +464,8 @@ namespace AcmeScanner
             // label12
             // 
             label12.AutoSize = true;
-            label12.Location = new Point(811, 75);
+            label12.Location = new Point(465, 45);
+            label12.Margin = new Padding(2, 0, 2, 0);
             label12.Name = "label12";
             label12.Size = new Size(136, 25);
             label12.TabIndex = 7;
@@ -465,7 +474,8 @@ namespace AcmeScanner
             // label11
             // 
             label11.AutoSize = true;
-            label11.Location = new Point(811, 50);
+            label11.Location = new Point(465, 30);
+            label11.Margin = new Padding(2, 0, 2, 0);
             label11.Name = "label11";
             label11.Size = new Size(91, 25);
             label11.TabIndex = 6;
@@ -474,7 +484,8 @@ namespace AcmeScanner
             // label10
             // 
             label10.AutoSize = true;
-            label10.Location = new Point(811, 25);
+            label10.Location = new Point(465, 15);
+            label10.Margin = new Padding(2, 0, 2, 0);
             label10.Name = "label10";
             label10.Size = new Size(112, 25);
             label10.TabIndex = 5;
@@ -488,14 +499,14 @@ namespace AcmeScanner
             btnUpdateSDK.Depth = 0;
             btnUpdateSDK.HighEmphasis = true;
             btnUpdateSDK.Icon = null;
-            btnUpdateSDK.Location = new Point(1321, 33);
-            btnUpdateSDK.Margin = new Padding(4, 7, 4, 7);
+            btnUpdateSDK.Location = new Point(304, 21);
+            btnUpdateSDK.Margin = new Padding(3, 4, 3, 4);
             btnUpdateSDK.MouseState = MaterialSkin.MouseState.HOVER;
             btnUpdateSDK.Name = "btnUpdateSDK";
             btnUpdateSDK.NoAccentTextColor = Color.Empty;
-            btnUpdateSDK.Size = new Size(151, 60);
+            btnUpdateSDK.Size = new Size(116, 36);
             btnUpdateSDK.TabIndex = 4;
-            btnUpdateSDK.Text = "Update SDK";
+            btnUpdateSDK.Text = "Download Latest SDK";
             btnUpdateSDK.Type = MaterialSkin.Controls.MaterialButton.MaterialButtonType.Contained;
             btnUpdateSDK.UseAccentColor = false;
             btnUpdateSDK.UseVisualStyleBackColor = true;
@@ -509,14 +520,14 @@ namespace AcmeScanner
             btnInstallOrchestration.Depth = 0;
             btnInstallOrchestration.HighEmphasis = true;
             btnInstallOrchestration.Icon = null;
-            btnInstallOrchestration.Location = new Point(1159, 35);
-            btnInstallOrchestration.Margin = new Padding(6, 10, 6, 10);
+            btnInstallOrchestration.Location = new Point(155, 21);
+            btnInstallOrchestration.Margin = new Padding(4, 6, 4, 6);
             btnInstallOrchestration.MouseState = MaterialSkin.MouseState.HOVER;
             btnInstallOrchestration.Name = "btnInstallOrchestration";
             btnInstallOrchestration.NoAccentTextColor = Color.Empty;
-            btnInstallOrchestration.Size = new Size(151, 60);
+            btnInstallOrchestration.Size = new Size(117, 36);
             btnInstallOrchestration.TabIndex = 3;
-            btnInstallOrchestration.Text = "Install";
+            btnInstallOrchestration.Text = "Install Patch";
             btnInstallOrchestration.Type = MaterialSkin.Controls.MaterialButton.MaterialButtonType.Contained;
             btnInstallOrchestration.UseAccentColor = false;
             btnInstallOrchestration.UseVisualStyleBackColor = true;
@@ -537,7 +548,7 @@ namespace AcmeScanner
             btnScanOrchestration.NoAccentTextColor = Color.Empty;
             btnScanOrchestration.Size = new Size(151, 60);
             btnScanOrchestration.TabIndex = 0;
-            btnScanOrchestration.Text = "Scan";
+            btnScanOrchestration.Text = "Load Patches";
             btnScanOrchestration.Type = MaterialSkin.Controls.MaterialButton.MaterialButtonType.Contained;
             btnScanOrchestration.UseAccentColor = false;
             btnScanOrchestration.UseVisualStyleBackColor = true;
@@ -817,7 +828,7 @@ namespace AcmeScanner
             mbLoad.NoAccentTextColor = Color.Empty;
             mbLoad.Size = new Size(177, 60);
             mbLoad.TabIndex = 0;
-            mbLoad.Text = "Load Products";
+            mbLoad.Text = "Load Product Information";
             mbLoad.Type = MaterialSkin.Controls.MaterialButton.MaterialButtonType.Contained;
             mbLoad.UseAccentColor = false;
             mbLoad.UseVisualStyleBackColor = true;
@@ -878,7 +889,7 @@ namespace AcmeScanner
             btnRefreshStatus.NoAccentTextColor = Color.Empty;
             btnRefreshStatus.Size = new Size(200, 70);
             btnRefreshStatus.TabIndex = 0;
-            btnRefreshStatus.Text = "Update Patch Status";
+            btnRefreshStatus.Text = "Load Patch Status";
             btnRefreshStatus.Type = MaterialSkin.Controls.MaterialButton.MaterialButtonType.Contained;
             btnRefreshStatus.UseAccentColor = false;
             btnRefreshStatus.UseVisualStyleBackColor = true;
@@ -921,7 +932,6 @@ namespace AcmeScanner
             panel7.Controls.Add(btnRunChecksMoby);
             panel7.Controls.Add(btnUpdateMoby);
             panel7.Controls.Add(btnMobyViewTotals);
-            panel7.Controls.Add(btnViewJson);
             panel7.Controls.Add(btnLoadMoby);
             panel7.Dock = DockStyle.Top;
             panel7.Location = new Point(4, 5);
@@ -932,19 +942,21 @@ namespace AcmeScanner
             // mobyTimestampData
             // 
             mobyTimestampData.AutoSize = true;
-            mobyTimestampData.Location = new Point(280, 53);
+            mobyTimestampData.BorderStyle = BorderStyle.FixedSingle;
+            mobyTimestampData.Location = new Point(785, 21);
             mobyTimestampData.Margin = new Padding(1, 0, 1, 0);
             mobyTimestampData.Name = "mobyTimestampData";
-            mobyTimestampData.Size = new Size(0, 25);
+            mobyTimestampData.Size = new Size(2, 17);
             mobyTimestampData.TabIndex = 8;
             // 
             // mobyTimestamp
             // 
             mobyTimestamp.AutoSize = true;
-            mobyTimestamp.Location = new Point(181, 53);
+            mobyTimestamp.BorderStyle = BorderStyle.FixedSingle;
+            mobyTimestamp.Location = new Point(712, 21);
             mobyTimestamp.Margin = new Padding(1, 0, 1, 0);
             mobyTimestamp.Name = "mobyTimestamp";
-            mobyTimestamp.Size = new Size(104, 25);
+            mobyTimestamp.Size = new Size(71, 17);
             mobyTimestamp.TabIndex = 7;
             mobyTimestamp.Text = "Timestamp:";
             // 
@@ -955,8 +967,8 @@ namespace AcmeScanner
             btnViewMobySubsets.Depth = 0;
             btnViewMobySubsets.HighEmphasis = true;
             btnViewMobySubsets.Icon = null;
-            btnViewMobySubsets.Location = new Point(503, 35);
-            btnViewMobySubsets.Margin = new Padding(4, 7, 4, 7);
+            btnViewMobySubsets.Location = new Point(129, 21);
+            btnViewMobySubsets.Margin = new Padding(3, 4, 3, 4);
             btnViewMobySubsets.MouseState = MaterialSkin.MouseState.HOVER;
             btnViewMobySubsets.Name = "btnViewMobySubsets";
             btnViewMobySubsets.NoAccentTextColor = Color.Empty;
@@ -975,8 +987,8 @@ namespace AcmeScanner
             btnRunChecksMoby.Depth = 0;
             btnRunChecksMoby.HighEmphasis = true;
             btnRunChecksMoby.Icon = null;
-            btnRunChecksMoby.Location = new Point(684, 35);
-            btnRunChecksMoby.Margin = new Padding(4, 7, 4, 7);
+            btnRunChecksMoby.Location = new Point(258, 21);
+            btnRunChecksMoby.Margin = new Padding(3, 4, 3, 4);
             btnRunChecksMoby.MouseState = MaterialSkin.MouseState.HOVER;
             btnRunChecksMoby.Name = "btnRunChecksMoby";
             btnRunChecksMoby.NoAccentTextColor = Color.Empty;
@@ -995,14 +1007,14 @@ namespace AcmeScanner
             btnUpdateMoby.Depth = 0;
             btnUpdateMoby.HighEmphasis = true;
             btnUpdateMoby.Icon = null;
-            btnUpdateMoby.Location = new Point(1297, 35);
-            btnUpdateMoby.Margin = new Padding(4, 7, 4, 7);
+            btnUpdateMoby.Location = new Point(548, 21);
+            btnUpdateMoby.Margin = new Padding(3, 4, 3, 4);
             btnUpdateMoby.MouseState = MaterialSkin.MouseState.HOVER;
             btnUpdateMoby.Name = "btnUpdateMoby";
             btnUpdateMoby.NoAccentTextColor = Color.Empty;
-            btnUpdateMoby.Size = new Size(122, 36);
+            btnUpdateMoby.Size = new Size(147, 36);
             btnUpdateMoby.TabIndex = 4;
-            btnUpdateMoby.Text = "update moby";
+            btnUpdateMoby.Text = "Download Moby";
             btnUpdateMoby.Type = MaterialSkin.Controls.MaterialButton.MaterialButtonType.Contained;
             btnUpdateMoby.UseAccentColor = false;
             btnUpdateMoby.UseVisualStyleBackColor = true;
@@ -1015,8 +1027,8 @@ namespace AcmeScanner
             btnMobyViewTotals.Depth = 0;
             btnMobyViewTotals.HighEmphasis = true;
             btnMobyViewTotals.Icon = null;
-            btnMobyViewTotals.Location = new Point(849, 35);
-            btnMobyViewTotals.Margin = new Padding(4, 7, 4, 7);
+            btnMobyViewTotals.Location = new Point(375, 21);
+            btnMobyViewTotals.Margin = new Padding(3, 4, 3, 4);
             btnMobyViewTotals.MouseState = MaterialSkin.MouseState.HOVER;
             btnMobyViewTotals.Name = "btnMobyViewTotals";
             btnMobyViewTotals.NoAccentTextColor = Color.Empty;
@@ -1027,26 +1039,6 @@ namespace AcmeScanner
             btnMobyViewTotals.UseAccentColor = false;
             btnMobyViewTotals.UseVisualStyleBackColor = true;
             btnMobyViewTotals.Click += BtnMobyViewTotals_Click;
-            // 
-            // btnViewJson
-            // 
-            btnViewJson.AutoSizeMode = AutoSizeMode.GrowAndShrink;
-            btnViewJson.Density = MaterialSkin.Controls.MaterialButton.MaterialButtonDensity.Default;
-            btnViewJson.Depth = 0;
-            btnViewJson.HighEmphasis = true;
-            btnViewJson.Icon = null;
-            btnViewJson.Location = new Point(1149, 35);
-            btnViewJson.Margin = new Padding(4, 7, 4, 7);
-            btnViewJson.MouseState = MaterialSkin.MouseState.HOVER;
-            btnViewJson.Name = "btnViewJson";
-            btnViewJson.NoAccentTextColor = Color.Empty;
-            btnViewJson.Size = new Size(98, 36);
-            btnViewJson.TabIndex = 2;
-            btnViewJson.Text = "View JSON";
-            btnViewJson.Type = MaterialSkin.Controls.MaterialButton.MaterialButtonType.Contained;
-            btnViewJson.UseAccentColor = false;
-            btnViewJson.UseVisualStyleBackColor = true;
-            btnViewJson.Click += BtnViewJson_Click;
             // 
             // btnLoadMoby
             // 
@@ -1112,7 +1104,8 @@ namespace AcmeScanner
             // label17
             // 
             label17.Font = new Font("Segoe UI", 11F, FontStyle.Regular, GraphicsUnit.Point);
-            label17.Location = new Point(653, 15);
+            label17.Location = new Point(240, 23);
+            label17.Margin = new Padding(2, 0, 2, 0);
             label17.Name = "label17";
             label17.Size = new Size(323, 33);
             label17.TabIndex = 2;
@@ -1120,7 +1113,8 @@ namespace AcmeScanner
             // label16
             // 
             label16.Font = new Font("Segoe UI", 11F, FontStyle.Regular, GraphicsUnit.Point);
-            label16.Location = new Point(529, 18);
+            label16.Location = new Point(160, 23);
+            label16.Margin = new Padding(2, 0, 2, 0);
             label16.Name = "label16";
             label16.Size = new Size(129, 33);
             label16.TabIndex = 1;
@@ -1134,8 +1128,8 @@ namespace AcmeScanner
             btnLoadCVEs.Depth = 0;
             btnLoadCVEs.HighEmphasis = true;
             btnLoadCVEs.Icon = null;
-            btnLoadCVEs.Location = new Point(36, 38);
-            btnLoadCVEs.Margin = new Padding(4, 7, 4, 7);
+            btnLoadCVEs.Location = new Point(13, 14);
+            btnLoadCVEs.Margin = new Padding(3, 4, 3, 4);
             btnLoadCVEs.MouseState = MaterialSkin.MouseState.HOVER;
             btnLoadCVEs.Name = "btnLoadCVEs";
             btnLoadCVEs.NoAccentTextColor = Color.Empty;
@@ -1287,7 +1281,6 @@ namespace AcmeScanner
         private ScannerListView scannerListView1;
         private MaterialSkin.Controls.MaterialButton btnLoadMoby;
         private MobyTotalCounts mobyCounts;
-        private MaterialSkin.Controls.MaterialButton btnViewJson;
         private MaterialSkin.Controls.MaterialButton btnMobyViewTotals;
         private MaterialSkin.Controls.MaterialButton btnUpdateMoby;
         private MaterialSkin.Controls.MaterialButton btnRunChecksMoby;
