@@ -353,7 +353,7 @@ namespace AcmeScanner
 
         private void LoadStatusWorker_DoWork(object sender, DoWorkEventArgs e)
         {
-            staticPatchStatusList = TaskLoadStatus.Load();
+            staticPatchStatusList = TaskLoadStatus.Load();            
         }
 
         private void LoadStatusWorker_Completed(object sender, RunWorkerCompletedEventArgs e)
@@ -909,6 +909,7 @@ namespace AcmeScanner
             scannerListView1.Columns.Add("Validation Supported", 200);
             scannerListView1.Columns.Add("Supports App Remover", 200);
             scannerListView1.Columns.Add("Supports Background Patching", 220);
+            scannerListView1.Tag = this;
             scannerListView1.View = View.Details;
             scannerListView1.Update();
 
@@ -1336,28 +1337,23 @@ namespace AcmeScanner
 
 
 
-        private void BtnViewJson_Click(object sender, EventArgs e)
+        public void BtnViewJson_Click(object sender, EventArgs e)
         {
-
-            if (scannerListView1.SelectedItems.Count > 0)
-            {
-                string sigID = scannerListView1.SelectedItems[0].SubItems[1].Text;
-                string pID = scannerListView1.SelectedItems[0].Tag.ToString();
-                MobyProduct selectedProduct = staticMobyProductList.FirstOrDefault(product => product.Id == pID);
-                MobySignature selectedSignature = selectedProduct.sigList.FirstOrDefault(signature => signature.Id == sigID);
-                string json = JsonConvert.SerializeObject(selectedSignature, Formatting.Indented);
-
+            ScannerListView listViewObject = (ScannerListView)sender;
+            
+            string sigID = listViewObject.SelectedItems[0].SubItems[1].Text;
+            string pID = listViewObject.SelectedItems[0].Tag.ToString();
+            MobyProduct selectedProduct = staticMobyProductList.FirstOrDefault(product => product.Id == pID);
+            MobySignature selectedSignature = selectedProduct.sigList.FirstOrDefault(signature => signature.Id == sigID);
+            string json = JsonConvert.SerializeObject(selectedSignature, Formatting.Indented);
 
 
 
-                ViewMobyJsonDialog textDialog = new ViewMobyJsonDialog(json);
-                textDialog.StartPosition = FormStartPosition.CenterParent;
-                textDialog.ShowDialog();
-            }
-            else
-            {
-                ShowMessageDialog("Select an item to view JSON!!", false);
-            }
+
+            ViewMobyJsonDialog textDialog = new ViewMobyJsonDialog(json);
+            textDialog.StartPosition = FormStartPosition.CenterParent;
+            textDialog.ShowDialog();
+                       
         }
 
         private void BtnUpdateMoby_Click(object sender, EventArgs e)

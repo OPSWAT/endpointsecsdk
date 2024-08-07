@@ -7,6 +7,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////
 using Newtonsoft.Json.Linq;
 using System;
+using System.Diagnostics;
 using System.Drawing;
 using System.Text;
 using System.Windows.Forms;
@@ -121,23 +122,7 @@ namespace AcmeScanner
         {
             e.DrawDefault = true;
         }
-
-
-        private void OrchestrationClickHandler(object sender, MouseEventArgs e)
-        {
-            StringBuilder kbIdBuilder = new StringBuilder();
-            kbIdBuilder.AppendLine("Title:\t\t" + this.SelectedItems[0].SubItems[0].Text);
-            kbIdBuilder.AppendLine("Severity:\t" + this.SelectedItems[0].SubItems[1].Text);
-            kbIdBuilder.AppendLine("Product:\t" + this.SelectedItems[0].SubItems[2].Text);
-            kbIdBuilder.AppendLine("KB:\t\t" + this.SelectedItems[0].SubItems[3].Text);
-            kbIdBuilder.AppendLine("Patched:\t" + this.SelectedItems[0].SubItems[4].Text);
-            kbIdBuilder.AppendLine("Description:\t" + this.SelectedItems[0].SubItems[5].Text);
-
-            string view_full = kbIdBuilder.ToString();
-            TextDialog textDialog = new TextDialog(view_full);
-            textDialog.StartPosition = FormStartPosition.CenterParent;
-            textDialog.ShowDialog();
-        }
+               
 
         private void CatalogClickHandler(object sender, MouseEventArgs e)
         {
@@ -175,21 +160,50 @@ namespace AcmeScanner
                 formObject.EnableButtons(true);
             }
         }
+        private void ShowRowAsJson(object sender, MouseEventArgs e)
+        {
+            var selectedItem = this.SelectedItems[0];
+            JObject kbObject = new JObject();
+
+            for (int i = 0; i < selectedItem.SubItems.Count; i++)
+            {                
+                string key = this.Columns.Count > i ? this.Columns[i].Text : "Column" + i;
+                kbObject[key] = selectedItem.SubItems[i].Text;
+            }
+
+            string kbObjectString = kbObject.ToString();
+            TextDialog textDialog = new TextDialog(kbObjectString);
+            textDialog.StartPosition = FormStartPosition.CenterParent;
+            textDialog.ShowDialog();
+        }
+
+        private void MobyClickHandler(object sender, EventArgs e)
+        {
+            ScannerForm formObject = (ScannerForm)((ScannerListView)sender).Tag;
+            formObject.BtnViewJson_Click(sender,e);
+        }
 
         private void ScannerListView_MouseDoubleClick(object sender, MouseEventArgs e)
         {
-            if (this.SelectedItems.Count > 0 && this.Columns[0].Text=="Title")
-            {
-                OrchestrationClickHandler(sender, e);
-            }
-            else if (this.SelectedItems.Count > 0 && this.Columns[0].Text=="Application"&& this.Columns[1].Text=="Installed")
+
+            if (this.SelectedItems.Count > 0 && this.Columns[0].Text=="Application"&& this.Columns[1].Text=="Installed")
             {
                 CatalogClickHandler(sender, e);
-            }
+            }            
+           
             else if (this.Columns[0].Text == "CVE ID")
             {
                 CveClickHandler(sender, e);
             }
+            else if (this.SelectedItems.Count > 0 && this.Columns[0].Text == "Name")
+            {
+                MobyClickHandler(sender, e);
+            }
+            else if (this.SelectedItems.Count > 0 && this.Columns[0].Text != "Application Name")
+            {
+                ShowRowAsJson(sender, e);
+            }
+            
         }
     }
 }
