@@ -1585,7 +1585,7 @@ namespace AcmeScanner
 
             if (InvokeRequired)
             {
-                this.Invoke(new MethodInvoker(delegate
+                this.Invoke(new System.Windows.Forms.MethodInvoker(delegate
                 {
                     label17.Text = cveCount.ToString();
                 }));

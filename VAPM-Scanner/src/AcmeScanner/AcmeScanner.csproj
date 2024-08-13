@@ -1,28 +1,27 @@
-<Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <OutputType>WinExe</OutputType>
-    <TargetFramework>net8.0-windows7.0</TargetFramework>
-    <Nullable>disable</Nullable>
-    <UseWindowsForms>true</UseWindowsForms>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <ApplicationManifest>app.manifest</ApplicationManifest>
-<<<<<<< HEAD
-    <Version>1.0.0.298</Version>
-=======
-    <Version>1.0.0.297</Version>
->>>>>>> 650e007b6b6ead69a2b596a16e4dc61607f93267
-  </PropertyGroup>
-  <Target Name="UpdateVersion" BeforeTargets="BeforeBuild">
-    <Exec Command="powershell -ExecutionPolicy Bypass -File UpdateVersion.ps1 $(MSBuildProjectDirectory)\$(MSBuildProjectName).csproj" />
-  </Target>
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+	    <OutputType>WinExe</OutputType>
+	    <TargetFramework>net8.0-windows7.0</TargetFramework>
+	    <Nullable>disable</Nullable>
+	    <UseWindowsForms>true</UseWindowsForms>
+	    <PlatformTarget>AnyCPU</PlatformTarget>
+	    <ApplicationManifest>app.manifest</ApplicationManifest>
+    </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="MaterialSkin.2.RTL" Version="2.3.1.1" />
     <PackageReference Include="MessagePack" Version="2.5.168" />
     <PackageReference Include="MessagePack.Annotations" Version="2.5.168" />
   </ItemGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\VAPMAdapter\VAPMAdapter.csproj" />
   </ItemGroup>
+
+  
+
+
   <ItemGroup>
     <Compile Update="InstallPatchMessageDialog.cs">
       <SubType>Form</SubType>
@@ -34,10 +33,12 @@
     </Compile>
     <Compile Update="CVEListDialog.cs" />
   </ItemGroup>
+
   <ItemGroup>
     <EmbeddedResource Update="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
+
 </Project>
