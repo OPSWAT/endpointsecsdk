@@ -35,7 +35,7 @@ namespace VAPMAdapter.Catalog
         /// It retrieves the JSON data from the file.
         /// </summary>
         /// <returns>A JObject representing the parsed JSON content from "patch_associations.json".</returns>
-        private JObject getPatchAssociationJsonObject()
+        private JObject GetPatchAssociationJsonObject()
         {
             JObject result;
             string jsonString = File.ReadAllText(jsonLocation);
@@ -62,11 +62,11 @@ namespace VAPMAdapter.Catalog
         /// If the element is not found, the function returns an empty list.
         /// </summary>
         /// <returns>A list of JObjects representing patch associations, or empty list if not found.</returns>
-        private List<JObject> getPatchAssociationsListJson()
+        private List<JObject> GetPatchAssociationsListJson()
         {
             List<JObject> result = new List<JObject>();
 
-            JObject patchAssociationsJsonObject = getPatchAssociationJsonObject();
+            JObject patchAssociationsJsonObject = GetPatchAssociationJsonObject();
             JArray oesisJson = (JArray)patchAssociationsJsonObject["oesis"];
 
 
@@ -106,7 +106,7 @@ namespace VAPMAdapter.Catalog
 
             if (result == null)
             {
-                List<JObject> associations = getPatchAssociationsListJson();
+                List<JObject> associations = GetPatchAssociationsListJson();
                 result = new List<CatalogPatchAssociation>();
 
                 foreach (JObject jsonPatchAssociationsList in associations)

@@ -21,12 +21,12 @@ namespace AcmeScanner
             TB_MOBY_JSON.Text = json;
         }
 
-        private void btnCloseViewJsonDialog_Click(object sender, EventArgs e)
+        private void BtnCloseViewJsonDialog_Click(object sender, EventArgs e)
         {
             this.Close();
         }
 
-        private void btnDownloadMobyJson_Click(object sender, EventArgs e)
+        private void BtnDownloadMobyJson_Click(object sender, EventArgs e)
         {
             string jsonContent = TB_MOBY_JSON.Text;
             JObject jsonObject = JObject.Parse(jsonContent);
@@ -56,7 +56,5 @@ namespace AcmeScanner
                 }
             }
         }
-
-
     }
 }

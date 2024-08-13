@@ -74,7 +74,7 @@ namespace VAPMAdapter.Moby
             return result;
         }
 
-        private JObject getProductJsonObject()
+        private JObject GetProductJsonObject()
         {
             JObject result;
             string jsonString = File.ReadAllText(jsonLocation);
@@ -92,9 +92,9 @@ namespace VAPMAdapter.Moby
             return result;
         }
 
-        private JObject getProductsListJson()
+        private JObject GetProductsListJson()
         {
-            JObject productJsonObject = getProductJsonObject();
+            JObject productJsonObject = GetProductJsonObject();
             return (JObject)productJsonObject["products"];
         }
 
@@ -108,7 +108,7 @@ namespace VAPMAdapter.Moby
 
             List<MobyProduct> result = new List<MobyProduct>();
 
-            JObject jsonProductList = getProductsListJson();
+            JObject jsonProductList = GetProductsListJson();
 
             foreach (JProperty product in jsonProductList.Properties())
             {
@@ -176,7 +176,7 @@ namespace VAPMAdapter.Moby
 
         public MobyTotalCounts LoadCounts()
         {
-            JObject jsonObject = getProductJsonObject();
+            JObject jsonObject = GetProductJsonObject();
             JObject countsJson = (JObject)jsonObject["counts"];
 
             MobyTotalCounts counts = new MobyTotalCounts
@@ -193,7 +193,7 @@ namespace VAPMAdapter.Moby
             return counts;
         }
 
-        private MobyPlatformCounts ParseCounts(JObject countJson)
+        private static MobyPlatformCounts ParseCounts(JObject countJson)
         {
             return new MobyPlatformCounts
             {

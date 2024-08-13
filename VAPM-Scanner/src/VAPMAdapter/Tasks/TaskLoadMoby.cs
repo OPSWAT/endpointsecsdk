@@ -16,7 +16,7 @@ namespace VAPMAdapter.Tasks
         {
             List<MobyProduct> result = new List<MobyProduct>();
             Moby.Moby moby = new Moby.Moby();
-            string mobyRoot = VAPMSettings.getLocalCatalogDir();
+            string mobyRoot = VAPMSettings.GetLocalCatalogDir();
             mobyRoot = Path.Combine(mobyRoot, "analog/server");
             moby.Load(mobyRoot);
             result = moby.GetList();

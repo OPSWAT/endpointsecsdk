@@ -25,7 +25,7 @@ namespace VAPMAdapater.Updates
         /// Checks if the SDK is downloaded
         /// </summary>
         /// <returns>True if the SDK is downloaded, otherwise false.</returns>
-        public static bool doesSDKExist()
+        public static bool DoesSDKExist()
         {
             bool result = false;
             if (File.Exists("libwavmodapi.dll"))
@@ -39,7 +39,7 @@ namespace VAPMAdapater.Updates
         /// Checks if the SDK has been updated in the last 7 days.
         /// </summary>
         /// <returns>True if the SDK has been updated in the last 7 days, otherwise false.</returns>
-        public static bool isSDKUpdated()
+        public static bool IsSDKUpdated()
         {
             bool result = false;
             //string x=DownloadSDK.getLatestReleaseDate(getLocalSDKDir());
@@ -56,14 +56,14 @@ namespace VAPMAdapater.Updates
 
             return result;
         }
-        public static string getLatestSDKReleaseDate()
+        public static string GetLatestSDKReleaseDate()
         {
-            string sdkDir = getLocalSDKDir();            
+            string sdkDir = GetLocalSDKDir();            
             string latestReleaseDate = Task.Run(async () =>
             {
                 try
                 {
-                    return await DownloadSDK.getLatestReleaseDateAsync(sdkDir);
+                    return await DownloadSDK.GetLatestReleaseDateAsync(sdkDir);
                 }
                 catch (Exception ex)
                 {                    
@@ -159,7 +159,7 @@ namespace VAPMAdapater.Updates
         /// Gets the local SDK directory, creating it if it doesn't exist.
         /// </summary>
         /// <returns>The path to the local SDK directory.</returns>
-        public static string getLocalSDKDir()
+        public static string GetLocalSDKDir()
         {
             // First delete the SDK directory if it exists
             string sdkDir = Path.Combine(Directory.GetCurrentDirectory(), "sdktemp");
@@ -180,7 +180,7 @@ namespace VAPMAdapater.Updates
         public static void DownloadAndInstall_OPSWAT_SDK()
         {
             // Get the local SDK directory
-            string sdkDir = getLocalSDKDir();
+            string sdkDir = GetLocalSDKDir();
 
             // Download all SDK files
             DownloadSDK.DownloadAllSDKFiles(sdkDir);

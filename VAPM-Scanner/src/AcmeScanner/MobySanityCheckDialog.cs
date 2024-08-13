@@ -13,6 +13,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.IO;
 using System.Text.Json.Nodes;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace AcmeScanner
 {
@@ -30,23 +31,24 @@ namespace AcmeScanner
         {
             runAllChecks = new BackgroundWorker();
             runAllChecks.DoWork +=
-            new DoWorkEventHandler(runAllChecks_DoWork);
+            new DoWorkEventHandler(RunAllChecks_DoWork);
             runAllChecks.RunWorkerCompleted +=
             new RunWorkerCompletedEventHandler(
-            runAllChecks_Completed);
+            RunAllChecks_Completed);
 
             runSelectedChecks = new BackgroundWorker();
             runSelectedChecks.DoWork +=
-            new DoWorkEventHandler(runSelectedChecks_DoWork);
+            new DoWorkEventHandler(RunSelectedChecks_DoWork);
             runSelectedChecks.RunWorkerCompleted +=
             new RunWorkerCompletedEventHandler(
-            runSelectedChecks_Completed);
+            RunSelectedChecks_Completed);
         }
 
-        private List<string> getAllScripts()
+        public static List<string> GetAllScripts()
         {
             string basePath = AppDomain.CurrentDomain.BaseDirectory;
-            string targetPath = Path.Combine(basePath, @"..\..\..\SanityChecks");
+            Debug.WriteLine(basePath);
+            string targetPath = Path.Combine(basePath, @"SanityChecks");
             string sanityChecksPath = Path.GetFullPath(targetPath);
             List<string> fileNames = new List<string>();
 
@@ -75,9 +77,9 @@ namespace AcmeScanner
 
 
 
-        private void runAllChecks_DoWork(object sender, DoWorkEventArgs e)
+        private void RunAllChecks_DoWork(object sender, DoWorkEventArgs e)
         {
-            List<string> allScripts = getAllScripts();
+            List<string> allScripts = GetAllScripts();
             checkedBoxes = new List<string>();
             hashmap = new Dictionary<string, sanityCheckSignature>();
             foreach (var script in allScripts)
@@ -113,72 +115,69 @@ namespace AcmeScanner
 
                     }
                 }
-                
+
             }
             UpdateCheckResults();
+
+        }
+
+        private void RunAllChecks_Completed(object sender, RunWorkerCompletedEventArgs e)
+        {
+
+        }
+
+        private void RunSelectedChecks_DoWork(object sender, DoWorkEventArgs e)
+        {
+            testDialog textDialog = new testDialog();
+            textDialog.StartPosition = FormStartPosition.CenterParent;
+            List<string> allScripts = textDialog.AddCheckboxes();
+            textDialog.ShowDialog();
             
-        }
-
-        private void runAllChecks_Completed(object sender, RunWorkerCompletedEventArgs e)
-        {
-
-        }
-
-        private void runSelectedChecks_DoWork(object sender, DoWorkEventArgs e)
-        {
-            List<(MaterialSkin.Controls.MaterialCheckbox, string)> checkboxScriptPairs = new List<(MaterialSkin.Controls.MaterialCheckbox, string)>
-            {
-                (materialCheckbox1, "auto_patching_check"),
-                (materialCheckbox2, "app_remover_check")
-            };
+            
             checkedBoxes = new List<string>();
             hashmap = new Dictionary<string, sanityCheckSignature>();
-            
-
-            foreach (var (checkbox, script) in checkboxScriptPairs)
+            foreach (var script in allScripts)
             {
-                if (checkbox.Checked)
+                checkedBoxes.Add(script);
+                JObject jsonContent = TaskRunPythonScripts.Execute(script);
+                foreach (var product in jsonContent)
                 {
-                    checkedBoxes.Add(checkbox.Text);
-                    JObject jsonContent = TaskRunPythonScripts.Execute(script);
-                    foreach (var product in jsonContent)
+                    string productName = product.Key;
+                    var platforms = (JObject)product.Value;
+
+                    foreach (var platform in platforms)
                     {
-                        string productName = product.Key;
-                        var platforms = (JObject)product.Value;
+                        string platformName = platform.Key;
+                        var signatures = (JObject)platform.Value;
 
-                        foreach (var platform in platforms)
+                        foreach (var signature in signatures)
                         {
-                            string platformName = platform.Key;
-                            var signatures = (JObject)platform.Value;
-
-                            foreach (var signature in signatures)
+                            if (hashmap.ContainsKey(signature.Key))
                             {
-                                if (hashmap.ContainsKey(signature.Key))
-                                {
-                                    hashmap[signature.Key].scripts.Add(script);
-                                }
-                                else
-                                {
-                                    hashmap[signature.Key] = new sanityCheckSignature();
-                                    hashmap[signature.Key].sigId = signature.Key;
-                                    hashmap[signature.Key].name = product.Key;
-                                    hashmap[signature.Key].platform = platformName;
-                                    hashmap[signature.Key].scripts = new List<string>();
-                                    hashmap[signature.Key].scripts.Add(script);
-                                }
+                                hashmap[signature.Key].scripts.Add(script);
                             }
-
+                            else
+                            {
+                                hashmap[signature.Key] = new sanityCheckSignature();
+                                hashmap[signature.Key].sigId = signature.Key;
+                                hashmap[signature.Key].name = product.Key;
+                                hashmap[signature.Key].platform = platformName;
+                                hashmap[signature.Key].scripts = new List<string>();
+                                hashmap[signature.Key].scripts.Add(script);
+                            }
                         }
+
                     }
                 }
+
             }
             UpdateCheckResults();
         }
 
-        private void runSelectedChecks_Completed(object sender, RunWorkerCompletedEventArgs e)
+        private void RunSelectedChecks_Completed(object sender, RunWorkerCompletedEventArgs e)
         {
-            
-            
+
+
         }
 
         private void UpdateCheckResults()
@@ -190,13 +189,13 @@ namespace AcmeScanner
                 //sanityChecksListView.Items.Clear();
                 sanityChecksListView.Columns.Add("Signature ID", 100);
                 sanityChecksListView.Columns.Add("Name", 200);
-                
+
                 sanityChecksListView.Columns.Add("Platform", 200);
                 foreach (string checkedBox in checkedBoxes)
                 {
                     sanityChecksListView.Columns.Add(checkedBox, 200);
                 }
-                
+
                 sanityChecksListView.View = View.Details;
                 sanityChecksListView.Update();
 
@@ -217,7 +216,7 @@ namespace AcmeScanner
                         {
                             item.SubItems.Add("");
                         }
-                        
+
                     }
                     resultList.Add(item);
                 }
@@ -227,7 +226,7 @@ namespace AcmeScanner
 
 
 
-                
+
                 sanityChecksListView.Items.Clear();
                 // Add the items to the ListView
                 sanityChecksListView.Items.AddRange(resultList.ToArray());
@@ -238,7 +237,7 @@ namespace AcmeScanner
         {
             InitializeComponent();
             InitializeBackgroundWorker();
-            
+
         }
 
         private void MobySanityCheckDialog_Load(object sender, EventArgs e)
@@ -246,16 +245,22 @@ namespace AcmeScanner
 
         }
 
-        private void btnRunAllChecksMoby_Click(object sender, EventArgs e)
+        private void BtnRunAllChecksMoby_Click(object sender, EventArgs e)
         {
-            
+
             runAllChecks.RunWorkerAsync();
         }
 
-        private void btnRunSelectedChecksMoby_Click(object sender, EventArgs e)
+        private void BtnRunSelectedChecksMoby_Click(object sender, EventArgs e)
         {
             runSelectedChecks.RunWorkerAsync();
+            
+            
         }
-        
+
+        private void sanityChecksListView_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
+        }
     }
 }

@@ -12,3 +12,6 @@
 /simple-samples/vulnerability/scan3rdParty-cSharp/src/.vs/scan-vuln
 /VAPM-Scanner/src/AcmeScanner/v4debug.txt
 /VAPM-Scanner/bin
+bin/
+obj/
+.vs/

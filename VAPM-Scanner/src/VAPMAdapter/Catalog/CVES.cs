@@ -39,7 +39,7 @@ namespace VAPMAdapter.Catalog
         /// Using the object-stored json file location we parse said file and return it.
         /// </summary>
         /// <returns>Parsed json found in the jsonLocation file</returns>
-        private JObject getCVEJsonObject() // Note this will be slow until caching can be implemented
+        private JObject GetCVEJsonObject() // Note this will be slow until caching can be implemented
         {
             JObject result;
             string jsonString = File.ReadAllText(jsonLocation);
@@ -61,13 +61,13 @@ namespace VAPMAdapter.Catalog
         /// This function parses the json object, if its not present already, and then stores the list of cve's derived from it.
         /// </summary>
         /// <returns>Returns the list of CVE's derived from the json object.</returns>
-        private JObject getCvesListJson()
+        private JObject GetCvesListJson()
         {
             JObject result = cveJsonObject;
 
             if (result == null)
             {
-                JObject productJsonObject = getCVEJsonObject();
+                JObject productJsonObject = GetCVEJsonObject();
                 JArray oesisJson = (JArray)productJsonObject["oesis"];
 
                 foreach (JObject current in oesisJson.Children<JObject>())
@@ -94,7 +94,7 @@ namespace VAPMAdapter.Catalog
         public string GetCVEDetails(string CVE)
         {
             string result = "";
-            JObject cveJsonObject = getCvesListJson();
+            JObject cveJsonObject = GetCvesListJson();
 
             JObject cveData = (JObject)cveJsonObject[CVE];
             if (cveData != null)
@@ -112,7 +112,7 @@ namespace VAPMAdapter.Catalog
         public List<CatalogCVEDate> GetCVEsFromDate(DateTime date)
         {
             List<CatalogCVEDate> result = new List<CatalogCVEDate>();
-            JObject cveJsonObject = getCvesListJson();
+            JObject cveJsonObject = GetCvesListJson();
 
             double unixTimestamp = JsonUtil.DateTimeToUnixTimestamp(date);
 

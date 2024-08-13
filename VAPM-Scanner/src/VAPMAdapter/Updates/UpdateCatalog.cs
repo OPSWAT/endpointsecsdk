@@ -23,7 +23,7 @@ namespace VAPMAdapter.Updates
         /// </summary>
         public static void Update()
         {
-            string catalogDir = VAPMSettings.getLocalCatalogDir();
+            string catalogDir = VAPMSettings.GetLocalCatalogDir();
 
 
             if (Directory.Exists(catalogDir))

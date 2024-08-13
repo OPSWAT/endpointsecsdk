@@ -30,7 +30,7 @@ namespace VAPMAdapter.Tasks
             UpdateCatalog.Update();
 
             //retrieve the local catalog directory from settings
-            string catalogRoot = VAPMSettings.getLocalCatalogDir();
+            string catalogRoot = VAPMSettings.GetLocalCatalogDir();
             catalogRoot = Path.Combine(catalogRoot, "analog/server");
             catalog.Load(catalogRoot);
 

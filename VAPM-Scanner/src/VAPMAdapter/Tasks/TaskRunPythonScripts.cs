@@ -15,7 +15,7 @@ namespace VAPMAdapter.Tasks
         public static JObject Execute(string pythonScript)
         {
             string basePath = AppDomain.CurrentDomain.BaseDirectory;
-            string targetPath = Path.Combine(basePath, @"..\..\..\SanityChecks");
+            string targetPath = Path.Combine(basePath, @"SanityChecks");
             string fullPath = Path.GetFullPath(targetPath);    
             // Append the script name to the base path for the script
             string scriptPath = Path.Combine(fullPath, pythonScript + ".py");
@@ -31,7 +31,7 @@ namespace VAPMAdapter.Tasks
             MobyPythonRunner pythonRunner = new MobyPythonRunner();
 
             // Run the script
-            pythonRunner.RunScript(scriptPath);
+            MobyPythonRunner.RunScript(scriptPath);
 
             // Read and return the contents of the produced JSON file
             if (File.Exists(jsonPath))
