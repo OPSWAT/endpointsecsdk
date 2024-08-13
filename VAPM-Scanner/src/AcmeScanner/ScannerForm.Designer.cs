@@ -49,10 +49,10 @@ namespace AcmeScanner
             panel3 = new Panel();
             pbLoading = new PictureBox();
             panel2 = new Panel();
-            tabCatalog = new TabControl();
-            tabPage1 = new TabPage();
+            tbcMainView = new TabControl();
+            tabOffline = new TabPage();
             lvScanResults = new ScannerListView();
-            tabPage2 = new TabPage();
+            tabOrchestrate = new TabPage();
             lvOrchestrationScanResult = new ScannerListView();
             panel4 = new Panel();
             label15 = new Label();
@@ -64,7 +64,7 @@ namespace AcmeScanner
             btnUpdateSDK = new MaterialSkin.Controls.MaterialButton();
             btnInstallOrchestration = new MaterialSkin.Controls.MaterialButton();
             btnScanOrchestration = new MaterialSkin.Controls.MaterialButton();
-            tabPage3 = new TabPage();
+            tabCatalog = new TabPage();
             lvCatalog = new ScannerListView();
             panel5 = new Panel();
             panel9 = new Panel();
@@ -82,11 +82,11 @@ namespace AcmeScanner
             label2 = new Label();
             label1 = new Label();
             mbLoad = new MaterialSkin.Controls.MaterialButton();
-            tabPage4 = new TabPage();
+            tabStatus = new TabPage();
             lvStatus = new ScannerListView();
             panel6 = new Panel();
             btnRefreshStatus = new MaterialSkin.Controls.MaterialButton();
-            tabPage5 = new TabPage();
+            tabMoby = new TabPage();
             scannerListView1 = new ScannerListView();
             panel7 = new Panel();
             mobyTimestampData = new Label();
@@ -111,17 +111,17 @@ namespace AcmeScanner
             panel3.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)pbLoading).BeginInit();
             panel2.SuspendLayout();
-            tabCatalog.SuspendLayout();
-            tabPage1.SuspendLayout();
-            tabPage2.SuspendLayout();
+            tbcMainView.SuspendLayout();
+            tabOffline.SuspendLayout();
+            tabOrchestrate.SuspendLayout();
             panel4.SuspendLayout();
-            tabPage3.SuspendLayout();
+            tabCatalog.SuspendLayout();
             panel5.SuspendLayout();
             panel9.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
             tabPage4.SuspendLayout();
             panel6.SuspendLayout();
-            tabPage5.SuspendLayout();
+            tabMoby.SuspendLayout();
             panel7.SuspendLayout();
             VulnerabilitiesTab.SuspendLayout();
             panel8.SuspendLayout();
@@ -331,14 +331,14 @@ namespace AcmeScanner
             // panel2
             // 
             panel2.BorderStyle = BorderStyle.FixedSingle;
-            panel2.Controls.Add(tabCatalog);
+            panel2.Controls.Add(tbcMainView);
             panel2.Dock = DockStyle.Fill;
             panel2.Location = new Point(15, 15);
             panel2.Name = "panel2";
             panel2.Size = new Size(1068, 600);
             panel2.TabIndex = 2;
             // 
-            // tabCatalog
+            // tbcMainView
             // 
             tabCatalog.Controls.Add(tabPage1);
             tabCatalog.Controls.Add(tabPage2);
@@ -353,7 +353,7 @@ namespace AcmeScanner
             tabCatalog.Size = new Size(1066, 598);
             tabCatalog.TabIndex = 3;
             // 
-            // tabPage1
+            // tabOffline
             // 
             tabPage1.Controls.Add(lvScanResults);
             tabPage1.Controls.Add(panel1);
@@ -380,7 +380,7 @@ namespace AcmeScanner
             lvScanResults.View = View.Details;
             lvScanResults.SelectedIndexChanged += LvScanResults_SelectedIndexChanged;
             // 
-            // tabPage2
+            // tabOrchestrate
             // 
             tabPage2.Controls.Add(lvOrchestrationScanResult);
             tabPage2.Controls.Add(panel4);
@@ -546,7 +546,7 @@ namespace AcmeScanner
             btnScanOrchestration.UseVisualStyleBackColor = true;
             btnScanOrchestration.Click += BtnScanOrchestration_Click;
             // 
-            // tabPage3
+            // tabCatalog
             // 
             tabPage3.Controls.Add(lvCatalog);
             tabPage3.Controls.Add(panel5);
@@ -816,7 +816,7 @@ namespace AcmeScanner
             mbLoad.UseVisualStyleBackColor = true;
             mbLoad.Click += MbLoad_Click;
             // 
-            // tabPage4
+            // tabStatus
             // 
             tabPage4.Controls.Add(lvStatus);
             tabPage4.Controls.Add(panel6);
@@ -875,7 +875,7 @@ namespace AcmeScanner
             btnRefreshStatus.UseVisualStyleBackColor = true;
             btnRefreshStatus.Click += BtnRefreshStatus_Click;
             // 
-            // tabPage5
+            // tabMoby
             // 
             tabPage5.Controls.Add(scannerListView1);
             tabPage5.Controls.Add(panel7);
@@ -1185,12 +1185,12 @@ namespace AcmeScanner
             panel3.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)pbLoading).EndInit();
             panel2.ResumeLayout(false);
-            tabCatalog.ResumeLayout(false);
-            tabPage1.ResumeLayout(false);
-            tabPage2.ResumeLayout(false);
+            tbcMainView.ResumeLayout(false);
+            tabOffline.ResumeLayout(false);
+            tabOrchestrate.ResumeLayout(false);
             panel4.ResumeLayout(false);
             panel4.PerformLayout();
-            tabPage3.ResumeLayout(false);
+            tabCatalog.ResumeLayout(false);
             panel5.ResumeLayout(false);
             panel5.PerformLayout();
             panel9.ResumeLayout(false);
@@ -1198,7 +1198,7 @@ namespace AcmeScanner
             ((System.ComponentModel.ISupportInitialize)pictureBox1).EndInit();
             tabPage4.ResumeLayout(false);
             panel6.ResumeLayout(false);
-            tabPage5.ResumeLayout(false);
+            tabMoby.ResumeLayout(false);
             panel7.ResumeLayout(false);
             panel7.PerformLayout();
             VulnerabilitiesTab.ResumeLayout(false);
@@ -1216,9 +1216,9 @@ namespace AcmeScanner
         private MaterialSkin.Controls.MaterialButton btnScan;
         private ScannerListView lvScanResults;
         private System.Windows.Forms.Timer timer1;
-        private TabControl tabCatalog;
-        private TabPage tabPage1;
-        private TabPage tabPage2;
+        private TabControl tbcMainView;
+        private TabPage tabOffline;
+        private TabPage tabOrchestrate;
         private CheckBox cbScanOSCVEs;
         private MaterialSkin.Controls.MaterialButton btnUpdate;
         private MaterialSkin.Controls.MaterialButton btnInstall;
@@ -1228,7 +1228,7 @@ namespace AcmeScanner
         private MaterialSkin.Controls.MaterialButton btnUpdateSDK;
         private MaterialSkin.Controls.MaterialButton btnInstallOrchestration;
         private MaterialSkin.Controls.MaterialButton btnScanOrchestration;
-        private TabPage tabPage3;
+        private TabPage tabCatalog;
         private ScannerListView lvCatalog;
         private Panel panel5;
         private MaterialSkin.Controls.MaterialButton mbLoad;
@@ -1238,7 +1238,6 @@ namespace AcmeScanner
         private Label label1;
         private Label lblTotalCVEs;
         private Label lblTotalProducts;
-        private MaterialSkin.Controls.MaterialTextBox2 tbCVE;
         private Label lblTotalInstalls;
         private Label label3;
         private MaterialSkin.Controls.MaterialButton btnExportCSV;

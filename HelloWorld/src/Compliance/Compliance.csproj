@@ -59,7 +59,8 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PreBuildEvent>$(SolutionDir)\SDKDownloader\$(OutDir)\SDKDownloader download-copy-windows $(SolutionDir)\lib</PreBuildEvent>
+    <PreBuildEvent>
+    </PreBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
     <PostBuildEvent>copy $(SolutionDir)\license $(ProjectDir)$(OutDir)

@@ -6,8 +6,7 @@
 ///  OPSWAT OEM Solutions Architect
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
-
-using Compliance;
+using Vulnerability;
 using Newtonsoft.Json.Linq;
 using System;
 using System.IO;

@@ -12,7 +12,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 
-namespace Compliance
+namespace Vulnerability
 {
     internal class Program
     {
@@ -220,6 +220,29 @@ namespace Compliance
 
 
 
+        // 
+        // This will return JSON details on whether a firewall is enabled
+        // https://software.opswat.com/OESIS_V4/html/c_method.html
+        // on the left select Manageability/GetFirewallState
+        public static bool GetDeviceIdentity()
+        {
+            bool result = false;
+            string json_in = "{\"input\": { \"method\": 30010 } }";
+            string json_out = "";
+            int callResult = Invoke(json_in, out json_out);
+
+            if (callResult >= 0)
+            {
+                dynamic parsedObject = JObject.Parse(json_out);
+                result = parsedObject["result"]["enabled"];
+            }
+
+            return result;
+        }
+
+
+
+
         static void Main(string[] args)
         {
             string products_json = "";
@@ -233,6 +256,8 @@ namespace Compliance
                 // Note using the 7 which maps to the Firewall Category
                 Console.WriteLine("Discovering Firewall Products");
                 CheckSuccess(DetectProducts(7, out products_json));
+
+                GetDeviceIdentity();
 
                 List<Product> productList = GetProductList(products_json);
                 foreach(Product product in productList)

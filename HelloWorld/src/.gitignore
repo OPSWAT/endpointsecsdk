@@ -15,3 +15,13 @@ src/SDKDownloadLib/bin/
 src/SDKDownloadLib/obj/
 src/SDKDownloadLib/.vs/
 src/SDKDownloadLib/SDKDownloadLib.csproj.user
+
+src/Vulnerability/bin/
+src/Vulnerability/obj/
+src/Vulnerability/.vs/
+src/Vulnerability/Vulnerability.csproj.user
+
+src/Patch/bin/
+src/Patch/obj/
+src/Patch/.vs/
+src/Patch/Patch.csproj.user

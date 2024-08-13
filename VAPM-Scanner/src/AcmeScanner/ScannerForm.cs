@@ -62,7 +62,7 @@ namespace AcmeScanner
         private System.ComponentModel.BackgroundWorker loadVulnerabilitiesWorker;
 
         //first method called by the main class
-        public ScannerForm()
+        public ScannerForm(string[] args)
         {
             //initializes UI componets
             InitializeComponent();
