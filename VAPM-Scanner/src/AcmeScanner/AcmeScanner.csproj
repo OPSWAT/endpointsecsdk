@@ -6,7 +6,11 @@
     <UseWindowsForms>true</UseWindowsForms>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <ApplicationManifest>app.manifest</ApplicationManifest>
+<<<<<<< HEAD
     <Version>1.0.0.298</Version>
+=======
+    <Version>1.0.0.297</Version>
+>>>>>>> 650e007b6b6ead69a2b596a16e4dc61607f93267
   </PropertyGroup>
   <Target Name="UpdateVersion" BeforeTargets="BeforeBuild">
     <Exec Command="powershell -ExecutionPolicy Bypass -File UpdateVersion.ps1 $(MSBuildProjectDirectory)\$(MSBuildProjectName).csproj" />
