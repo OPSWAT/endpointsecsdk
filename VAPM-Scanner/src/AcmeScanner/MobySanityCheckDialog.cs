@@ -46,10 +46,12 @@ namespace AcmeScanner
 
         public static List<string> GetAllScripts()
         {
-            string basePath = AppDomain.CurrentDomain.BaseDirectory;
-            Debug.WriteLine(basePath);
+            string currentDirectory = Directory.GetCurrentDirectory();            
+            string basePath = Path.Combine(currentDirectory, @"..\..\..\");
+            basePath= Path.GetFullPath(basePath);
             string targetPath = Path.Combine(basePath, @"SanityChecks");
             string sanityChecksPath = Path.GetFullPath(targetPath);
+            Debug.WriteLine("target " + targetPath);
             List<string> fileNames = new List<string>();
 
             // Check if the directory exists
