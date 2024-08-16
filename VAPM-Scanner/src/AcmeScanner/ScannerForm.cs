@@ -583,6 +583,7 @@ namespace AcmeScanner
                 btnFreshInstall.Enabled = enabled;
                 btnDomainCSV.Enabled = enabled;
                 btnRefreshStatus.Enabled = enabled;
+                btnLoadCVEs.Enabled = enabled;
 
             }
             if (!MobyDownload)
