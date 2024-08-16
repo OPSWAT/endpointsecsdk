@@ -90,6 +90,7 @@ namespace AcmeScanner
             mobyTimestampData.Text = UpdateMobyFile.GetMobyTimestamp();
         }
 
+        //This function fills in the SDK labels present on the Offline and Patches tab.
         private void FillSDKlabels()
         {
             EnableButtons(true);
@@ -137,6 +138,7 @@ namespace AcmeScanner
             }
         }
 
+        //Check if license files are present in bin folder; does not allow to run program if not
         private void CheckLicenseFiles()
         {
             if (!File.Exists("license.cfg") || !File.Exists("pass_key.txt"))
@@ -544,13 +546,13 @@ namespace AcmeScanner
             return ShowMessageDialog(messageDialog);
         }
 
+        //Function which disables buttons on certain conditions, mostly when other background worker is being run.
         public void EnableButtons(bool enabled)
         {
             bool SDKdownload = UpdateSDK.DoesSDKExist();
             bool DBdownload = UpdateDBFiles.DoesDBExist();
             bool MobyDownload = UpdateMobyFile.DoesMobyExist();
-
-            //these buttons are still being loaded in and enabeled somewhere else, need to find out where
+            
             if (!SDKdownload || !DBdownload)
             {
                 btnInstall.Enabled = false;
@@ -1629,6 +1631,7 @@ namespace AcmeScanner
             ShowLoading(true);
             loadVulnerabilitiesWorker.RunWorkerAsync();
         }
+        //Removes placeholder text of "Search Products" when search bar is clicked
         private void searchCatalogClicked(object sender, EventArgs e)
         {
             if (staticProductList == null)
@@ -1643,6 +1646,7 @@ namespace AcmeScanner
 
         }
 
+        //Function called whenever text changed in search bar and updates catalog if it hasn't been updated yet.
         private void searchCatalog_TextChanged(object sender, EventArgs e)
         {
 
@@ -1652,6 +1656,8 @@ namespace AcmeScanner
             }
 
         }
+
+        //Function returns list of CatalogSignature objects containing searched name in their name property
         private List<CatalogSignature> searchResult(string signatureName)
         {
             List<CatalogSignature> result = new List<CatalogSignature>();
@@ -1672,6 +1678,7 @@ namespace AcmeScanner
             return result;
         }
 
+        //Function takes in list of CatalogSignature objects to display on the catalog tab
         private void UpdateSearchCatalogResults(List<CatalogSignature> resultList)
         {
             List<ListViewItem> resultListCatalog = new List<ListViewItem>();
@@ -1704,6 +1711,8 @@ namespace AcmeScanner
             isCatalogUpdated = false;
         }
 
+        //This function is called whenever enter key is pressed in the search box on the catalog tab. Fetches list of CatalogSignature objects to show from 
+        //searchResult function and then displays them using UpdateSearchCatalogResults function
         private void searchCatalogEnter(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Enter)
