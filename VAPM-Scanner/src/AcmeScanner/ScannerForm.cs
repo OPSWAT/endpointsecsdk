@@ -1495,9 +1495,11 @@ namespace AcmeScanner
         private List<ListViewItem> LoadVulnerabilities()
         {
             int cveCount = 0;
-            string JsonFilePath = "C:\\Users\\ethanmay\\Projects\\endpointsecsdk\\VAPM-Scanner\\src\\AcmeScanner";
+            string currentDirectory = Directory.GetCurrentDirectory();            
+            string jsonFilePath = Path.Combine(currentDirectory, @"..\..\..");            
+            jsonFilePath = Path.GetFullPath(jsonFilePath);
             string JsonName = "T1Applications.json";
-            string FilePath = Path.Combine(JsonFilePath, JsonName);
+            string FilePath = Path.Combine(jsonFilePath, JsonName);
 
             List<ListViewItem> resultList = new List<ListViewItem>();
             Dictionary<string, string> productDictionary = new Dictionary<string, string>();
