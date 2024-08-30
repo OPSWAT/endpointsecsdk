@@ -8,6 +8,7 @@
 using System.Drawing;
 using System.Text;
 using System.Windows.Forms;
+using AcmeScanner.Dialogs;
 
 namespace AcmeScanner
 {
