@@ -31,6 +31,7 @@ using VAPMAdapter.Moby;
 using Newtonsoft.Json;
 using System.Security.Cryptography.Xml;
 using System.Globalization;
+using AcmeScanner.Dialogs;
 
 
 namespace AcmeScanner
@@ -76,7 +77,7 @@ namespace AcmeScanner
         {
             base.OnKeyDown(e);
 
-            if(e.KeyCode == Keys.D && e.Control)
+            if (e.KeyCode == Keys.D && e.Control)
             {
                 ShowDevTabs();
             }
@@ -84,7 +85,7 @@ namespace AcmeScanner
 
         private void ShowDevTabs()
         {
-            if(tbcMainView.TabPages.Count < 4)
+            if (tbcMainView.TabPages.Count < 4)
             {
                 tbcMainView.TabPages.Add(tabStatus);
                 tbcMainView.TabPages.Add(tabMoby);
@@ -98,7 +99,7 @@ namespace AcmeScanner
             tbcMainView.TabPages.Add(tabOffline);
             tbcMainView.TabPages.Add(tabOrchestrate);
             tbcMainView.TabPages.Add(tabCatalog);
-            
+
             //
             // Enable the Moby component here
             //
@@ -1417,6 +1418,56 @@ namespace AcmeScanner
         private void BtnMobysubsetClose_Click(object sender, EventArgs e)
         {
             mobySubsetsPanel.Visible = false;  // Hide the panel
+        }
+
+        private void btnExportMobyCSV_Click(object sender, EventArgs e)
+        {
+            if(staticMobyProductList == null || staticMobyProductList.Count == 0)
+            {
+                MessageBox.Show("Load Moby first to export results.");
+                return;
+            }
+
+
+            StringBuilder CSVResult = new StringBuilder();
+
+            CSVResult.AppendLine("Name,SignatureID,OSType,AutoPatching,VulnDetection");
+
+            foreach (MobyProduct product in staticMobyProductList)
+            {
+                foreach (MobySignature signature in product.sigList)
+                {
+                    CSVResult.Append(signature.Name);
+                    CSVResult.Append(",");
+                    CSVResult.Append(signature.Id);
+                    CSVResult.Append(",");
+                    CSVResult.Append(product.osType);
+                    CSVResult.Append(",");
+                    CSVResult.Append(signature.supportAutoPatching);
+                    CSVResult.Append(",");
+
+                    if(signature.vulnerabilityVersions != null && signature.vulnerabilityVersions.Count > 0)
+                    {
+                        CSVResult.Append("TRUE");
+                    }
+                    else
+                    {
+                        CSVResult.Append("FALSE");
+                    }
+
+                    CSVResult.AppendLine("");
+                }
+            }
+
+
+            string listFileName = "vapm-list.csv";
+            if(File.Exists(listFileName))
+            {
+                File.Delete(listFileName);
+            }
+
+            File.WriteAllText(listFileName, CSVResult.ToString());
+            MessageBox.Show("Results have been written to " + Path.Combine(Directory.GetCurrentDirectory(), listFileName));
         }
     }
 }

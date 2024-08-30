@@ -23,7 +23,7 @@
 
 
   <ItemGroup>
-    <Compile Update="InstallPatchMessageDialog.cs">
+    <Compile Update="Dialogs\InstallPatchMessageDialog.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Update="Properties\Resources.Designer.cs">
@@ -31,7 +31,7 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Update="CVEListDialog.cs" />
+    <Compile Update="Dialogs\CVEListDialog.cs" />
   </ItemGroup>
 
   <ItemGroup>
