@@ -1,16 +1,16 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="Current" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Compile Update="CustomMessageDialog.cs">
+    <Compile Update="Dialogs\CustomMessageDialog.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Update="CVEListDialog.cs">
+    <Compile Update="Dialogs\CVEListDialog.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Update="LookupCVEBox.cs">
+    <Compile Update="Dialogs\LookupCVEBox.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Update="MobySanityCheckDialog.cs">
+    <Compile Update="Dialogs\MobySanityCheckDialog.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Update="ScannerForm.cs">
@@ -19,13 +19,10 @@
     <Compile Update="ScannerListView.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Update="testDialog.cs">
+    <Compile Update="Dialogs\TextDialog.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Update="TextDialog.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Update="ViewMobyJsonDialog.cs">
+    <Compile Update="Dialogs\ViewMobyJsonDialog.cs">
       <SubType>Form</SubType>
     </Compile>
   </ItemGroup>

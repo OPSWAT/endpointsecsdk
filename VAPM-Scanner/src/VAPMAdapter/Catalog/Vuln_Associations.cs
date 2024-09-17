@@ -193,7 +193,6 @@ namespace VAPMAdapter.Catalog
                             }
 
                             newProductVulnDictionary[signatureId].Add(association);
-                            System.Diagnostics.Debug.WriteLine(signatureId+"\n");
                         }
                     }
                 }

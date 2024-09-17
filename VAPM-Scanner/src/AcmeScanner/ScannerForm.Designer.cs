@@ -91,6 +91,7 @@ namespace AcmeScanner
             tabPage5 = new TabPage();
             scannerListView1 = new ScannerListView();
             panel7 = new Panel();
+            btnExportMobyCSV = new MaterialSkin.Controls.MaterialButton();
             mobyTimestampData = new Label();
             mobyTimestamp = new Label();
             btnViewMobySubsets = new MaterialSkin.Controls.MaterialButton();
@@ -1171,6 +1172,39 @@ namespace AcmeScanner
             MobySubsetsLabel.Size = new Size(534, 29);
             MobySubsetsLabel.TabIndex = 2;
             MobySubsetsLabel.Text = "Double-click a JSON name to view its content";
+            // 
+            // mobySubsetsPanel
+            // 
+            mobySubsetsPanel.Controls.Add(labelTitle);
+            mobySubsetsPanel.Controls.Add(btnClose);
+            mobySubsetsPanel.Controls.Add(listView);
+            mobySubsetsPanel.Location = new Point(0, 0);
+            mobySubsetsPanel.Name = "mobySubsetsPanel";
+            mobySubsetsPanel.Size = new Size(200, 100);
+            mobySubsetsPanel.TabIndex = 3;
+            // 
+            // labelTitle
+            // 
+            labelTitle.Location = new Point(0, 0);
+            labelTitle.Name = "labelTitle";
+            labelTitle.Size = new Size(100, 23);
+            labelTitle.TabIndex = 0;
+            // 
+            // btnClose
+            // 
+            btnClose.Location = new Point(0, 0);
+            btnClose.Name = "btnClose";
+            btnClose.Size = new Size(75, 23);
+            btnClose.TabIndex = 1;
+            btnClose.Click += BtnMobysubsetClose_Click;
+            // 
+            // listView
+            // 
+            listView.Location = new Point(0, 0);
+            listView.Name = "listView";
+            listView.Size = new Size(121, 97);
+            listView.TabIndex = 2;
+            listView.UseCompatibleStateImageBehavior = false;
             // 
             // ScannerForm
             // 
