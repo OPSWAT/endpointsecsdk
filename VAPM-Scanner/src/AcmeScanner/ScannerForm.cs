@@ -74,8 +74,8 @@ namespace AcmeScanner
             FillSDKlabels();
             FillMobyLabels();
             SetTitleWithFileVersion();
-
-
+            SetTabs(args);
+        }
 
 
 
@@ -556,9 +556,9 @@ namespace AcmeScanner
                     lvVulnerabilities.Items.AddRange(resultList.ToArray());
                     lvVulnerabilities.Update();
 
-                    if (!VulnerabilitiesTab.Controls.Contains(lvVulnerabilities))
+                    if (!tabVulnerabilities.Controls.Contains(lvVulnerabilities))
                     {
-                        VulnerabilitiesTab.Controls.Add(lvVulnerabilities);
+                        tabVulnerabilities.Controls.Add(lvVulnerabilities);
                     }
                     ShowLoading(false);
                 }));

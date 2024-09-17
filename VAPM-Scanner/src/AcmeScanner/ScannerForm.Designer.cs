@@ -1,4 +1,5 @@
-﻿using System.Drawing;
+﻿using MaterialSkin.Controls;
+using System.Drawing;
 using System.Windows.Forms;
 using VAPMAdapter.Moby.POCO;
 
@@ -43,18 +44,18 @@ namespace AcmeScanner
             label6 = new Label();
             label5 = new Label();
             label4 = new Label();
-            btnUpdate = new MaterialSkin.Controls.MaterialButton();
-            btnInstall = new MaterialSkin.Controls.MaterialButton();
-            btnCVEJSON = new MaterialSkin.Controls.MaterialButton();
+            btnUpdate = new MaterialButton();
+            btnInstall = new MaterialButton();
+            btnCVEJSON = new MaterialButton();
             cbScanOSCVEs = new CheckBox();
-            btnScan = new MaterialSkin.Controls.MaterialButton();
+            btnScan = new MaterialButton();
             panel3 = new Panel();
             pbLoading = new PictureBox();
             panel2 = new Panel();
-            tabCatalog = new TabControl();
-            tabPage1 = new TabPage();
+            tbcMainView = new TabControl();
+            tabOffline = new TabPage();
             lvScanResults = new ScannerListView();
-            tabPage2 = new TabPage();
+            tabOrchestrate = new TabPage();
             lvOrchestrationScanResult = new ScannerListView();
             panel4 = new Panel();
             label15 = new Label();
@@ -63,70 +64,70 @@ namespace AcmeScanner
             label12 = new Label();
             label11 = new Label();
             label10 = new Label();
-            btnUpdateSDK = new MaterialSkin.Controls.MaterialButton();
-            btnInstallOrchestration = new MaterialSkin.Controls.MaterialButton();
-            btnScanOrchestration = new MaterialSkin.Controls.MaterialButton();
-            tabPage3 = new TabPage();
+            btnUpdateSDK = new MaterialButton();
+            btnInstallOrchestration = new MaterialButton();
+            btnScanOrchestration = new MaterialButton();
+            tabCatalog = new TabPage();
             lvCatalog = new ScannerListView();
             panel5 = new Panel();
             panel9 = new Panel();
             pictureBox1 = new PictureBox();
             searchCatalog = new TextBox();
-            btnDomainCSV = new MaterialSkin.Controls.MaterialButton();
-            btnListCatalogCVE = new MaterialSkin.Controls.MaterialButton();
-            btnFreshInstall = new MaterialSkin.Controls.MaterialButton();
-            btnExportCSV = new MaterialSkin.Controls.MaterialButton();
+            btnDomainCSV = new MaterialButton();
+            btnListCatalogCVE = new MaterialButton();
+            btnFreshInstall = new MaterialButton();
+            btnExportCSV = new MaterialButton();
             lblTotalInstalls = new Label();
             label3 = new Label();
             lblTotalCVEs = new Label();
             lblTotalProducts = new Label();
-            btnLookupCVE = new MaterialSkin.Controls.MaterialButton();
+            btnLookupCVE = new MaterialButton();
             label2 = new Label();
             label1 = new Label();
-            mbLoad = new MaterialSkin.Controls.MaterialButton();
-            tabPage4 = new TabPage();
+            mbLoad = new MaterialButton();
+            tabStatus = new TabPage();
             lvStatus = new ScannerListView();
             panel6 = new Panel();
-            btnRefreshStatus = new MaterialSkin.Controls.MaterialButton();
-            tabPage5 = new TabPage();
+            btnRefreshStatus = new MaterialButton();
+            tabMoby = new TabPage();
             scannerListView1 = new ScannerListView();
             panel7 = new Panel();
-            btnExportMobyCSV = new MaterialSkin.Controls.MaterialButton();
             mobyTimestampData = new Label();
             mobyTimestamp = new Label();
-            btnViewMobySubsets = new MaterialSkin.Controls.MaterialButton();
-            btnRunChecksMoby = new MaterialSkin.Controls.MaterialButton();
-            btnUpdateMoby = new MaterialSkin.Controls.MaterialButton();
-            btnMobyViewTotals = new MaterialSkin.Controls.MaterialButton();
-            btnLoadMoby = new MaterialSkin.Controls.MaterialButton();
-            VulnerabilitiesTab = new TabPage();
+            btnViewMobySubsets = new MaterialButton();
+            btnRunChecksMoby = new MaterialButton();
+            btnUpdateMoby = new MaterialButton();
+            btnMobyViewTotals = new MaterialButton();
+            btnLoadMoby = new MaterialButton();
+            tabVulnerabilities = new TabPage();
             lvVulnerabilities = new ScannerListView();
             panel8 = new Panel();
             label17 = new Label();
             label16 = new Label();
-            btnLoadCVEs = new MaterialSkin.Controls.MaterialButton();
+            btnLoadCVEs = new MaterialButton();
+            btnExportMobyCSV = new MaterialButton();
             timer1 = new Timer(components);
             mobySubsetsPanel = new Panel();
-            listView = new ListView();
-            btnClose = new Button();
             MobySubsetsLabel = new Label();
+            btnClose = new Button();
+            listView = new ListView();
             panel1.SuspendLayout();
             panel3.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)pbLoading).BeginInit();
             panel2.SuspendLayout();
-            tabCatalog.SuspendLayout();
-            tabPage1.SuspendLayout();
-            tabPage2.SuspendLayout();
+            tbcMainView.SuspendLayout();
+            tabOffline.SuspendLayout();
+            tabOrchestrate.SuspendLayout();
             panel4.SuspendLayout();
-            tabPage3.SuspendLayout();
+            tabCatalog.SuspendLayout();
             panel5.SuspendLayout();
             panel9.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
-            tabPage4.SuspendLayout();
+            tabStatus.SuspendLayout();
             panel6.SuspendLayout();
-            tabPage5.SuspendLayout();
+            tabMoby.SuspendLayout();
             panel7.SuspendLayout();
-            VulnerabilitiesTab.SuspendLayout();
+            tabVulnerabilities.SuspendLayout();
             panel8.SuspendLayout();
             mobySubsetsPanel.SuspendLayout();
             SuspendLayout();
@@ -208,7 +209,7 @@ namespace AcmeScanner
             // 
             btnUpdate.AutoSize = false;
             btnUpdate.AutoSizeMode = AutoSizeMode.GrowAndShrink;
-            btnUpdate.Density = MaterialSkin.Controls.MaterialButton.MaterialButtonDensity.Default;
+            btnUpdate.Density = MaterialButton.MaterialButtonDensity.Default;
             btnUpdate.Depth = 0;
             btnUpdate.HighEmphasis = true;
             btnUpdate.Icon = null;
@@ -220,7 +221,7 @@ namespace AcmeScanner
             btnUpdate.Size = new Size(149, 60);
             btnUpdate.TabIndex = 4;
             btnUpdate.Text = "Download Latest DB";
-            btnUpdate.Type = MaterialSkin.Controls.MaterialButton.MaterialButtonType.Contained;
+            btnUpdate.Type = MaterialButton.MaterialButtonType.Contained;
             btnUpdate.UseAccentColor = false;
             btnUpdate.UseVisualStyleBackColor = true;
             btnUpdate.Click += BtnUpdate_Click;
@@ -229,7 +230,7 @@ namespace AcmeScanner
             // 
             btnInstall.AutoSize = false;
             btnInstall.AutoSizeMode = AutoSizeMode.GrowAndShrink;
-            btnInstall.Density = MaterialSkin.Controls.MaterialButton.MaterialButtonDensity.Default;
+            btnInstall.Density = MaterialButton.MaterialButtonDensity.Default;
             btnInstall.Depth = 0;
             btnInstall.HighEmphasis = true;
             btnInstall.Icon = null;
@@ -241,7 +242,7 @@ namespace AcmeScanner
             btnInstall.Size = new Size(156, 60);
             btnInstall.TabIndex = 3;
             btnInstall.Text = "Install APP";
-            btnInstall.Type = MaterialSkin.Controls.MaterialButton.MaterialButtonType.Contained;
+            btnInstall.Type = MaterialButton.MaterialButtonType.Contained;
             btnInstall.UseAccentColor = false;
             btnInstall.UseVisualStyleBackColor = true;
             btnInstall.Click += BtnInstall_Click;
@@ -250,7 +251,7 @@ namespace AcmeScanner
             // 
             btnCVEJSON.AutoSize = false;
             btnCVEJSON.AutoSizeMode = AutoSizeMode.GrowAndShrink;
-            btnCVEJSON.Density = MaterialSkin.Controls.MaterialButton.MaterialButtonDensity.Default;
+            btnCVEJSON.Density = MaterialButton.MaterialButtonDensity.Default;
             btnCVEJSON.Depth = 0;
             btnCVEJSON.HighEmphasis = true;
             btnCVEJSON.Icon = null;
@@ -262,7 +263,7 @@ namespace AcmeScanner
             btnCVEJSON.Size = new Size(151, 60);
             btnCVEJSON.TabIndex = 2;
             btnCVEJSON.Text = "List CVEs";
-            btnCVEJSON.Type = MaterialSkin.Controls.MaterialButton.MaterialButtonType.Contained;
+            btnCVEJSON.Type = MaterialButton.MaterialButtonType.Contained;
             btnCVEJSON.UseAccentColor = false;
             btnCVEJSON.UseVisualStyleBackColor = true;
             btnCVEJSON.Click += BtnCVEJSON_Click;
@@ -283,7 +284,7 @@ namespace AcmeScanner
             // 
             btnScan.AutoSize = false;
             btnScan.AutoSizeMode = AutoSizeMode.GrowAndShrink;
-            btnScan.Density = MaterialSkin.Controls.MaterialButton.MaterialButtonDensity.Default;
+            btnScan.Density = MaterialButton.MaterialButtonDensity.Default;
             btnScan.Depth = 0;
             btnScan.HighEmphasis = true;
             btnScan.Icon = null;
@@ -295,7 +296,7 @@ namespace AcmeScanner
             btnScan.Size = new Size(150, 60);
             btnScan.TabIndex = 0;
             btnScan.Text = "Scan Offline APPs";
-            btnScan.Type = MaterialSkin.Controls.MaterialButton.MaterialButtonType.Contained;
+            btnScan.Type = MaterialButton.MaterialButtonType.Contained;
             btnScan.UseAccentColor = false;
             btnScan.UseVisualStyleBackColor = true;
             btnScan.Click += BtnScan_Click;
@@ -330,7 +331,7 @@ namespace AcmeScanner
             // panel2
             // 
             panel2.BorderStyle = BorderStyle.FixedSingle;
-            panel2.Controls.Add(tabCatalog);
+            panel2.Controls.Add(tbcMainView);
             panel2.Dock = DockStyle.Fill;
             panel2.Location = new Point(21, 25);
             panel2.Margin = new Padding(4, 5, 4, 5);
@@ -338,34 +339,34 @@ namespace AcmeScanner
             panel2.Size = new Size(1527, 1000);
             panel2.TabIndex = 2;
             // 
-            // tabCatalog
+            // tbcMainView
             // 
-            tabCatalog.Controls.Add(tabPage1);
-            tabCatalog.Controls.Add(tabPage2);
-            tabCatalog.Controls.Add(tabPage3);
-            tabCatalog.Controls.Add(tabPage4);
-            tabCatalog.Controls.Add(tabPage5);
-            tabCatalog.Controls.Add(VulnerabilitiesTab);
-            tabCatalog.Dock = DockStyle.Fill;
-            tabCatalog.Location = new Point(0, 0);
-            tabCatalog.Margin = new Padding(4, 5, 4, 5);
-            tabCatalog.Name = "tabCatalog";
-            tabCatalog.SelectedIndex = 0;
-            tabCatalog.Size = new Size(1525, 998);
-            tabCatalog.TabIndex = 3;
+            tbcMainView.Controls.Add(tabOffline);
+            tbcMainView.Controls.Add(tabOrchestrate);
+            tbcMainView.Controls.Add(tabCatalog);
+            tbcMainView.Controls.Add(tabStatus);
+            tbcMainView.Controls.Add(tabMoby);
+            tbcMainView.Controls.Add(tabVulnerabilities);
+            tbcMainView.Dock = DockStyle.Fill;
+            tbcMainView.Location = new Point(0, 0);
+            tbcMainView.Margin = new Padding(4, 5, 4, 5);
+            tbcMainView.Name = "tbcMainView";
+            tbcMainView.SelectedIndex = 0;
+            tbcMainView.Size = new Size(1525, 998);
+            tbcMainView.TabIndex = 3;
             // 
-            // tabPage1
+            // tabOffline
             // 
-            tabPage1.Controls.Add(lvScanResults);
-            tabPage1.Controls.Add(panel1);
-            tabPage1.Location = new Point(4, 34);
-            tabPage1.Margin = new Padding(4, 5, 4, 5);
-            tabPage1.Name = "tabPage1";
-            tabPage1.Padding = new Padding(4, 5, 4, 5);
-            tabPage1.Size = new Size(1517, 960);
-            tabPage1.TabIndex = 0;
-            tabPage1.Text = "Offline";
-            tabPage1.UseVisualStyleBackColor = true;
+            tabOffline.Controls.Add(lvScanResults);
+            tabOffline.Controls.Add(panel1);
+            tabOffline.Location = new Point(4, 34);
+            tabOffline.Margin = new Padding(4, 5, 4, 5);
+            tabOffline.Name = "tabOffline";
+            tabOffline.Padding = new Padding(4, 5, 4, 5);
+            tabOffline.Size = new Size(1517, 960);
+            tabOffline.TabIndex = 0;
+            tabOffline.Text = "Offline";
+            tabOffline.UseVisualStyleBackColor = true;
             // 
             // lvScanResults
             // 
@@ -383,18 +384,18 @@ namespace AcmeScanner
             lvScanResults.View = View.Details;
             lvScanResults.SelectedIndexChanged += LvScanResults_SelectedIndexChanged;
             // 
-            // tabPage2
+            // tabOrchestrate
             // 
-            tabPage2.Controls.Add(lvOrchestrationScanResult);
-            tabPage2.Controls.Add(panel4);
-            tabPage2.Location = new Point(4, 34);
-            tabPage2.Margin = new Padding(4, 5, 4, 5);
-            tabPage2.Name = "tabPage2";
-            tabPage2.Padding = new Padding(4, 5, 4, 5);
-            tabPage2.Size = new Size(1515, 959);
-            tabPage2.TabIndex = 1;
-            tabPage2.Text = "Patches";
-            tabPage2.UseVisualStyleBackColor = true;
+            tabOrchestrate.Controls.Add(lvOrchestrationScanResult);
+            tabOrchestrate.Controls.Add(panel4);
+            tabOrchestrate.Location = new Point(4, 34);
+            tabOrchestrate.Margin = new Padding(4, 5, 4, 5);
+            tabOrchestrate.Name = "tabOrchestrate";
+            tabOrchestrate.Padding = new Padding(4, 5, 4, 5);
+            tabOrchestrate.Size = new Size(1517, 960);
+            tabOrchestrate.TabIndex = 1;
+            tabOrchestrate.Text = "Patches";
+            tabOrchestrate.UseVisualStyleBackColor = true;
             // 
             // lvOrchestrationScanResult
             // 
@@ -406,7 +407,7 @@ namespace AcmeScanner
             lvOrchestrationScanResult.MultiSelect = false;
             lvOrchestrationScanResult.Name = "lvOrchestrationScanResult";
             lvOrchestrationScanResult.OwnerDraw = true;
-            lvOrchestrationScanResult.Size = new Size(1507, 822);
+            lvOrchestrationScanResult.Size = new Size(1509, 823);
             lvOrchestrationScanResult.TabIndex = 4;
             lvOrchestrationScanResult.UseCompatibleStateImageBehavior = false;
             lvOrchestrationScanResult.View = View.Details;
@@ -428,7 +429,7 @@ namespace AcmeScanner
             panel4.Margin = new Padding(21, 25, 21, 25);
             panel4.Name = "panel4";
             panel4.Padding = new Padding(21, 25, 21, 25);
-            panel4.Size = new Size(1507, 127);
+            panel4.Size = new Size(1509, 127);
             panel4.TabIndex = 3;
             // 
             // label15
@@ -486,7 +487,7 @@ namespace AcmeScanner
             // 
             btnUpdateSDK.AutoSize = false;
             btnUpdateSDK.AutoSizeMode = AutoSizeMode.GrowAndShrink;
-            btnUpdateSDK.Density = MaterialSkin.Controls.MaterialButton.MaterialButtonDensity.Default;
+            btnUpdateSDK.Density = MaterialButton.MaterialButtonDensity.Default;
             btnUpdateSDK.Depth = 0;
             btnUpdateSDK.HighEmphasis = true;
             btnUpdateSDK.Icon = null;
@@ -498,7 +499,7 @@ namespace AcmeScanner
             btnUpdateSDK.Size = new Size(166, 60);
             btnUpdateSDK.TabIndex = 4;
             btnUpdateSDK.Text = "Download Latest SDK";
-            btnUpdateSDK.Type = MaterialSkin.Controls.MaterialButton.MaterialButtonType.Contained;
+            btnUpdateSDK.Type = MaterialButton.MaterialButtonType.Contained;
             btnUpdateSDK.UseAccentColor = false;
             btnUpdateSDK.UseVisualStyleBackColor = true;
             btnUpdateSDK.Click += BtnUpdateSDK_Click;
@@ -507,7 +508,7 @@ namespace AcmeScanner
             // 
             btnInstallOrchestration.AutoSize = false;
             btnInstallOrchestration.AutoSizeMode = AutoSizeMode.GrowAndShrink;
-            btnInstallOrchestration.Density = MaterialSkin.Controls.MaterialButton.MaterialButtonDensity.Default;
+            btnInstallOrchestration.Density = MaterialButton.MaterialButtonDensity.Default;
             btnInstallOrchestration.Depth = 0;
             btnInstallOrchestration.HighEmphasis = true;
             btnInstallOrchestration.Icon = null;
@@ -519,7 +520,7 @@ namespace AcmeScanner
             btnInstallOrchestration.Size = new Size(167, 60);
             btnInstallOrchestration.TabIndex = 3;
             btnInstallOrchestration.Text = "Install Patch";
-            btnInstallOrchestration.Type = MaterialSkin.Controls.MaterialButton.MaterialButtonType.Contained;
+            btnInstallOrchestration.Type = MaterialButton.MaterialButtonType.Contained;
             btnInstallOrchestration.UseAccentColor = false;
             btnInstallOrchestration.UseVisualStyleBackColor = true;
             btnInstallOrchestration.Click += BtnInstallOrchestration_Click;
@@ -528,7 +529,7 @@ namespace AcmeScanner
             // 
             btnScanOrchestration.AutoSize = false;
             btnScanOrchestration.AutoSizeMode = AutoSizeMode.GrowAndShrink;
-            btnScanOrchestration.Density = MaterialSkin.Controls.MaterialButton.MaterialButtonDensity.Default;
+            btnScanOrchestration.Density = MaterialButton.MaterialButtonDensity.Default;
             btnScanOrchestration.Depth = 0;
             btnScanOrchestration.HighEmphasis = true;
             btnScanOrchestration.Icon = null;
@@ -540,23 +541,23 @@ namespace AcmeScanner
             btnScanOrchestration.Size = new Size(151, 60);
             btnScanOrchestration.TabIndex = 0;
             btnScanOrchestration.Text = "Load Patches";
-            btnScanOrchestration.Type = MaterialSkin.Controls.MaterialButton.MaterialButtonType.Contained;
+            btnScanOrchestration.Type = MaterialButton.MaterialButtonType.Contained;
             btnScanOrchestration.UseAccentColor = false;
             btnScanOrchestration.UseVisualStyleBackColor = true;
             btnScanOrchestration.Click += BtnScanOrchestration_Click;
             // 
-            // tabPage3
+            // tabCatalog
             // 
-            tabPage3.Controls.Add(lvCatalog);
-            tabPage3.Controls.Add(panel5);
-            tabPage3.Location = new Point(4, 34);
-            tabPage3.Margin = new Padding(4, 5, 4, 5);
-            tabPage3.Name = "tabPage3";
-            tabPage3.Padding = new Padding(4, 5, 4, 5);
-            tabPage3.Size = new Size(1515, 959);
-            tabPage3.TabIndex = 2;
-            tabPage3.Text = "Catalog";
-            tabPage3.UseVisualStyleBackColor = true;
+            tabCatalog.Controls.Add(lvCatalog);
+            tabCatalog.Controls.Add(panel5);
+            tabCatalog.Location = new Point(4, 34);
+            tabCatalog.Margin = new Padding(4, 5, 4, 5);
+            tabCatalog.Name = "tabCatalog";
+            tabCatalog.Padding = new Padding(4, 5, 4, 5);
+            tabCatalog.Size = new Size(1517, 960);
+            tabCatalog.TabIndex = 2;
+            tabCatalog.Text = "Catalog";
+            tabCatalog.UseVisualStyleBackColor = true;
             // 
             // lvCatalog
             // 
@@ -568,7 +569,7 @@ namespace AcmeScanner
             lvCatalog.MultiSelect = false;
             lvCatalog.Name = "lvCatalog";
             lvCatalog.OwnerDraw = true;
-            lvCatalog.Size = new Size(1507, 822);
+            lvCatalog.Size = new Size(1509, 823);
             lvCatalog.TabIndex = 6;
             lvCatalog.UseCompatibleStateImageBehavior = false;
             lvCatalog.View = View.Details;
@@ -594,7 +595,7 @@ namespace AcmeScanner
             panel5.Margin = new Padding(21, 25, 21, 25);
             panel5.Name = "panel5";
             panel5.Padding = new Padding(21, 25, 21, 25);
-            panel5.Size = new Size(1507, 127);
+            panel5.Size = new Size(1509, 127);
             panel5.TabIndex = 5;
             // 
             // panel9
@@ -636,7 +637,7 @@ namespace AcmeScanner
             // 
             btnDomainCSV.AutoSize = false;
             btnDomainCSV.AutoSizeMode = AutoSizeMode.GrowAndShrink;
-            btnDomainCSV.Density = MaterialSkin.Controls.MaterialButton.MaterialButtonDensity.Default;
+            btnDomainCSV.Density = MaterialButton.MaterialButtonDensity.Default;
             btnDomainCSV.Depth = 0;
             btnDomainCSV.HighEmphasis = true;
             btnDomainCSV.Icon = null;
@@ -648,7 +649,7 @@ namespace AcmeScanner
             btnDomainCSV.Size = new Size(157, 53);
             btnDomainCSV.TabIndex = 13;
             btnDomainCSV.Text = "Url CSV";
-            btnDomainCSV.Type = MaterialSkin.Controls.MaterialButton.MaterialButtonType.Contained;
+            btnDomainCSV.Type = MaterialButton.MaterialButtonType.Contained;
             btnDomainCSV.UseAccentColor = false;
             btnDomainCSV.UseMnemonic = false;
             btnDomainCSV.UseVisualStyleBackColor = true;
@@ -658,7 +659,7 @@ namespace AcmeScanner
             // 
             btnListCatalogCVE.AutoSize = false;
             btnListCatalogCVE.AutoSizeMode = AutoSizeMode.GrowAndShrink;
-            btnListCatalogCVE.Density = MaterialSkin.Controls.MaterialButton.MaterialButtonDensity.Default;
+            btnListCatalogCVE.Density = MaterialButton.MaterialButtonDensity.Default;
             btnListCatalogCVE.Depth = 0;
             btnListCatalogCVE.HighEmphasis = true;
             btnListCatalogCVE.Icon = null;
@@ -670,7 +671,7 @@ namespace AcmeScanner
             btnListCatalogCVE.Size = new Size(157, 53);
             btnListCatalogCVE.TabIndex = 1;
             btnListCatalogCVE.Text = "View CVES";
-            btnListCatalogCVE.Type = MaterialSkin.Controls.MaterialButton.MaterialButtonType.Contained;
+            btnListCatalogCVE.Type = MaterialButton.MaterialButtonType.Contained;
             btnListCatalogCVE.UseAccentColor = false;
             btnListCatalogCVE.UseVisualStyleBackColor = true;
             btnListCatalogCVE.Click += BtnListCatalogCVE_Click;
@@ -679,7 +680,7 @@ namespace AcmeScanner
             // 
             btnFreshInstall.AutoSize = false;
             btnFreshInstall.AutoSizeMode = AutoSizeMode.GrowAndShrink;
-            btnFreshInstall.Density = MaterialSkin.Controls.MaterialButton.MaterialButtonDensity.Default;
+            btnFreshInstall.Density = MaterialButton.MaterialButtonDensity.Default;
             btnFreshInstall.Depth = 0;
             btnFreshInstall.HighEmphasis = true;
             btnFreshInstall.Icon = null;
@@ -691,7 +692,7 @@ namespace AcmeScanner
             btnFreshInstall.Size = new Size(157, 53);
             btnFreshInstall.TabIndex = 12;
             btnFreshInstall.Text = "Fresh Install";
-            btnFreshInstall.Type = MaterialSkin.Controls.MaterialButton.MaterialButtonType.Contained;
+            btnFreshInstall.Type = MaterialButton.MaterialButtonType.Contained;
             btnFreshInstall.UseAccentColor = false;
             btnFreshInstall.UseVisualStyleBackColor = true;
             btnFreshInstall.Click += BtnFreshInstall_Click;
@@ -700,7 +701,7 @@ namespace AcmeScanner
             // 
             btnExportCSV.AutoSize = false;
             btnExportCSV.AutoSizeMode = AutoSizeMode.GrowAndShrink;
-            btnExportCSV.Density = MaterialSkin.Controls.MaterialButton.MaterialButtonDensity.Default;
+            btnExportCSV.Density = MaterialButton.MaterialButtonDensity.Default;
             btnExportCSV.Depth = 0;
             btnExportCSV.HighEmphasis = true;
             btnExportCSV.Icon = null;
@@ -712,7 +713,7 @@ namespace AcmeScanner
             btnExportCSV.Size = new Size(157, 53);
             btnExportCSV.TabIndex = 11;
             btnExportCSV.Text = "Export CSV";
-            btnExportCSV.Type = MaterialSkin.Controls.MaterialButton.MaterialButtonType.Contained;
+            btnExportCSV.Type = MaterialButton.MaterialButtonType.Contained;
             btnExportCSV.UseAccentColor = false;
             btnExportCSV.UseVisualStyleBackColor = true;
             btnExportCSV.Click += BtnExportCSV_Click;
@@ -765,7 +766,7 @@ namespace AcmeScanner
             // 
             btnLookupCVE.AutoSize = false;
             btnLookupCVE.AutoSizeMode = AutoSizeMode.GrowAndShrink;
-            btnLookupCVE.Density = MaterialSkin.Controls.MaterialButton.MaterialButtonDensity.Default;
+            btnLookupCVE.Density = MaterialButton.MaterialButtonDensity.Default;
             btnLookupCVE.Depth = 0;
             btnLookupCVE.HighEmphasis = true;
             btnLookupCVE.Icon = null;
@@ -777,7 +778,7 @@ namespace AcmeScanner
             btnLookupCVE.Size = new Size(157, 60);
             btnLookupCVE.TabIndex = 4;
             btnLookupCVE.Text = "Lookup CVE";
-            btnLookupCVE.Type = MaterialSkin.Controls.MaterialButton.MaterialButtonType.Contained;
+            btnLookupCVE.Type = MaterialButton.MaterialButtonType.Contained;
             btnLookupCVE.UseAccentColor = false;
             btnLookupCVE.UseVisualStyleBackColor = true;
             btnLookupCVE.Click += BtnLookupCVE_Click;
@@ -808,7 +809,7 @@ namespace AcmeScanner
             // 
             mbLoad.AutoSize = false;
             mbLoad.AutoSizeMode = AutoSizeMode.GrowAndShrink;
-            mbLoad.Density = MaterialSkin.Controls.MaterialButton.MaterialButtonDensity.Default;
+            mbLoad.Density = MaterialButton.MaterialButtonDensity.Default;
             mbLoad.Depth = 0;
             mbLoad.HighEmphasis = true;
             mbLoad.Icon = null;
@@ -820,23 +821,23 @@ namespace AcmeScanner
             mbLoad.Size = new Size(177, 60);
             mbLoad.TabIndex = 0;
             mbLoad.Text = "Load Product Information";
-            mbLoad.Type = MaterialSkin.Controls.MaterialButton.MaterialButtonType.Contained;
+            mbLoad.Type = MaterialButton.MaterialButtonType.Contained;
             mbLoad.UseAccentColor = false;
             mbLoad.UseVisualStyleBackColor = true;
             mbLoad.Click += MbLoad_Click;
             // 
-            // tabPage4
+            // tabStatus
             // 
-            tabPage4.Controls.Add(lvStatus);
-            tabPage4.Controls.Add(panel6);
-            tabPage4.Location = new Point(4, 34);
-            tabPage4.Margin = new Padding(4, 5, 4, 5);
-            tabPage4.Name = "tabPage4";
-            tabPage4.Padding = new Padding(4, 5, 4, 5);
-            tabPage4.Size = new Size(1515, 959);
-            tabPage4.TabIndex = 3;
-            tabPage4.Text = "Status";
-            tabPage4.UseVisualStyleBackColor = true;
+            tabStatus.Controls.Add(lvStatus);
+            tabStatus.Controls.Add(panel6);
+            tabStatus.Location = new Point(4, 34);
+            tabStatus.Margin = new Padding(4, 5, 4, 5);
+            tabStatus.Name = "tabStatus";
+            tabStatus.Padding = new Padding(4, 5, 4, 5);
+            tabStatus.Size = new Size(1517, 960);
+            tabStatus.TabIndex = 3;
+            tabStatus.Text = "Status";
+            tabStatus.UseVisualStyleBackColor = true;
             // 
             // lvStatus
             // 
@@ -848,7 +849,7 @@ namespace AcmeScanner
             lvStatus.MultiSelect = false;
             lvStatus.Name = "lvStatus";
             lvStatus.OwnerDraw = true;
-            lvStatus.Size = new Size(1507, 822);
+            lvStatus.Size = new Size(1509, 823);
             lvStatus.TabIndex = 6;
             lvStatus.UseCompatibleStateImageBehavior = false;
             lvStatus.View = View.Details;
@@ -862,14 +863,14 @@ namespace AcmeScanner
             panel6.Margin = new Padding(21, 25, 21, 25);
             panel6.Name = "panel6";
             panel6.Padding = new Padding(21, 25, 21, 25);
-            panel6.Size = new Size(1507, 127);
+            panel6.Size = new Size(1509, 127);
             panel6.TabIndex = 5;
             // 
             // btnRefreshStatus
             // 
             btnRefreshStatus.AutoSize = false;
             btnRefreshStatus.AutoSizeMode = AutoSizeMode.GrowAndShrink;
-            btnRefreshStatus.Density = MaterialSkin.Controls.MaterialButton.MaterialButtonDensity.Default;
+            btnRefreshStatus.Density = MaterialButton.MaterialButtonDensity.Default;
             btnRefreshStatus.Depth = 0;
             btnRefreshStatus.HighEmphasis = true;
             btnRefreshStatus.Icon = null;
@@ -881,23 +882,23 @@ namespace AcmeScanner
             btnRefreshStatus.Size = new Size(200, 70);
             btnRefreshStatus.TabIndex = 0;
             btnRefreshStatus.Text = "Load Patch Status";
-            btnRefreshStatus.Type = MaterialSkin.Controls.MaterialButton.MaterialButtonType.Contained;
+            btnRefreshStatus.Type = MaterialButton.MaterialButtonType.Contained;
             btnRefreshStatus.UseAccentColor = false;
             btnRefreshStatus.UseVisualStyleBackColor = true;
             btnRefreshStatus.Click += BtnRefreshStatus_Click;
             // 
-            // tabPage5
+            // tabMoby
             // 
-            tabPage5.Controls.Add(scannerListView1);
-            tabPage5.Controls.Add(panel7);
-            tabPage5.Location = new Point(4, 34);
-            tabPage5.Margin = new Padding(4, 5, 4, 5);
-            tabPage5.Name = "tabPage5";
-            tabPage5.Padding = new Padding(4, 5, 4, 5);
-            tabPage5.Size = new Size(1517, 960);
-            tabPage5.TabIndex = 4;
-            tabPage5.Text = "Moby";
-            tabPage5.UseVisualStyleBackColor = true;
+            tabMoby.Controls.Add(scannerListView1);
+            tabMoby.Controls.Add(panel7);
+            tabMoby.Location = new Point(4, 34);
+            tabMoby.Margin = new Padding(4, 5, 4, 5);
+            tabMoby.Name = "tabMoby";
+            tabMoby.Padding = new Padding(4, 5, 4, 5);
+            tabMoby.Size = new Size(1517, 960);
+            tabMoby.TabIndex = 4;
+            tabMoby.Text = "Moby";
+            tabMoby.UseVisualStyleBackColor = true;
             // 
             // scannerListView1
             // 
@@ -954,7 +955,7 @@ namespace AcmeScanner
             // btnViewMobySubsets
             // 
             btnViewMobySubsets.AutoSizeMode = AutoSizeMode.GrowAndShrink;
-            btnViewMobySubsets.Density = MaterialSkin.Controls.MaterialButton.MaterialButtonDensity.Default;
+            btnViewMobySubsets.Density = MaterialButton.MaterialButtonDensity.Default;
             btnViewMobySubsets.Depth = 0;
             btnViewMobySubsets.HighEmphasis = true;
             btnViewMobySubsets.Icon = null;
@@ -966,7 +967,7 @@ namespace AcmeScanner
             btnViewMobySubsets.Size = new Size(123, 36);
             btnViewMobySubsets.TabIndex = 6;
             btnViewMobySubsets.Text = "View Subsets";
-            btnViewMobySubsets.Type = MaterialSkin.Controls.MaterialButton.MaterialButtonType.Contained;
+            btnViewMobySubsets.Type = MaterialButton.MaterialButtonType.Contained;
             btnViewMobySubsets.UseAccentColor = false;
             btnViewMobySubsets.UseVisualStyleBackColor = true;
             btnViewMobySubsets.Click += BtnViewMobySubsets_Click;
@@ -974,7 +975,7 @@ namespace AcmeScanner
             // btnRunChecksMoby
             // 
             btnRunChecksMoby.AutoSizeMode = AutoSizeMode.GrowAndShrink;
-            btnRunChecksMoby.Density = MaterialSkin.Controls.MaterialButton.MaterialButtonDensity.Default;
+            btnRunChecksMoby.Density = MaterialButton.MaterialButtonDensity.Default;
             btnRunChecksMoby.Depth = 0;
             btnRunChecksMoby.HighEmphasis = true;
             btnRunChecksMoby.Icon = null;
@@ -986,7 +987,7 @@ namespace AcmeScanner
             btnRunChecksMoby.Size = new Size(111, 36);
             btnRunChecksMoby.TabIndex = 5;
             btnRunChecksMoby.Text = "Run checks";
-            btnRunChecksMoby.Type = MaterialSkin.Controls.MaterialButton.MaterialButtonType.Contained;
+            btnRunChecksMoby.Type = MaterialButton.MaterialButtonType.Contained;
             btnRunChecksMoby.UseAccentColor = false;
             btnRunChecksMoby.UseVisualStyleBackColor = true;
             btnRunChecksMoby.Click += BtnRunChecksMoby_Click;
@@ -994,7 +995,7 @@ namespace AcmeScanner
             // btnUpdateMoby
             // 
             btnUpdateMoby.AutoSizeMode = AutoSizeMode.GrowAndShrink;
-            btnUpdateMoby.Density = MaterialSkin.Controls.MaterialButton.MaterialButtonDensity.Default;
+            btnUpdateMoby.Density = MaterialButton.MaterialButtonDensity.Default;
             btnUpdateMoby.Depth = 0;
             btnUpdateMoby.HighEmphasis = true;
             btnUpdateMoby.Icon = null;
@@ -1006,7 +1007,7 @@ namespace AcmeScanner
             btnUpdateMoby.Size = new Size(147, 36);
             btnUpdateMoby.TabIndex = 4;
             btnUpdateMoby.Text = "Download Moby";
-            btnUpdateMoby.Type = MaterialSkin.Controls.MaterialButton.MaterialButtonType.Contained;
+            btnUpdateMoby.Type = MaterialButton.MaterialButtonType.Contained;
             btnUpdateMoby.UseAccentColor = false;
             btnUpdateMoby.UseVisualStyleBackColor = true;
             btnUpdateMoby.Click += BtnUpdateMoby_Click;
@@ -1014,7 +1015,7 @@ namespace AcmeScanner
             // btnMobyViewTotals
             // 
             btnMobyViewTotals.AutoSizeMode = AutoSizeMode.GrowAndShrink;
-            btnMobyViewTotals.Density = MaterialSkin.Controls.MaterialButton.MaterialButtonDensity.Default;
+            btnMobyViewTotals.Density = MaterialButton.MaterialButtonDensity.Default;
             btnMobyViewTotals.Depth = 0;
             btnMobyViewTotals.HighEmphasis = true;
             btnMobyViewTotals.Icon = null;
@@ -1026,7 +1027,7 @@ namespace AcmeScanner
             btnMobyViewTotals.Size = new Size(167, 36);
             btnMobyViewTotals.TabIndex = 3;
             btnMobyViewTotals.Text = "view total counts";
-            btnMobyViewTotals.Type = MaterialSkin.Controls.MaterialButton.MaterialButtonType.Contained;
+            btnMobyViewTotals.Type = MaterialButton.MaterialButtonType.Contained;
             btnMobyViewTotals.UseAccentColor = false;
             btnMobyViewTotals.UseVisualStyleBackColor = true;
             btnMobyViewTotals.Click += BtnMobyViewTotals_Click;
@@ -1034,7 +1035,7 @@ namespace AcmeScanner
             // btnLoadMoby
             // 
             btnLoadMoby.AutoSizeMode = AutoSizeMode.GrowAndShrink;
-            btnLoadMoby.Density = MaterialSkin.Controls.MaterialButton.MaterialButtonDensity.Default;
+            btnLoadMoby.Density = MaterialButton.MaterialButtonDensity.Default;
             btnLoadMoby.Depth = 0;
             btnLoadMoby.HighEmphasis = true;
             btnLoadMoby.Icon = null;
@@ -1046,22 +1047,22 @@ namespace AcmeScanner
             btnLoadMoby.Size = new Size(104, 36);
             btnLoadMoby.TabIndex = 0;
             btnLoadMoby.Text = "Load Moby";
-            btnLoadMoby.Type = MaterialSkin.Controls.MaterialButton.MaterialButtonType.Contained;
+            btnLoadMoby.Type = MaterialButton.MaterialButtonType.Contained;
             btnLoadMoby.UseAccentColor = false;
             btnLoadMoby.UseVisualStyleBackColor = true;
             btnLoadMoby.Click += BtnLoadMoby_Click;
             // 
-            // VulnerabilitiesTab
+            // tabVulnerabilities
             // 
-            VulnerabilitiesTab.Controls.Add(lvVulnerabilities);
-            VulnerabilitiesTab.Controls.Add(panel8);
-            VulnerabilitiesTab.Location = new Point(4, 34);
-            VulnerabilitiesTab.Name = "VulnerabilitiesTab";
-            VulnerabilitiesTab.Padding = new Padding(3, 3, 3, 3);
-            VulnerabilitiesTab.Size = new Size(1515, 959);
-            VulnerabilitiesTab.TabIndex = 5;
-            VulnerabilitiesTab.Text = "Vulnerabilities";
-            VulnerabilitiesTab.UseVisualStyleBackColor = true;
+            tabVulnerabilities.Controls.Add(lvVulnerabilities);
+            tabVulnerabilities.Controls.Add(panel8);
+            tabVulnerabilities.Location = new Point(4, 34);
+            tabVulnerabilities.Name = "tabVulnerabilities";
+            tabVulnerabilities.Padding = new Padding(3);
+            tabVulnerabilities.Size = new Size(1517, 960);
+            tabVulnerabilities.TabIndex = 5;
+            tabVulnerabilities.Text = "Vulnerabilities";
+            tabVulnerabilities.UseVisualStyleBackColor = true;
             // 
             // lvVulnerabilities
             // 
@@ -1072,7 +1073,7 @@ namespace AcmeScanner
             lvVulnerabilities.MultiSelect = false;
             lvVulnerabilities.Name = "lvVulnerabilities";
             lvVulnerabilities.OwnerDraw = true;
-            lvVulnerabilities.Size = new Size(1509, 824);
+            lvVulnerabilities.Size = new Size(1511, 825);
             lvVulnerabilities.TabIndex = 6;
             lvVulnerabilities.UseCompatibleStateImageBehavior = false;
             lvVulnerabilities.View = View.Details;
@@ -1089,7 +1090,7 @@ namespace AcmeScanner
             panel8.Margin = new Padding(14, 15, 14, 15);
             panel8.Name = "panel8";
             panel8.Padding = new Padding(14, 15, 14, 15);
-            panel8.Size = new Size(1509, 129);
+            panel8.Size = new Size(1511, 129);
             panel8.TabIndex = 5;
             // 
             // label17
@@ -1113,7 +1114,7 @@ namespace AcmeScanner
             // 
             btnLoadCVEs.AutoSize = false;
             btnLoadCVEs.AutoSizeMode = AutoSizeMode.GrowAndShrink;
-            btnLoadCVEs.Density = MaterialSkin.Controls.MaterialButton.MaterialButtonDensity.Default;
+            btnLoadCVEs.Density = MaterialButton.MaterialButtonDensity.Default;
             btnLoadCVEs.Depth = 0;
             btnLoadCVEs.HighEmphasis = true;
             btnLoadCVEs.Icon = null;
@@ -1125,43 +1126,39 @@ namespace AcmeScanner
             btnLoadCVEs.Size = new Size(174, 67);
             btnLoadCVEs.TabIndex = 0;
             btnLoadCVEs.Text = "Load CVEs";
-            btnLoadCVEs.Type = MaterialSkin.Controls.MaterialButton.MaterialButtonType.Contained;
+            btnLoadCVEs.Type = MaterialButton.MaterialButtonType.Contained;
             btnLoadCVEs.UseAccentColor = false;
             btnLoadCVEs.UseVisualStyleBackColor = true;
             btnLoadCVEs.Click += BtnLoadCVEs_Click;
             // 
+            // btnExportMobyCSV
+            // 
+            btnExportMobyCSV.AutoSizeMode = AutoSizeMode.GrowAndShrink;
+            btnExportMobyCSV.Density = MaterialButton.MaterialButtonDensity.Default;
+            btnExportMobyCSV.Depth = 0;
+            btnExportMobyCSV.HighEmphasis = true;
+            btnExportMobyCSV.Icon = null;
+            btnExportMobyCSV.Location = new Point(0, 0);
+            btnExportMobyCSV.Margin = new Padding(4, 6, 4, 6);
+            btnExportMobyCSV.MouseState = MaterialSkin.MouseState.HOVER;
+            btnExportMobyCSV.Name = "btnExportMobyCSV";
+            btnExportMobyCSV.NoAccentTextColor = Color.Empty;
+            btnExportMobyCSV.Size = new Size(75, 36);
+            btnExportMobyCSV.TabIndex = 0;
+            btnExportMobyCSV.Type = MaterialButton.MaterialButtonType.Contained;
+            btnExportMobyCSV.UseAccentColor = false;
+            // 
             // mobySubsetsPanel
             // 
             mobySubsetsPanel.BorderStyle = BorderStyle.FixedSingle;
-            mobySubsetsPanel.Controls.Add(listView);
-            mobySubsetsPanel.Controls.Add(btnClose);
             mobySubsetsPanel.Controls.Add(MobySubsetsLabel);
+            mobySubsetsPanel.Controls.Add(btnClose);
+            mobySubsetsPanel.Controls.Add(listView);
             mobySubsetsPanel.Dock = DockStyle.Fill;
             mobySubsetsPanel.Location = new Point(0, 0);
             mobySubsetsPanel.Name = "mobySubsetsPanel";
             mobySubsetsPanel.Size = new Size(1569, 1050);
-            mobySubsetsPanel.TabIndex = 4;
-            // 
-            // listView
-            // 
-            listView.FullRowSelect = true;
-            listView.GridLines = true;
-            listView.Location = new Point(14, 83);
-            listView.Name = "listView";
-            listView.Size = new Size(1567, 1047);
-            listView.TabIndex = 1;
-            listView.UseCompatibleStateImageBehavior = false;
-            listView.View = View.Details;
-            listView.ItemActivate += ListView_ItemActivateMobySubsetTable;
-            // 
-            // btnClose
-            // 
-            btnClose.Location = new Point(1287, 17);
-            btnClose.Name = "btnClose";
-            btnClose.Size = new Size(143, 50);
-            btnClose.TabIndex = 0;
-            btnClose.Text = "Close";
-            btnClose.Click += BtnMobysubsetClose_Click;
+            mobySubsetsPanel.TabIndex = 3;
             // 
             // MobySubsetsLabel
             // 
@@ -1173,38 +1170,26 @@ namespace AcmeScanner
             MobySubsetsLabel.TabIndex = 2;
             MobySubsetsLabel.Text = "Double-click a JSON name to view its content";
             // 
-            // mobySubsetsPanel
-            // 
-            mobySubsetsPanel.Controls.Add(labelTitle);
-            mobySubsetsPanel.Controls.Add(btnClose);
-            mobySubsetsPanel.Controls.Add(listView);
-            mobySubsetsPanel.Location = new Point(0, 0);
-            mobySubsetsPanel.Name = "mobySubsetsPanel";
-            mobySubsetsPanel.Size = new Size(200, 100);
-            mobySubsetsPanel.TabIndex = 3;
-            // 
-            // labelTitle
-            // 
-            labelTitle.Location = new Point(0, 0);
-            labelTitle.Name = "labelTitle";
-            labelTitle.Size = new Size(100, 23);
-            labelTitle.TabIndex = 0;
-            // 
             // btnClose
             // 
             btnClose.Location = new Point(0, 0);
             btnClose.Name = "btnClose";
             btnClose.Size = new Size(75, 23);
             btnClose.TabIndex = 1;
+            btnClose.Text = "Close";
             btnClose.Click += BtnMobysubsetClose_Click;
             // 
             // listView
             // 
+            listView.FullRowSelect = true;
+            listView.GridLines = true;
             listView.Location = new Point(0, 0);
             listView.Name = "listView";
             listView.Size = new Size(121, 97);
             listView.TabIndex = 2;
             listView.UseCompatibleStateImageBehavior = false;
+            listView.View = View.Details;
+            listView.ItemActivate += ListView_ItemActivateMobySubsetTable;
             // 
             // ScannerForm
             // 
@@ -1214,6 +1199,7 @@ namespace AcmeScanner
             Controls.Add(panel3);
             Controls.Add(mobySubsetsPanel);
             Icon = (Icon)resources.GetObject("$this.Icon");
+            KeyPreview = true;
             Margin = new Padding(4, 5, 4, 5);
             Name = "ScannerForm";
             Text = "Acme Scanner";
@@ -1222,23 +1208,23 @@ namespace AcmeScanner
             panel3.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)pbLoading).EndInit();
             panel2.ResumeLayout(false);
-            tabCatalog.ResumeLayout(false);
-            tabPage1.ResumeLayout(false);
-            tabPage2.ResumeLayout(false);
+            tbcMainView.ResumeLayout(false);
+            tabOffline.ResumeLayout(false);
+            tabOrchestrate.ResumeLayout(false);
             panel4.ResumeLayout(false);
             panel4.PerformLayout();
-            tabPage3.ResumeLayout(false);
+            tabCatalog.ResumeLayout(false);
             panel5.ResumeLayout(false);
             panel5.PerformLayout();
             panel9.ResumeLayout(false);
             panel9.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)pictureBox1).EndInit();
-            tabPage4.ResumeLayout(false);
+            tabStatus.ResumeLayout(false);
             panel6.ResumeLayout(false);
-            tabPage5.ResumeLayout(false);
+            tabMoby.ResumeLayout(false);
             panel7.ResumeLayout(false);
             panel7.PerformLayout();
-            VulnerabilitiesTab.ResumeLayout(false);
+            tabVulnerabilities.ResumeLayout(false);
             panel8.ResumeLayout(false);
             mobySubsetsPanel.ResumeLayout(false);
             mobySubsetsPanel.PerformLayout();
@@ -1253,9 +1239,9 @@ namespace AcmeScanner
         private MaterialSkin.Controls.MaterialButton btnScan;
         private ScannerListView lvScanResults;
         private System.Windows.Forms.Timer timer1;
-        private TabControl tabCatalog;
-        private TabPage tabPage1;
-        private TabPage tabPage2;
+        private TabControl tbcMainView;
+        private TabPage tabOffline;
+        private TabPage tabOrchestrate;
         private CheckBox cbScanOSCVEs;
         private MaterialSkin.Controls.MaterialButton btnUpdate;
         private MaterialSkin.Controls.MaterialButton btnInstall;
@@ -1265,7 +1251,7 @@ namespace AcmeScanner
         private MaterialSkin.Controls.MaterialButton btnUpdateSDK;
         private MaterialSkin.Controls.MaterialButton btnInstallOrchestration;
         private MaterialSkin.Controls.MaterialButton btnScanOrchestration;
-        private TabPage tabPage3;
+        private TabPage tabCatalog;
         private ScannerListView lvCatalog;
         private Panel panel5;
         private MaterialSkin.Controls.MaterialButton mbLoad;
@@ -1281,9 +1267,9 @@ namespace AcmeScanner
         private MaterialSkin.Controls.MaterialButton btnExportCSV;
         private MaterialSkin.Controls.MaterialButton btnFreshInstall;
         private MaterialSkin.Controls.MaterialButton btnDomainCSV;
-        private TabPage tabPage4;
-        private TabPage tabPage5;
-        private TabPage VulnerabilitiesTab;
+        private TabPage tabStatus;
+        private TabPage tabMoby;
+        private TabPage tabVulnerabilities;
         private ScannerListView lvStatus;
         private Panel panel6;
         private MaterialSkin.Controls.MaterialButton btnRefreshStatus;
@@ -1300,6 +1286,7 @@ namespace AcmeScanner
         private Label label14;
         private Label label13;
         private Panel panel7;
+        private MaterialButton btnExportMobyCSV;
         private ScannerListView scannerListView1;
         private MaterialSkin.Controls.MaterialButton btnLoadMoby;
         private MobyTotalCounts mobyCounts;
@@ -1322,5 +1309,6 @@ namespace AcmeScanner
         private TextBox searchCatalog;
         private Panel panel9;
         private PictureBox pictureBox1;
+        private Control labelTitle;
     }
 }
