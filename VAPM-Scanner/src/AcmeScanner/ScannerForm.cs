@@ -95,6 +95,7 @@ namespace AcmeScanner
             {
                 tbcMainView.TabPages.Add(tabStatus);
                 tbcMainView.TabPages.Add(tabMoby);
+                tbcMainView.TabPages.Add(tabVulnerabilities);
             }
         }
 
@@ -105,6 +106,7 @@ namespace AcmeScanner
             tbcMainView.TabPages.Add(tabOffline);
             tbcMainView.TabPages.Add(tabOrchestrate);
             tbcMainView.TabPages.Add(tabCatalog);
+            tbcMainView.TabPages.Add(tabVulnerabilities);
 
             //
             // Enable the Moby component here
