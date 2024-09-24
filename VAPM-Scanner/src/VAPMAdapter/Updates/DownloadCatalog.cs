@@ -20,7 +20,7 @@ namespace VAPMAdapter.Updates
         // from VAPMSettings.getCatalogURL() and saves it to the specified catalogFile path.
         public static void Download(string catalogFile)
         {
-            HttpClientUtils.DownloadFileSynchronous(VAPMSettings.getCatalogURL(), catalogFile);
+            HttpClientUtils.DownloadFileSynchronous(VAPMSettings.GetCatalogURL(), catalogFile);
         }
 
     }

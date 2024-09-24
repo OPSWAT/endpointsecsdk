@@ -34,7 +34,7 @@ namespace VAPMAdapter.Catalog
         /// It throws an exception if the file is empty or cannot be read.
         /// </summary>
         /// <returns>A JObject representing the parsed JSON content, or throws an exception if the file is empty or unreadable.</returns>
-        private JObject getVulnAssociationJsonObject()
+        private JObject GetVulnAssociationJsonObject()
         {
             JObject result;
             string jsonString = File.ReadAllText(jsonLocation);
@@ -63,11 +63,11 @@ namespace VAPMAdapter.Catalog
         /// </summary>
         /// <returns>A JObject containing vulnerability associations, or null if the relevant header is not found.</returns>
 
-        private JObject getVulnAssociationsListJson()
+        private JObject GetVulnAssociationsListJson()
         {
             JObject result = null;
 
-            JObject vulnAssociationsJsonObject = getVulnAssociationJsonObject();
+            JObject vulnAssociationsJsonObject = GetVulnAssociationJsonObject();
             JArray oesisJson = (JArray)vulnAssociationsJsonObject["oesis"];
 
             foreach (JObject current in oesisJson.Children<JObject>())
@@ -85,7 +85,7 @@ namespace VAPMAdapter.Catalog
         }
 
         
-        private HashSet<string> getProductIds(JArray processList)
+        private HashSet<string> GetProductIds(JArray processList)
         {
             HashSet<string> result = new HashSet<string>();
 
@@ -97,7 +97,7 @@ namespace VAPMAdapter.Catalog
             return result;
         }
 
-        private List<CatalogRange> getRanges(JArray rangeList)
+        private List<CatalogRange> GetRanges(JArray rangeList)
         {
             List<CatalogRange> result = new List<CatalogRange>();
 
@@ -131,7 +131,7 @@ namespace VAPMAdapter.Catalog
             }
 
             List<CatalogVulnerabilityAssociation> result = new List<CatalogVulnerabilityAssociation>();
-            JObject jsonVulnAssociationsList = (JObject)getVulnAssociationsListJson();
+            JObject jsonVulnAssociationsList = (JObject)GetVulnAssociationsListJson();
 
             if (jsonVulnAssociationsList != null)
             {
@@ -147,10 +147,10 @@ namespace VAPMAdapter.Catalog
                     };
 
                     JArray v4_pids = (JArray)jsonVulnAssociationsList[current.Name]["v4_pids"];
-                    newVulnAssociation.ProductIdSet = v4_pids != null ? (HashSet<string>)getProductIds(v4_pids) : new HashSet<string>();
+                    newVulnAssociation.ProductIdSet = v4_pids != null ? (HashSet<string>)GetProductIds(v4_pids) : new HashSet<string>();
 
                     JArray ranges = (JArray)jsonVulnAssociationsList[current.Name]["ranges"];
-                    newVulnAssociation.RangeList = ranges != null ? (List<CatalogRange>)getRanges(ranges) : new List<CatalogRange>();
+                    newVulnAssociation.RangeList = ranges != null ? (List<CatalogRange>)GetRanges(ranges) : new List<CatalogRange>();
 
                     result.Add(newVulnAssociation);
                 }

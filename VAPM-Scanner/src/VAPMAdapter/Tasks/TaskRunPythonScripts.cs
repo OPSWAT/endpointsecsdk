@@ -13,13 +13,16 @@ namespace VAPMAdapter.Tasks
     public class TaskRunPythonScripts
     {
         public static JObject Execute(string pythonScript)
-        {
-            string basePath = AppDomain.CurrentDomain.BaseDirectory;
-            string targetPath = Path.Combine(basePath, @"..\..\..\SanityChecks");
+        {            
+            string currentDirectory = Directory.GetCurrentDirectory();
+            string basePath = Path.Combine(currentDirectory, @"..\..\..\");
+            basePath = Path.GetFullPath(basePath);
+            string targetPath = Path.Combine(basePath, @"SanityChecks");
             string fullPath = Path.GetFullPath(targetPath);    
+            
             // Append the script name to the base path for the script
             string scriptPath = Path.Combine(fullPath, pythonScript + ".py");
-            string jsonPath = Path.Combine(basePath, pythonScript + ".json");
+            string jsonPath = Path.Combine(currentDirectory, pythonScript + ".json");
 
             // Delete the existing JSON file if it exists
             if (File.Exists(jsonPath))
@@ -31,7 +34,7 @@ namespace VAPMAdapter.Tasks
             MobyPythonRunner pythonRunner = new MobyPythonRunner();
 
             // Run the script
-            pythonRunner.RunScript(scriptPath);
+            MobyPythonRunner.RunScript(scriptPath);
 
             // Read and return the contents of the produced JSON file
             if (File.Exists(jsonPath))

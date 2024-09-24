@@ -26,7 +26,7 @@ namespace VAPMAdapter.Updates
         private static void DownloadDBFile(string destPath, string fileName)
         {
             // Get the download URL for the specified file
-            string downloadURL = VAPMSettings.getTokenDownloadURL(fileName);
+            string downloadURL = VAPMSettings.GetTokenDownloadURL(fileName);
             string newFilePath = Path.Combine(destPath, fileName);
 
             if(File.Exists(destPath))
@@ -57,7 +57,7 @@ namespace VAPMAdapter.Updates
         /// Checks if the DB is downloaded
         /// </summary>
         /// <returns>True if the DB is downloaded, otherwise false.</returns>
-        public static bool doesDBExist()
+        public static bool DoesDBExist()
         {
             bool result = false;
             if (File.Exists("patch.dat"))
@@ -71,7 +71,7 @@ namespace VAPMAdapter.Updates
         /// Checks if the DB has been updated in the last 7 days.
         /// </summary>
         /// <returns>True if the DB has been updated in the last 7 days, otherwise false.</returns>
-        public static bool isDBUpdated()
+        public static bool IsDBUpdated()
         {
             bool result = false;
 

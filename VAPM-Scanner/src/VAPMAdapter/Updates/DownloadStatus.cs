@@ -24,7 +24,7 @@ namespace VAPMAdapter.Updates
         {
             // Downloads the file from the URL obtained from VAPMSettings.getStatusURL()
             // and saves it to the specified statusFile path.
-            HttpClientUtils.DownloadFileSynchronous(VAPMSettings.getStatusURL(), statusFile);
+            HttpClientUtils.DownloadFileSynchronous(VAPMSettings.GetStatusURL(), statusFile);
         }
 
     }

@@ -55,7 +55,7 @@ namespace AcmeScanner
             }
         }
 
-        private void download_json_Click(object sender, EventArgs e)
+        private void Download_json_Click(object sender, EventArgs e)
         {
             string cve = TB_CVE.Text;
             string cveJson = TaskLookupCVE.LookupCVE(cve);

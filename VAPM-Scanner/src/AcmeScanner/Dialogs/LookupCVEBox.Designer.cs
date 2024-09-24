@@ -102,7 +102,7 @@
             download_json.Type = MaterialSkin.Controls.MaterialButton.MaterialButtonType.Contained;
             download_json.UseAccentColor = false;
             download_json.UseVisualStyleBackColor = true;
-            download_json.Click += download_json_Click;
+            download_json.Click += Download_json_Click;
             // 
             // LookupCVEBox
             // 
