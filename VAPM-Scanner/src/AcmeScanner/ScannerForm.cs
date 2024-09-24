@@ -852,16 +852,16 @@ namespace AcmeScanner
             lvScanResults.Columns.Clear();
             lvScanResults.Columns.Add("Application", 300);
             lvScanResults.Columns.Add("Ver", 100);
-            lvScanResults.Columns.Add("Arch", 50);
+            lvScanResults.Columns.Add("Arch", 40);
             lvScanResults.Columns.Add("Lang", 50);
             lvScanResults.Columns.Add("Latest", 100);
-            lvScanResults.Columns.Add("Severity", 100);
-            lvScanResults.Columns.Add("CVE Count", 100);
-            lvScanResults.Columns.Add("Patched", 100);
+            lvScanResults.Columns.Add("Severity", 40);
+            lvScanResults.Columns.Add("CVE Count", 40);
+            lvScanResults.Columns.Add("Patched", 70);
             lvScanResults.Columns.Add("Auto", 50);
             lvScanResults.Columns.Add("SigId", 50);
-            lvScanResults.Columns.Add("PatchId", 50);
-            lvScanResults.Columns.Add("Url", 50);
+            lvScanResults.Columns.Add("PatchId", 60);
+            lvScanResults.Columns.Add("Url", 100);
 
             lvScanResults.Columns.Add("", 400);
             lvScanResults.View = View.Details;

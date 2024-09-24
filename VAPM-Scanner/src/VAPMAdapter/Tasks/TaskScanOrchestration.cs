@@ -66,7 +66,7 @@ namespace VAPMAdapter.Tasks
             foreach (OnlinePatchDetail current in patchList)
             {
                 // Add patch to the dictionary if it does not already contain the patch key.
-                if (!resultList.ContainsKey(current.kb))
+                if (current.kb != null && !resultList.ContainsKey(current.kb))
                 {
                     resultList.Add(current.kb, current);
                 }
