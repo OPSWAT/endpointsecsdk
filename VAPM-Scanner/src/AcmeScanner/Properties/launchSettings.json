@@ -1,8 +1,7 @@
 {
   "profiles": {
     "AcmeScanner": {
-      "commandName": "Project",
-      "commandLineArgs": "--dev"
+      "commandName": "Project"
     }
   }
 }

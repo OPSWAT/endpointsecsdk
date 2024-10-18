@@ -29,7 +29,7 @@ namespace VAPMAdapter.Tasks
             Catalog.Catalog catalog = new Catalog.Catalog();
 
             // Retrieve the local catalog directory from settings.
-            string catalogRoot = VAPMSettings.getLocalCatalogDir();
+            string catalogRoot = VAPMSettings.GetLocalCatalogDir();
             catalogRoot = Path.Combine(catalogRoot, "analog/server");
 
             // Load the catalog from the specified directory

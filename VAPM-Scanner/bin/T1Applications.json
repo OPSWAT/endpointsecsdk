@@ -1,0 +1,266 @@
+[
+  {
+    "name": "Google Chrome",
+    "productID": "41"
+  },
+  {
+    "name": "Mozilla Firefox",
+    "productID": "46"
+  },
+  {
+    "name": "MS Office 365",
+    "productID": "3029"
+  },
+  {
+    "name": "Office 2019",
+    "productID": "3242"
+  },
+  {
+    "name": "Office 2021",
+    "productID": "3676"
+  },
+  {
+    "name": "Office MSI",
+    "productID": "3247"
+  },
+  {
+    "name": "MS Teams",
+    "productID": "3089"
+  },
+  {
+    "name": "Adobe Acrobat Reader",
+    "productID": "104"
+  },
+  {
+    "name": "7-Zip",
+    "productID": "200"
+  },
+  {
+    "name": "Zoom",
+    "productID": "1872"
+  },
+  {
+    "name": "Notepad++",
+    "productID": "303"
+  },
+  {
+    "name": "VLC Media Player",
+    "productID": "188"
+  },
+  {
+    "name": "MS Edge",
+    "productID": "2407"
+  },
+  {
+    "name": "Java",
+    "productID": "114"
+  },
+  {
+    "name": "Adobe Acrobat DC Continuous",
+    "productID": "2819"
+  },
+  {
+    "name": "Adobe Acrobat DC Continuous MUI",
+    "productID": "3104"
+  },
+  {
+    "name": "iTunes",
+    "productID": "419"
+  },
+  {
+    "name": "Foxit Reader",
+    "productID": "398"
+  },
+  {
+    "name": "Slack",
+    "productID": "2059"
+  },
+  {
+    "name": "Dropbox",
+    "productID": "113"
+  },
+  {
+    "name": "GotoMeeting",
+    "productID": "1412"
+  },
+  {
+    "name": "Citrix Workspace",
+    "productID": "3087"
+  },
+  {
+    "name": "OneDrive",
+    "productID": "842"
+  },
+  {
+    "name": "McAfee Security",
+    "productID": "567"
+  },
+  {
+    "name": "Norton Security",
+    "productID": "1375"
+  },
+  {
+    "name": "Microsoft Defender ATP",
+    "productID": "3194"
+  },
+  {
+    "name": "Kaspersky Endpoint Security",
+    "productID": "1401"
+  },
+  {
+    "name": "Sophos Endpoint",
+    "productID": "636"
+  },
+  {
+    "name": "CrowdStrike Falcon",
+    "productID": "2866"
+  },
+  {
+    "name": "ESET Endpoint Security",
+    "productID": "25"
+  },
+  {
+    "name": "Symantec Endpoint Protection",
+    "productID": "543"
+  },
+  {
+    "name": "Check Point Endpoint Security",
+    "productID": "857"
+  },
+  {
+    "name": "Google Chrome (macOS)",
+    "productID": "100004"
+  },
+  {
+    "name": "Mozilla Firefox (macOS)",
+    "productID": "100292"
+  },
+  {
+    "name": "MS Teams (macOS)",
+    "productID": "100432"
+  },
+  {
+    "name": "Adobe Acrobat Reader (macOS)",
+    "productID": "100277"
+  },
+  {
+    "name": "Zoom (macOS)",
+    "productID": "100282"
+  },
+  {
+    "name": "Adobe Acrobat (macOS)",
+    "productID": "100353"
+  },
+  {
+    "name": "Slack (macOS)",
+    "productID": "100119"
+  },
+  {
+    "name": "Dropbox (macOS)",
+    "productID": "100148"
+  },
+  {
+    "name": "GotoMeeting (macOS)",
+    "productID": "100377"
+  },
+  {
+    "name": "OneDrive (macOS)",
+    "productID": "100159"
+  },
+  {
+    "name": "Thunderbird (macOS)",
+    "productID": "100015"
+  },
+  {
+    "name": "Visual Studio Code (macOS)",
+    "productID": "100483"
+  },
+  {
+    "name": "VLC (macOS)",
+    "productID": "100283"
+  },
+  {
+    "name": "VNC Viewer (macOS)",
+    "productID": "100101"
+  },
+  {
+    "name": "VNC Server (macOS)",
+    "productID": "100449"
+  },
+  {
+    "name": "Webex (macOS)",
+    "productID": "100405"
+  },
+  {
+    "name": "LibreOffice (macOS)",
+    "productID": "100318"
+  },
+  {
+    "name": "Microsoft Edge (macOS)",
+    "productID": "100474"
+  },
+  {
+    "name": "Spotify (macOS)",
+    "productID": "100450"
+  },
+  {
+    "name": "Firefox (Linux)",
+    "productID": "200003"
+  },
+  {
+    "name": "Thunderbird (Linux)",
+    "productID": "200096"
+  },
+  {
+    "name": "Visual Studio Code (Linux)",
+    "productID": "200206"
+  },
+  {
+    "name": "Wireshark (Linux)",
+    "productID": "200167"
+  },
+  {
+    "name": "Zoom Desktop (Linux)",
+    "productID": "200071"
+  },
+  {
+    "name": "FileZilla (Linux)",
+    "productID": "200150"
+  },
+  {
+    "name": "GIMP (Linux)",
+    "productID": "200098"
+  },
+  {
+    "name": "LibreOffice (Linux)",
+    "productID": "200165"
+  },
+  {
+    "name": "Signal (Linux)",
+    "productID": "200210"
+  },
+  {
+    "name": "VLC (Linux)",
+    "productID": "200153"
+  },
+  {
+    "name": "MySQL Server (Linux)",
+    "productID": "200134"
+  },
+  {
+    "name": "MySQL Workbench (Linux)",
+    "productID": "200129"
+  },
+  {
+    "name": "DB Browser for SQLite (Linux)",
+    "productID": "200109"
+  },
+  {
+    "name": "ServerProtect for Linux",
+    "productID": "200059"
+  },
+  {
+    "name": "Firebird SQL Server (Linux)",
+    "productID": "200155"
+  }
+]

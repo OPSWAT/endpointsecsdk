@@ -5,9 +5,14 @@
 ///  Created by Chris Seiler
 ///  OPSWAT OEM Solutions Architect
 ///////////////////////////////////////////////////////////////////////////////////////////////
+using Newtonsoft.Json.Linq;
+using System;
+using System.Diagnostics;
 using System.Drawing;
 using System.Text;
 using System.Windows.Forms;
+using AcmeScanner.Dialogs;
+using VAPMAdapter.Catalog;
 
 namespace AcmeScanner
 {
@@ -15,7 +20,7 @@ namespace AcmeScanner
     public class ScannerListView : ListView
     {
         private ListViewColumnSorter lvwColumnSorter;
-
+        private CVEDetailsManager cveDetailsManager;
         public ScannerListView() : base()
         {
             this.OwnerDraw = true;
@@ -25,16 +30,19 @@ namespace AcmeScanner
 
             lvwColumnSorter = new ListViewColumnSorter();
             this.ListViewItemSorter = lvwColumnSorter;
-            this.ColumnClick += lv_ColumnClick;
+            this.ColumnClick += Lv_ColumnClick;
             this.FullRowSelect = true;
             this.GridLines = true;
             this.View = View.Details;
             this.MultiSelect = false;
-            
             this.MouseClick += ScannerListView_MouseClick;
+            this.MouseDoubleClick += ScannerListView_MouseDoubleClick;
+           
         }
 
-        private void lv_ColumnClick(object sender, ColumnClickEventArgs e)
+        
+
+        private void Lv_ColumnClick(object sender, ColumnClickEventArgs e)
         {
             // Determine if clicked column is already the column that is being sorted.
             if (e.Column == lvwColumnSorter.SortColumn)
@@ -115,25 +123,88 @@ namespace AcmeScanner
         {
             e.DrawDefault = true;
         }
-        private void ScannerListView_MouseClick(object sender, MouseEventArgs e)
+               
+
+        private void CatalogClickHandler(object sender, MouseEventArgs e)
         {
-            if (this.SelectedItems.Count > 0 && this.Columns[0].Text=="Title")
+            string sigId = this.SelectedItems[0].SubItems[2].Text;
+            string txt = ScannerForm.ProductInfoForSignatureId(sigId);
+            TextDialog textDialog = new TextDialog(txt);
+            textDialog.StartPosition = FormStartPosition.CenterParent;
+            textDialog.ShowDialog();
+        }
+
+        private void CveClickHandler(object sender, MouseEventArgs e)
+        {
+            CVEDetailsManager cveDetailsManager = new CVEDetailsManager();
+            if (cveDetailsManager == null)
             {
+                MessageBox.Show("CVE Details Manager is not initialized.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
 
-                StringBuilder kbIdBuilder = new StringBuilder();
-                kbIdBuilder.AppendLine("Title:\t\t" + this.SelectedItems[0].SubItems[0].Text);
-                kbIdBuilder.AppendLine("Severity:\t" + this.SelectedItems[0].SubItems[1].Text);
-                kbIdBuilder.AppendLine("Product:\t" + this.SelectedItems[0].SubItems[2].Text);
-                kbIdBuilder.AppendLine("KB:\t\t" + this.SelectedItems[0].SubItems[3].Text);
-                kbIdBuilder.AppendLine("Patched:\t" + this.SelectedItems[0].SubItems[4].Text);
-                kbIdBuilder.AppendLine("Description:\t" + this.SelectedItems[0].SubItems[5].Text);
-
-                string view_full = kbIdBuilder.ToString();
-                TextDialog textDialog = new TextDialog(view_full);
+            if (this.SelectedItems.Count > 0)
+            {
+                string cveId = this.SelectedItems[0].SubItems[0].Text;
+                string cveContent = cveDetailsManager.GetCveJsonContentById(cveId);
+                TextDialog textDialog = new TextDialog(cveContent);
                 textDialog.StartPosition = FormStartPosition.CenterParent;
                 textDialog.ShowDialog();
             }
         }
 
+        private void ScannerListView_MouseClick(object sender, MouseEventArgs e)
+        {
+            if (this.SelectedItems.Count > 0 && this.Columns[0].Text == "Application" && this.Columns[1].Text == "Installed")
+            {
+                ScannerForm formObject = (ScannerForm)((ScannerListView)sender).Tag;
+                formObject.EnableButtons(true);
+            }
+        }
+        private void ShowRowAsJson(object sender, MouseEventArgs e)
+        {
+            var selectedItem = this.SelectedItems[0];
+            JObject kbObject = new JObject();
+
+            for (int i = 0; i < selectedItem.SubItems.Count; i++)
+            {                
+                string key = this.Columns.Count > i ? this.Columns[i].Text : "Column" + i;
+                kbObject[key] = selectedItem.SubItems[i].Text;
+            }
+
+            string kbObjectString = kbObject.ToString();
+            TextDialog textDialog = new TextDialog(kbObjectString);
+            textDialog.StartPosition = FormStartPosition.CenterParent;
+            textDialog.ShowDialog();
+        }
+
+        private void MobyClickHandler(object sender, EventArgs e)
+        {
+            ScannerForm formObject = (ScannerForm)((ScannerListView)sender).Tag;
+            formObject.BtnViewJson_Click(sender,e);
+        }
+
+        private void ScannerListView_MouseDoubleClick(object sender, MouseEventArgs e)
+        {
+
+            if (this.SelectedItems.Count > 0 && this.Columns[0].Text=="Application"&& this.Columns[1].Text=="Installed")
+            {
+                CatalogClickHandler(sender, e);
+            }            
+           
+            else if (this.Columns[0].Text == "CVE ID")
+            {
+                CveClickHandler(sender, e);
+            }
+            else if (this.SelectedItems.Count > 0 && this.Columns[0].Text == "Name")
+            {
+                MobyClickHandler(sender, e);
+            }
+            else if (this.SelectedItems.Count > 0 && this.Columns[0].Text != "Application Name")
+            {
+                ShowRowAsJson(sender, e);
+            }
+            
+        }
     }
 }

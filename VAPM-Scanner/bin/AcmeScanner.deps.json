@@ -5,8 +5,8 @@
   },
   "compilationOptions": {},
   "targets": {
-    ".NETCoreApp,Version=v8.0": {
-      "AcmeScanner/1.0.0": {
+    ".NETCoreApp,Version=v6.0": {
+      "AcmeScanner/1.0.0.39": {
         "dependencies": {
           "MaterialSkin.2.RTL": "2.3.1.1",
           "MessagePack": "2.5.168",
@@ -74,7 +74,7 @@
     }
   },
   "libraries": {
-    "AcmeScanner/1.0.0": {
+    "AcmeScanner/1.0.0.39": {
       "type": "project",
       "serviceable": false,
       "sha512": ""

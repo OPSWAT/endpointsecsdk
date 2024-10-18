@@ -1,7 +1,7 @@
 ﻿
 using System.Windows.Forms;
 
-namespace AcmeScanner
+namespace AcmeScanner.Dialogs
 {
     internal interface IScannerMessageDialog
     {

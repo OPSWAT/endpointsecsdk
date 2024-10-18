@@ -153,7 +153,6 @@ namespace VAPMAdapater.Updates
             }
         }
 
-
         /// <summary>
         /// Asynchronously downloads a file from the specified URI and saves it to the given file name.
         /// </summary>

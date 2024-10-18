@@ -31,6 +31,11 @@ using VAPMAdapter.Moby;
 using Newtonsoft.Json;
 using System.Security.Cryptography.Xml;
 using System.Globalization;
+using AcmeScanner.Dialogs;
+using System.Net.Http.Json;
+using Newtonsoft.Json.Linq;
+using VAPMAdapter.Catalog;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 
 namespace AcmeScanner
@@ -40,9 +45,11 @@ namespace AcmeScanner
         static Dictionary<string, ProductScanResult> staticScanResults = new Dictionary<string, ProductScanResult>();
         static Dictionary<string, CatalogSignature> staticSignatureCatalogResults = new Dictionary<string, CatalogSignature>();
         static Dictionary<string, OnlinePatchDetail> staticOrchestrationScanResults = new Dictionary<string, OnlinePatchDetail>();
+        private CVEDetailsManager cveDetailsManager = new CVEDetailsManager();
         static List<CatalogProduct> staticProductList = null;
         static List<MobyProduct> staticMobyProductList = null;
         static List<PatchStatus> staticPatchStatusList = null;
+        static bool isCatalogUpdated = false;
         static List<string> sigIds;
 
         private System.ComponentModel.BackgroundWorker scanWorker;
@@ -53,6 +60,7 @@ namespace AcmeScanner
         private System.ComponentModel.BackgroundWorker loadCatalogWorker;
         private System.ComponentModel.BackgroundWorker loadMobyWorker;
         private System.ComponentModel.BackgroundWorker loadStatusWorker;
+        private System.ComponentModel.BackgroundWorker loadVulnerabilitiesWorker;
 
         //first method called by the main class
         public ScannerForm(string[] args)
@@ -64,11 +72,10 @@ namespace AcmeScanner
             CheckLicenseFiles();
             UpdateFilesOnStartup();
             FillSDKlabels();
+            FillMobyLabels();
             SetTitleWithFileVersion();
             SetTabs(args);
         }
-
-
 
 
 
@@ -76,7 +83,7 @@ namespace AcmeScanner
         {
             base.OnKeyDown(e);
 
-            if(e.KeyCode == Keys.D && e.Control)
+            if (e.KeyCode == Keys.D && e.Control)
             {
                 ShowDevTabs();
             }
@@ -84,10 +91,11 @@ namespace AcmeScanner
 
         private void ShowDevTabs()
         {
-            if(tbcMainView.TabPages.Count < 4)
+            if (tbcMainView.TabPages.Count < 4)
             {
                 tbcMainView.TabPages.Add(tabStatus);
                 tbcMainView.TabPages.Add(tabMoby);
+                tbcMainView.TabPages.Add(tabVulnerabilities);
             }
         }
 
@@ -99,6 +107,7 @@ namespace AcmeScanner
             tbcMainView.TabPages.Add(tabOrchestrate);
             tbcMainView.TabPages.Add(tabCatalog);
             
+
             //
             // Enable the Moby component here
             //
@@ -108,6 +117,7 @@ namespace AcmeScanner
                 {
                     tbcMainView.TabPages.Add(tabStatus);
                     tbcMainView.TabPages.Add(tabMoby);
+                    tbcMainView.TabPages.Add(tabVulnerabilities);
                 }
             }
         }
@@ -120,20 +130,26 @@ namespace AcmeScanner
             this.Text = $"AcmeScanner - Version {fileVersion}";
         }
 
+        private void FillMobyLabels()
+        {
+            mobyTimestampData.Text = UpdateMobyFile.GetMobyTimestamp();
+        }
+
+        //This function fills in the SDK labels present on the Offline and Patches tab.
         private void FillSDKlabels()
         {
             EnableButtons(true);
             // Check if libwavmodapi.dll exists
-            if (UpdateSDK.doesSDKExist())
+            if (UpdateSDK.DoesSDKExist())
             {
                 FileInfo vmodInfo = new FileInfo("libwavmodapi.dll");
                 FileVersionInfo versionInfo = FileVersionInfo.GetVersionInfo(vmodInfo.FullName);
                 string productVersion = versionInfo.ProductVersion;
                 label5.Text = productVersion;
                 label13.Text = productVersion;
-                label7.Text = UpdateSDK.getLatestSDKReleaseDate();
+                label7.Text = UpdateSDK.GetLatestSDKReleaseDate();
                 label14.Text = label7.Text;
-                if (!UpdateSDK.isSDKUpdated())
+                if (!UpdateSDK.IsSDKUpdated())
                 {
                     label6.ForeColor = System.Drawing.Color.Red;
                     label7.ForeColor = System.Drawing.Color.Red;
@@ -146,14 +162,14 @@ namespace AcmeScanner
                 btnUpdateSDK.Text = "Download SDK";
             }
             // Check if patch.dat exists
-            if (UpdateDBFiles.doesDBExist())
+            if (UpdateDBFiles.DoesDBExist())
             {
                 FileInfo dbFileInfo = new FileInfo("patch.dat");
                 DateTime lastModifiedDB = dbFileInfo.LastWriteTime.Date;
                 label9.Text = lastModifiedDB.ToString("MMMM dd, yyyy");
                 label15.Text = label9.Text;
 
-                if (!UpdateDBFiles.isDBUpdated())
+                if (!UpdateDBFiles.IsDBUpdated())
                 {
                     label9.ForeColor = System.Drawing.Color.Red;
                     label8.ForeColor = System.Drawing.Color.Red;
@@ -167,6 +183,7 @@ namespace AcmeScanner
             }
         }
 
+        //Check if license files are present in bin folder; does not allow to run program if not
         private void CheckLicenseFiles()
         {
             if (!File.Exists("license.cfg") || !File.Exists("pass_key.txt"))
@@ -176,20 +193,18 @@ namespace AcmeScanner
             }
         }
 
-
-
         //
         // Update SDK if needed
         //
         private void UpdateFilesOnStartup()
         {
-            if (!UpdateSDK.isSDKUpdated())
+            if (!UpdateSDK.IsSDKUpdated())
             {
                 btnUpdateSDK.UseAccentColor = true;
 
             }
 
-            if (!UpdateDBFiles.isDBUpdated())
+            if (!UpdateDBFiles.IsDBUpdated())
             {
                 btnUpdate.UseAccentColor = true;
             }
@@ -201,62 +216,68 @@ namespace AcmeScanner
         {
             scanWorker = new BackgroundWorker();
             scanWorker.DoWork +=
-            new DoWorkEventHandler(scanWorker_DoWork);
+            new DoWorkEventHandler(ScanWorker_DoWork);
             scanWorker.RunWorkerCompleted +=
             new RunWorkerCompletedEventHandler(
-            scanWorker_Completed);
+            ScanWorker_Completed);
 
             installVAPMPatchWorker = new BackgroundWorker();
             installVAPMPatchWorker.DoWork +=
-                new DoWorkEventHandler(installVAPMPatchWorker_DoWork);
+                new DoWorkEventHandler(InstallVAPMPatchWorker_DoWork);
             installVAPMPatchWorker.RunWorkerCompleted +=
                 new RunWorkerCompletedEventHandler(
-            installVAPMPatchWorker_Completed);
+            InstallVAPMPatchWorker_Completed);
 
             installOnlinePatchWorker = new BackgroundWorker();
             installOnlinePatchWorker.DoWork +=
-                new DoWorkEventHandler(installOnlinePatchWorker_DoWork);
+                new DoWorkEventHandler(InstallOnlinePatchWorker_DoWork);
             installOnlinePatchWorker.RunWorkerCompleted +=
                 new RunWorkerCompletedEventHandler(
-            installOnlinePatchWorker_Completed);
+            InstallOnlinePatchWorker_Completed);
 
 
             updateDBWorker = new BackgroundWorker();
             updateDBWorker.DoWork +=
-                new DoWorkEventHandler(updateDBWorker_DoWork);
+                new DoWorkEventHandler(UpdateDBWorker_DoWork);
             updateDBWorker.RunWorkerCompleted +=
                 new RunWorkerCompletedEventHandler(
-            updateDBWorker_Completed);
+            UpdateDBWorker_Completed);
 
             updateMobyWorker = new BackgroundWorker();
             updateMobyWorker.DoWork +=
-                new DoWorkEventHandler(updateMobyWorker_DoWork);
+                new DoWorkEventHandler(UpdateMobyWorker_DoWork);
             updateMobyWorker.RunWorkerCompleted +=
-                new RunWorkerCompletedEventHandler(updateMobyWorker_Completed);
+                new RunWorkerCompletedEventHandler(UpdateMobyWorker_Completed);
 
 
             loadCatalogWorker = new BackgroundWorker();
             loadCatalogWorker.DoWork +=
-                new DoWorkEventHandler(loadCatalogWorker_DoWork);
+                new DoWorkEventHandler(LoadCatalogWorker_DoWork);
             loadCatalogWorker.RunWorkerCompleted +=
                 new RunWorkerCompletedEventHandler(
-            loadCatalogWorker_Completed);
+            LoadCatalogWorker_Completed);
 
             loadStatusWorker = new BackgroundWorker();
             loadStatusWorker.DoWork +=
-                new DoWorkEventHandler(loadStatusWorker_DoWork);
+                new DoWorkEventHandler(LoadStatusWorker_DoWork);
             loadStatusWorker.RunWorkerCompleted +=
                 new RunWorkerCompletedEventHandler(
-            loadStatusWorker_Completed);
+            LoadStatusWorker_Completed);
 
             loadMobyWorker = new BackgroundWorker();
             loadMobyWorker.DoWork +=
-                new DoWorkEventHandler(loadMobyWorker_DoWork);
+                new DoWorkEventHandler(LoadMobyWorker_DoWork);
             loadMobyWorker.RunWorkerCompleted +=
-                new RunWorkerCompletedEventHandler(loadMobyWorker_Completed);
+                new RunWorkerCompletedEventHandler(LoadMobyWorker_Completed);
+
+            loadVulnerabilitiesWorker = new BackgroundWorker();
+            loadVulnerabilitiesWorker.DoWork +=
+                new DoWorkEventHandler(loadVulnerabilitiesWorker_DoWork);
+            loadVulnerabilitiesWorker.RunWorkerCompleted +=
+                new RunWorkerCompletedEventHandler(loadVulnerabilitiesWorker_Completed);
         }
 
-        private List<string> getScanResults()
+        private List<string> GetScanResults()
         {
             List<String> results = new List<string>();
             foreach (string item in staticScanResults.Keys)
@@ -271,7 +292,7 @@ namespace AcmeScanner
         ///  Worker Threads
         /// </summary>
         ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        private void scanWorker_DoWork(object sender, DoWorkEventArgs e)
+        private void ScanWorker_DoWork(object sender, DoWorkEventArgs e)
         {
             bool isOffline = (bool)e.Argument;
 
@@ -280,7 +301,7 @@ namespace AcmeScanner
                 // Scan Offline
                 bool scanOSCVEs = cbScanOSCVEs.Checked;
                 staticScanResults = TaskScanAll.Scan(scanOSCVEs);
-                sigIds = getScanResults();
+                sigIds = GetScanResults();
             }
             else
             {
@@ -291,7 +312,7 @@ namespace AcmeScanner
             e.Result = isOffline;
         }
 
-        private void scanWorker_Completed(object sender, RunWorkerCompletedEventArgs e)
+        private void ScanWorker_Completed(object sender, RunWorkerCompletedEventArgs e)
         {
             bool isOffline = (bool)e.Result;
 
@@ -307,7 +328,7 @@ namespace AcmeScanner
             ShowLoading(false);
         }
 
-        private bool isJsonCatalogChanged()
+        private static bool IsJsonCatalogChanged()
         {
             string basePath = "catalog\\analog\\server\\";
 
@@ -340,10 +361,10 @@ namespace AcmeScanner
         }
 
 
-        private void loadCatalogWorker_DoWork(object sender, DoWorkEventArgs e)
+        private void LoadCatalogWorker_DoWork(object sender, DoWorkEventArgs e)
         {
 
-            if (CatalogCache.CachedCatalog != null && !isJsonCatalogChanged())
+            if (CatalogCache.CachedCatalog != null && !IsJsonCatalogChanged())
             {
                 staticProductList = CatalogCache.CachedCatalog;
             }
@@ -363,45 +384,45 @@ namespace AcmeScanner
 
         }
 
-        private void loadCatalogWorker_Completed(object sender, RunWorkerCompletedEventArgs e)
+        private void LoadCatalogWorker_Completed(object sender, RunWorkerCompletedEventArgs e)
         {
             if (staticProductList != null)
             {
                 UpdateCatalogResults();
             }
             CatalogCache.CachedCatalog = staticProductList;
-            if (CatalogCache.CachedCatalog == null) { Debug.WriteLine("after loading cataog also null"); }
             ShowLoading(false);
+            searchCatalog.Enabled = true;
             UpdateScanResults();
         }
 
 
 
-        private void loadStatusWorker_DoWork(object sender, DoWorkEventArgs e)
+        private void LoadStatusWorker_DoWork(object sender, DoWorkEventArgs e)
         {
-            staticPatchStatusList = TaskLoadStatus.Load();
+            staticPatchStatusList = TaskLoadStatus.Load();            
         }
 
-        private void loadStatusWorker_Completed(object sender, RunWorkerCompletedEventArgs e)
+        private void LoadStatusWorker_Completed(object sender, RunWorkerCompletedEventArgs e)
         {
             UpdatePatchStatusResults();
             ShowLoading(false);
         }
 
-        private void loadMobyWorker_DoWork(object sender, DoWorkEventArgs e)
+        private void LoadMobyWorker_DoWork(object sender, DoWorkEventArgs e)
         {
             staticMobyProductList = TaskLoadMoby.Load();
 
             mobyCounts = TaskLoadMobyCounts.LoadCounts();
         }
 
-        private void loadMobyWorker_Completed(object sender, RunWorkerCompletedEventArgs e)
+        private void LoadMobyWorker_Completed(object sender, RunWorkerCompletedEventArgs e)
         {
             UpdateMobyScanResults();
             ShowLoading(false);
         }
 
-        private void installVAPMPatchWorker_DoWork(object sender, DoWorkEventArgs e)
+        private void InstallVAPMPatchWorker_DoWork(object sender, DoWorkEventArgs e)
         {
             InstallCommand installCommand = (InstallCommand)e.Argument;
             ProductInstallResult installResult = TaskDownloadAndInstallApplication.InstallAndDownload(installCommand.signatureId,
@@ -413,7 +434,7 @@ namespace AcmeScanner
             e.Result = installResult;
         }
 
-        private void installVAPMPatchWorker_Completed(object sender, RunWorkerCompletedEventArgs e)
+        private void InstallVAPMPatchWorker_Completed(object sender, RunWorkerCompletedEventArgs e)
         {
             if (e.Result != null && e.Result is ProductInstallResult)
             {
@@ -454,15 +475,10 @@ namespace AcmeScanner
                 ShowMessageDialog("Unexpected result occurred installing the product", false);
             }
 
-
-
-            // Do a scan again
-            //lvScanResults.Items.Clear();
-            //scanWorker.RunWorkerAsync(true);
             ShowLoading(false);
         }
 
-        private void installOnlinePatchWorker_DoWork(object sender, DoWorkEventArgs e)
+        private void InstallOnlinePatchWorker_DoWork(object sender, DoWorkEventArgs e)
         {
             string kb = (string)e.Argument;
             OnlinePatchDetail patchDetail = staticOrchestrationScanResults[kb];
@@ -470,7 +486,7 @@ namespace AcmeScanner
             TaskOrchestrateDownloadAndInstall.InstallAndDownload(patchDetail);
         }
 
-        private void installOnlinePatchWorker_Completed(object sender, RunWorkerCompletedEventArgs e)
+        private void InstallOnlinePatchWorker_Completed(object sender, RunWorkerCompletedEventArgs e)
         {
             // Do a scan again
             lvOrchestrationScanResult.Items.Clear();
@@ -479,7 +495,7 @@ namespace AcmeScanner
 
 
 
-        private void updateDBWorker_DoWork(object sender, DoWorkEventArgs e)
+        private void UpdateDBWorker_DoWork(object sender, DoWorkEventArgs e)
         {
             bool sdkOnly = (bool)e.Argument;
 
@@ -491,7 +507,6 @@ namespace AcmeScanner
                 label9.ForeColor = System.Drawing.Color.Black;
                 label12.ForeColor = System.Drawing.Color.Black;
                 label15.ForeColor = System.Drawing.Color.Black;
-                btnUpdate.Text = "Update DB";
             }
 
             else
@@ -502,29 +517,63 @@ namespace AcmeScanner
                 label7.ForeColor = System.Drawing.Color.Black;
                 label11.ForeColor = System.Drawing.Color.Black;
                 label14.ForeColor = System.Drawing.Color.Black;
-                btnUpdateSDK.Text = "Update SDK";
             }
         }
 
-        private void updateDBWorker_Completed(object sender, RunWorkerCompletedEventArgs e)
+        private void UpdateDBWorker_Completed(object sender, RunWorkerCompletedEventArgs e)
         {
             ShowLoading(false);
             FillSDKlabels();//change sdk labels to current version
         }
 
-        private void updateMobyWorker_DoWork(object sender, DoWorkEventArgs e)
+        private void UpdateMobyWorker_DoWork(object sender, DoWorkEventArgs e)
         {
             UpdateMobyFile.DownloadMoby();
 
         }
 
-        private void updateMobyWorker_Completed(object sender, RunWorkerCompletedEventArgs e)
+        private void UpdateMobyWorker_Completed(object sender, RunWorkerCompletedEventArgs e)
         {
             btnUpdateMoby.UseAccentColor = false;
+            btnUpdateMoby.Text = "Update Moby";
             ShowLoading(false);
         }
+        private void loadVulnerabilitiesWorker_DoWork(Object sender, DoWorkEventArgs e)
+        {
+            e.Result = LoadVulnerabilities();
+        }
 
-        private bool ShowMessageDialog(IScannerMessageDialog messageDialog)
+        private void loadVulnerabilitiesWorker_Completed(Object sender, RunWorkerCompletedEventArgs e)
+        {
+            if (e.Error == null)
+            {
+                var resultList = (List<ListViewItem>)e.Result;
+                lvVulnerabilities.BeginInvoke(new Action(() =>
+                {
+                    lvVulnerabilities.Columns.Clear();
+                    lvVulnerabilities.Columns.Add("Application Name", 200);
+                    lvVulnerabilities.Columns.Add("Platform", 200);
+                    lvVulnerabilities.Columns.Add("SigID", 200);
+                    lvVulnerabilities.Columns.Add("Info", 300);
+                    lvVulnerabilities.View = View.Details;
+                    lvVulnerabilities.Items.AddRange(resultList.ToArray());
+                    lvVulnerabilities.Update();
+
+                    if (!tabVulnerabilities.Controls.Contains(lvVulnerabilities))
+                    {
+                        tabVulnerabilities.Controls.Add(lvVulnerabilities);
+                    }
+                    ShowLoading(false);
+                }));
+            }
+            else
+            {
+                ShowLoading(false);
+                MessageBox.Show("An error occurred: " + e.Error.Message);
+            }
+        }
+
+        private static bool ShowMessageDialog(IScannerMessageDialog messageDialog)
         {
             bool result = false;
 
@@ -536,19 +585,19 @@ namespace AcmeScanner
         }
 
 
-        private bool ShowMessageDialog(string message, bool question)
+        private static bool ShowMessageDialog(string message, bool question)
         {
             CustomMessageDialog messageDialog = new CustomMessageDialog(message, question);
-            return this.ShowMessageDialog(messageDialog);
+            return ShowMessageDialog(messageDialog);
         }
 
-        private void EnableButtons(bool enabled)
+        //Function which disables buttons on certain conditions, mostly when other background worker is being run.
+        public void EnableButtons(bool enabled)
         {
-            bool SDKdownload = UpdateSDK.doesSDKExist();
-            bool DBdownload = UpdateDBFiles.doesDBExist();
-            bool MobyDownload = UpdateMobyFile.doesMobyExist();
-
-            //these buttons are still being loaded in and enabeled somewhere else, need to find out where
+            bool SDKdownload = UpdateSDK.DoesSDKExist();
+            bool DBdownload = UpdateDBFiles.DoesDBExist();
+            bool MobyDownload = UpdateMobyFile.DoesMobyExist();
+            
             if (!SDKdownload || !DBdownload)
             {
                 btnInstall.Enabled = false;
@@ -579,13 +628,14 @@ namespace AcmeScanner
                 btnFreshInstall.Enabled = enabled;
                 btnDomainCSV.Enabled = enabled;
                 btnRefreshStatus.Enabled = enabled;
+                btnLoadCVEs.Enabled = enabled;
 
             }
             if (!MobyDownload)
             {
                 btnUpdateMoby.UseAccentColor = true;
+                btnUpdateMoby.Text = "Download Moby";
                 btnLoadMoby.Enabled = false;
-                btnViewJson.Enabled = false;
                 btnMobyViewTotals.Enabled = false;
                 btnRunChecksMoby.Enabled = false;
                 btnViewMobySubsets.Enabled = false;
@@ -593,10 +643,21 @@ namespace AcmeScanner
             else
             {
                 btnLoadMoby.Enabled = enabled;
-                btnViewJson.Enabled = enabled;
                 btnMobyViewTotals.Enabled = enabled;
                 btnRunChecksMoby.Enabled = enabled;
                 btnViewMobySubsets.Enabled = enabled;
+            }
+            if (staticProductList == null)
+            {
+                btnDomainCSV.Enabled = false;
+                btnFreshInstall.Enabled = false;
+                btnListCatalogCVE.Enabled = false;
+                btnExportCSV.Enabled = false;
+            }
+            if (lvCatalog != null && lvCatalog.SelectedItems.Count == 0)
+            {
+                btnListCatalogCVE.Enabled = false;
+                btnFreshInstall.Enabled = false;
             }
             btnUpdate.Enabled = enabled;
             btnUpdateSDK.Enabled = enabled;
@@ -623,7 +684,7 @@ namespace AcmeScanner
         }
 
 
-        private int getSeverity(ProductScanResult scanResult)
+        private int GetSeverity(ProductScanResult scanResult)
         {
             int result = 0;
 
@@ -661,6 +722,7 @@ namespace AcmeScanner
             lvCatalog.Columns.Add("Background", 80);
             lvCatalog.Columns.Add("Validate", 80);
             lvCatalog.Columns.Add("", 400);
+            lvCatalog.Tag = this;
             lvCatalog.View = View.Details;
             lvCatalog.Update();
 
@@ -673,7 +735,7 @@ namespace AcmeScanner
             if (sigIds == null || sigIds.Count == 0)
             {
                 staticScanResults = TaskScanAll.Scan(false);
-                sigIds = getScanResults();
+                sigIds = GetScanResults();
             }
 
             await Task.Run(() =>
@@ -730,6 +792,7 @@ namespace AcmeScanner
                 lvCatalog.Items.Clear();
                 lvCatalog.Items.AddRange(concurrentResultList.ToArray());
                 lvCatalog.EndUpdate();
+                isCatalogUpdated = true;
                 UpdateScanResults();
             }));
         }
@@ -789,16 +852,16 @@ namespace AcmeScanner
             lvScanResults.Columns.Clear();
             lvScanResults.Columns.Add("Application", 300);
             lvScanResults.Columns.Add("Ver", 100);
-            lvScanResults.Columns.Add("Arch", 50);
+            lvScanResults.Columns.Add("Arch", 40);
             lvScanResults.Columns.Add("Lang", 50);
             lvScanResults.Columns.Add("Latest", 100);
-            lvScanResults.Columns.Add("Severity", 100);
-            lvScanResults.Columns.Add("CVE Count", 100);
-            lvScanResults.Columns.Add("Patched", 100);
+            lvScanResults.Columns.Add("Severity", 40);
+            lvScanResults.Columns.Add("CVE Count", 40);
+            lvScanResults.Columns.Add("Patched", 70);
             lvScanResults.Columns.Add("Auto", 50);
             lvScanResults.Columns.Add("SigId", 50);
-            lvScanResults.Columns.Add("PatchId", 50);
-            lvScanResults.Columns.Add("Url", 50);
+            lvScanResults.Columns.Add("PatchId", 60);
+            lvScanResults.Columns.Add("Url", 100);
 
             lvScanResults.Columns.Add("", 400);
             lvScanResults.View = View.Details;
@@ -807,7 +870,7 @@ namespace AcmeScanner
 
             foreach (ProductScanResult current in sortedList)
             {
-                int OPSWATseverity = getSeverity(current);
+                int OPSWATseverity = GetSeverity(current);
                 int cveCount = current.cveDetailList.Count;
 
                 ListViewItem lviCurrent = new ListViewItem();
@@ -890,6 +953,7 @@ namespace AcmeScanner
             scannerListView1.Columns.Add("Validation Supported", 200);
             scannerListView1.Columns.Add("Supports App Remover", 200);
             scannerListView1.Columns.Add("Supports Background Patching", 220);
+            scannerListView1.Tag = this;
             scannerListView1.View = View.Details;
             scannerListView1.Update();
 
@@ -931,13 +995,13 @@ namespace AcmeScanner
             return lviCounts;
         }
 
-        private void btnLoadMoby_Click(object sender, EventArgs e)
+        private void BtnLoadMoby_Click(object sender, EventArgs e)
         {
             ShowLoading(true);
             loadMobyWorker.RunWorkerAsync();
         }
 
-        private void btnScan_Click(object sender, EventArgs e)
+        private void BtnScan_Click(object sender, EventArgs e)
         {
             ShowLoading(true);
             scanWorker.RunWorkerAsync(true);
@@ -967,7 +1031,7 @@ namespace AcmeScanner
         }
 
 
-        private void btnMobyViewTotals_Click(object sender, EventArgs e)
+        private void BtnMobyViewTotals_Click(object sender, EventArgs e)
         {
             string totalCountsJson = GetMobyTotalCountsJson();
             TextDialog textDialog = new TextDialog(totalCountsJson);
@@ -975,7 +1039,7 @@ namespace AcmeScanner
             textDialog.ShowDialog();
         }
 
-        private void btnCVEJSON_Click(object sender, EventArgs e)
+        private void BtnCVEJSON_Click(object sender, EventArgs e)
         {
             if (lvScanResults.SelectedItems != null && lvScanResults.SelectedItems.Count > 0)
             {
@@ -1003,7 +1067,7 @@ namespace AcmeScanner
         }
 
 
-        private void btnInstall_Click(object sender, EventArgs e)
+        private void BtnInstall_Click(object sender, EventArgs e)
         {
             if (lvScanResults.SelectedItems.Count > 0)
             {
@@ -1053,25 +1117,25 @@ namespace AcmeScanner
 
         }
 
-        private void btnUpdate_Click(object sender, EventArgs e)
+        private void BtnUpdate_Click(object sender, EventArgs e)
         {
             ShowLoading(true);
             updateDBWorker.RunWorkerAsync(false);
         }
 
-        private void btnUpdateSDK_Click(object sender, EventArgs e)
+        private void BtnUpdateSDK_Click(object sender, EventArgs e)
         {
             ShowLoading(true);
             updateDBWorker.RunWorkerAsync(true);
         }
 
-        private void btnScanOrchestration_Click(object sender, EventArgs e)
+        private void BtnScanOrchestration_Click(object sender, EventArgs e)
         {
             ShowLoading(true);
             scanWorker.RunWorkerAsync(false); // This will not scan offline
         }
 
-        private void btnInstallOrchestration_Click(object sender, EventArgs e)
+        private void BtnInstallOrchestration_Click(object sender, EventArgs e)
         {
             if (lvOrchestrationScanResult.SelectedItems.Count > 0)
             {
@@ -1106,13 +1170,13 @@ namespace AcmeScanner
 
         }
 
-        private void mbLoad_Click(object sender, EventArgs e)
+        private void MbLoad_Click(object sender, EventArgs e)
         {
             ShowLoading(true);
             loadCatalogWorker.RunWorkerAsync();
         }
 
-        private void btnListCatalogCVE_Click(object sender, EventArgs e)
+        private void BtnListCatalogCVE_Click(object sender, EventArgs e)
         {
             if (lvCatalog.SelectedItems != null && lvCatalog.SelectedItems.Count > 0)
             {
@@ -1140,13 +1204,13 @@ namespace AcmeScanner
 
         }
 
-        private void btnLookupCVE_Click(object sender, EventArgs e)
+        private void BtnLookupCVE_Click(object sender, EventArgs e)
         {
             LookupCVEBox cb = new LookupCVEBox();
             cb.ShowDialog();
         }
 
-        private void btnExportCSV_Click(object sender, EventArgs e)
+        private void BtnExportCSV_Click(object sender, EventArgs e)
         {
             StringBuilder csvFile = new StringBuilder();
 
@@ -1169,7 +1233,7 @@ namespace AcmeScanner
             MessageBox.Show("Results have been written to " + Path.Combine(Directory.GetCurrentDirectory(), "ProductSupport.csv"));
         }
 
-        private void btnFreshInstall_Click(object sender, EventArgs e)
+        private void BtnFreshInstall_Click(object sender, EventArgs e)
         {
             if (staticSignatureCatalogResults != null && staticSignatureCatalogResults.Count > 0)
             {
@@ -1211,7 +1275,7 @@ namespace AcmeScanner
             }
         }
 
-        private void ForceWrite(StringBuilder sb, string filename)
+        private static void ForceWrite(StringBuilder sb, string filename)
         {
             if (File.Exists(filename))
             {
@@ -1221,7 +1285,7 @@ namespace AcmeScanner
             File.WriteAllText(filename, sb.ToString());
         }
 
-        private void btnUrlCSV_Click(object sender, EventArgs e)
+        private void BtnUrlCSV_Click(object sender, EventArgs e)
         {
             if (staticSignatureCatalogResults == null || staticSignatureCatalogResults.Count == 0)
             {
@@ -1278,18 +1342,18 @@ namespace AcmeScanner
             ShowMessageDialog("The files \"urls.csv\" and \"domains.csv\" have been created in the working directory.", false);
         }
 
-        private void btnRefreshStatus_Click(object sender, EventArgs e)
+        private void BtnRefreshStatus_Click(object sender, EventArgs e)
         {
             ShowLoading(true);
             loadStatusWorker.RunWorkerAsync();
         }
 
-        private void lvScanResults_SelectedIndexChanged(object sender, EventArgs e)
+        private void LvScanResults_SelectedIndexChanged(object sender, EventArgs e)
         {
 
         }
 
-        public void btnOrchestrationView_Click()
+        public void BtnOrchestrationView_Click()
         {
             if (lvOrchestrationScanResult.SelectedItems.Count > 0)
             {
@@ -1317,82 +1381,109 @@ namespace AcmeScanner
 
 
 
-        private void btnViewJson_Click(object sender, EventArgs e)
+        public void BtnViewJson_Click(object sender, EventArgs e)
         {
-
-            if (scannerListView1.SelectedItems.Count > 0)
-            {
-                string sigID = scannerListView1.SelectedItems[0].SubItems[1].Text;
-                string pID = scannerListView1.SelectedItems[0].Tag.ToString();
-                MobyProduct selectedProduct = staticMobyProductList.FirstOrDefault(product => product.Id == pID);
-                MobySignature selectedSignature = selectedProduct.sigList.FirstOrDefault(signature => signature.Id == sigID);
-                string json = JsonConvert.SerializeObject(selectedSignature, Formatting.Indented);
-
+            ScannerListView listViewObject = (ScannerListView)sender;
+            
+            string sigID = listViewObject.SelectedItems[0].SubItems[1].Text;
+            string pID = listViewObject.SelectedItems[0].Tag.ToString();
+            MobyProduct selectedProduct = staticMobyProductList.FirstOrDefault(product => product.Id == pID);
+            MobySignature selectedSignature = selectedProduct.sigList.FirstOrDefault(signature => signature.Id == sigID);
+            string json = JsonConvert.SerializeObject(selectedSignature, Formatting.Indented);
 
 
 
-                ViewMobyJsonDialog textDialog = new ViewMobyJsonDialog(json);
-                textDialog.StartPosition = FormStartPosition.CenterParent;
-                textDialog.ShowDialog();
-            }
-            else
-            {
-                ShowMessageDialog("Select an item to view JSON!!", false);
-            }
+
+            ViewMobyJsonDialog textDialog = new ViewMobyJsonDialog(json);
+            textDialog.StartPosition = FormStartPosition.CenterParent;
+            textDialog.ShowDialog();
+                       
         }
 
-        private void btnUpdateMoby_Click(object sender, EventArgs e)
+        private void BtnUpdateMoby_Click(object sender, EventArgs e)
         {
             ShowLoading(true);
             updateMobyWorker.RunWorkerAsync(true);
         }
 
-        private void btnRunChecksMoby_Click(object sender, EventArgs e)
+        private void BtnRunChecksMoby_Click(object sender, EventArgs e)
         {
             MobySanityCheckDialog sanityCheckDialog = new MobySanityCheckDialog();
             sanityCheckDialog.StartPosition = FormStartPosition.CenterParent;
             sanityCheckDialog.ShowDialog();
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        private void Button1_Click(object sender, EventArgs e)
         {
             Debug.WriteLine("called button funciton");
+
+        }
+
+        public static string ProductInfoForSignatureId(string sigId)
+        {
+            int i = 0;
+            int foundId = 0;
+            bool found = false;
+            foreach (CatalogProduct prod in staticProductList)
+            {
+                foundId = 0;
+                foreach (CatalogSignature sig in prod.SigList)
+                {
+                    if (sig.Id == sigId)
+                    {
+                        found = true;
+                        break;
+                    }
+                    foundId += 1;
+                }
+                if (found) { break; }
+                i += 1;
+            }
+
+            CatalogProduct finalProduct = staticProductList[i];
+            CatalogSignature finalSignature = finalProduct.SigList[foundId];
+            var productWithSingleSignature = new
+            {
+                finalProduct.Name,
+                finalProduct.Vendor,
+                finalProduct.Id,
+                finalProduct.SupportsInstall,
+                finalProduct.OsType,
+                finalProduct.CveCount,
+                SelectedSignature = finalSignature
+            };
+
+            string json = JsonConvert.SerializeObject(productWithSingleSignature, Formatting.Indented);
+            return json;
 
         }
 
         //need to rework this panel
         private void LoadMobySubsets()
         {
-            /*
-            // Get the dictionary of JSON file names and timestamps
-            Dictionary<string, string> mobyFileTimestamps = DownloadMobySubsets.GetMobyFileTimestamps();
+            //need to hide the other panels when this panel opens up, so you can only see this one, then reopen them when this panel is closed
+            panel1.Visible = false;
+            panel2.Visible = false;
+            panel3.Visible = false;
+            panel4.Visible = false;
+            panel5.Visible = false;
+            panel6.Visible = false;
+            panel7.Visible = false;
 
-            // Create a formatted string for the TextDialog
-            StringBuilder formattedString = new StringBuilder();
-            formattedString.AppendLine(string.Format("{0,-40} {1}", "JSON File Name", "Timestamp"));
-            formattedString.AppendLine(new string('-', 60));
-
-            foreach (var entry in mobyFileTimestamps)
-            {
-                formattedString.AppendLine(string.Format("{0,-40} {1}", entry.Key, entry.Value));
-            }
-
-            // Display the formatted string in the TextDialog
-            TextDialog textDialog = new TextDialog(formattedString.ToString());
-            textDialog.StartPosition = FormStartPosition.CenterParent;
-            textDialog.ShowDialog();
-            */
-
-            // Hide the other panel
 
             // Get the dictionary of JSON file names and timestamps
             Dictionary<string, string> mobyFileTimestamps = DownloadMobySubsets.GetMobyFileTimestamps();
 
             // Clear previous controls from the ListView
-            ListView listView = mobySubsetsPanel.Controls.OfType<ListView>().FirstOrDefault();
+            System.Windows.Forms.ListView listView = mobySubsetsPanel.Controls.OfType<System.Windows.Forms.ListView>().FirstOrDefault();
+
             if (listView != null)
             {
                 listView.Items.Clear();
+                listView.Columns.Clear();
+
+                listView.Columns.Add("JSON File Name", 200);
+                listView.Columns.Add("Timestamp (GMT 0 Time)", 200);
 
                 // Add items to the ListView
                 foreach (var entry in mobyFileTimestamps)
@@ -1407,7 +1498,7 @@ namespace AcmeScanner
             }
         }
 
-        private async void btnViewMobySubsets_Click(object sender, EventArgs e)
+        private async void BtnViewMobySubsets_Click(object sender, EventArgs e)
         {
             await DownloadMobySubsets.DownloadMobyFilesAsync();
 
@@ -1417,6 +1508,317 @@ namespace AcmeScanner
         private void BtnMobysubsetClose_Click(object sender, EventArgs e)
         {
             mobySubsetsPanel.Visible = false;  // Hide the panel
+            panel1.Visible = true;
+            panel2.Visible = true;
+            panel3.Visible = true;
+            panel4.Visible = true;
+            panel5.Visible = true;
+            panel6.Visible = true;
+            panel7.Visible = true;
+
+        }
+
+        private void ListView_ItemActivateMobySubsetTable(object sender, EventArgs e)
+        {
+            System.Windows.Forms.ListView listView = sender as System.Windows.Forms.ListView;
+
+            if (listView != null && listView.SelectedItems.Count > 0)
+            {
+                string fileName = listView.SelectedItems[0].Text;
+                ShowJsonContentMobySubset(fileName);
+            }
+        }
+
+        // Method to show JSON content in a text dialog
+        private void ShowJsonContentMobySubset(string filename)
+        {
+            string jsonContent = DownloadMobySubsets.GetJsonContent(filename);
+            ViewMobyJsonDialog textDialog = new ViewMobyJsonDialog(jsonContent);
+            textDialog.StartPosition = FormStartPosition.CenterParent;
+            textDialog.ShowDialog();
+        }
+
+        private List<ListViewItem> LoadVulnerabilities()
+        {
+            int cveCount = 0;
+            string currentDirectory = Directory.GetCurrentDirectory();            
+            string jsonFilePath = Path.Combine(currentDirectory, @"..\..\..");            
+            jsonFilePath = Path.GetFullPath(jsonFilePath);
+            string JsonName = "T1Applications.json";
+            string FilePath = Path.Combine(jsonFilePath, JsonName);
+
+            List<ListViewItem> resultList = new List<ListViewItem>();
+            Dictionary<string, string> productDictionary = new Dictionary<string, string>();
+
+            // Read and parse the JSON file
+            var jsonContent = File.ReadAllText(FilePath);
+            var productList = JArray.Parse(jsonContent);
+
+            foreach (var product in productList)
+            {
+                string productName = product["name"]?.ToString();
+                string productID = product["productID"]?.ToString();
+
+                if (string.IsNullOrEmpty(productName) || string.IsNullOrEmpty(productID))
+                    continue;
+
+                // Populate the dictionary with productID as the key and productName as the value
+                productDictionary[productID] = productName;
+            }
+
+            // Pass the dictionary to MapPatchData to get vulnerabilities
+            var vulnerabilities = TaskGetProductVulnerabilities.MapPatchData(productDictionary);
+
+            foreach (var kvp in vulnerabilities)
+            {
+                string productID = kvp.Key;
+                string productVulJson = kvp.Value;
+                string productName = productDictionary[productID];
+
+                string platform = "Windows"; // Default platform
+                if (productName.Contains("macOS", StringComparison.OrdinalIgnoreCase))
+                {
+                    platform = "Mac";
+                }
+                else if (productName.Contains("Linux", StringComparison.OrdinalIgnoreCase))
+                {
+                    platform = "Linux";
+                }
+
+                if (productVulJson == "Install app to see data")
+                {
+                    ListViewItem item = new ListViewItem(productName);
+                    item.SubItems.Add(platform); // Add platform information
+                    item.SubItems.Add(productID);
+                    item.SubItems.Add(productVulJson); // Use the error message directly
+
+                    // Optionally store an empty JSON or a message in the Tag property
+                    item.Tag = productVulJson;
+
+                    resultList.Add(item);
+                }
+                else
+                {
+                    try
+                    {
+                        // Try to parse the JSON
+                        JObject cveJson = JObject.Parse(productVulJson);
+                        cveCount += cveJson["result"]["cves"].Count();
+
+                        ListViewItem item = new ListViewItem(productName);
+                        item.SubItems.Add(platform);
+                        item.SubItems.Add(productID);
+                        item.SubItems.Add("Double click to view CVEs and resolutions");
+
+                        // Store the JSON content in the Tag property for easy access later
+                        item.Tag = productVulJson;
+
+                        resultList.Add(item);
+                    }
+                    catch (JsonReaderException ex)
+                    {
+                        // Handle JSON parsing error
+                        Console.WriteLine($"Error parsing JSON for productID {productID}: {ex.Message}");
+                        // Optionally add an item with an error message
+                        ListViewItem item = new ListViewItem(productName);
+                        item.SubItems.Add(platform); // Add platform information
+                        item.SubItems.Add(productID);
+                        item.SubItems.Add("Error parsing product vulnerabilities");
+
+                        // Optionally store the error message or invalid JSON in the Tag property
+                        item.Tag = productVulJson;
+
+                        resultList.Add(item);
+                    }
+                }
+            }
+
+            if (InvokeRequired)
+            {
+                this.Invoke(new System.Windows.Forms.MethodInvoker(delegate
+                {
+                    label17.Text = cveCount.ToString();
+                }));
+            }
+
+            return resultList;
+        }
+
+
+        private void LvVulnerabilities_DoubleClick(object sender, EventArgs e)
+        {
+            if (lvVulnerabilities.SelectedItems.Count > 0)
+            {
+                ListViewItem selectedItem = lvVulnerabilities.SelectedItems[0];
+                string jsonContent = selectedItem.Tag as string;
+
+                if (!string.IsNullOrEmpty(jsonContent))
+                {
+                    try
+                    {
+                        // Parse and format the JSON string
+                        var parsedJson = JToken.Parse(jsonContent);
+                        string formattedJson = parsedJson.ToString(Formatting.Indented);
+
+                        // Pass the formatted JSON string to the dialog
+                        ViewMobyJsonDialog textDialog = new ViewMobyJsonDialog(formattedJson);
+                        textDialog.StartPosition = FormStartPosition.CenterParent;
+                        textDialog.ShowDialog();
+                    }
+                    catch
+                    {
+                        // Handle JSON parsing error
+                        MessageBox.Show($"Error", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                }
+            }
+        }
+
+        private void BtnLoadCVEs_Click(object sender, EventArgs e)
+        {
+            ShowLoading(true);
+            loadVulnerabilitiesWorker.RunWorkerAsync();
+        }
+        //Removes placeholder text of "Search Products" when search bar is clicked
+        private void searchCatalogClicked(object sender, EventArgs e)
+        {
+            if (staticProductList == null)
+            {
+                searchCatalog.Enabled = false;
+                return;
+            }
+            if (searchCatalog.Text == "Search Products")
+            {
+                searchCatalog.Text = "";
+            }
+
+        }
+
+        //Function called whenever text changed in search bar and updates catalog if it hasn't been updated yet.
+        private void searchCatalog_TextChanged(object sender, EventArgs e)
+        {
+
+            if (!isCatalogUpdated)
+            {
+                UpdateCatalogResults();
+            }
+
+        }
+
+        //Function returns list of CatalogSignature objects containing searched name in their name property
+        private List<CatalogSignature> searchResult(string signatureName)
+        {
+            List<CatalogSignature> result = new List<CatalogSignature>();
+
+            foreach (CatalogProduct prod in staticProductList)
+            {
+
+                foreach (CatalogSignature sig in prod.SigList)
+                {
+                    if (sig.Name.ToLower().Contains(signatureName.ToLower()))
+                    {
+                        result.Add(sig);
+
+                    }
+
+                }
+            }
+            return result;
+        }
+
+        //Function takes in list of CatalogSignature objects to display on the catalog tab
+        private void UpdateSearchCatalogResults(List<CatalogSignature> resultList)
+        {
+            List<ListViewItem> resultListCatalog = new List<ListViewItem>();
+            int intIndex = 0;
+            bool found = false;
+            while (intIndex < lvCatalog.Items.Count)
+            {
+
+                string line = lvCatalog.Items[intIndex].SubItems[2].Text;
+                foreach (CatalogSignature sig in resultList)
+                {
+                    if (line == sig.Id)
+                    {
+                        found = true;
+                        break;
+                    }
+                }
+                if (found)
+                {
+                    resultListCatalog.Add(lvCatalog.Items[intIndex]);
+                }
+                intIndex++;
+                found = false;
+
+            }
+            lvCatalog.BeginUpdate();
+            lvCatalog.Items.Clear();
+            lvCatalog.Items.AddRange(resultListCatalog.ToArray());
+            lvCatalog.EndUpdate();
+            isCatalogUpdated = false;
+        }
+
+        //This function is called whenever enter key is pressed in the search box on the catalog tab. Fetches list of CatalogSignature objects to show from 
+        //searchResult function and then displays them using UpdateSearchCatalogResults function
+        private void searchCatalogEnter(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+            {
+                List<CatalogSignature> resultList = searchResult(searchCatalog.Text);
+                UpdateSearchCatalogResults(resultList);
+
+            }
+        }
+
+        private void btnExportMobyCSV_Click(object sender, EventArgs e)
+        {
+            if(staticMobyProductList == null || staticMobyProductList.Count == 0)
+            {
+                MessageBox.Show("Load Moby first to export results.");
+                return;
+            }
+
+
+            StringBuilder CSVResult = new StringBuilder();
+
+            CSVResult.AppendLine("Name,SignatureID,OSType,AutoPatching,VulnDetection");
+
+            foreach (MobyProduct product in staticMobyProductList)
+            {
+                foreach (MobySignature signature in product.sigList)
+                {
+                    CSVResult.Append(signature.Name);
+                    CSVResult.Append(",");
+                    CSVResult.Append(signature.Id);
+                    CSVResult.Append(",");
+                    CSVResult.Append(product.osType);
+                    CSVResult.Append(",");
+                    CSVResult.Append(signature.supportAutoPatching);
+                    CSVResult.Append(",");
+
+                    if(signature.vulnerabilityVersions != null && signature.vulnerabilityVersions.Count > 0)
+                    {
+                        CSVResult.Append("TRUE");
+                    }
+                    else
+                    {
+                        CSVResult.Append("FALSE");
+                    }
+
+                    CSVResult.AppendLine("");
+                }
+            }
+
+
+            string listFileName = "vapm-list.csv";
+            if(File.Exists(listFileName))
+            {
+                File.Delete(listFileName);
+            }
+
+            File.WriteAllText(listFileName, CSVResult.ToString());
+            MessageBox.Show("Results have been written to " + Path.Combine(Directory.GetCurrentDirectory(), listFileName));
         }
     }
 }
