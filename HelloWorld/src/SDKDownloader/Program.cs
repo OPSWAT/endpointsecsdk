@@ -87,12 +87,22 @@ namespace SDKDownloader
             if(ValidateCommandLine(args))
             {
                 string command = args[0];
+                string architecture = "x64";
+
+                if(args.Length > 2)
+                {
+                    if (args[2] == "x86")
+                    {
+                        architecture = "win32";
+                    }
+                }
 
                 switch(command)
                 {
                     case "download":
                         {
                             string archivePath = args[1];
+                            archivePath = Path.Combine(archivePath, args[2]);
                             string firstFile = FindFirstFile(archivePath);
 
                             if (!IsFileUpdated(firstFile))
@@ -123,7 +133,7 @@ namespace SDKDownloader
                             if (!IsFileUpdated(checkFilePath))
                             {
                                 Util.CreateCleanDir(libPath);
-                                ExtractorCatalog.DownloadAndCopy(libPath,1); // Download Windows Platform
+                                ExtractorCatalog.DownloadAndCopy(libPath,1, architecture); // Download Windows Platform
                             }
 
                             break;
@@ -132,12 +142,13 @@ namespace SDKDownloader
                         {
                             Console.WriteLine("Copying windows files");
                             string libPath = args[1];
+                            libPath = Path.Combine(libPath, args[2]);
                             string checkFilePath = Path.Combine(libPath, "libwavmodapi.dll"); 
 
                             if(!IsFileUpdated(checkFilePath))
                             {
                                 Util.CreateCleanDir(libPath);
-                                ExtractorSDK.DownloadAndCopy(libPath,1);
+                                ExtractorSDK.DownloadAndCopy(libPath,1,architecture);
                             }
 
                             break;

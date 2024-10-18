@@ -12,11 +12,12 @@ namespace SDKDownloader
 {
     public class ExtractorSDK
     {
-        private static void CopyExtractedFile(string libDir, string sdkDir, string folder, string filename)
+        private static void CopyExtractedFile(string libDir, string sdkDir, string architecture, string folder, string filename)
         {
             string rootFile = Path.Combine(sdkDir, "sdk");
             rootFile = Path.Combine(rootFile, folder);
-            rootFile = Path.Combine(rootFile, "x64/release");
+            rootFile = Path.Combine(rootFile, architecture);
+            rootFile = Path.Combine(rootFile, "release");
             rootFile = Path.Combine(rootFile, filename);
 
             string destFile = Path.Combine(libDir, filename);
@@ -25,17 +26,17 @@ namespace SDKDownloader
             File.Copy(rootFile, destFile, true);
         }
 
-        private static void CopySDKFiles(string sdkDir,string libDir)
+        private static void CopySDKFiles(string sdkDir,string libDir, string architecture)
         {
-            CopyExtractedFile(libDir, sdkDir, "bin/detection", "libwaaddon.dll");
-            CopyExtractedFile(libDir, sdkDir, "bin/detection", "libwaapi.dll");
-            CopyExtractedFile(libDir, sdkDir, "bin/detection", "libwaheap.dll");
-            CopyExtractedFile(libDir, sdkDir, "bin/detection", "libwautils.dll");
-            CopyExtractedFile(libDir, sdkDir, "bin/manageability", "libwalocal.dll");
-            CopyExtractedFile(libDir, sdkDir, "bin/manageability", "wa_3rd_party_host_32.exe");
-            CopyExtractedFile(libDir, sdkDir, "bin/manageability", "wa_3rd_party_host_64.exe");
-            CopyExtractedFile(libDir, sdkDir, "bin/vulnerability", "libwavmodapi.dll");
-            CopyExtractedFile(libDir, sdkDir, "bin/deviceinfo", "libwadeviceinfo.dll");
+            CopyExtractedFile(libDir, sdkDir, architecture, "bin/detection", "libwaaddon.dll");
+            CopyExtractedFile(libDir, sdkDir, architecture, "bin/detection", "libwaapi.dll");
+            CopyExtractedFile(libDir, sdkDir, architecture, "bin/detection", "libwaheap.dll");
+            CopyExtractedFile(libDir, sdkDir, architecture, "bin/detection", "libwautils.dll");
+            CopyExtractedFile(libDir, sdkDir, architecture, "bin/manageability", "libwalocal.dll");
+            CopyExtractedFile(libDir, sdkDir, architecture, "bin/manageability", "wa_3rd_party_host_32.exe");
+            CopyExtractedFile(libDir, sdkDir, architecture, "bin/manageability", "wa_3rd_party_host_64.exe");
+            CopyExtractedFile(libDir, sdkDir, architecture, "bin/vulnerability", "libwavmodapi.dll");
+            CopyExtractedFile(libDir, sdkDir, architecture, "bin/deviceinfo", "libwadeviceinfo.dll");
         }
 
         private static void CopyResourceFiles(string sdkDir, string libDir)
@@ -45,9 +46,9 @@ namespace SDKDownloader
             File.Copy(sourceFile, destFile, true);
         }
 
-        public static void CopyAllLibFiles(string extractDir, string libDir)
+        public static void CopyAllLibFiles(string extractDir, string libDir, string architecture)
         {
-            CopySDKFiles(extractDir, libDir);
+            CopySDKFiles(extractDir, libDir, architecture);
             CopyResourceFiles(extractDir, libDir);
         }
 
@@ -58,7 +59,7 @@ namespace SDKDownloader
         // 1 - Windows
         // 2 - Mac
         // 3 - Linux
-        public static void DownloadAndCopy(string libDir, int platform)
+        public static void DownloadAndCopy(string libDir, int platform, string architecture)
         {
             string tempArchiveDir = Util.GetCleanTempDir("OESIS-ARCHIVE");
             DownloadSDK.Download(tempArchiveDir);
@@ -69,7 +70,7 @@ namespace SDKDownloader
 
             if (platform == 1)
             {
-                ExtractorSDK.CopyAllLibFiles(tempSDKDir, libDir);
+                ExtractorSDK.CopyAllLibFiles(tempSDKDir, libDir, architecture);
             }
             if (platform == 2)
             {

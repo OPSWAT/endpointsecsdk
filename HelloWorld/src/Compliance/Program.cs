@@ -257,8 +257,6 @@ namespace Vulnerability
                 Console.WriteLine("Discovering Firewall Products");
                 CheckSuccess(DetectProducts(7, out products_json));
 
-                GetDeviceIdentity();
-
                 List<Product> productList = GetProductList(products_json);
                 foreach(Product product in productList)
                 {

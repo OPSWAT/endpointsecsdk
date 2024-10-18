@@ -35,7 +35,7 @@ namespace SDKDownloadLib
         // 1 - Windows
         // 2 - Mac
         // 3 - Linux
-        public static void DownloadAndCopy(string catalogDir, int platform)
+        public static void DownloadAndCopy(string catalogDir, int platform,string architecture)
         {
             string tempArchiveDir = Util.GetCleanTempDir("OESIS-CATALOG-ARCHIVE");
             DownloadCatalog.Download(tempArchiveDir);
