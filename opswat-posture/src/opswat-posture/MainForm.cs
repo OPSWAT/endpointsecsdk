@@ -328,7 +328,14 @@ namespace OPSWATPosture
         ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         private void updateSDK_Worker_DoWork(object sender, DoWorkEventArgs e)
         {
-            UpdateSDK.DownloadAndInstall_OPSWAT_SDK();
+            try
+            {
+                UpdateSDK.DownloadAndInstall_OPSWAT_SDK();
+            }
+            catch(Exception ex)
+            {
+                MessageBox.Show("Failed to download SDK.  " + ex.Message);
+            }
         }
 
         private void updateSDK_Worker_Completed(object sender, RunWorkerCompletedEventArgs e)

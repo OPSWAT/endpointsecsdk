@@ -102,7 +102,7 @@ namespace VAPMAdapater.Updates
         public static void DownloadAllSDKFiles(string sdkDir)
         {
             string oesisFilePath = Path.Combine(sdkDir,"OESIS-Descriptior.xml");
-            HttpClientUtils.DownloadFileSynchronous(SDKSettings.getSDKURL(), oesisFilePath);
+            HttpClientUtils.DownloadFileSynchronous(SDKSettings.GetSDKURL(), oesisFilePath);
 
             if (File.Exists(oesisFilePath))
             {
