@@ -12,7 +12,7 @@ Or download the installer here:
 
 Once Visual Studio is installed open the solution /src/HelloWorld/HelloWorld.sln.  
 
-Make sure to copy the license.cfg and pass_key.txt file into the /src/HelloWorld/license directory.
+Make sure to copy the download_token.txt, license.cfg and pass_key.txt file into the /src/HelloWorld/license directory.
 
 Compile the Compliance project.
 

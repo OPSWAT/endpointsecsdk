@@ -6,6 +6,7 @@
 ///  OPSWAT OEM Solutions Architect
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Xml.Linq;
@@ -14,7 +15,7 @@ namespace SDKDownloader
 {
     public class DownloadSDK
     {
-        private static string SDK_INDEX_URL = "https://software.opswat.com/OESIS_V4/OesisPackageLinks.xml";
+        private static string SDK_INDEX_URL = "https://vcr.opswat.com/gw/file/download/OesisPackageLinks.xml?type=1&token=%token%";
 
         private static string getAttribute(XElement element, string key)
         {
@@ -96,10 +97,31 @@ namespace SDKDownloader
             }
         }
 
+        private static string GetDownloadToken()
+        {
+            string sdk_token_file = "download_token.txt";
+            if (!File.Exists(sdk_token_file))
+            {
+                throw new Exception("Make sure there is a download token file available in the running directory: " + Directory.GetCurrentDirectory());
+            }
+
+            string downloadToken = File.ReadAllText(sdk_token_file);
+            return downloadToken;
+        }
+
+        private static string GetSDKUrl()
+        {
+            string token = GetDownloadToken();
+            string result = SDK_INDEX_URL.Replace("%token%", token);
+
+            return result;
+        }
+
         public static void Download(string sdkDir)
         {
             string oesisFilePath = Path.Combine(sdkDir, "OESIS-Descriptior.xml");
-            HttpClientUtils.DownloadFileSynchronous(SDK_INDEX_URL, oesisFilePath);
+
+            HttpClientUtils.DownloadFileSynchronous(GetSDKUrl(), oesisFilePath);
 
             if (File.Exists(oesisFilePath))
             {
