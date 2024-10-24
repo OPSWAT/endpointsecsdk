@@ -38,6 +38,7 @@ namespace AcmeScanner
             components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ScannerForm));
             panel1 = new Panel();
+            btnUpdateSDK = new MaterialButton();
             label9 = new Label();
             label8 = new Label();
             label7 = new Label();
@@ -110,7 +111,6 @@ namespace AcmeScanner
             MobySubsetsLabel = new Label();
             btnClose = new Button();
             listView = new ListView();
-            btnUpdateSDK = new MaterialButton();
             panel1.SuspendLayout();
             panel3.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)pbLoading).BeginInit();
@@ -149,11 +149,32 @@ namespace AcmeScanner
             panel1.Controls.Add(btnScan);
             panel1.Dock = DockStyle.Top;
             panel1.Location = new Point(3, 3);
-            panel1.Margin = new Padding(15, 15, 15, 15);
+            panel1.Margin = new Padding(15);
             panel1.Name = "panel1";
-            panel1.Padding = new Padding(15, 15, 15, 15);
+            panel1.Padding = new Padding(15);
             panel1.Size = new Size(1052, 77);
             panel1.TabIndex = 1;
+            // 
+            // btnUpdateSDK
+            // 
+            btnUpdateSDK.AutoSize = false;
+            btnUpdateSDK.AutoSizeMode = AutoSizeMode.GrowAndShrink;
+            btnUpdateSDK.Density = MaterialButton.MaterialButtonDensity.Default;
+            btnUpdateSDK.Depth = 0;
+            btnUpdateSDK.HighEmphasis = true;
+            btnUpdateSDK.Icon = null;
+            btnUpdateSDK.Location = new Point(681, 21);
+            btnUpdateSDK.Margin = new Padding(3, 4, 3, 4);
+            btnUpdateSDK.MouseState = MaterialSkin.MouseState.HOVER;
+            btnUpdateSDK.Name = "btnUpdateSDK";
+            btnUpdateSDK.NoAccentTextColor = Color.Empty;
+            btnUpdateSDK.Size = new Size(116, 36);
+            btnUpdateSDK.TabIndex = 11;
+            btnUpdateSDK.Text = "Download Latest SDK";
+            btnUpdateSDK.Type = MaterialButton.MaterialButtonType.Contained;
+            btnUpdateSDK.UseAccentColor = false;
+            btnUpdateSDK.UseVisualStyleBackColor = true;
+            btnUpdateSDK.Click += btnUpdateSDK_Click_1;
             // 
             // label9
             // 
@@ -314,9 +335,9 @@ namespace AcmeScanner
             panel3.Controls.Add(panel2);
             panel3.Dock = DockStyle.Fill;
             panel3.Location = new Point(0, 0);
-            panel3.Margin = new Padding(15, 15, 15, 15);
+            panel3.Margin = new Padding(15);
             panel3.Name = "panel3";
-            panel3.Padding = new Padding(15, 15, 15, 15);
+            panel3.Padding = new Padding(15);
             panel3.Size = new Size(1098, 630);
             panel3.TabIndex = 2;
             // 
@@ -364,7 +385,7 @@ namespace AcmeScanner
             tabOffline.Controls.Add(panel1);
             tabOffline.Location = new Point(4, 24);
             tabOffline.Name = "tabOffline";
-            tabOffline.Padding = new Padding(3, 3, 3, 3);
+            tabOffline.Padding = new Padding(3);
             tabOffline.Size = new Size(1058, 570);
             tabOffline.TabIndex = 0;
             tabOffline.Text = "Detection";
@@ -391,7 +412,7 @@ namespace AcmeScanner
             tabOrchestrate.Controls.Add(panel4);
             tabOrchestrate.Location = new Point(4, 24);
             tabOrchestrate.Name = "tabOrchestrate";
-            tabOrchestrate.Padding = new Padding(3, 3, 3, 3);
+            tabOrchestrate.Padding = new Padding(3);
             tabOrchestrate.Size = new Size(1058, 570);
             tabOrchestrate.TabIndex = 1;
             tabOrchestrate.Text = "WU Orchestration";
@@ -424,9 +445,9 @@ namespace AcmeScanner
             panel4.Controls.Add(btnScanOrchestration);
             panel4.Dock = DockStyle.Top;
             panel4.Location = new Point(3, 3);
-            panel4.Margin = new Padding(15, 15, 15, 15);
+            panel4.Margin = new Padding(15);
             panel4.Name = "panel4";
-            panel4.Padding = new Padding(15, 15, 15, 15);
+            panel4.Padding = new Padding(15);
             panel4.Size = new Size(1052, 77);
             panel4.TabIndex = 3;
             // 
@@ -535,7 +556,7 @@ namespace AcmeScanner
             tabCatalog.Controls.Add(panel5);
             tabCatalog.Location = new Point(4, 24);
             tabCatalog.Name = "tabCatalog";
-            tabCatalog.Padding = new Padding(3, 3, 3, 3);
+            tabCatalog.Padding = new Padding(3);
             tabCatalog.Size = new Size(1058, 570);
             tabCatalog.TabIndex = 2;
             tabCatalog.Text = "Catalog";
@@ -573,9 +594,9 @@ namespace AcmeScanner
             panel5.Controls.Add(mbLoad);
             panel5.Dock = DockStyle.Top;
             panel5.Location = new Point(3, 3);
-            panel5.Margin = new Padding(15, 15, 15, 15);
+            panel5.Margin = new Padding(15);
             panel5.Name = "panel5";
-            panel5.Padding = new Padding(15, 15, 15, 15);
+            panel5.Padding = new Padding(15);
             panel5.Size = new Size(1052, 77);
             panel5.TabIndex = 5;
             // 
@@ -805,7 +826,7 @@ namespace AcmeScanner
             tabStatus.Controls.Add(panel6);
             tabStatus.Location = new Point(4, 24);
             tabStatus.Name = "tabStatus";
-            tabStatus.Padding = new Padding(3, 3, 3, 3);
+            tabStatus.Padding = new Padding(3);
             tabStatus.Size = new Size(1058, 570);
             tabStatus.TabIndex = 3;
             tabStatus.Text = "Status";
@@ -831,9 +852,9 @@ namespace AcmeScanner
             panel6.Controls.Add(btnRefreshStatus);
             panel6.Dock = DockStyle.Top;
             panel6.Location = new Point(3, 3);
-            panel6.Margin = new Padding(15, 15, 15, 15);
+            panel6.Margin = new Padding(15);
             panel6.Name = "panel6";
-            panel6.Padding = new Padding(15, 15, 15, 15);
+            panel6.Padding = new Padding(15);
             panel6.Size = new Size(1052, 77);
             panel6.TabIndex = 5;
             // 
@@ -864,7 +885,7 @@ namespace AcmeScanner
             tabMoby.Controls.Add(panel7);
             tabMoby.Location = new Point(4, 24);
             tabMoby.Name = "tabMoby";
-            tabMoby.Padding = new Padding(3, 3, 3, 3);
+            tabMoby.Padding = new Padding(3);
             tabMoby.Size = new Size(1058, 570);
             tabMoby.TabIndex = 4;
             tabMoby.Text = "Moby";
@@ -876,7 +897,7 @@ namespace AcmeScanner
             scannerListView1.FullRowSelect = true;
             scannerListView1.GridLines = true;
             scannerListView1.Location = new Point(3, 80);
-            scannerListView1.Margin = new Padding(1, 1, 1, 1);
+            scannerListView1.Margin = new Padding(1);
             scannerListView1.MultiSelect = false;
             scannerListView1.Name = "scannerListView1";
             scannerListView1.OwnerDraw = true;
@@ -897,7 +918,7 @@ namespace AcmeScanner
             panel7.Controls.Add(btnLoadMoby);
             panel7.Dock = DockStyle.Top;
             panel7.Location = new Point(3, 3);
-            panel7.Margin = new Padding(2, 2, 2, 2);
+            panel7.Margin = new Padding(2);
             panel7.Name = "panel7";
             panel7.Size = new Size(1052, 77);
             panel7.TabIndex = 0;
@@ -1028,9 +1049,9 @@ namespace AcmeScanner
             tabVulnerabilities.Controls.Add(lvVulnerabilities);
             tabVulnerabilities.Controls.Add(panel8);
             tabVulnerabilities.Location = new Point(4, 24);
-            tabVulnerabilities.Margin = new Padding(2, 2, 2, 2);
+            tabVulnerabilities.Margin = new Padding(2);
             tabVulnerabilities.Name = "tabVulnerabilities";
-            tabVulnerabilities.Padding = new Padding(2, 2, 2, 2);
+            tabVulnerabilities.Padding = new Padding(2);
             tabVulnerabilities.Size = new Size(1058, 570);
             tabVulnerabilities.TabIndex = 5;
             tabVulnerabilities.Text = "Vulnerabilities";
@@ -1042,7 +1063,7 @@ namespace AcmeScanner
             lvVulnerabilities.FullRowSelect = true;
             lvVulnerabilities.GridLines = true;
             lvVulnerabilities.Location = new Point(2, 80);
-            lvVulnerabilities.Margin = new Padding(2, 2, 2, 2);
+            lvVulnerabilities.Margin = new Padding(2);
             lvVulnerabilities.MultiSelect = false;
             lvVulnerabilities.Name = "lvVulnerabilities";
             lvVulnerabilities.OwnerDraw = true;
@@ -1131,7 +1152,7 @@ namespace AcmeScanner
             mobySubsetsPanel.Controls.Add(listView);
             mobySubsetsPanel.Dock = DockStyle.Fill;
             mobySubsetsPanel.Location = new Point(0, 0);
-            mobySubsetsPanel.Margin = new Padding(2, 2, 2, 2);
+            mobySubsetsPanel.Margin = new Padding(2);
             mobySubsetsPanel.Name = "mobySubsetsPanel";
             mobySubsetsPanel.Size = new Size(1098, 630);
             mobySubsetsPanel.TabIndex = 3;
@@ -1150,7 +1171,7 @@ namespace AcmeScanner
             // btnClose
             // 
             btnClose.Location = new Point(0, 0);
-            btnClose.Margin = new Padding(2, 2, 2, 2);
+            btnClose.Margin = new Padding(2);
             btnClose.Name = "btnClose";
             btnClose.Size = new Size(52, 14);
             btnClose.TabIndex = 1;
@@ -1162,33 +1183,13 @@ namespace AcmeScanner
             listView.FullRowSelect = true;
             listView.GridLines = true;
             listView.Location = new Point(0, 0);
-            listView.Margin = new Padding(2, 2, 2, 2);
+            listView.Margin = new Padding(2);
             listView.Name = "listView";
             listView.Size = new Size(86, 60);
             listView.TabIndex = 2;
             listView.UseCompatibleStateImageBehavior = false;
             listView.View = View.Details;
             listView.ItemActivate += ListView_ItemActivateMobySubsetTable;
-            // 
-            // btnUpdateSDK
-            // 
-            btnUpdateSDK.AutoSize = false;
-            btnUpdateSDK.AutoSizeMode = AutoSizeMode.GrowAndShrink;
-            btnUpdateSDK.Density = MaterialButton.MaterialButtonDensity.Default;
-            btnUpdateSDK.Depth = 0;
-            btnUpdateSDK.HighEmphasis = true;
-            btnUpdateSDK.Icon = null;
-            btnUpdateSDK.Location = new Point(681, 21);
-            btnUpdateSDK.Margin = new Padding(3, 4, 3, 4);
-            btnUpdateSDK.MouseState = MaterialSkin.MouseState.HOVER;
-            btnUpdateSDK.Name = "btnUpdateSDK";
-            btnUpdateSDK.NoAccentTextColor = Color.Empty;
-            btnUpdateSDK.Size = new Size(116, 36);
-            btnUpdateSDK.TabIndex = 11;
-            btnUpdateSDK.Text = "Download Latest SDK";
-            btnUpdateSDK.Type = MaterialButton.MaterialButtonType.Contained;
-            btnUpdateSDK.UseAccentColor = false;
-            btnUpdateSDK.UseVisualStyleBackColor = true;
             // 
             // ScannerForm
             // 
@@ -1258,7 +1259,6 @@ namespace AcmeScanner
         private Label label1;
         private Label lblTotalCVEs;
         private Label lblTotalProducts;
-        private MaterialSkin.Controls.MaterialTextBox2 tbCVE;
         private Label lblTotalInstalls;
         private Label label3;
         private MaterialSkin.Controls.MaterialButton btnExportCSV;
@@ -1306,7 +1306,6 @@ namespace AcmeScanner
         private TextBox searchCatalog;
         private Panel panel9;
         private PictureBox pictureBox1;
-        private Control labelTitle;
         private MaterialButton btnUpdateSDK;
     }
 }

@@ -67,7 +67,7 @@ namespace VAPMAdapater.Updates
                 }
                 catch (Exception ex)
                 {                    
-                    return "Error fetching date"; 
+                    return "Error fetching date: " + ex; 
                 }
             }).Result;
                         
@@ -121,7 +121,7 @@ namespace VAPMAdapater.Updates
 
                     break; // If the copy succeeds, exit the retry loop
                 }
-                catch (IOException ex) when (i <= numberOfRetries)
+                catch (IOException) when (i <= numberOfRetries)
                 {
                     // Retry if there's an IOException
                     Thread.Sleep(delayOnRetry);

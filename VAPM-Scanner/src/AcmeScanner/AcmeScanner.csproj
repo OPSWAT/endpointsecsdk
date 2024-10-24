@@ -6,15 +6,15 @@
     <UseWindowsForms>true</UseWindowsForms>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <ApplicationManifest>app.manifest</ApplicationManifest>
-    <Version>1.0.0.346</Version>
+    <Version>1.0.0.372</Version>
   </PropertyGroup>
   <Target Name="UpdateVersion" BeforeTargets="BeforeBuild">
     <Exec Command="powershell -ExecutionPolicy Bypass -File UpdateVersion.ps1 $(MSBuildProjectDirectory)\$(MSBuildProjectName).csproj" />
   </Target>
   <ItemGroup>
     <PackageReference Include="MaterialSkin.2.RTL" Version="2.3.1.1" />
-    <PackageReference Include="MessagePack" Version="2.5.168" />
-    <PackageReference Include="MessagePack.Annotations" Version="2.5.168" />
+    <PackageReference Include="MessagePack" Version="2.5.187" />
+    <PackageReference Include="MessagePack.Annotations" Version="2.5.187" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\VAPMAdapter\VAPMAdapter.csproj" />

@@ -106,7 +106,7 @@ namespace AcmeScanner
             tbcMainView.TabPages.Add(tabOffline);
             tbcMainView.TabPages.Add(tabOrchestrate);
             tbcMainView.TabPages.Add(tabCatalog);
-            
+
 
             //
             // Enable the Moby component here
@@ -400,7 +400,7 @@ namespace AcmeScanner
 
         private void LoadStatusWorker_DoWork(object sender, DoWorkEventArgs e)
         {
-            staticPatchStatusList = TaskLoadStatus.Load();            
+            staticPatchStatusList = TaskLoadStatus.Load();
         }
 
         private void LoadStatusWorker_Completed(object sender, RunWorkerCompletedEventArgs e)
@@ -499,24 +499,31 @@ namespace AcmeScanner
         {
             bool sdkOnly = (bool)e.Argument;
 
-            if (!sdkOnly)
+            try
             {
-                UpdateDBFiles.DownloadFiles();
-                btnUpdate.UseAccentColor = false;
-                label8.ForeColor = System.Drawing.Color.Black;
-                label9.ForeColor = System.Drawing.Color.Black;
-                label12.ForeColor = System.Drawing.Color.Black;
-                label15.ForeColor = System.Drawing.Color.Black;
-            }
+                if (!sdkOnly)
+                {
+                    UpdateDBFiles.DownloadFiles();
+                    btnUpdate.UseAccentColor = false;
+                    label8.ForeColor = System.Drawing.Color.Black;
+                    label9.ForeColor = System.Drawing.Color.Black;
+                    label12.ForeColor = System.Drawing.Color.Black;
+                    label15.ForeColor = System.Drawing.Color.Black;
+                }
 
-            else
+                else
+                {
+                    UpdateSDK.DownloadAndInstall_OPSWAT_SDK();
+                    btnUpdateSDK.UseAccentColor = false;
+                    label6.ForeColor = System.Drawing.Color.Black;
+                    label7.ForeColor = System.Drawing.Color.Black;
+                    label11.ForeColor = System.Drawing.Color.Black;
+                    label14.ForeColor = System.Drawing.Color.Black;
+                }
+            }
+            catch (Exception ex)
             {
-                UpdateSDK.DownloadAndInstall_OPSWAT_SDK();
-                btnUpdateSDK.UseAccentColor = false;
-                label6.ForeColor = System.Drawing.Color.Black;
-                label7.ForeColor = System.Drawing.Color.Black;
-                label11.ForeColor = System.Drawing.Color.Black;
-                label14.ForeColor = System.Drawing.Color.Black;
+                MessageBox.Show("There was an error downloading the files: " + ex.Message);
             }
         }
 
@@ -597,7 +604,7 @@ namespace AcmeScanner
             bool SDKdownload = UpdateSDK.DoesSDKExist();
             bool DBdownload = UpdateDBFiles.DoesDBExist();
             bool MobyDownload = UpdateMobyFile.DoesMobyExist();
-            
+
             if (!SDKdownload || !DBdownload)
             {
                 btnInstall.Enabled = false;
@@ -1384,7 +1391,7 @@ namespace AcmeScanner
         public void BtnViewJson_Click(object sender, EventArgs e)
         {
             ScannerListView listViewObject = (ScannerListView)sender;
-            
+
             string sigID = listViewObject.SelectedItems[0].SubItems[1].Text;
             string pID = listViewObject.SelectedItems[0].Tag.ToString();
             MobyProduct selectedProduct = staticMobyProductList.FirstOrDefault(product => product.Id == pID);
@@ -1397,7 +1404,7 @@ namespace AcmeScanner
             ViewMobyJsonDialog textDialog = new ViewMobyJsonDialog(json);
             textDialog.StartPosition = FormStartPosition.CenterParent;
             textDialog.ShowDialog();
-                       
+
         }
 
         private void BtnUpdateMoby_Click(object sender, EventArgs e)
@@ -1541,8 +1548,8 @@ namespace AcmeScanner
         private List<ListViewItem> LoadVulnerabilities()
         {
             int cveCount = 0;
-            string currentDirectory = Directory.GetCurrentDirectory();            
-            string jsonFilePath = Path.Combine(currentDirectory, @"..\..\..");            
+            string currentDirectory = Directory.GetCurrentDirectory();
+            string jsonFilePath = Path.Combine(currentDirectory, @"..\..\..");
             jsonFilePath = Path.GetFullPath(jsonFilePath);
             string JsonName = "T1Applications.json";
             string FilePath = Path.Combine(jsonFilePath, JsonName);
@@ -1773,7 +1780,7 @@ namespace AcmeScanner
 
         private void btnExportMobyCSV_Click(object sender, EventArgs e)
         {
-            if(staticMobyProductList == null || staticMobyProductList.Count == 0)
+            if (staticMobyProductList == null || staticMobyProductList.Count == 0)
             {
                 MessageBox.Show("Load Moby first to export results.");
                 return;
@@ -1797,7 +1804,7 @@ namespace AcmeScanner
                     CSVResult.Append(signature.supportAutoPatching);
                     CSVResult.Append(",");
 
-                    if(signature.vulnerabilityVersions != null && signature.vulnerabilityVersions.Count > 0)
+                    if (signature.vulnerabilityVersions != null && signature.vulnerabilityVersions.Count > 0)
                     {
                         CSVResult.Append("TRUE");
                     }
@@ -1812,13 +1819,19 @@ namespace AcmeScanner
 
 
             string listFileName = "vapm-list.csv";
-            if(File.Exists(listFileName))
+            if (File.Exists(listFileName))
             {
                 File.Delete(listFileName);
             }
 
             File.WriteAllText(listFileName, CSVResult.ToString());
             MessageBox.Show("Results have been written to " + Path.Combine(Directory.GetCurrentDirectory(), listFileName));
+        }
+
+        private void btnUpdateSDK_Click_1(object sender, EventArgs e)
+        {
+            ShowLoading(true);
+            updateDBWorker.RunWorkerAsync(true);
         }
     }
 }

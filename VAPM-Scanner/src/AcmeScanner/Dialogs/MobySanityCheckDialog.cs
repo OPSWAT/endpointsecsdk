@@ -22,11 +22,8 @@ namespace AcmeScanner
     {
         private System.ComponentModel.BackgroundWorker runAllChecks;
         private System.ComponentModel.BackgroundWorker runSelectedChecks;
-        private JObject jsonContentAutoPatchingCheck;
-        private JObject jsonContentAppRemoverCheck;
         private Dictionary<string, sanityCheckSignature> hashmap;
         private List<string> checkedBoxes;
-        private List<(MaterialSkin.Controls.MaterialCheckbox, string)> checkboxScriptPairs;
 
         private void InitializeBackgroundWorker()
         {

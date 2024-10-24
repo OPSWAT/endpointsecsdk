@@ -20,7 +20,6 @@ namespace AcmeScanner
     public class ScannerListView : ListView
     {
         private ListViewColumnSorter lvwColumnSorter;
-        private CVEDetailsManager cveDetailsManager;
         public ScannerListView() : base()
         {
             this.OwnerDraw = true;
