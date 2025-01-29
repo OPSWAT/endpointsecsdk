@@ -333,24 +333,12 @@ namespace AcmeScanner
             string basePath = "catalog\\analog\\server\\";
 
             string productsPath = Path.Combine(basePath, "products.json");
-            string cvesPath = Path.Combine(basePath, "cves.json");
-            string patchAggregationPath = Path.Combine(basePath, "patch_aggregation.json");
-            string patchAssociationsPath = Path.Combine(basePath, "patch_associations.json");
-            string vulnAssociationsPath = Path.Combine(basePath, "vuln_associations.json");
             string binaryFilePath = Path.Combine("", "catalog.bin");
 
             DateTime productsLastModified = File.Exists(productsPath) ? new FileInfo(productsPath).LastWriteTime : DateTime.MinValue;
-            DateTime cvesLastModified = File.Exists(cvesPath) ? new FileInfo(cvesPath).LastWriteTime : DateTime.MinValue;
-            DateTime patchAggregationLastModified = File.Exists(patchAggregationPath) ? new FileInfo(patchAggregationPath).LastWriteTime : DateTime.MinValue;
-            DateTime patchAssociationsLastModified = File.Exists(patchAssociationsPath) ? new FileInfo(patchAssociationsPath).LastWriteTime : DateTime.MinValue;
-            DateTime vulnAssociationsLastModified = File.Exists(vulnAssociationsPath) ? new FileInfo(vulnAssociationsPath).LastWriteTime : DateTime.MinValue;
             DateTime binaryFileLastModified = File.Exists(binaryFilePath) ? new FileInfo(binaryFilePath).LastWriteTime : DateTime.MinValue;
 
-            if (productsLastModified > binaryFileLastModified ||
-            cvesLastModified > binaryFileLastModified ||
-            patchAggregationLastModified > binaryFileLastModified ||
-            patchAssociationsLastModified > binaryFileLastModified ||
-            vulnAssociationsLastModified > binaryFileLastModified)
+            if (productsLastModified < binaryFileLastModified)
             {
                 return true;
             }
@@ -738,13 +726,6 @@ namespace AcmeScanner
             int cveCount = 0;
             int installCount = 0;
 
-            // Ensure sigIds is populated
-            if (sigIds == null || sigIds.Count == 0)
-            {
-                staticScanResults = TaskScanAll.Scan(false);
-                sigIds = GetScanResults();
-            }
-
             await Task.Run(() =>
             {
                 // Parallel processing for staticProductList
@@ -762,7 +743,8 @@ namespace AcmeScanner
                             Text = signature.Name,
                             Tag = signature.Id
                         };
-                        lviCurrent.SubItems.Add(sigIds.Contains(signature.Id) ? "Yes" : "No");
+
+                        lviCurrent.SubItems.Add("No");
                         lviCurrent.SubItems.Add(signature.Id);
                         lviCurrent.SubItems.Add(signature.CVECount.ToString());
                         lviCurrent.SubItems.Add(supportsPatch ? "Yes" : "");
