@@ -69,12 +69,13 @@ namespace AcmeScanner
             InitializeComponent();
             //is used to perform async operations
             InitializeBackgroundWorker();
-            CheckLicenseFiles();
-            UpdateFilesOnStartup();
-            FillSDKlabels();
-            FillMobyLabels();
-            SetTitleWithFileVersion();
-            SetTabs(args);
+            if (CheckLicenseFiles())
+            {
+                UpdateFilesOnStartup();
+                FillSDKlabels();
+                SetTitleWithFileVersion();
+                SetTabs(args);
+            }
         }
 
 
@@ -130,10 +131,6 @@ namespace AcmeScanner
             this.Text = $"AcmeScanner - Version {fileVersion}";
         }
 
-        private void FillMobyLabels()
-        {
-            mobyTimestampData.Text = UpdateMobyFile.GetMobyTimestamp();
-        }
 
         //This function fills in the SDK labels present on the Offline and Patches tab.
         private void FillSDKlabels()
@@ -161,6 +158,7 @@ namespace AcmeScanner
             {
                 btnUpdateSDK.Text = "Download SDK";
             }
+
             // Check if patch.dat exists
             if (UpdateDBFiles.DoesDBExist())
             {
@@ -184,13 +182,20 @@ namespace AcmeScanner
         }
 
         //Check if license files are present in bin folder; does not allow to run program if not
-        private void CheckLicenseFiles()
+        private bool CheckLicenseFiles()
         {
+            bool result = false;
             if (!File.Exists("license.cfg") || !File.Exists("pass_key.txt"))
             {
                 ShowMessageDialog("This program requires the license.cfg and pass_key.txt to be in the running directory.  Please check and make sure this is correct.", false);
                 Close();
             }
+            else
+            {
+                result = true;
+            }
+
+            return result;
         }
 
         //
@@ -626,22 +631,7 @@ namespace AcmeScanner
                 btnLoadCVEs.Enabled = enabled;
 
             }
-            if (!MobyDownload)
-            {
-                btnUpdateMoby.UseAccentColor = true;
-                btnUpdateMoby.Text = "Download Moby";
-                btnLoadMoby.Enabled = false;
-                btnMobyViewTotals.Enabled = false;
-                btnRunChecksMoby.Enabled = false;
-                btnViewMobySubsets.Enabled = false;
-            }
-            else
-            {
-                btnLoadMoby.Enabled = enabled;
-                btnMobyViewTotals.Enabled = enabled;
-                btnRunChecksMoby.Enabled = enabled;
-                btnViewMobySubsets.Enabled = enabled;
-            }
+            
             if (staticProductList == null)
             {
                 btnDomainCSV.Enabled = false;
@@ -1393,13 +1383,6 @@ namespace AcmeScanner
         {
             ShowLoading(true);
             updateMobyWorker.RunWorkerAsync(true);
-        }
-
-        private void BtnRunChecksMoby_Click(object sender, EventArgs e)
-        {
-            MobySanityCheckDialog sanityCheckDialog = new MobySanityCheckDialog();
-            sanityCheckDialog.StartPosition = FormStartPosition.CenterParent;
-            sanityCheckDialog.ShowDialog();
         }
 
         private void Button1_Click(object sender, EventArgs e)
