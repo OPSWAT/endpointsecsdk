@@ -1,0 +1,8 @@
+.vs/
+vapm/
+sdk/
+license/*.*
+
+DetectProducts/x64
+SDKDownloader/x64
+x64
