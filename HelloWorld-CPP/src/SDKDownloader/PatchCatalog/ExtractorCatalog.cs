@@ -7,6 +7,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
 using SDKDownloader;
+using System;
 using System.IO;
 
 namespace SDKDownloadLib
@@ -23,6 +24,7 @@ namespace SDKDownloadLib
 
         private static void CopyWindowsClientFiles(string tempCatalogDir, string clientDBDir)
         {
+            Util.MakeDirs(clientDBDir);
             CopyExtractedFile(tempCatalogDir, clientDBDir, "analog/client", "v2mod.dat");
             CopyExtractedFile(tempCatalogDir, clientDBDir, "analog/client", "ap_checksum.dat");
             CopyExtractedFile(tempCatalogDir, clientDBDir, "analog/client", "patch.dat");
@@ -35,33 +37,26 @@ namespace SDKDownloadLib
         // 1 - Windows
         // 2 - Mac
         // 3 - Linux
-        public static void DownloadAndCopy(string rootDir, int platform, string architecture)
+        public static void DownloadAndCopy(string rootDir)
         {
             string tempArchiveDir = Util.GetCleanTempDir("OESIS-CATALOG-ARCHIVE");
+
             DownloadCatalog.Download(tempArchiveDir);
 
+
+            Console.WriteLine("Extracting Vulnerability and Patch Catalog");
             string tempCatalogDir = Util.GetCleanTempDir("OESIS-CATALOG");
             string archivePath = Path.Combine(tempArchiveDir, "analog.zip");
+
+            Util.CreateCleanDir(tempCatalogDir);
             System.IO.Compression.ZipFile.ExtractToDirectory(archivePath, tempCatalogDir);
             string catalogDir = Path.Combine(rootDir, "vapm");
 
             //
             // Either cleanup the directory or create a new one here
             //
-            Util.CreateCleanDir(catalogDir);
-
-            if (platform == 1)
-            {
-                CopyWindowsClientFiles(tempCatalogDir, catalogDir);
-            }
-            if (platform == 2)
-            {
-                // TODO: Copy Mac files
-            }
-            if (platform == 3)
-            {
-                // TODO: Copy Windows files
-            }
+            Console.WriteLine("Copying Windows files for to project Vulnerability and Patch Catalog");
+            CopyWindowsClientFiles(tempCatalogDir, catalogDir);
 
             //
             // Cleanup the temp paths

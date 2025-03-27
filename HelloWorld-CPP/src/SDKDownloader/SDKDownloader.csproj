@@ -100,7 +100,7 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>$(SolutionDir)\SDKDownloader\$(OutDir)\SDKDownloader.exe download-copy-files $(SolutionDir) $(PlatformName)</PostBuildEvent>
+    <PostBuildEvent>$(SolutionDir)\SDKDownloader\$(OutDir)\SDKDownloader.exe download-copy-files $(SolutionDir)</PostBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
     <PreBuildEvent>copy $(SolutionDir)\license $(ProjectDir)$(OutDir)</PreBuildEvent>

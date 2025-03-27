@@ -63,7 +63,8 @@ vector<wa_int> RegisterCallbacks()
 	wa_api_register_handler(json_config.c_str(), HandleInstallCallback, &handler_id);
 	handler_ids.push_back(handler_id);
 
-	json_config = L"{\"event_type\": 10}";
+	// Set this up to listen for the GetFirewallState(1007) event for Windows Firewall(288)
+	json_config = L"{\"event_type\": 10, \"config\": {\"signature\":288,\"method\":1007}}";
 	wa_api_register_handler(json_config.c_str(), HandleStateCallback, &handler_id);
 	handler_ids.push_back(handler_id);
 

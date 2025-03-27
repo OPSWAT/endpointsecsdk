@@ -90,6 +90,7 @@ namespace SDKDownloader
                         //
                         if (platformName == "Windows")
                         {
+                            Console.WriteLine("Downloading MetaDefender Endpoint Security SDK for Windows");
                             DownloadPlatform(platformElement, sdkDir);
                         }
                     }
@@ -117,16 +118,19 @@ namespace SDKDownloader
             return result;
         }
 
-        public static void Download(string sdkDir)
+        public static void Download(string destDir)
         {
-            string oesisFilePath = Path.Combine(sdkDir, "OESIS-Descriptior.xml");
+            Util.MakeDirs(destDir);
 
+            string oesisFilePath = Path.Combine(destDir, "OESIS-Descriptior.xml");
+
+            Console.WriteLine("Downloading MetaDefender Endpoint Security SDK Index");
             HttpClientUtils.DownloadFileSynchronous(GetSDKUrl(), oesisFilePath);
 
             if (File.Exists(oesisFilePath))
             {
                 string xmlString = File.ReadAllText(oesisFilePath);
-                DownloadReleases(sdkDir, xmlString);
+                DownloadReleases(destDir, xmlString);
             }
         }
 

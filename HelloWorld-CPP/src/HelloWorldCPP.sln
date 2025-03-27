@@ -11,8 +11,14 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SDKDownloader", "SDKDownloader\SDKDownloader.csproj", "{B91CB1E4-F12F-443A-B0B5-6F61190AAB3F}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ProcessCallback", "ProcessCallback\ProcessCallback.vcxproj", "{A25E0644-6996-4957-91D5-EEBB8EC2CD40}"
+	ProjectSection(ProjectDependencies) = postProject
+		{B91CB1E4-F12F-443A-B0B5-6F61190AAB3F} = {B91CB1E4-F12F-443A-B0B5-6F61190AAB3F}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RealTimeMonitoring", "RealTimeMonitoring\RealTimeMonitoring.vcxproj", "{9AAAA74A-6CF1-4AF0-8C93-AAE99B35C32E}"
+	ProjectSection(ProjectDependencies) = postProject
+		{B91CB1E4-F12F-443A-B0B5-6F61190AAB3F} = {B91CB1E4-F12F-443A-B0B5-6F61190AAB3F}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

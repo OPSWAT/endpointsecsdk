@@ -33,7 +33,6 @@ namespace SDKDownloader
                             extractionPath = Path.Combine(extractionPath, "sdk");
                         }
 
-                        Util.CreateCleanDir(extractionPath);
                         System.IO.Compression.ZipFile.ExtractToDirectory(archive, extractionPath);
                     }
                 }
@@ -47,10 +46,7 @@ namespace SDKDownloader
         public static string GetCleanTempDir(string dirName)
         {
             string tempPath;
-
             tempPath = Path.Combine(Path.GetTempPath(), dirName);
-            Util.CreateCleanDir(tempPath);
-
             return tempPath;
         }
         public static void CreateCleanDir(string dir)
@@ -60,6 +56,14 @@ namespace SDKDownloader
                 Directory.Delete(dir, true);
             }
             Directory.CreateDirectory(dir);
+        }
+
+        public static void MakeDirs(string dir)
+        {
+            if (!Directory.Exists(dir))
+            {
+                Directory.CreateDirectory(dir);
+            }
         }
 
         public static void CopyDirectory(string sourceDir, string destinationDir, bool recursive)
@@ -81,7 +85,7 @@ namespace SDKDownloader
             foreach (FileInfo file in dir.GetFiles())
             {
                 string targetFilePath = Path.Combine(destinationDir, file.Name);
-                file.CopyTo(targetFilePath);
+                file.CopyTo(targetFilePath,true);
             }
 
             // If recursive and copying subdirectories, recursively call this method

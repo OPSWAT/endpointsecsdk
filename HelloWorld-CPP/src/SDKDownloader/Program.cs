@@ -86,46 +86,43 @@ namespace SDKDownloader
             if (ValidateCommandLine(args))
             {
                 string command = args[0];
-                string architecture = "x64";
-
-                if (args.Length > 2)
-                {
-                    if (args[2] == "x86")
-                    {
-                        architecture = "win32";
-                    }
-                }
 
                 switch (command)
                 {
-                    case "download":
+                    case "clean":
                         {
                             string archivePath = args[1];
-                            archivePath = Path.Combine(archivePath, args[2]);
-                            string firstFile = FindFirstFile(archivePath);
+                            string sdkFolder = Path.Combine(archivePath, "sdk");
+                            string vapmFolder = Path.Combine(archivePath, "vapm");
 
-                            if (!IsFileUpdated(firstFile))
-                            {
-                                Util.CreateCleanDir(archivePath);
-                                DownloadSDK.Download(archivePath);
-                            }
+                            Directory.Delete(sdkFolder, true);
+                            Directory.Delete(vapmFolder, true);
+                            break;
+                        }
+                    case "download-windows":
+                        {
+                            string archivePath = args[1];
+                            DownloadSDK.Download(archivePath);
+                            DownloadCatalog.Download(archivePath);
                             break;
                         }
                     case "download-copy-files":
                         {
                             string rootPath = args[1];
-                            string rootArch = Path.Combine(rootPath, args[2]);
+                            string rootArch = Path.Combine(rootPath, args[1]);
                             string vapmDir = Path.Combine(rootPath, "vapm");
                             string firstFile = Path.Combine(vapmDir, "v2mod.dat");
 
                             if (!IsFileUpdated(firstFile))
                             {
-                                ExtractorCatalog.DownloadAndCopy(rootPath, 1, architecture); // Download Windows Platform
-                                ExtractorSDK.DownloadAndCopy(rootPath, 1, architecture);
+                                ExtractorCatalog.DownloadAndCopy(rootPath); // Download Windows Platform
+                                ExtractorSDK.DownloadAndCopy(rootPath);
                             }
                             break;
                         }
                 }
+
+                Console.WriteLine("SDKDownloader Complete");
             }
 
             return 0;

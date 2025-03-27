@@ -56,9 +56,12 @@ namespace SDKDownloadLib
             return GetTokenDownloadURL("analog.zip");
         }
 
-        public static void Download(string sdkDir)
+        public static void Download(string destDir)
         {
-            string catalogFilePath = Path.Combine(sdkDir, "analog.zip");
+            Util.MakeDirs(destDir);            
+            string catalogFilePath = Path.Combine(destDir, "analog.zip");
+
+            Console.WriteLine("Downloading Vulnerability and Patch Catalog");
             HttpClientUtils.DownloadFileSynchronous(GetCatalogURL(), catalogFilePath);
         }
 
