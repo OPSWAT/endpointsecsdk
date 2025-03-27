@@ -1,6 +1,6 @@
 .vs/
-vapm/
-sdk/
+vapm/*
+sdk/*
 license/*.*
 
 DetectProducts/x64
