@@ -35,7 +35,7 @@ namespace SDKDownloadLib
         // 1 - Windows
         // 2 - Mac
         // 3 - Linux
-        public static void DownloadAndCopy(string rootDir, int platform,string architecture)
+        public static void DownloadAndCopy(string rootDir, int platform, string architecture)
         {
             string tempArchiveDir = Util.GetCleanTempDir("OESIS-CATALOG-ARCHIVE");
             DownloadCatalog.Download(tempArchiveDir);
@@ -54,11 +54,11 @@ namespace SDKDownloadLib
             {
                 CopyWindowsClientFiles(tempCatalogDir, catalogDir);
             }
-            if(platform == 2)
+            if (platform == 2)
             {
                 // TODO: Copy Mac files
             }
-            if(platform == 3)
+            if (platform == 3)
             {
                 // TODO: Copy Windows files
             }

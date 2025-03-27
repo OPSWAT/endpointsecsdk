@@ -9,14 +9,12 @@
 using SDKDownloadLib;
 using System;
 using System.IO;
-using System.IO.Compression;
-using System.Threading;
 
 namespace SDKDownloader
 {
     internal class Program
     {
-  
+
         private static bool IsFileUpdated(string checkFile)
         {
             bool result = false;
@@ -40,8 +38,8 @@ namespace SDKDownloader
         private static string FindFirstFile(string dir)
         {
             string result = null;
-            
-            if(Directory.Exists(dir))
+
+            if (Directory.Exists(dir))
             {
                 string[] fileList = Directory.GetFiles(dir);
                 if (fileList != null && fileList.Length > 0)
@@ -85,12 +83,12 @@ namespace SDKDownloader
         static int Main(string[] args)
         {
             Console.WriteLine("SDKDownloader Started");
-            if(ValidateCommandLine(args))
+            if (ValidateCommandLine(args))
             {
                 string command = args[0];
                 string architecture = "x64";
 
-                if(args.Length > 2)
+                if (args.Length > 2)
                 {
                     if (args[2] == "x86")
                     {
@@ -98,7 +96,7 @@ namespace SDKDownloader
                     }
                 }
 
-                switch(command)
+                switch (command)
                 {
                     case "download":
                         {
@@ -118,7 +116,7 @@ namespace SDKDownloader
                             string rootPath = args[1];
                             string rootArch = Path.Combine(rootPath, args[2]);
                             string vapmDir = Path.Combine(rootPath, "vapm");
-                            string firstFile = Path.Combine(vapmDir,"v2mod.dat");
+                            string firstFile = Path.Combine(vapmDir, "v2mod.dat");
 
                             if (!IsFileUpdated(firstFile))
                             {

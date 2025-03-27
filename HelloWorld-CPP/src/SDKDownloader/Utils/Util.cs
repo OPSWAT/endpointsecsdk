@@ -57,7 +57,7 @@ namespace SDKDownloader
         {
             if (Directory.Exists(dir))
             {
-                Directory.Delete(dir,true);
+                Directory.Delete(dir, true);
             }
             Directory.CreateDirectory(dir);
         }

@@ -7,6 +7,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
 using SDKDownloader;
+using System;
 using System.IO;
 
 namespace SDKDownloadLib
@@ -18,9 +19,8 @@ namespace SDKDownloadLib
         // Please email me for the values for %download_token% and %SDK-URL%.   You need these values for the auto download to work
         // Email: christopher.seiler@opswat.com
         //
-        private static string DOWNLOAD_TOKEN = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJjdW9uZ2xlQWNjb3VudCIsImlhdCI6MTU4MjI3OTMzMn0.SI9tOtEHtytBoABciMynqtKCUUx1ZXIbq7O7UR-BJIPPcKoxEcN2vOMBS0zT4FE9ikTALHhSGCd3tu8yBOs3rQ";
         private static string VCR_URL = "https://vcr.opswat.com/gw/file/download/%file%?type=1&token=%token%";
-        
+
 
         //public static string THIRD_PARTY_VULNERABILITY_DB   = "vmod.dat";
         public static string THIRD_PARTY_VULNERABILITY_DB = "v2mod.dat";
@@ -30,14 +30,26 @@ namespace SDKDownloadLib
         public static string PATCH_CHECKSUMS_DB = "ap_checksum.dat";
 
 
+        private static string GetDownloadToken()
+        {
+            string sdk_token_file = "download_token.txt";
+            if (!File.Exists(sdk_token_file))
+            {
+                throw new Exception("Make sure there is a download token file available in the running directory: " + Directory.GetCurrentDirectory());
+            }
+
+            string downloadToken = File.ReadAllText(sdk_token_file);
+            return downloadToken;
+        }
+
         public static string GetTokenDownloadURL(string fileName)
         {
-            string result = VCR_URL.Replace("%token%", DOWNLOAD_TOKEN);
+            string result = VCR_URL.Replace("%token%", GetDownloadToken());
             result = result.Replace("%file%", fileName);
             return result;
         }
 
-     
+
 
         public static string GetCatalogURL()
         {
