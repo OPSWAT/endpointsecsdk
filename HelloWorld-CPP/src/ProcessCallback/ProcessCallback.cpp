@@ -31,33 +31,46 @@ int SetupOESIS()
 }
 
 
-int DetectProducts(wstring* result)
+void HandleProcessCallback(wa_wchar* json_event)
 {
-	const wstring json_in = L"{ \"input\" : { \"method\" : 0} }";
+	wcout << json_event;
+	wcout << L"\n---------------------------------------------------------------------------------\n";
+}
 
-	wa_wchar* json_out = NULL;
-	int rc = wa_api_invoke(json_in.c_str(), &json_out);
-	*result += json_out;
 
-	return rc;
+wa_int RegisterCallbacks()
+{
+	wa_int handler_id;
+
+	const wstring json_config = L"{\"event_type\": 1}";
+	wa_api_register_handler(json_config.c_str(), HandleProcessCallback, &handler_id);
+
+	return handler_id;
+}
+
+void UnRegisterCallbacks(wa_int handler_id)
+{
+	wa_api_unregister_handler(handler_id);
 }
 
 
 int main()
 {
+	//
+	// This will monitor processes and print out data for 2 minutes
+	//
 	if (WAAPI_SUCCESS(SetupOESIS()))
 	{
-		wstring productResult;
-
-		if (WAAPI_SUCCESS(DetectProducts(&productResult)))
+		wa_int handler_id = RegisterCallbacks();
+		
+		int timeToRun = 60 * 2; // 2 minutes
+		while (timeToRun > 0)
 		{
-			wcout << productResult;
+			Sleep(1000);
+			timeToRun--;
 		}
-		else
-		{
-			wcout << "Failed:";
-			wcout << productResult;
-		}
+	
+		UnRegisterCallbacks(handler_id);
 	}
 
 	return 0;
