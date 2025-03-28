@@ -15,7 +15,7 @@ int SetupOESIS()
 {
 	wstring pass_key = L"";
 	pass_key = Utils::ReadFileContentIntoWString(Utils::GetCurrentFolderPath() + L"/pass_key.txt");
-	const wstring json_config = L"{ \"config\" : { \"passkey_string\": \"" + pass_key + L"\", \"enable_pretty_print\": true, \"online_mode\": true, \"silent_mode\": true } }";
+	const wstring json_config = L"{ \"config\" : { \"passkey_string\": \"" + pass_key + L"\", \"enable_pretty_print\": true, \"silent_mode\": true } }";
 
 
 	wa_wchar* json_out = NULL;
