@@ -45,6 +45,17 @@ Scans the system for installed security products (e.g., firewalls) and checks if
 
 ---
 
+### GetMissingPatches List missing patches found on the endpoint
+This will scan for each patch product and list the missing patches on the linux system
+
+**Files:**
+- `GetMissingPatches.cpp`: Core logic of GetMissingPatches.
+- `Utils.cpp`: Utility functions for string processing.
+- `SDKInit.cpp`: Contains functions that setup the SDK configuration
+
+---
+
+
 ## Coming Soon
 Additional examples and advanced use cases will be added to this repository over time.
 
