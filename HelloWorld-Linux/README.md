@@ -55,6 +55,16 @@ This will scan for each patch product and list the missing patches on the linux 
 
 ---
 
+### GetOSInfo List missing patches found on the endpoint
+This will return the information of the OS
+
+**Files:**
+- `GetOSInfo.cpp`: Core logic of GetOSInfo.
+- `Utils.cpp`: Utility functions for string processing.
+- `SDKInit.cpp`: Contains functions that setup the SDK configuration
+
+---
+
 
 ## Coming Soon
 Additional examples and advanced use cases will be added to this repository over time.
