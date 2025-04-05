@@ -7,9 +7,9 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
 
-#ifndef SDK_FILES_H
-#define SDK_FILES_H
+#ifndef CATALOG_FILES_H
+#define CATALOG_FILES_H
 
-void DownloadAndExtractSDKFiles();
+void DownloadAndExtractCatalogFiles();
 
-#endif // SDK_FILES_H
+#endif // CATALOG_FILES_H

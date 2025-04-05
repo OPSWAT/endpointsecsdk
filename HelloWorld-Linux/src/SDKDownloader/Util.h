@@ -44,10 +44,8 @@ void UntarPackage(const std::string& filePath, const std::string& filename);
 // Delete a directory and all its contents
 void DeleteDirectory(const std::string& dirPath);
 
-// Move the SDK directory one level up from the current directory
-void MoveSDKUpOneLevel();
-
 bool CreateDirectory(const std::string& dirPath);
 
+void CopyExtractedBinaries(const std::string& sourcePath, const std::string& destPath);
 
 #endif // DOWNLOADER_H

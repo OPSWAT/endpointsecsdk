@@ -111,24 +111,6 @@ void DeleteDirectory(const std::string& dirPath) {
     }
 }
 
-void MoveSDKUpOneLevel() {
-    fs::path currentDir = fs::current_path();
-    fs::path sdkPath = currentDir / "sdk";
-    fs::path newLocation = currentDir.parent_path() / "sdk";
-
-    try {
-        if (!fs::exists(sdkPath)) {
-            std::cerr << "[ERROR] 'sdk' directory not found in current directory.\n";
-            return;
-        }
-
-        fs::rename(sdkPath, newLocation);
-        std::cout << "[✓] Moved sdk directory to: " << newLocation << "\n";
-    }
-    catch (const fs::filesystem_error& ex) {
-        std::cerr << "[ERROR] Failed to move sdk directory: " << ex.what() << "\n";
-    }
-}
 
 bool CreateDirectory(const std::string& dirPath) {
     try {
@@ -153,4 +135,38 @@ bool CreateDirectory(const std::string& dirPath) {
         return false;
     }
 }
+
+void CopyExtractedBinaries(const std::string& sourcePath, const std::string& destPath) {
+    try {
+        // Ensure destination directory exists
+        fs::create_directories(destPath);
+
+        // Append trailing slashes to ensure correct syntax
+        std::string src = sourcePath;
+        if (src.back() != '/')
+            src += '/';
+
+        std::string dst = destPath;
+        if (dst.back() != '/')
+            dst += '/';
+
+        // Form the command: copy everything inside the source dir to dest dir
+        std::string cmd = "cp -a \"" + src + ".\" \"" + dst + "\"";
+
+        std::cout << "[*] Copying using command: " << cmd << "\n";
+        int result = std::system(cmd.c_str());
+
+        if (result != 0) {
+            std::cerr << "[ERROR] Copy command failed with code: " << result << "\n";
+        }
+        else {
+            std::cout << "[✓] Copy completed successfully.\n";
+        }
+
+    }
+    catch (const fs::filesystem_error& ex) {
+        std::cerr << "[ERROR] Filesystem error: " << ex.what() << "\n";
+    }
+}
+
 

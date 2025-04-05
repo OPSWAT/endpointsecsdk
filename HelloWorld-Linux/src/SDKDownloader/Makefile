@@ -7,7 +7,7 @@ LDFLAGS = -lcurl -ltinyxml2
 TARGET = SDKDownloader
 
 # Source files
-SRC = SDKDownloader.cpp SDKFiles.cpp Util.cpp
+SRC = SDKDownloader.cpp SDKFiles.cpp Util.cpp CatalogFiles.cpp
 
 # Default target
 all: $(TARGET)

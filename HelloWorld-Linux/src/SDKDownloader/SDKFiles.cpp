@@ -95,38 +95,6 @@ void ParseAndHandleLinuxZips(const std::string& xmlContent) {
 }
 
 
-void CopyExtractedBinaries(const std::string& sourcePath, const std::string& destPath) {
-    try {
-        // Ensure destination directory exists
-        fs::create_directories(destPath);
-
-        // Append trailing slashes to ensure correct syntax
-        std::string src = sourcePath;
-        if (src.back() != '/')
-            src += '/';
-
-        std::string dst = destPath;
-        if (dst.back() != '/')
-            dst += '/';
-
-        // Form the command: copy everything inside the source dir to dest dir
-        std::string cmd = "cp -a \"" + src + ".\" \"" + dst + "\"";
-
-        std::cout << "[*] Copying using command: " << cmd << "\n";
-        int result = std::system(cmd.c_str());
-
-        if (result != 0) {
-            std::cerr << "[ERROR] Copy command failed with code: " << result << "\n";
-        }
-        else {
-            std::cout << "[✓] Copy completed successfully.\n";
-        }
-
-    }
-    catch (const fs::filesystem_error& ex) {
-        std::cerr << "[ERROR] Filesystem error: " << ex.what() << "\n";
-    }
-}
 void CopySDKFiles()
 {
     //
@@ -215,8 +183,6 @@ std::string GetDownloadXML() {
 
 void DownloadAndExtractSDKFiles()
 {
-    DeleteDirectory("stage"); // Delete the stage directory and its contents
-    CreateDirectory("stage");
 
     string xml = GetDownloadXML();
 
@@ -230,15 +196,10 @@ void DownloadAndExtractSDKFiles()
 
 
     DeleteDirectory("sdk"); // Delete the stage directory and its contents
-    DeleteDirectory("../sdk"); // Delete the stage directory and its contents
-
+ 
     CopySDKFiles();
     CopyIncFiles();
     CopyResourceFiles();
     CopyDocsFiles();
-
-    MoveSDKUpOneLevel();
-
-    DeleteDirectory("stage"); // Delete the stage directory and its contents
 
 }
