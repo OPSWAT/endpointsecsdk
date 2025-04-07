@@ -1,0 +1,58 @@
+#!/bin/bash
+
+# Check to see if the license file has been put in the license directory
+if [ ! -e "license/license.cfg" ]; then
+    echo "Make sure that the license files have been extracted to the license directory. Once that is complete run this command again."
+    exit 1
+fi
+
+# Install Homebrew if not already installed
+if ! command -v brew &> /dev/null; then
+    echo "Homebrew not found. Installing Homebrew..."
+    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+    
+    # Add Homebrew to PATH for M1 Macs
+    if [[ $(uname -m) == 'arm64' ]]; then
+        echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> ~/.zprofile
+        eval "$(/opt/homebrew/bin/brew shellenv)"
+    fi
+fi
+
+# Install required packages
+brew install nlohmann-json
+brew install tinyxml2
+brew install curl
+brew install pkg-config
+
+# Clean up existing directories before starting
+rm -rf stage
+echo "Cleaning up old files from previous runs..."
+rm -rf sdk
+mkdir -p sdk/lib/{x64,arm64} sdk/inc sdk/docs
+
+# Build the SDKDownloader
+echo "Building SDKDownloader..."
+cd SDKDownloader || { echo "Error: SDKDownloader directory not found"; exit 1; }
+make clean
+make
+if [ ! -f "./SDKDownloader" ]; then
+    echo "Error: Failed to build SDKDownloader"
+    exit 1
+fi
+
+# Run the SDKDownloader
+echo "Running SDKDownloader..."
+./SDKDownloader || { echo "Error executing SDKDownloader"; exit 1; }
+
+cd ..
+
+# Clean up temporary files
+echo "Cleaning up temporary files..."
+rm -rf stage
+
+echo "SDK installation complete!"
+echo "SDK files are located in:"
+echo "  - Library files: $(pwd)/sdk/lib/{x64,arm64}"
+echo "  - Include files: $(pwd)/sdk/inc"
+echo "  - Documentation: $(pwd)/sdk/docs"
+echo "  - VAPM files: $(pwd)/vapm" 
