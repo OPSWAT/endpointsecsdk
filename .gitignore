@@ -17,3 +17,4 @@ obj/
 .vs/
 /test.test
 /temp
+.DS_Store
