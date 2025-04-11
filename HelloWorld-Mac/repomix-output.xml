@@ -1,0 +1,1999 @@
+This file is a merged representation of the entire codebase, combined into a single document by Repomix.
+
+<file_summary>
+This section contains a summary of this file.
+
+<purpose>
+This file contains a packed representation of the entire repository's contents.
+It is designed to be easily consumable by AI systems for analysis, code review,
+or other automated processes.
+</purpose>
+
+<file_format>
+The content is organized as follows:
+1. This summary section
+2. Repository information
+3. Directory structure
+4. Repository files, each consisting of:
+  - File path as an attribute
+  - Full contents of the file
+</file_format>
+
+<usage_guidelines>
+- This file should be treated as read-only. Any changes should be made to the
+  original repository files, not this packed version.
+- When processing this file, use the file path to distinguish
+  between different files in the repository.
+- Be aware that this file may contain sensitive information. Handle it with
+  the same level of security as you would the original repository.
+</usage_guidelines>
+
+<notes>
+- Some files may have been excluded based on .gitignore rules and Repomix's configuration
+- Binary files are not included in this packed representation. Please refer to the Repository Structure section for a complete list of file paths, including binary files
+- Files matching patterns in .gitignore are excluded
+- Files matching default ignore patterns are excluded
+- Files are sorted by Git change count (files with more changes are at the bottom)
+</notes>
+
+<additional_info>
+
+</additional_info>
+
+</file_summary>
+
+<directory_structure>
+src/
+  catalog_downloader.cpp
+  catalog_downloader.h
+  download_manager.cpp
+  download_manager.h
+  main.cpp
+  package_extractor.cpp
+  package_extractor.h
+  sdk_downloader.cpp
+  sdk_downloader.h
+  xml_parser.cpp
+  xml_parser.h
+CMakeLists.txt
+</directory_structure>
+
+<files>
+This section contains the contents of the repository's files.
+
+<file path="src/catalog_downloader.cpp">
+#include "catalog_downloader.h"
+#include <filesystem>
+#include <iostream>
+
+namespace fs = std::filesystem;
+
+CatalogDownloader::CatalogDownloader(const std::string& vapmDir, const std::string& workDir)
+    : vapmDirectory_(vapmDir),
+      workingDirectory_(workDir) {
+    
+    stageDirectory_ = workingDirectory_ + "/stage";
+}
+
+bool CatalogDownloader::downloadAndSetupCatalog(const std::string& downloadToken) {
+    try {
+        // Create directories
+        fs::create_directories(stageDirectory_);
+        
+        // Download analog.zip
+        std::string catalogUrl = "https://vcr.opswat.com/gw/file/download/analog.zip?type=1&token=" + downloadToken;
+        std::string catalogOutputPath = stageDirectory_ + "/analog.zip";
+        
+        std::cout << "Downloading catalog package (analog.zip)" << std::endl;
+        
+        if (!downloadManager_.downloadToFile(catalogUrl, catalogOutputPath)) {
+            std::cerr << "Failed to download catalog package" << std::endl;
+            return false;
+        }
+        
+        // Extract the package
+        std::string extractPath = stageDirectory_ + "/analog";
+        if (!packageExtractor_.extractPackage(catalogOutputPath, extractPath)) {
+            std::cerr << "Failed to extract catalog package" << std::endl;
+            return false;
+        }
+        
+        // Copy catalog files to VAPM directory
+        if (fs::exists(extractPath + "/client")) {
+            std::cout << "Setting up catalog files..." << std::endl;
+            
+            // Create VAPM directory
+            fs::create_directories(vapmDirectory_);
+            
+            // Clear existing content
+            if (fs::exists(vapmDirectory_)) {
+                for (const auto& entry : fs::directory_iterator(vapmDirectory_)) {
+                    fs::remove_all(entry.path());
+                }
+            }
+            
+            // Copy client directory
+            fs::path sourcePath = fs::path(extractPath) / "client";
+            
+            packageExtractor_.copyExtractedFiles(extractPath, "", vapmDirectory_);
+            
+            std::cout << "Catalog files installed successfully to: " << fs::absolute(vapmDirectory_) << std::endl;
+        } else {
+            std::cerr << "Client directory not found in extracted catalog package" << std::endl;
+            return false;
+        }
+        
+        return true;
+    } catch (const std::exception& e) {
+        std::cerr << "Error downloading catalog files: " << e.what() << std::endl;
+        return false;
+    }
+}
+</file>
+
+<file path="src/catalog_downloader.h">
+/**
+ * @file catalog_downloader.h
+ * @brief Manages downloading catalog files
+ */
+
+#pragma once
+
+#include "download_manager.h"
+#include "package_extractor.h"
+#include <string>
+
+/**
+ * @class CatalogDownloader
+ * @brief Downloads and extracts OESIS catalog files
+ * 
+ * This class is responsible for downloading and setting up
+ * the catalog files (analog.zip) used by the OESIS SDK.
+ */
+class CatalogDownloader {
+public:
+    /**
+     * @brief Constructor
+     * 
+     * @param vapmDir Directory where VAPM files will be stored
+     * @param workDir Temporary working directory for downloads and extraction
+     */
+    CatalogDownloader(const std::string& vapmDir, const std::string& workDir);
+    
+    /**
+     * @brief Download and setup catalog files
+     * 
+     * @param downloadToken The token used for authentication with the download server
+     * @return true if operation was successful, false otherwise
+     */
+    bool downloadAndSetupCatalog(const std::string& downloadToken);
+
+private:
+    DownloadManager downloadManager_;
+    PackageExtractor packageExtractor_;
+    
+    std::string vapmDirectory_;
+    std::string workingDirectory_;
+    std::string stageDirectory_;
+};
+</file>
+
+<file path="src/download_manager.cpp">
+#include "download_manager.h"
+#include <curl/curl.h>
+#include <fstream>
+#include <iostream>
+
+// Callback for writing data to a string
+static size_t writeToStringCallback(void* content, size_t size, size_t nmemb, std::string* userp) {
+    userp->append(static_cast<char*>(content), size * nmemb);
+    return size * nmemb;
+}
+
+// Callback for writing data to a file
+static size_t writeToFileCallback(void* content, size_t size, size_t nmemb, FILE* file) {
+    return fwrite(content, size, nmemb, file);
+}
+
+// Progress callback
+static int progressCallback(void* clientp, double dltotal, double dlnow, double ultotal, double ulnow) {
+    if (clientp && dltotal > 0) {
+        auto callback = static_cast<std::function<void(double)>*>(clientp);
+        (*callback)(dlnow / dltotal * 100.0);
+    }
+    return 0;
+}
+
+void* DownloadManager::initCurl(const std::string& url) {
+    CURL* curl = curl_easy_init();
+    if (!curl) {
+        std::cerr << "Failed to initialize curl" << std::endl;
+        return nullptr;
+    }
+
+    curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+    curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
+    curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);
+    curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L);
+    curl_easy_setopt(curl, CURLOPT_USERAGENT, "OESIS-SDK-Downloader/1.0");
+
+    return curl;
+}
+
+bool DownloadManager::downloadToFile(const std::string& url, const std::string& outputPath,
+                                     std::function<void(double)> progressCallback) {
+    CURL* curl = static_cast<CURL*>(initCurl(url));
+    if (!curl) return false;
+
+    // Open the file for writing
+    FILE* file = fopen(outputPath.c_str(), "wb");
+    if (!file) {
+        std::cerr << "Failed to open file for writing: " << outputPath << std::endl;
+        curl_easy_cleanup(curl);
+        return false;
+    }
+
+    // Set write callback
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeToFileCallback);
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, file);
+
+    // Set progress callback if provided
+    std::function<void(double)>* progressCallbackPtr = nullptr;
+    if (progressCallback) {
+        progressCallbackPtr = new std::function<void(double)>(progressCallback);
+        curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 0L);
+        curl_easy_setopt(curl, CURLOPT_PROGRESSFUNCTION, ::progressCallback);
+        curl_easy_setopt(curl, CURLOPT_PROGRESSDATA, progressCallbackPtr);
+    }
+
+    // Perform the request
+    std::cout << "Downloading: " << url << std::endl;
+    CURLcode res = curl_easy_perform(curl);
+    
+    // Close the file
+    fclose(file);
+    
+    // Clean up
+    curl_easy_cleanup(curl);
+    delete progressCallbackPtr;
+    
+    if (res != CURLE_OK) {
+        std::cerr << "Download failed: " << curl_easy_strerror(res) << std::endl;
+        return false;
+    }
+    
+    return true;
+}
+
+std::string DownloadManager::downloadToString(const std::string& url) {
+    CURL* curl = static_cast<CURL*>(initCurl(url));
+    if (!curl) return "";
+    
+    std::string buffer;
+    
+    // Set write callback
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeToStringCallback);
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, &buffer);
+    
+    // Perform the request
+    CURLcode res = curl_easy_perform(curl);
+    
+    // Clean up
+    curl_easy_cleanup(curl);
+    
+    if (res != CURLE_OK) {
+        std::cerr << "Download failed: " << curl_easy_strerror(res) << std::endl;
+        return "";
+    }
+    
+    return buffer;
+}
+</file>
+
+<file path="src/download_manager.h">
+/**
+ * @file download_manager.h
+ * @brief Handles HTTP downloads using libcurl
+ */
+
+#pragma once
+
+#include <string>
+#include <functional>
+#include <memory>
+
+/**
+ * @class DownloadManager
+ * @brief Manages downloads from HTTP sources using libcurl
+ * 
+ * This class provides methods to download files from URLs and save them
+ * to the local filesystem or return their content as a string.
+ */
+class DownloadManager {
+public:
+    /**
+     * @brief Download a file from a URL to a local file
+     * 
+     * @param url The source URL
+     * @param outputPath The local file path where the downloaded file will be saved
+     * @param progressCallback Optional callback function for download progress updates
+     * @return true if download was successful, false otherwise
+     */
+    bool downloadToFile(const std::string& url, const std::string& outputPath, 
+                        std::function<void(double)> progressCallback = nullptr);
+    
+    /**
+     * @brief Download content from a URL and return it as a string
+     * 
+     * @param url The source URL
+     * @return std::string The downloaded content or empty string on failure
+     */
+    std::string downloadToString(const std::string& url);
+
+private:
+    /**
+     * @brief Initialize curl for a request
+     * 
+     * @param url The URL to access
+     * @return void* The initialized curl handle or nullptr on failure
+     */
+    void* initCurl(const std::string& url);
+};
+</file>
+
+<file path="src/main.cpp">
+#include "sdk_downloader.h"
+#include <iostream>
+#include <filesystem>
+#include <string>
+
+namespace fs = std::filesystem;
+
+void printUsage(const char* programName) {
+    std::cout << "Usage: " << programName << " [options]" << std::endl;
+    std::cout << "Options:" << std::endl;
+    std::cout << "  --sdk-dir <path>     : Set the SDK installation directory (default: ../sdk)" << std::endl;
+    std::cout << "  --vapm-dir <path>    : Set the VAPM installation directory (default: ../vapm)" << std::endl;
+    std::cout << "  --work-dir <path>    : Set the working directory (default: ./work)" << std::endl;
+    std::cout << "  --license-dir <path> : Set the license directory (default: ./license)" << std::endl;
+    std::cout << "  --flat-sdk <path>    : Create a flat SDK structure in the specified directory" << std::endl;
+    std::cout << "  --help               : Display this help message" << std::endl;
+}
+
+int main(int argc, char** argv) {
+    // Default to relative paths from the executable location
+    std::string sdkDir = "../sdk";
+    std::string vapmDir = "../vapm";
+    std::string workDir = "./work";
+    std::string licenseDir = "./license";
+    std::string flatSdkDir = ""; // Empty by default, meaning don't create flat SDK
+    
+    // Parse command line arguments
+    for (int i = 1; i < argc; i++) {
+        std::string arg = argv[i];
+        
+        if (arg == "--help") {
+            printUsage(argv[0]);
+            return 0;
+        } else if (arg == "--sdk-dir" && i + 1 < argc) {
+            sdkDir = argv[++i];
+        } else if (arg == "--vapm-dir" && i + 1 < argc) {
+            vapmDir = argv[++i];
+        } else if (arg == "--work-dir" && i + 1 < argc) {
+            workDir = argv[++i];
+        } else if (arg == "--license-dir" && i + 1 < argc) {
+            licenseDir = argv[++i];
+        } else if (arg == "--flat-sdk" && i + 1 < argc) {
+            flatSdkDir = argv[++i];
+        } else {
+            std::cerr << "Unknown option: " << arg << std::endl;
+            printUsage(argv[0]);
+            return 1;
+        }
+    }
+    
+    std::cout << "OESIS SDK Downloader" << std::endl;
+    std::cout << "===================" << std::endl;
+    std::cout << "SDK will be installed to: " << fs::absolute(sdkDir) << std::endl;
+    std::cout << "VAPM will be installed to: " << fs::absolute(vapmDir) << std::endl;
+    std::cout << "Using license files from: " << fs::absolute(licenseDir) << std::endl;
+    if (!flatSdkDir.empty()) {
+        std::cout << "Flat SDK will be created at: " << fs::absolute(flatSdkDir) << std::endl;
+    }
+    
+    // Check if license directory exists
+    if (!fs::exists(licenseDir) || 
+        !fs::exists(fs::path(licenseDir) / "download_token.txt")) {
+        std::cerr << "Error: license directory or download_token.txt not found at " << licenseDir << std::endl;
+        std::cerr << "Please make sure you have extracted the license files to the license directory" << std::endl;
+        std::cerr << "The license directory should contain at least:" << std::endl;
+        std::cerr << "  - download_token.txt" << std::endl;
+        std::cerr << "  - license.cfg" << std::endl;
+        std::cerr << "  - pass_key.txt" << std::endl;
+        return 1;
+    }
+    
+    // Initialize the SDK downloader
+    SdkDownloader downloader(sdkDir, vapmDir, workDir, licenseDir, flatSdkDir);
+    
+    // Start the download and setup process
+    std::cout << "Starting SDK download and setup..." << std::endl;
+    if (!downloader.downloadAndSetupSdk()) {
+        std::cerr << "SDK setup failed" << std::endl;
+        return 1;
+    }
+    
+    return 0;
+}
+</file>
+
+<file path="src/package_extractor.cpp">
+#include "package_extractor.h"
+#include <iostream>
+#include <fstream>
+#include <vector>
+#include <cstring>
+#include <filesystem>
+#include <algorithm>
+
+#ifdef _WIN32
+#include <Windows.h>
+#include <direct.h>
+#define MKDIR(dir) _mkdir(dir)
+#else
+#include <sys/stat.h>
+#include <unistd.h>
+#define MKDIR(dir) mkdir(dir, 0755)
+#endif
+
+namespace fs = std::filesystem;
+
+PackageExtractor::PackageExtractor() {
+}
+
+PackageExtractor::~PackageExtractor() {
+    // Cleanup if needed
+}
+
+bool PackageExtractor::extractPackage(const std::string& packageFile, const std::string& extractDir) {
+    std::cout << "Extracting package: " << packageFile << " to: " << extractDir << std::endl;
+    
+    // Create extraction directory if it doesn't exist
+    fs::create_directories(extractDir);
+    
+    // Extract based on file extension
+    std::string extension = fs::path(packageFile).extension().string();
+    
+    if (extension == ".zip" || extension == ".ZIP") {
+        return extractZipPackage(packageFile, extractDir);
+    } else if (extension == ".tar" || extension == ".tgz" || 
+               extension == ".gz" || extension == ".bz2" || 
+               extension == ".xz") {
+        return extractTarPackage(packageFile, extractDir);
+    } else {
+        std::cerr << "Unsupported package format: " << extension << std::endl;
+        return false;
+    }
+}
+
+bool PackageExtractor::extractZipPackage(const std::string& packageFile, const std::string& extractDir) {
+    std::string command;
+    
+    #ifdef _WIN32
+        // Windows: Use PowerShell's Expand-Archive
+        command = "powershell -command \"Expand-Archive -Path '" + packageFile + 
+                  "' -DestinationPath '" + extractDir + "' -Force\"";
+    #else
+        // macOS/Linux: Use unzip
+        command = "unzip -o '" + packageFile + "' -d '" + extractDir + "'";
+    #endif
+    
+    std::cout << "Running extraction command: " << command << std::endl;
+    int result = system(command.c_str());
+    
+    if (result != 0) {
+        std::cerr << "Failed to extract zip package. Error code: " << result << std::endl;
+        // Try alternative method if available
+        #ifndef _WIN32
+            // Try using Python's zipfile module as a fallback
+            std::string pyCommand = "python3 -c \"import zipfile; zipfile.ZipFile('" + 
+                                   packageFile + "').extractall('" + extractDir + "')\"";
+            std::cout << "Trying alternative extraction method: " << pyCommand << std::endl;
+            result = system(pyCommand.c_str());
+            
+            if (result != 0) {
+                std::cerr << "Alternative extraction also failed. Error code: " << result << std::endl;
+                return false;
+            }
+        #else
+            return false;
+        #endif
+    }
+    
+    std::cout << "Package extraction completed successfully" << std::endl;
+    return true;
+}
+
+bool PackageExtractor::extractTarPackage(const std::string& packageFile, const std::string& extractDir) {
+    std::string command;
+    
+    // Determine tar flags based on extension
+    std::string extension = fs::path(packageFile).extension().string();
+    std::string flags = "xf";
+    
+    if (extension == ".gz" || extension == ".tgz") {
+        flags = "xzf";
+    } else if (extension == ".bz2") {
+        flags = "xjf";
+    } else if (extension == ".xz") {
+        flags = "xJf";
+    }
+    
+    #ifdef _WIN32
+        // Windows might not have tar, try to use 7z if available
+        command = "7z x \"" + packageFile + "\" -o\"" + extractDir + "\" -y";
+    #else
+        // macOS/Linux: Use tar with appropriate flags
+        command = "tar " + flags + " '" + packageFile + "' -C '" + extractDir + "'";
+    #endif
+    
+    std::cout << "Running extraction command: " << command << std::endl;
+    int result = system(command.c_str());
+    
+    if (result != 0) {
+        std::cerr << "Failed to extract tar package. Error code: " << result << std::endl;
+        
+        // Try alternative method if first one failed
+        #ifdef _WIN32
+            // Try Python's tarfile module as a fallback on Windows
+            std::string pyCommand = "python -c \"import tarfile; tarfile.open('" + 
+                                   packageFile + "').extractall('" + extractDir + "')\"";
+            std::cout << "Trying alternative extraction method: " << pyCommand << std::endl;
+            result = system(pyCommand.c_str());
+            
+            if (result != 0) {
+                std::cerr << "Alternative extraction also failed. Error code: " << result << std::endl;
+                return false;
+            }
+        #else
+            // On Unix systems, try a different tar implementation
+            if (extension == ".gz" || extension == ".tgz") {
+                command = "gunzip -c '" + packageFile + "' | tar -x -C '" + extractDir + "'";
+            } else if (extension == ".bz2") {
+                command = "bunzip2 -c '" + packageFile + "' | tar -x -C '" + extractDir + "'";
+            } else if (extension == ".xz") {
+                command = "unxz -c '" + packageFile + "' | tar -x -C '" + extractDir + "'";
+            } else {
+                return false;
+            }
+            
+            std::cout << "Trying alternative extraction method: " << command << std::endl;
+            result = system(command.c_str());
+            
+            if (result != 0) {
+                std::cerr << "Alternative extraction also failed. Error code: " << result << std::endl;
+                return false;
+            }
+        #endif
+    }
+    
+    std::cout << "Package extraction completed successfully" << std::endl;
+    return true;
+}
+
+std::string PackageExtractor::findBinDirectory(const std::string& extractDir) {
+    // Try to locate the bin directory in the extracted files
+    std::vector<std::string> possibleBinDirs = {
+        "/bin",
+        "/Bin",
+        "/lib",
+        "/Lib"
+    };
+
+    // First, try to find directories directly
+    for (const auto& binDir : possibleBinDirs) {
+        std::string fullPath = extractDir + binDir;
+        if (fs::exists(fullPath) && fs::is_directory(fullPath)) {
+            return fullPath;
+        }
+    }
+
+    // Then, try to find in subdirectories (one level)
+    for (const auto& entry : fs::directory_iterator(extractDir)) {
+        if (entry.is_directory()) {
+            for (const auto& binDir : possibleBinDirs) {
+                std::string fullPath = entry.path().string() + binDir;
+                if (fs::exists(fullPath) && fs::is_directory(fullPath)) {
+                    return fullPath;
+                }
+            }
+        }
+    }
+
+    // If we can't find it, look for the deepest directory with library files
+    for (const auto& entry : fs::recursive_directory_iterator(extractDir)) {
+        if (entry.is_regular_file()) {
+            std::string filename = entry.path().filename().string();
+            if (filename.find("waapi") != std::string::npos &&
+                (filename.find(".dll") != std::string::npos ||
+                 filename.find(".so") != std::string::npos ||
+                 filename.find(".dylib") != std::string::npos)) {
+                return entry.path().parent_path().string();
+            }
+        }
+    }
+
+    // Not found
+    std::cerr << "Warning: Could not find bin directory in extracted files" << std::endl;
+    return "";
+}
+
+bool PackageExtractor::copyExtractedFiles(const std::string& extractDir, const std::string& sdkDir, const std::string& vapmDir) {
+    try {
+        // Create necessary directories
+        fs::create_directories(fs::path(sdkDir) / "lib");
+        fs::create_directories(fs::path(sdkDir) / "include");
+        fs::create_directories(vapmDir);
+        
+        // Get current platform and architecture
+        std::string platform = getCurrentPlatform();
+        std::string arch = getCurrentArchitecture();
+        
+        std::cout << "Detected platform: " << platform << ", architecture: " << arch << std::endl;
+        
+        // Copy include files regardless of platform
+        copyIncludeFiles(extractDir, sdkDir);
+        
+        // Copy platform-specific libraries
+        if (platform == "windows") {
+            copyWindowsLibs(extractDir, sdkDir, arch);
+        } else if (platform == "macos") {
+            copyMacOsLibs(extractDir, sdkDir, arch);
+        } else if (platform == "linux") {
+            copyLinuxLibs(extractDir, sdkDir, arch);
+        } else {
+            std::cerr << "Unknown platform: " << platform << std::endl;
+            return false;
+        }
+        
+        // Copy VAPM files
+        copyVapmFiles(extractDir, vapmDir);
+        
+        return true;
+    } catch (const std::exception& e) {
+        std::cerr << "Error copying files: " << e.what() << std::endl;
+        return false;
+    }
+}
+
+void PackageExtractor::copyWindowsLibs(const std::string& extractDir, const std::string& sdkDir, const std::string& arch) {
+    std::cout << "Copying Windows libraries..." << std::endl;
+    
+    // Target directory
+    fs::path targetLibDir = fs::path(sdkDir) / "lib";
+    fs::create_directories(targetLibDir);
+    
+    // Use glob patterns to find all DLL and LIB files recursively
+    std::vector<fs::path> libFiles;
+    bool foundLibs = false;
+    
+    try {
+        std::cout << "Searching for " << arch << " .dll and .lib files in: " << extractDir << std::endl;
+        
+        // Search recursively for all DLL and LIB files
+        for (const auto& entry : fs::recursive_directory_iterator(extractDir)) {
+            if (entry.is_regular_file()) {
+                std::string ext = entry.path().extension().string();
+                if (ext == ".dll" || ext == ".lib") {
+                    // Check if it's in an architecture-specific directory
+                    std::string pathStr = entry.path().string();
+                    std::transform(pathStr.begin(), pathStr.end(), pathStr.begin(), ::tolower);
+                    
+                    // Only copy files from directories matching our architecture or from non-architecture specific paths
+                    if (pathStr.find("/" + arch + "/") != std::string::npos || 
+                        pathStr.find("\\" + arch + "\\") != std::string::npos ||
+                        (pathStr.find("/x86/") == std::string::npos && 
+                         pathStr.find("/x64/") == std::string::npos && 
+                         pathStr.find("/arm64/") == std::string::npos &&
+                         pathStr.find("\\x86\\") == std::string::npos && 
+                         pathStr.find("\\x64\\") == std::string::npos && 
+                         pathStr.find("\\arm64\\") == std::string::npos)) {
+                        
+                        libFiles.push_back(entry.path());
+                        foundLibs = true;
+                        
+                        // Copy the file
+                        fs::copy_file(entry.path(), targetLibDir / entry.path().filename(), 
+                                     fs::copy_options::overwrite_existing);
+                        std::cout << "Copied: " << entry.path().filename().string() << std::endl;
+                    }
+                }
+            }
+        }
+    } catch (const std::exception& e) {
+        std::cerr << "Error while searching for Windows libraries: " << e.what() << std::endl;
+    }
+    
+    if (!foundLibs) {
+        std::cerr << "Warning: Could not find Windows libraries for architecture: " << arch << std::endl;
+    } else {
+        std::cout << "Successfully copied " << libFiles.size() << " Windows libraries" << std::endl;
+    }
+}
+
+void PackageExtractor::copyMacOsLibs(const std::string& extractDir, const std::string& sdkDir, const std::string& arch) {
+    std::cout << "Copying macOS libraries..." << std::endl;
+    
+    // Target directory
+    fs::path targetLibDir = fs::path(sdkDir) / "lib";
+    fs::create_directories(targetLibDir);
+    
+    // Use glob patterns to find all dylib files recursively
+    std::vector<fs::path> dylibs;
+    bool foundLibs = false;
+    
+    try {
+        std::cout << "Searching for dylib files in: " << extractDir << std::endl;
+        
+        // Search recursively for all dylib files
+        for (const auto& entry : fs::recursive_directory_iterator(extractDir)) {
+            if (entry.is_regular_file()) {
+                std::string ext = entry.path().extension().string();
+                if (ext == ".dylib" || ext == ".a" || ext == ".framework") {
+                    dylibs.push_back(entry.path());
+                    foundLibs = true;
+                    
+                    // Copy the file
+                    fs::copy_file(entry.path(), targetLibDir / entry.path().filename(), 
+                                 fs::copy_options::overwrite_existing);
+                    std::cout << "Copied: " << entry.path().filename().string() << std::endl;
+                }
+            }
+        }
+    } catch (const std::exception& e) {
+        std::cerr << "Error while searching for macOS libraries: " << e.what() << std::endl;
+    }
+    
+    if (!foundLibs) {
+        std::cerr << "Warning: Could not find macOS libraries" << std::endl;
+    } else {
+        std::cout << "Successfully copied " << dylibs.size() << " macOS libraries" << std::endl;
+    }
+}
+
+void PackageExtractor::copyLinuxLibs(const std::string& extractDir, const std::string& sdkDir, const std::string& arch) {
+    std::cout << "Copying Linux libraries..." << std::endl;
+    
+    // Target directory
+    fs::path targetLibDir = fs::path(sdkDir) / "lib";
+    fs::create_directories(targetLibDir);
+    
+    // Use glob patterns to find all .so and .a files recursively
+    std::vector<fs::path> libFiles;
+    bool foundLibs = false;
+    
+    try {
+        std::cout << "Searching for " << arch << " .so and .a files in: " << extractDir << std::endl;
+        
+        // Search recursively for all .so and .a files
+        for (const auto& entry : fs::recursive_directory_iterator(extractDir)) {
+            if (entry.is_regular_file()) {
+                std::string ext = entry.path().extension().string();
+                if (ext == ".so" || ext == ".a") {
+                    // Check if it's in an architecture-specific directory
+                    std::string pathStr = entry.path().string();
+                    std::transform(pathStr.begin(), pathStr.end(), pathStr.begin(), ::tolower);
+                    
+                    // Only copy files from directories matching our architecture or from non-architecture specific paths
+                    if (pathStr.find("/" + arch + "/") != std::string::npos || 
+                        pathStr.find("\\" + arch + "\\") != std::string::npos ||
+                        (pathStr.find("/x86/") == std::string::npos && 
+                         pathStr.find("/x64/") == std::string::npos && 
+                         pathStr.find("/arm64/") == std::string::npos &&
+                         pathStr.find("\\x86\\") == std::string::npos && 
+                         pathStr.find("\\x64\\") == std::string::npos && 
+                         pathStr.find("\\arm64\\") == std::string::npos)) {
+                        
+                        libFiles.push_back(entry.path());
+                        foundLibs = true;
+                        
+                        // Copy the file
+                        fs::copy_file(entry.path(), targetLibDir / entry.path().filename(), 
+                                     fs::copy_options::overwrite_existing);
+                        std::cout << "Copied: " << entry.path().filename().string() << std::endl;
+                    }
+                }
+            }
+        }
+    } catch (const std::exception& e) {
+        std::cerr << "Error while searching for Linux libraries: " << e.what() << std::endl;
+    }
+    
+    if (!foundLibs) {
+        std::cerr << "Warning: Could not find Linux libraries for architecture: " << arch << std::endl;
+    } else {
+        std::cout << "Successfully copied " << libFiles.size() << " Linux libraries" << std::endl;
+    }
+}
+
+void PackageExtractor::copyIncludeFiles(const std::string& extractDir, const std::string& sdkDir) {
+    std::cout << "Copying include files..." << std::endl;
+    
+    // Target directory
+    fs::path targetIncludeDir = fs::path(sdkDir) / "include";
+    fs::create_directories(targetIncludeDir);
+    
+    // First check common include directories
+    std::vector<fs::path> sourceIncludeDirs = {
+        fs::path(extractDir) / "include",
+        fs::path(extractDir) / "headers",
+        fs::path(extractDir) / "inc"
+    };
+    
+    bool foundHeaders = false;
+    
+    // First try copying from standard include directories
+    for (const auto& includeDir : sourceIncludeDirs) {
+        if (fs::exists(includeDir)) {
+            std::cout << "Found include files in: " << includeDir.string() << std::endl;
+            
+            // Copy all files and subdirectories from include directory
+            for (const auto& entry : fs::recursive_directory_iterator(includeDir)) {
+                fs::path relativePath = fs::relative(entry.path(), includeDir);
+                fs::path targetPath = targetIncludeDir / relativePath;
+                
+                if (entry.is_directory()) {
+                    fs::create_directories(targetPath);
+                } else if (entry.is_regular_file()) {
+                    fs::create_directories(targetPath.parent_path());
+                    fs::copy_file(entry.path(), targetPath, fs::copy_options::overwrite_existing);
+                    std::cout << "Copied include file: " << relativePath.string() << std::endl;
+                    foundHeaders = true;
+                }
+            }
+        }
+    }
+    
+    // If no headers found in standard directories, use glob to find .h files
+    if (!foundHeaders) {
+        std::cout << "Searching for header files using glob pattern..." << std::endl;
+        
+        try {
+            // Search for all .h files recursively
+            for (const auto& entry : fs::recursive_directory_iterator(extractDir)) {
+                if (entry.is_regular_file()) {
+                    std::string ext = entry.path().extension().string();
+                    if (ext == ".h" || ext == ".hpp") {
+                        // Copy to flat include directory
+                        fs::create_directories(targetIncludeDir);
+                        fs::copy_file(entry.path(), targetIncludeDir / entry.path().filename(), 
+                                     fs::copy_options::overwrite_existing);
+                        std::cout << "Copied header: " << entry.path().filename().string() << std::endl;
+                        foundHeaders = true;
+                    }
+                }
+            }
+        } catch (const std::exception& e) {
+            std::cerr << "Error while searching for header files: " << e.what() << std::endl;
+        }
+    }
+    
+    if (!foundHeaders) {
+        std::cerr << "Warning: Could not find any header files." << std::endl;
+    }
+}
+
+void PackageExtractor::copyVapmFiles(const std::string& extractDir, const std::string& vapmDir) {
+    std::cout << "Copying VAPM files..." << std::endl;
+    
+    // Define possible VAPM directories
+    std::vector<fs::path> vapmDirs = {
+        fs::path(extractDir) / "vapm",
+        fs::path(extractDir) / "VAPM",
+        fs::path(extractDir) / "va_plugins"
+    };
+    
+    bool foundVapmDir = false;
+    
+    // Try each potential VAPM directory
+    for (const auto& sourceVapmDir : vapmDirs) {
+        if (fs::exists(sourceVapmDir)) {
+            std::cout << "Found VAPM files in: " << sourceVapmDir.string() << std::endl;
+            
+            // Copy all files and subdirectories from VAPM directory
+            for (const auto& entry : fs::recursive_directory_iterator(sourceVapmDir)) {
+                fs::path relativePath = fs::relative(entry.path(), sourceVapmDir);
+                fs::path targetPath = fs::path(vapmDir) / relativePath;
+                
+                if (entry.is_directory()) {
+                    fs::create_directories(targetPath);
+                } else if (entry.is_regular_file()) {
+                    fs::create_directories(targetPath.parent_path());
+                    fs::copy_file(entry.path(), targetPath, fs::copy_options::overwrite_existing);
+                }
+            }
+            
+            foundVapmDir = true;
+            break;
+        }
+    }
+    
+    if (!foundVapmDir) {
+        std::cerr << "Warning: Could not find VAPM directory." << std::endl;
+    }
+}
+
+std::string PackageExtractor::getCurrentPlatform() {
+    #ifdef _WIN32
+        return "windows";
+    #elif __APPLE__
+        return "macos";
+    #elif __linux__
+        return "linux";
+    #else
+        return "unknown";
+    #endif
+}
+
+std::string PackageExtractor::getCurrentArchitecture() {
+    #ifdef _WIN32
+        #ifdef _WIN64
+            return "x64";
+        #else
+            return "x86";
+        #endif
+    #elif __APPLE__
+        #ifdef __arm64__
+            return "arm64";
+        #else
+            return "x64";
+        #endif
+    #elif __linux__
+        struct utsname buffer;
+        if (uname(&buffer) == 0) {
+            if (strcmp(buffer.machine, "x86_64") == 0) {
+                return "x64";
+            } else if (strcmp(buffer.machine, "i686") == 0) {
+                return "x86";
+            } else if (strcmp(buffer.machine, "aarch64") == 0 || 
+                       strcmp(buffer.machine, "arm64") == 0) {
+                return "arm64";
+            }
+        }
+        return "unknown";
+    #else
+        return "unknown";
+    #endif
+}
+
+std::vector<fs::path> PackageExtractor::findFiles(const fs::path& directory, const std::string& extension) {
+    std::vector<fs::path> result;
+    
+    if (!fs::exists(directory) || !fs::is_directory(directory)) {
+        std::cout << "Warning: Directory does not exist: " << directory.string() << std::endl;
+        return result;
+    }
+    
+    try {
+        for (const auto& entry : fs::recursive_directory_iterator(directory)) {
+            if (fs::is_regular_file(entry) && entry.path().extension() == extension) {
+                result.push_back(entry.path());
+            }
+        }
+    } catch (const std::exception& e) {
+        std::cerr << "Error while searching for files: " << e.what() << std::endl;
+    }
+    
+    return result;
+}
+
+std::vector<fs::path> PackageExtractor::findDirectories(const fs::path& directory, const std::string& namePattern) {
+    std::vector<fs::path> result;
+    
+    if (!fs::exists(directory) || !fs::is_directory(directory)) {
+        std::cout << "Warning: Directory does not exist: " << directory.string() << std::endl;
+        return result;
+    }
+    
+    try {
+        for (const auto& entry : fs::recursive_directory_iterator(directory)) {
+            if (fs::is_directory(entry)) {
+                std::string dirName = entry.path().filename().string();
+                if (dirName.find(namePattern) != std::string::npos) {
+                    result.push_back(entry.path());
+                }
+            }
+        }
+    } catch (const std::exception& e) {
+        std::cerr << "Error while searching for directories: " << e.what() << std::endl;
+    }
+    
+    return result;
+}
+
+void PackageExtractor::listDirectoryContents(const fs::path& directory, int depth) {
+    if (!fs::exists(directory) || !fs::is_directory(directory)) {
+        std::cout << "Directory does not exist: " << directory.string() << std::endl;
+        return;
+    }
+    
+    std::cout << "Contents of " << directory.string() << ":" << std::endl;
+    
+    try {
+        for (const auto& entry : fs::directory_iterator(directory)) {
+            std::string indentation(depth * 2, ' ');
+            std::cout << indentation << entry.path().filename().string();
+            
+            if (fs::is_directory(entry)) {
+                std::cout << " [DIR]";
+                if (depth < 3) { // Limit recursion depth
+                    std::cout << std::endl;
+                    listDirectoryContents(entry.path(), depth + 1);
+                } else {
+                    std::cout << " ..." << std::endl;
+                }
+            } else if (fs::is_regular_file(entry)) {
+                std::cout << " [" << fs::file_size(entry) << " bytes]" << std::endl;
+            } else {
+                std::cout << " [OTHER]" << std::endl;
+            }
+        }
+    } catch (const std::exception& e) {
+        std::cerr << "Error while listing directory contents: " << e.what() << std::endl;
+    }
+}
+
+bool PackageExtractor::isValidExtractedPackage(const fs::path& extractDir) {
+    // Check for common directories that should exist in a valid SDK package
+    bool hasInclude = false;
+    bool hasLib = false;
+    bool hasPlatformSpecific = false;
+    
+    try {
+        for (const auto& entry : fs::recursive_directory_iterator(extractDir, fs::directory_options::skip_permission_denied)) {
+            if (fs::is_directory(entry)) {
+                std::string dirName = entry.path().filename().string();
+                std::transform(dirName.begin(), dirName.end(), dirName.begin(), ::tolower);
+                
+                if (dirName == "include") {
+                    hasInclude = true;
+                } else if (dirName == "lib") {
+                    hasLib = true;
+                } else if (dirName.find("win") != std::string::npos || 
+                          dirName.find("mac") != std::string::npos || 
+                          dirName.find("linux") != std::string::npos) {
+                    hasPlatformSpecific = true;
+                }
+                
+                // Early exit if we found all required directories
+                if (hasInclude && (hasLib || hasPlatformSpecific)) {
+                    return true;
+                }
+            }
+        }
+    } catch (const std::exception& e) {
+        std::cerr << "Error while validating package: " << e.what() << std::endl;
+        return false;
+    }
+    
+    std::cout << "Package validation results - Include: " << (hasInclude ? "Yes" : "No") 
+              << ", Lib: " << (hasLib ? "Yes" : "No") 
+              << ", Platform dirs: " << (hasPlatformSpecific ? "Yes" : "No") << std::endl;
+              
+    return hasInclude && (hasLib || hasPlatformSpecific);
+}
+
+bool PackageExtractor::createFlatSDKStructure(const fs::path& extractDir, const fs::path& outputDir) {
+    try {
+        if (!fs::exists(extractDir)) {
+            std::cerr << "Error: Extract directory does not exist: " << extractDir << std::endl;
+            return false;
+        }
+
+        if (!fs::exists(outputDir)) {
+            fs::create_directories(outputDir);
+        }
+
+        // Create standard directories
+        fs::path includeDir = outputDir / "include";
+        fs::path libDir = outputDir / "lib";
+        fs::path binDir = outputDir / "bin";
+        
+        fs::create_directories(includeDir);
+        fs::create_directories(libDir);
+        fs::create_directories(binDir);
+
+        std::string platform = getCurrentPlatform();
+        std::string arch = getCurrentArchitecture();
+        
+        std::cout << "Creating flat SDK structure for " << platform << " " << arch << std::endl;
+        
+        // Copy header files
+        std::vector<fs::path> headerFiles = findFiles(extractDir, ".h");
+        headerFiles = findFiles(extractDir, ".hpp"); // Add .hpp files
+        
+        for (const auto& headerFile : headerFiles) {
+            // Skip files in build or test directories
+            std::string pathStr = headerFile.string();
+            if (pathStr.find("/build/") != std::string::npos || 
+                pathStr.find("/test/") != std::string::npos ||
+                pathStr.find("\\build\\") != std::string::npos || 
+                pathStr.find("\\test\\") != std::string::npos) {
+                continue;
+            }
+            
+            fs::path destPath = includeDir / headerFile.filename();
+            std::cout << "Copying " << headerFile.filename() << " to " << destPath << std::endl;
+            fs::copy_file(headerFile, destPath, fs::copy_options::overwrite_existing);
+        }
+        
+        // Find and copy library files based on platform
+        std::vector<fs::path> libFiles;
+        if (platform == "Windows") {
+            // Windows libraries (.lib, .dll)
+            libFiles = findFiles(extractDir, ".lib");
+            std::vector<fs::path> dllFiles = findFiles(extractDir, ".dll");
+            libFiles.insert(libFiles.end(), dllFiles.begin(), dllFiles.end());
+        } else if (platform == "macOS") {
+            // macOS libraries (.dylib, .a)
+            libFiles = findFiles(extractDir, ".dylib");
+            std::vector<fs::path> aFiles = findFiles(extractDir, ".a");
+            libFiles.insert(libFiles.end(), aFiles.begin(), aFiles.end());
+        } else if (platform == "Linux") {
+            // Linux libraries (.so, .a)
+            libFiles = findFiles(extractDir, ".so");
+            std::vector<fs::path> aFiles = findFiles(extractDir, ".a");
+            libFiles.insert(libFiles.end(), aFiles.begin(), aFiles.end());
+        }
+        
+        // Copy library files
+        for (const auto& libFile : libFiles) {
+            fs::path destPath;
+            if (libFile.extension() == ".dll") {
+                destPath = binDir / libFile.filename();
+            } else {
+                destPath = libDir / libFile.filename();
+            }
+            std::cout << "Copying " << libFile.filename() << " to " << destPath << std::endl;
+            fs::copy_file(libFile, destPath, fs::copy_options::overwrite_existing);
+        }
+        
+        // Copy any binaries or executables
+        std::vector<fs::path> exeFiles;
+        if (platform == "Windows") {
+            exeFiles = findFiles(extractDir, ".exe");
+        } else {
+            // Find executable files by checking permissions for Unix platforms
+            std::vector<fs::path> allFiles;
+            for (const auto& entry : fs::recursive_directory_iterator(extractDir)) {
+                if (fs::is_regular_file(entry) && (fs::status(entry).permissions() & 
+                    fs::perms::owner_exec) != fs::perms::none) {
+                    allFiles.push_back(entry.path());
+                }
+            }
+            exeFiles = allFiles;
+        }
+        
+        // Copy executable files
+        for (const auto& exeFile : exeFiles) {
+            fs::path destPath = binDir / exeFile.filename();
+            std::cout << "Copying " << exeFile.filename() << " to " << destPath << std::endl;
+            fs::copy_file(exeFile, destPath, fs::copy_options::overwrite_existing);
+        }
+        
+        return true;
+    } catch (const std::exception& e) {
+        std::cerr << "Error creating flat SDK structure: " << e.what() << std::endl;
+        return false;
+    }
+}
+</file>
+
+<file path="src/package_extractor.h">
+/**
+ * @file package_extractor.h
+ * @brief Handles extraction of downloaded packages
+ */
+
+#pragma once
+
+#include <string>
+#include <unordered_map>
+#include <vector>
+#include <filesystem>
+
+namespace fs = std::filesystem;
+
+/**
+ * @class PackageExtractor
+ * @brief Extracts downloaded packages (ZIP and TAR formats)
+ * 
+ * This class provides functionality to extract downloaded packages
+ * to specified directories.
+ */
+class PackageExtractor {
+public:
+    PackageExtractor();
+    ~PackageExtractor();
+    
+    /**
+     * @brief Extract a package file to the specified directory
+     * 
+     * @param packagePath Path to the package file
+     * @param extractDir Directory to extract the package to
+     * @return true if extraction was successful, false otherwise
+     */
+    bool extractPackage(const std::string& packagePath, const std::string& extractDir);
+    
+    /**
+     * @brief Copy extracted files to the SDK and VAPM directories
+     * 
+     * @param extractDir Directory containing extracted files
+     * @param sdkDir Target SDK directory
+     * @param vapmDir Target VAPM directory
+     * @return true if copying was successful, false otherwise
+     */
+    bool copyExtractedFiles(const std::string& extractDir, const std::string& sdkDir, const std::string& vapmDir);
+
+    /**
+     * Check if an extracted package directory has a valid structure
+     * @param extractDir Path to extracted package directory
+     * @return true if valid, false otherwise
+     */
+    bool isValidExtractedPackage(const fs::path& extractDir);
+
+    /**
+     * Create a flat SDK structure organizing files by platform
+     * @param extractDir Source directory containing extracted package
+     * @param outputDir Destination directory for flat SDK structure
+     * @return true if successful, false otherwise
+     */
+    bool createFlatSDKStructure(const fs::path& extractDir, const fs::path& outputDir);
+
+private:
+    /**
+     * @brief Extract a ZIP file
+     * 
+     * @param zipPath Path to the ZIP file
+     * @param outputDir Directory to extract to
+     * @return true if extraction was successful, false otherwise
+     */
+    bool extractZip(const std::string& zipPath, const std::string& outputDir);
+    
+    /**
+     * @brief Extract a TAR file
+     * 
+     * @param tarPath Path to the TAR file
+     * @param outputDir Directory to extract to
+     * @return true if extraction was successful, false otherwise
+     */
+    bool extractTar(const std::string& tarPath, const std::string& outputDir);
+    
+    /**
+     * @brief Extract a ZIP package
+     * 
+     * @param packageFile Path to the ZIP package file
+     * @param extractDir Directory to extract to
+     * @return true if extraction was successful, false otherwise
+     */
+    bool extractZipPackage(const std::string& packageFile, const std::string& extractDir);
+    
+    /**
+     * @brief Extract a TAR package
+     * 
+     * @param packageFile Path to the TAR package file
+     * @param extractDir Directory to extract to
+     * @return true if extraction was successful, false otherwise
+     */
+    bool extractTarPackage(const std::string& packageFile, const std::string& extractDir);
+    
+    /**
+     * @brief Find the bin directory in the extracted files
+     * 
+     * @param extractDir Directory containing extracted files
+     * @return std::string Path to the bin directory, or empty if not found
+     */
+    std::string findBinDirectory(const std::string& extractDir);
+    
+    /**
+     * @brief Copy include files to the SDK directory
+     * 
+     * @param extractDir Directory containing extracted files
+     * @param sdkDir Target include directory
+     */
+    void copyIncludeFiles(const std::string& extractDir, const std::string& sdkDir);
+    
+    /**
+     * @brief Copy library files to the SDK directory
+     * 
+     * @param binDir Directory containing library files
+     * @param targetDir Target lib directory
+     */
+    void copyLibFiles(const std::string& binDir, const std::string& targetDir);
+    
+    /**
+     * @brief Copy Windows library files
+     * 
+     * @param extractDir Directory containing extracted files
+     * @param sdkDir Target SDK directory
+     * @param arch Architecture (x64, x86, arm64)
+     */
+    void copyWindowsLibs(const std::string& extractDir, const std::string& sdkDir, const std::string& arch);
+    
+    /**
+     * @brief Copy macOS library files
+     * 
+     * @param extractDir Directory containing extracted files
+     * @param sdkDir Target SDK directory
+     * @param arch Architecture (x64, x86, arm64)
+     */
+    void copyMacOsLibs(const std::string& extractDir, const std::string& sdkDir, const std::string& arch);
+    
+    /**
+     * @brief Copy Linux library files
+     * 
+     * @param extractDir Directory containing extracted files
+     * @param sdkDir Target SDK directory
+     * @param arch Architecture (x64, x86, arm64)
+     */
+    void copyLinuxLibs(const std::string& extractDir, const std::string& sdkDir, const std::string& arch);
+    
+    /**
+     * @brief Copy VAPM files to the VAPM directory
+     * 
+     * @param extractDir Directory containing extracted files
+     * @param vapmDir Target VAPM directory
+     */
+    void copyVapmFiles(const std::string& extractDir, const std::string& vapmDir);
+    
+    /**
+     * @brief Get the current platform
+     * 
+     * @return std::string Platform identifier (windows, mac, linux, unknown)
+     */
+    std::string getCurrentPlatform();
+    
+    /**
+     * @brief Get the current architecture
+     * 
+     * @return std::string Architecture identifier (x64, x86, arm64, unknown)
+     */
+    std::string getCurrentArchitecture();
+    
+    /**
+     * @brief Find files with a specific extension in a directory (recursively)
+     * 
+     * @param directory Directory to search in
+     * @param extension File extension to search for
+     * @return std::vector<fs::path> List of matching files
+     */
+    std::vector<fs::path> findFiles(const fs::path& directory, const std::string& extension);
+    
+    /**
+     * @brief Find directories matching a name pattern (recursively)
+     * 
+     * @param directory Directory to search in
+     * @param namePattern Pattern to match in directory names
+     * @return std::vector<fs::path> List of matching directories
+     */
+    std::vector<fs::path> findDirectories(const fs::path& directory, const std::string& namePattern);
+    
+    /**
+     * @brief List contents of a directory (with optional recursion)
+     * 
+     * @param directory Directory to list
+     * @param depth Current recursion depth (used for indentation)
+     */
+    void listDirectoryContents(const fs::path& directory, int depth = 0);
+    
+    std::unordered_map<std::string, std::string> extractedFiles;
+};
+</file>
+
+<file path="src/sdk_downloader.cpp">
+#include "sdk_downloader.h"
+#include <iostream>
+#include <fstream>
+
+SdkDownloader::SdkDownloader(const std::string& sdkDir, 
+                           const std::string& vapmDir,
+                           const std::string& workDir,
+                           const std::string& licenseDir,
+                           const std::string& flatSdkDir)
+    : sdkDirectory_(sdkDir),
+      vapmDirectory_(vapmDir),
+      workingDirectory_(workDir),
+      licenseDirectory_(licenseDir),
+      flatSdkDirectory_(flatSdkDir) {
+    
+    // Set up stage and extract directories
+    stageDirectory_ = workingDirectory_ + "/stage";
+    extractDirectory_ = stageDirectory_ + "/extract";
+}
+
+bool SdkDownloader::initialize() {
+    try {
+        // Create working directories
+        fs::create_directories(workingDirectory_);
+        fs::create_directories(stageDirectory_);
+        fs::create_directories(extractDirectory_);
+        
+        // Read download token
+        if (!readDownloadToken()) {
+            std::cerr << "Failed to read download token" << std::endl;
+            return false;
+        }
+        
+        return true;
+    } catch (const std::exception& e) {
+        std::cerr << "Initialization failed: " << e.what() << std::endl;
+        return false;
+    }
+}
+
+bool SdkDownloader::readDownloadToken() {
+    try {
+        std::string tokenFile = fs::path(licenseDirectory_) / "download_token.txt";
+        std::ifstream file(tokenFile);
+        if (!file.is_open()) {
+            std::cerr << "Failed to open token file: " << tokenFile << std::endl;
+            return false;
+        }
+        
+        std::getline(file, downloadToken_);
+        file.close();
+        
+        if (downloadToken_.empty()) {
+            std::cerr << "Download token is empty" << std::endl;
+            return false;
+        }
+        
+        return true;
+    } catch (const std::exception& e) {
+        std::cerr << "Failed to read download token: " << e.what() << std::endl;
+        return false;
+    }
+}
+
+std::string SdkDownloader::getPackageListXml() {
+    std::string url = "https://vcr.opswat.com/gw/file/download/OesisPackageLinks.xml?type=1&token=" + downloadToken_;
+    return downloadManager_.downloadToString(url);
+}
+
+bool SdkDownloader::downloadSdkPackages() {
+    try {
+        // Get package list XML
+        std::string xml = getPackageListXml();
+        if (xml.empty()) {
+            std::cerr << "Failed to get package list XML" << std::endl;
+            return false;
+        }
+        
+        // Parse SDK packages
+        auto sdkPackages = xmlParser_.parseSdkPackages(xml);
+        if (sdkPackages.empty()) {
+            std::cerr << "No SDK packages found for the current platform" << std::endl;
+            return false;
+        }
+        
+        // Download SDK packages
+        for (const auto& package : sdkPackages) {
+            std::string fileName = package.url.substr(package.url.find_last_of("/") + 1);
+            std::string outputPath = stageDirectory_ + "/" + fileName;
+            
+            std::cout << "Downloading SDK package: " << package.name << " (" << package.version << ")" << std::endl;
+            
+            if (!downloadManager_.downloadToFile(package.url, outputPath)) {
+                std::cerr << "Failed to download SDK package: " << package.url << std::endl;
+                return false;
+            }
+            
+            // Extract the package
+            if (!packageExtractor_.extractPackage(outputPath, extractDirectory_)) {
+                std::cerr << "Failed to extract SDK package: " << outputPath << std::endl;
+                return false;
+            }
+        }
+        
+        // Download catalog files (analog.zip)
+        std::string catalogUrl = "https://vcr.opswat.com/gw/file/download/analog.zip?type=1&token=" + downloadToken_;
+        std::string catalogOutputPath = stageDirectory_ + "/analog.zip";
+        
+        std::cout << "Downloading catalog package (analog.zip)" << std::endl;
+        
+        if (!downloadManager_.downloadToFile(catalogUrl, catalogOutputPath)) {
+            std::cerr << "Failed to download catalog package: " << catalogUrl << std::endl;
+            return false;
+        }
+        
+        // Extract catalog package
+        if (!packageExtractor_.extractPackage(catalogOutputPath, stageDirectory_ + "/analog")) {
+            std::cerr << "Failed to extract catalog package: " << catalogOutputPath << std::endl;
+            return false;
+        }
+        
+        return true;
+    } catch (const std::exception& e) {
+        std::cerr << "Error downloading SDK packages: " << e.what() << std::endl;
+        return false;
+    }
+}
+
+bool SdkDownloader::extractAndSetupSdk() {
+    try {
+        // Clean existing SDK and VAPM directories
+        if (fs::exists(sdkDirectory_)) {
+            fs::remove_all(sdkDirectory_);
+        }
+        
+        if (fs::exists(vapmDirectory_)) {
+            fs::remove_all(vapmDirectory_);
+        }
+        
+        // Create fresh directories
+        fs::create_directories(sdkDirectory_);
+        fs::create_directories(vapmDirectory_);
+        
+        // Copy SDK files from extracted packages
+        if (!packageExtractor_.copyExtractedFiles(extractDirectory_, sdkDirectory_, vapmDirectory_)) {
+            std::cerr << "Failed to copy SDK files" << std::endl;
+            return false;
+        }
+        
+        // Copy catalog files
+        std::string analogPath = stageDirectory_ + "/analog";
+        if (fs::exists(analogPath + "/client")) {
+            packageExtractor_.copyExtractedFiles(analogPath, sdkDirectory_, vapmDirectory_);
+        }
+        
+        return true;
+    } catch (const std::exception& e) {
+        std::cerr << "Error setting up SDK: " << e.what() << std::endl;
+        return false;
+    }
+}
+
+bool SdkDownloader::cleanup() {
+    try {
+        // Remove the staging directory
+        if (fs::exists(stageDirectory_)) {
+            std::cout << "Cleaning up temporary files..." << std::endl;
+            fs::remove(stageDirectory_);
+        }
+        
+        return true;
+    } catch (const std::exception& e) {
+        std::cerr << "Error during cleanup: " << e.what() << std::endl;
+        return false;
+    }
+}
+
+bool SdkDownloader::downloadAndSetupSdk() {
+    if (!initialize()) {
+        return false;
+    }
+    
+    if (!downloadSdkPackages()) {
+        return false;
+    }
+    
+    if (!extractAndSetupSdk()) {
+        return false;
+    }
+    
+    // Create flat SDK structure if requested
+    if (!flatSdkDirectory_.empty()) {
+        std::cout << "Creating flat SDK structure at " << fs::absolute(flatSdkDirectory_) << "..." << std::endl;
+        if (!packageExtractor_.createFlatSDKStructure(sdkDirectory_, flatSdkDirectory_)) {
+            std::cerr << "Failed to create flat SDK structure" << std::endl;
+            return false;
+        }
+        std::cout << "Flat SDK structure created successfully!" << std::endl;
+    }
+    
+    if (!cleanup()) {
+        std::cerr << "Warning: Failed to clean up temporary files" << std::endl;
+        // Continue despite cleanup failure
+    }
+    
+    std::cout << "SDK setup completed successfully!" << std::endl;
+    std::cout << "SDK files installed to: " << fs::absolute(sdkDirectory_) << std::endl;
+    std::cout << "VAPM files installed to: " << fs::absolute(vapmDirectory_) << std::endl;
+    if (!flatSdkDirectory_.empty()) {
+        std::cout << "Flat SDK structure created at: " << fs::absolute(flatSdkDirectory_) << std::endl;
+    }
+    
+    return true;
+}
+</file>
+
+<file path="src/sdk_downloader.h">
+/**
+ * @file sdk_downloader.h
+ * @brief Main SDK downloader class
+ */
+
+#pragma once
+
+#include "download_manager.h"
+#include "xml_parser.h"
+#include "package_extractor.h"
+#include <string>
+#include <vector>
+#include <filesystem>
+
+namespace fs = std::filesystem;
+
+/**
+ * @class SdkDownloader
+ * @brief Main class for downloading and setting up the OESIS SDK
+ * 
+ * This class coordinates the downloading, extraction, and setup
+ * of the OESIS SDK files.
+ */
+class SdkDownloader {
+public:
+    /**
+     * @brief Constructor
+     * 
+     * @param sdkDir Directory where SDK files will be stored
+     * @param vapmDir Directory where VAPM files will be stored
+     * @param workDir Temporary working directory for downloads and extraction
+     * @param licenseDir Directory containing license files
+     * @param flatSdkDir Optional directory to create a flat SDK structure (empty = don't create)
+     */
+    SdkDownloader(const std::string& sdkDir, 
+                 const std::string& vapmDir,
+                 const std::string& workDir,
+                 const std::string& licenseDir = "./license",
+                 const std::string& flatSdkDir = "");
+    
+    /**
+     * @brief Initialize the downloader
+     * 
+     * @return true if initialization was successful, false otherwise
+     */
+    bool initialize();
+    
+    /**
+     * @brief Download and set up the SDK
+     * 
+     * @return true if the operation was successful, false otherwise
+     */
+    bool downloadAndSetupSdk();
+
+private:
+    DownloadManager downloadManager_;
+    XmlParser xmlParser_;
+    PackageExtractor packageExtractor_;
+    
+    std::string sdkDirectory_;
+    std::string vapmDirectory_;
+    std::string workingDirectory_;
+    std::string stageDirectory_;
+    std::string extractDirectory_;
+    std::string licenseDirectory_;
+    std::string flatSdkDirectory_;
+    
+    std::string downloadToken_;
+    
+    /**
+     * @brief Read the download token from file
+     * 
+     * @return true if the token was read successfully, false otherwise
+     */
+    bool readDownloadToken();
+    
+    /**
+     * @brief Download the SDK packages
+     * 
+     * @return true if downloads were successful, false otherwise
+     */
+    bool downloadSdkPackages();
+    
+    /**
+     * @brief Extract and set up the SDK files
+     * 
+     * @return true if extraction and setup were successful, false otherwise
+     */
+    bool extractAndSetupSdk();
+    
+    /**
+     * @brief Clean up temporary files
+     * 
+     * @return true if cleanup was successful, false otherwise
+     */
+    bool cleanup();
+    
+    /**
+     * @brief Get the XML package list from the server
+     * 
+     * @return std::string The XML data or empty string on failure
+     */
+    std::string getPackageListXml();
+};
+</file>
+
+<file path="src/xml_parser.cpp">
+#include "xml_parser.h"
+#include <iostream>
+
+// Define platform-specific identifiers
+#if defined(_WIN32) || defined(_WIN64)
+    #define PLATFORM_NAME "Windows"
+    #define SDK_PREFIX "OESIS_V4_win"
+    #define PACKAGE_EXT ".zip"
+#elif defined(__APPLE__)
+    #define PLATFORM_NAME "Mac"
+    #define SDK_PREFIX "OESIS_V4_mac"
+    #define PACKAGE_EXT ".zip"
+#elif defined(__linux__)
+    #define PLATFORM_NAME "Linux"
+    #define SDK_PREFIX "OESIS_V4_nix"
+    #define PACKAGE_EXT ".tar"
+#else
+    #error "Unsupported platform"
+#endif
+
+std::string XmlParser::getCurrentPlatform() {
+    return PLATFORM_NAME;
+}
+
+bool XmlParser::isSdkPackageForCurrentPlatform(const std::string& filename) {
+    // Check file extension
+    if (filename.size() < 4 || filename.substr(filename.size() - 4) != PACKAGE_EXT) {
+        return false;
+    }
+    
+    // Check prefix for current platform
+    if (filename.rfind(SDK_PREFIX, 0) == 0) {
+        return true;
+    }
+    
+    return false;
+}
+
+bool XmlParser::isCatalogPackage(const std::string& filename) {
+    // This is the catalog package, typically named analog.zip
+    return (filename == "analog.zip");
+}
+
+std::vector<XmlParser::Package> XmlParser::parseSdkPackages(const std::string& xmlData) {
+    std::vector<Package> packages;
+    tinyxml2::XMLDocument doc;
+    
+    if (doc.Parse(xmlData.c_str()) != tinyxml2::XML_SUCCESS) {
+        std::cerr << "Failed to parse XML data" << std::endl;
+        return packages;
+    }
+    
+    tinyxml2::XMLElement* root = doc.RootElement();
+    if (!root) {
+        std::cerr << "XML has no root element" << std::endl;
+        return packages;
+    }
+    
+    // Current platform name
+    std::string platformName = getCurrentPlatform();
+    
+    // Loop through all <Platform> nodes
+    for (tinyxml2::XMLElement* platformNode = root->FirstChildElement("Platform"); 
+         platformNode; 
+         platformNode = platformNode->NextSiblingElement("Platform")) {
+        
+        const char* platformAttr = platformNode->Attribute("Name");
+        if (!platformAttr || std::string(platformAttr) != platformName) {
+            continue;
+        }
+        
+        // Look for Releases
+        for (tinyxml2::XMLElement* releases = platformNode->FirstChildElement("Releases"); 
+             releases; 
+             releases = releases->NextSiblingElement("Releases")) {
+            
+            const char* releaseName = releases->Attribute("Name");
+            if (!releaseName || std::string(releaseName) != "OESIS Local V4") {
+                continue;
+            }
+            
+            // Find latest release
+            for (tinyxml2::XMLElement* latestRelease = releases->FirstChildElement("LatestRelease"); 
+                 latestRelease; 
+                 latestRelease = latestRelease->NextSiblingElement("LatestRelease")) {
+                
+                // Get packages
+                for (tinyxml2::XMLElement* package = latestRelease->FirstChildElement("Package"); 
+                     package; 
+                     package = package->NextSiblingElement("Package")) {
+                    
+                    const char* url = package->Attribute("Link");
+                    const char* packageName = package->Attribute("Name");
+                    const char* version = package->Attribute("Version");
+                    
+                    if (!url) continue;
+                    
+                    std::string filename = url;
+                    size_t lastSlash = filename.find_last_of("/");
+                    if (lastSlash != std::string::npos) {
+                        filename = filename.substr(lastSlash + 1);
+                    }
+                    
+                    if (isSdkPackageForCurrentPlatform(filename)) {
+                        Package pkg;
+                        pkg.name = packageName ? packageName : filename;
+                        pkg.url = url;
+                        pkg.version = version ? version : "unknown";
+                        packages.push_back(pkg);
+                    }
+                }
+            }
+        }
+    }
+    
+    return packages;
+}
+
+std::vector<XmlParser::Package> XmlParser::parseCatalogPackages(const std::string& xmlData) {
+    std::vector<Package> packages;
+    tinyxml2::XMLDocument doc;
+    
+    if (doc.Parse(xmlData.c_str()) != tinyxml2::XML_SUCCESS) {
+        std::cerr << "Failed to parse XML data" << std::endl;
+        return packages;
+    }
+    
+    tinyxml2::XMLElement* root = doc.RootElement();
+    if (!root) {
+        std::cerr << "XML has no root element" << std::endl;
+        return packages;
+    }
+    
+    // For catalog files, we look for the specific package name
+    // (typically "analog.zip") across all platforms
+    
+    for (tinyxml2::XMLElement* packageNode = root->FirstChildElement("Package"); 
+         packageNode; 
+         packageNode = packageNode->NextSiblingElement("Package")) {
+        
+        const char* url = packageNode->Attribute("Link");
+        const char* packageName = packageNode->Attribute("Name");
+        const char* version = packageNode->Attribute("Version");
+        
+        if (!url) continue;
+        
+        std::string filename = url;
+        size_t lastSlash = filename.find_last_of("/");
+        if (lastSlash != std::string::npos) {
+            filename = filename.substr(lastSlash + 1);
+        }
+        
+        if (isCatalogPackage(filename)) {
+            Package pkg;
+            pkg.name = packageName ? packageName : filename;
+            pkg.url = url;
+            pkg.version = version ? version : "unknown";
+            packages.push_back(pkg);
+        }
+    }
+    
+    return packages;
+}
+</file>
+
+<file path="src/xml_parser.h">
+/**
+ * @file xml_parser.h
+ * @brief Parses XML data to extract package information
+ */
+
+#pragma once
+
+#include <string>
+#include <vector>
+#include <tuple>
+#include <tinyxml2.h>
+
+/**
+ * @class XmlParser
+ * @brief Parses OESIS XML package data to extract download information
+ * 
+ * This class handles the parsing of XML data from the OESIS server
+ * to extract package download URLs based on platform.
+ */
+class XmlParser {
+public:
+    /**
+     * @brief Struct representing a package to download
+     */
+    struct Package {
+        std::string name;    ///< Name of the package
+        std::string url;     ///< Download URL
+        std::string version; ///< Version of the package
+    };
+
+    /**
+     * @brief Parses XML data to extract SDK package information for the current platform
+     * 
+     * @param xmlData The XML content to parse
+     * @return std::vector<Package> List of packages to download
+     */
+    std::vector<Package> parseSdkPackages(const std::string& xmlData);
+    
+    /**
+     * @brief Parses XML data to extract catalog package information
+     * 
+     * @param xmlData The XML content to parse
+     * @return std::vector<Package> List of catalog packages to download
+     */
+    std::vector<Package> parseCatalogPackages(const std::string& xmlData);
+
+private:
+    /**
+     * @brief Determines if a filename is an OESIS SDK package for the current platform
+     * 
+     * @param filename The filename to check
+     * @return true if the file is an SDK package for the current platform
+     */
+    bool isSdkPackageForCurrentPlatform(const std::string& filename);
+    
+    /**
+     * @brief Determines if a filename is a catalog package
+     * 
+     * @param filename The filename to check
+     * @return true if the file is a catalog package
+     */
+    bool isCatalogPackage(const std::string& filename);
+    
+    /**
+     * @brief Gets the current platform identifier (Windows, Linux, Mac)
+     * 
+     * @return std::string The platform identifier
+     */
+    std::string getCurrentPlatform();
+};
+</file>
+
+<file path="CMakeLists.txt">
+cmake_minimum_required(VERSION 3.15)
+project(sdk_downloader VERSION 1.0.0 LANGUAGES CXX)
+
+# Set C++17 standard
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
+# Find required packages
+find_package(CURL REQUIRED)
+find_package(tinyxml2 REQUIRED)
+
+# Set source files
+set(SOURCES
+    src/main.cpp
+    src/download_manager.cpp
+    src/xml_parser.cpp
+    src/package_extractor.cpp
+    src/sdk_downloader.cpp
+    src/catalog_downloader.cpp
+)
+
+# Create executable
+add_executable(sdk_downloader ${SOURCES})
+
+# Include directories
+target_include_directories(sdk_downloader PRIVATE 
+    ${CMAKE_CURRENT_SOURCE_DIR}/src
+    ${CURL_INCLUDE_DIRS}
+    ${TINYXML2_INCLUDE_DIRS}
+)
+
+# Link libraries
+target_link_libraries(sdk_downloader PRIVATE 
+    ${CURL_LIBRARIES}
+    tinyxml2::tinyxml2
+)
+
+# Note: License directory is handled by the build_sdk_downloader.sh script
+# which passes the correct --license-dir parameter to the executable
+</file>
+
+</files>

@@ -1,28 +1,29 @@
-# Compiler and flags
 CXX = clang++
 CXXFLAGS = -std=c++17 -Wall -I/opt/homebrew/include
 LDFLAGS = -L/opt/homebrew/lib -lcurl -ltinyxml2
 
-# Target executable
+# For ARM64 architecture (M1/M2 Macs)
+ifeq ($(shell uname -m),arm64)
+	CXXFLAGS += -arch arm64
+	LDFLAGS += -arch arm64
+else
+	CXXFLAGS += -arch x86_64
+	LDFLAGS += -arch x86_64
+endif
+
+SRCS = main.cpp download_manager.cpp xml_parser.cpp package_extractor.cpp sdk_downloader.cpp
+OBJS = $(SRCS:.cpp=.o)
 TARGET = SDKDownloader
 
-# Source files
-SRC = SDKDownloader.cpp SDKFiles.cpp Util.cpp CatalogFiles.cpp
+.PHONY: all clean
 
-# Default target
 all: $(TARGET)
 
-# Force recompile every time
-$(TARGET): $(SRC)
-	$(CXX) $(CXXFLAGS) $(SRC) -o $(TARGET) $(LDFLAGS)
-	touch $@
+$(TARGET): $(OBJS)
+	$(CXX) $(CXXFLAGS) -o $@ $^ $(LDFLAGS)
 
-# Clean build files
+%.o: %.cpp
+	$(CXX) $(CXXFLAGS) -c $< -o $@
+
 clean:
-	rm -f $(TARGET)
-
-# Run the program
-run: $(TARGET)
-	./$(TARGET)
-
-.PHONY: all clean run 
+	rm -f $(OBJS) $(TARGET) 

@@ -1,5 +1,5 @@
 ################################################################################
-# This .gitignore file was automatically created for the macOS project
+# OPSWAT MetaDefender Security Endpoint SDK - macOS Sample Applications
 ################################################################################
 
 # OS and IDE files
@@ -7,20 +7,35 @@
 *.xcuserstate
 xcuserdata/
 .xcode-select/
-.xcworkspace/ 
+.xcworkspace/
 
-# SDK-related directories
-src/license/*
-src/sdk/*
+# SDK-related directories and files
+src/sdk/
+src/Frameworks/
 sdk/
 vapm/
 
+# License files (containing credentials/tokens)
+src/license/license.cfg
+src/license/download_token.txt
+src/license/pass_key.txt
+src/*/license/license.cfg
+src/*/license/download_token.txt
+src/*/license/pass_key.txt
+
+# Example project executables and symlinks
+src/DetectProducts/detect_products
+src/GetOSInfo/get-os-info
+src/GetMissingPatches/get-missing-patches
+src/GetProductVulnerability/get-product-vulnerability
+src/*/libwa*.dylib
+
 # Build artifacts
 build/
-copydev
-run
 *.o
 *.dSYM
+copydev
+run
 
 # Downloaded and extracted files
 stage/
@@ -30,16 +45,6 @@ stage/
 *.tar.bz2
 *.sig
 *.gpg
-
-# Example project executables and symlinks
-src/DetectProducts/detect_products
-src/DetectProducts/libwa*.dylib
-src/GetOSInfo/get-os-info
-src/GetOSInfo/libwa*.dylib
-src/GetMissingPatches/get-missing-patches
-src/GetMissingPatches/libwa*.dylib
-src/GetProductVulnerability/get-product-vulnerability
-src/GetProductVulnerability/libwa*.dylib
 
 # Log files
 *.log

@@ -7,29 +7,45 @@ This repository provides sample applications that demonstrate how to integrate w
 ## Getting Started
 
 ### Prerequisites
-These examples use clang++ for compiling and using the SDK. There is a script that will install the corresponding libraries for downloading, parsing and running the SDK.
+These examples use clang++ for compiling and using the SDK. You will need [Homebrew](https://brew.sh/) installed to manage dependencies.
 
-### Compiling the Samples
-1. First run the Prerequisites script to install the necessary dependencies. This can be done by running the following command in your terminal:
-   ```bash
-   sh src/install-pre-req
-   ```
-   This will install all the required libraries and dependencies for the SDK.
+1.  **Install Homebrew (if not already installed)**
 
-2. Try running the Detect Products example. Navigate to the DetectProducts Folder and type 'make' in the terminal. This will compile the DetectProducts example and create an executable file.
+2.  **Install Required Packages using Homebrew:**
+    Run the following command in your terminal:
+    ```bash
+    brew install nlohmann-json tinyxml2 curl pkg-config
+    ```
 
-   ```bash
-   cd src/DetectProducts
-   make
-   ```
+3.  **License File:**
+    Ensure you have placed your `license.cfg` file inside the `src/license/` directory.
 
-3. Run detect_products by typing the following command in the terminal:
-   ```bash
-   ./detect_products
-   ```
+### Building and Running the Samples
+
+1.  **Download the SDK:**
+    First, run the SDK downloader script. This will download the necessary OPSWAT SDK files into the `src/sdk` directory.
+    ```bash
+    cd src
+    chmod +x build_sdk_downloader.sh
+    ./build_sdk_downloader.sh
+    ```
+    *Note: This script requires the license file (`src/license/license.cfg`) to be present.* 
+
+2.  **Run an Example:**
+    Use the `run_example.sh` script to build and run a specific example. Provide the name of the example directory as an argument.
+    ```bash
+    chmod +x run_example.sh
+    ./run_example.sh <ExampleName>
+    ```
+    Replace `<ExampleName>` with the name of the example you want to run (e.g., `DetectProducts`, `GetMissingPatches`, `GetOSInfo`).
+
+    If you run the script without an example name, it will list the available examples:
+    ```bash
+    ./run_example.sh 
+    ```
 
 ### Notes
-- The `SDKDownloader` utility downloads the latest SDK files into `HelloWorld-Mac/src/sdk`. This will also be built when you run with the install-pre-req script.
+- The `build_sdk_downloader.sh` script downloads the latest SDK files into `src/sdk`. It uses the `SDKDownloader` utility located in `src/SDKDownloader`.
 ---
 
 ## Sample Applications
@@ -37,6 +53,12 @@ Each sample project demonstrates a different feature of the SDK.
 
 ### DetectProducts List Installed Products
 Scans the system for installed security products (e.g., firewalls) and checks if they are active. Outputs the status of each detected product.
+
+**To Run:**
+```bash
+cd src
+./run_example.sh DetectProducts
+```
 
 **Files:**
 - `DetectProducts.cpp`: Core logic of product detection.
@@ -48,6 +70,12 @@ Scans the system for installed security products (e.g., firewalls) and checks if
 ### GetMissingPatches List missing patches found on the endpoint
 This will scan for each patch product and list the missing patches on the macOS system
 
+**To Run:**
+```bash
+cd src
+./run_example.sh GetMissingPatches
+```
+
 **Files:**
 - `GetMissingPatches.cpp`: Core logic of GetMissingPatches.
 - `Utils.cpp`: Utility functions for string processing.
@@ -57,6 +85,12 @@ This will scan for each patch product and list the missing patches on the macOS 
 
 ### GetOSInfo List OS information
 This will return the information of the OS
+
+**To Run:**
+```bash
+cd src
+./run_example.sh GetOSInfo
+```
 
 **Files:**
 - `GetOSInfo.cpp`: Core logic of GetOSInfo.

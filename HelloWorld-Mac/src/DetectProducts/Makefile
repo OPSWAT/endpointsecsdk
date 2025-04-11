@@ -3,31 +3,30 @@ CXXFLAGS = -std=c++17 -Iinclude -I../sdk/inc
 # Detect architecture and set appropriate Homebrew paths
 ifeq ($(shell uname -m),arm64)
 	CXXFLAGS += -I/opt/homebrew/include
+	ARCH = arm64
 else
 	CXXFLAGS += -I/usr/local/include
+	ARCH = x64
 endif
 LDFLAGS = -lnlohmann_json
-# Force using x64 libraries for now since arm64 directory is empty
-ARCH = x64
 LIBS = -L../sdk/lib/$(ARCH) -lwaapi
-REQUIRED_LIBS = libwaapi.dylib
+REQUIRED_LIBS = libwaapi.dylib libwaaddon.dylib libwacollector.dylib libwadeviceinfo.dylib libwadriver.dylib libwainfection.dylib libwalocal.dylib libwaremoval.dylib libwaresource.dylib libwautils.dylib libwavmodapi.dylib
 
 SRC = DetectProducts.cpp Util.cpp SDKInit.cpp
 OUT = detect_products
 
-all: symlinks
-	$(CXX) $(CXXFLAGS) $(SRC) -o $(OUT) $(LIBS) -Wl,-rpath,../sdk/lib/$(ARCH)
+all: frameworks
+	$(CXX) $(CXXFLAGS) $(SRC) -o $(OUT) $(LIBS) -Wl,-rpath,@loader_path/../Frameworks
 	@echo "Build complete. Run with: ./$(OUT)"
 
-symlinks:
-	@echo "Creating symbolic links to required libraries..."
+frameworks:
+	@echo "Creating Frameworks directory structure..."
+	@mkdir -p ../Frameworks
 	@for lib in $(REQUIRED_LIBS); do \
-		ln -sf ../sdk/lib/$(ARCH)/$$lib .; \
+		cp -f ../sdk/lib/$(ARCH)/$$lib ../Frameworks/; \
 	done
 
 clean:
 	rm -f $(OUT) 
-	@echo "Removing symbolic links..."
-	@for lib in $(REQUIRED_LIBS); do \
-		rm -f $$lib; \
-	done 
+	@echo "Removing Frameworks directory..."
+	@rm -rf ../Frameworks 
