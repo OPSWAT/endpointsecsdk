@@ -22,9 +22,32 @@ These examples use clang++ for compiling and using the SDK. You will need [Homeb
 
 ## Building and Running the Samples
 
-You can build and run the samples using either the terminal scripts or Xcode.
+You can build and run the samples using either Xcode (recommended) or the terminal scripts.
 
-### Method 1: Using Terminal Scripts
+### Method 1: Using Xcode (Recommended)
+
+This repository includes an Xcode workspace with projects for the SDK Downloader and all examples, making it easy to build and debug directly within Xcode.
+
+1.  **Open the Xcode Workspace:**
+    Open `HelloWorld-Mac.xcworkspace` in Xcode.
+
+2.  **Download the SDK First:**
+    Before running any examples, you must first build and run the SDK Downloader:
+    - In Xcode, select the `SDKDownloader` scheme from the scheme selector
+    - Click the Run button (or press ⌘R) to build and run
+    - This will download the necessary SDK files to the `src/sdk` directory
+
+3.  **Run an Example:**
+    After the SDK has been downloaded, you can build and run any of the examples:
+    - Select the desired example scheme (e.g., `DetectProducts`, `GetOSInfo`, or `GetMissingPatches`)
+    - Click the Run button (or press ⌘R) to build and run the selected example
+
+4.  **Debugging:**
+    You can set breakpoints in the code and use Xcode's debugging tools to step through the execution.
+
+*Note: The Xcode projects are configured to use the SDK files in the `src/sdk` directory, so make sure to run the SDK Downloader first.*
+
+### Method 2: Using Terminal Scripts
 
 1.  **Download the SDK:**
     First, run the SDK downloader script. This will download the necessary OPSWAT SDK files into the `src/sdk` directory.
@@ -48,28 +71,17 @@ You can build and run the samples using either the terminal scripts or Xcode.
     ./run_example.sh 
     ```
 
-### Method 2: Using Xcode
+### Important: macOS Security Permissions
 
-This repository includes an Xcode workspace with projects for the SDK Downloader and all examples, making it easy to build and debug directly within Xcode.
+When running any of the examples (via Xcode or terminal), you will likely see multiple permission requests from macOS. **You must accept these permission dialogs** for the examples to work properly. 
 
-1.  **Open the Xcode Workspace:**
-    Open `HelloWorld-Mac.xcworkspace` in Xcode.
+The SDK needs to scan your system for installed applications and security products, which requires access to various folders on your Mac. You may see prompts requesting access to:
 
-2.  **Download the SDK First:**
-    Before running any examples, you must first build and run the SDK Downloader:
-    - In Xcode, select the `SDKDownloader` scheme from the scheme selector
-    - Click the Run button (or press ⌘R) to build and run
-    - This will download the necessary SDK files to the `src/sdk` directory
+- Files and Folders
+- System Events
+- Automation permissions
 
-3.  **Run an Example:**
-    After the SDK has been downloaded, you can build and run any of the examples:
-    - Select the desired example scheme (e.g., `DetectProducts`, `GetOSInfo`, or `GetMissingPatches`)
-    - Click the Run button (or press ⌘R) to build and run the selected example
-
-4.  **Debugging:**
-    You can set breakpoints in the code and use Xcode's debugging tools to step through the execution.
-
-*Note: The Xcode projects are configured to use the SDK files in the `src/sdk` directory, so make sure to run the SDK Downloader first.*
+These permission requests are normal and necessary for the SDK to function correctly. After accepting these permissions, the examples will be able to properly detect installed products, missing patches, and other system information.
 
 ### Notes
 - The `build_sdk_downloader.sh` script downloads the latest SDK files into `src/sdk`. It uses the `SDKDownloader` utility located in `src/SDKDownloader`.
