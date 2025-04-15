@@ -43,6 +43,9 @@ int main() {
             wcerr << L"[ERROR] Failed to GetOSInfo products.\n";
             wcerr << osInfoResult;
         }
+        
+        // Make sure to free up the memory
+        wa_api_teardown();
     }
     else {
         wcerr << L"[ERROR] Failed to initialize OESIS.\n";

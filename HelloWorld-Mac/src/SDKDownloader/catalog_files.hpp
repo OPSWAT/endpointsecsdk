@@ -1,0 +1,15 @@
+///////////////////////////////////////////////////////////////////////////////////////////////
+///  Sample Code for HelloWorld
+///  Reference Implementation using OPSWAT MetaDefender Endpoint Security SDK
+///
+///  Created by Chris Seiler
+///  OPSWAT OEM Solutions Architect
+///////////////////////////////////////////////////////////////////////////////////////////////
+
+
+#ifndef CATALOG_FILES_H
+#define CATALOG_FILES_H
+
+void downloadAndExtractCatalogFiles();
+
+#endif // CATALOG_FILES_H

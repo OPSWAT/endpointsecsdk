@@ -43,6 +43,8 @@ int main() {
             wcerr << L"[ERROR] Failed to detect products.\n";
             wcerr << productResult;
         }
+        
+        wa_api_teardown();
     }
     else {
         wcerr << L"[ERROR] Failed to initialize OESIS.\n";

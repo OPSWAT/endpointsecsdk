@@ -252,9 +252,7 @@ void PackageExtractor::copyVapmFiles(const std::string& extractDir, const std::s
     
     // Define possible VAPM directories
     std::vector<fs::path> vapmDirs = {
-        fs::path(extractDir) / "vapm",
-        fs::path(extractDir) / "VAPM",
-        fs::path(extractDir) / "va_plugins"
+        fs::path(extractDir) / "analog/client"
     };
     
     bool foundVapmDir = false;

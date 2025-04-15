@@ -23,7 +23,7 @@ wstring GetDebugConfig()
 
 wstring CreateConfig(bool enableDebug)
 {
-    wstring pass_key = ReadFileContentIntoWString(L"./license/pass_key.txt");
+    wstring pass_key = ReadFileContentIntoWString(L"pass_key.txt");
     wstring licenseKey;
     wstring license;
     json jsonData;
@@ -34,16 +34,18 @@ wstring CreateConfig(bool enableDebug)
         return L"";
     }
 
-    LoadJsonFromFile("./license/license.cfg", jsonData);
+    LoadJsonFromFile("license.cfg", jsonData);
     licenseKey = utf8_to_wstring(jsonData["license_key"].get<string>());
     license = utf8_to_wstring(jsonData["license"].get<string>());
 
+
     // Setup the original config. If debug is enabled then overwrite
-    wstring json_config = L"{ \"config\" : { \"license_bytes\":\"" + license + L"\",\"license_key_bytes\":\"" + licenseKey + L"\",\"passkey_string\": \"" + pass_key + L"\", \"enable_pretty_print\": true, \"silent_mode\": true}, \"config_debug\":{\"debug_log_level\": \"ALL\" } }";
+    // Note: restrict_bundle_search avoids looking in user specific folders on Mac because Apple limitis their access
+    wstring json_config = L"{ \"config\" : { \"license_bytes\":\"" + license + L"\",\"license_key_bytes\":\"" + licenseKey + L"\",\"passkey_string\": \"" + pass_key + L"\", \"enable_pretty_print\": true, \"silent_mode\": true, \"restrict_bundle_search\": \"user_home|shared_folder|removable_media|reminders|photos|calendars|contacts|music\"} } }";
     if (enableDebug)
     {
         wstring debugConfig = GetDebugConfig();
-        json_config = L"{ \"config\" : { \"license_bytes\":\"" + license + L"\",\"license_key_bytes\":\"" + licenseKey + L"\",\"passkey_string\": \"" + pass_key + L"\", \"enable_pretty_print\": true, \"silent_mode\": true}, \"config_debug\":" + debugConfig + L"}";
+        json_config = L"{ \"config\" : { \"license_bytes\":\"" + license + L"\",\"license_key_bytes\":\"" + licenseKey + L"\",\"passkey_string\": \"" + pass_key + L"\", \"enable_pretty_print\": true, \"silent_mode\": true, \"restrict_bundle_search\": \"user_home|shared_folder|removable_media|reminders|photos|calendars|contacts|music\"}, \"config_debug\":" + debugConfig + L"}";
     }
 
     return json_config;

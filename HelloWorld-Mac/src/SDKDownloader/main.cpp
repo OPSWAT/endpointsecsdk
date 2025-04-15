@@ -19,8 +19,8 @@ int main(int argc, char** argv) {
     // Default to relative paths from the executable location
     std::string sdkDir = "../sdk";
     std::string vapmDir = "../vapm";
-    std::string workDir = "./work";
-    std::string licenseDir = "./license";
+    std::string workDir = "../work";
+    std::string licenseDir = "../license";
     
     // Parse command line arguments
     for (int i = 1; i < argc; i++) {
@@ -51,8 +51,11 @@ int main(int argc, char** argv) {
     std::cout << "Using license files from: " << fs::absolute(licenseDir) << std::endl;
     
     // Check if license directory exists
-    if (!fs::exists(licenseDir) || 
-        !fs::exists(fs::path(licenseDir) / "download_token.txt")) {
+    fs::path rawLicensePath = licenseDir;
+    fs::path normalizedLicensePath = rawLicensePath.lexically_normal();
+    
+    if (!fs::exists(normalizedLicensePath) ||
+        !fs::exists(normalizedLicensePath / "download_token.txt")) {
         std::cerr << "Error: license directory or download_token.txt not found at " << licenseDir << std::endl;
         std::cerr << "Please make sure you have extracted the license files to the license directory" << std::endl;
         std::cerr << "The license directory should contain at least:" << std::endl;

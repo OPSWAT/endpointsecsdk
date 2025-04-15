@@ -83,11 +83,16 @@ int GetMissingPatches(wstring* result, int signatureID) {
         }
     }
     else {
-        wcerr << L"[ERROR] GetMissingPatches failed for signature ID " << signatureID
+        
+        // Make sure to check this is not expected.  Not Implemented means that the patch provider is not supportted.
+        if(rc != WAAPI_ERROR_COMPONENT_METHOD_NOT_IMPLEMENTED)
+        {
+            wcerr << L"[ERROR] GetMissingPatches failed for signature ID " << signatureID
             << L" with error code: " << rc << L".\n";
-        if (json_out) {
-            wcerr << json_out;
-            wa_api_free(json_out);  // Free memory after use
+            if (json_out) {
+                wcerr << json_out;
+                wa_api_free(json_out);  // Free memory after use
+            }
         }
     }
 
@@ -103,7 +108,11 @@ void ProcessSignatures(const vector<int>& signatureIDs) {
             wcout << L"[INFO] Success for signature ID " << signatureID << L": " << result << endl;
         }
         else {
-            wcerr << L"[ERROR] Failed to get missing patches for signature ID " << signatureID << endl;
+            
+            if(status != WAAPI_ERROR_COMPONENT_METHOD_NOT_IMPLEMENTED)
+            {
+                wcerr << L"[ERROR] Failed to get missing patches for signature ID " << signatureID << endl;
+            }
         }
     }
 }
@@ -121,6 +130,8 @@ int main() {
             wcerr << L"[ERROR] Failed to detect products.\n";
             wcerr << productResult;
         }
+        
+        wa_api_teardown();
     }
     else {
         wcerr << L"[ERROR] Failed to initialize OESIS.\n";

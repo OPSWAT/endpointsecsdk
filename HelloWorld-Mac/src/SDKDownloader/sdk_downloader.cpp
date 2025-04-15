@@ -2,6 +2,7 @@
 #include <iostream>
 #include <fstream>
 
+
 SdkDownloader::SdkDownloader(const std::string& sdkDir, 
                            const std::string& vapmDir,
                            const std::string& workDir,
@@ -112,7 +113,7 @@ bool SdkDownloader::downloadSdkPackages() {
         }
         
         // Extract catalog package
-        if (!packageExtractor_.extractPackage(catalogOutputPath, stageDirectory_ + "/analog")) {
+        if (!packageExtractor_.extractPackage(catalogOutputPath, extractDirectory_)) {
             std::cerr << "Failed to extract catalog package: " << catalogOutputPath << std::endl;
             return false;
         }
@@ -143,12 +144,6 @@ bool SdkDownloader::extractAndSetupSdk() {
         if (!packageExtractor_.copyExtractedFiles(extractDirectory_, sdkDirectory_, vapmDirectory_)) {
             std::cerr << "Failed to copy SDK files" << std::endl;
             return false;
-        }
-        
-        // Copy catalog files
-        std::string analogPath = stageDirectory_ + "/analog";
-        if (fs::exists(analogPath + "/client")) {
-            packageExtractor_.copyExtractedFiles(analogPath, "", vapmDirectory_);
         }
         
         return true;
