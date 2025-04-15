@@ -1,0 +1,586 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		8A2345671234567800000001 /* DetectProducts.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8A2345671234567800000021 /* DetectProducts.cpp */; };
+		8A2345671234567800000002 /* Util.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8A2345671234567800000022 /* Util.cpp */; };
+		8A2345671234567800000003 /* SDKInit.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8A2345671234567800000023 /* SDKInit.cpp */; };
+		8A2345671234567800000004 /* GetOSInfo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8A2345671234567800000024 /* GetOSInfo.cpp */; };
+		8A2345671234567800000005 /* Util.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8A2345671234567800000025 /* Util.cpp */; };
+		8A2345671234567800000006 /* SDKInit.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8A2345671234567800000026 /* SDKInit.cpp */; };
+		8A2345671234567800000007 /* GetMissingPatches.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8A2345671234567800000027 /* GetMissingPatches.cpp */; };
+		8A2345671234567800000008 /* Util.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8A2345671234567800000028 /* Util.cpp */; };
+		8A2345671234567800000009 /* SDKInit.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8A2345671234567800000029 /* SDKInit.cpp */; };
+		8ABCDEF123456789000001 /* libwaapi.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8ABCDEF1234567890000011 /* libwaapi.dylib */; };
+		8ABCDEF123456789000002 /* libwaaddon.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8ABCDEF1234567890000012 /* libwaaddon.dylib */; };
+		8ABCDEF123456789000003 /* libwacollector.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8ABCDEF1234567890000013 /* libwacollector.dylib */; };
+		8ABCDEF123456789000004 /* libwadeviceinfo.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8ABCDEF1234567890000014 /* libwadeviceinfo.dylib */; };
+		8ABCDEF123456789000005 /* libwadriver.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8ABCDEF1234567890000015 /* libwadriver.dylib */; };
+		8ABCDEF123456789000006 /* libwainfection.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8ABCDEF1234567890000016 /* libwainfection.dylib */; };
+		8ABCDEF123456789000007 /* libwalocal.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8ABCDEF1234567890000017 /* libwalocal.dylib */; };
+		8ABCDEF123456789000008 /* libwaremoval.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8ABCDEF1234567890000018 /* libwaremoval.dylib */; };
+		8ABCDEF123456789000009 /* libwaresource.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8ABCDEF1234567890000019 /* libwaresource.dylib */; };
+		8ABCDEF123456789000010 /* libwautils.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8ABCDEF1234567890000020 /* libwautils.dylib */; };
+		8ABCDEF123456789000011 /* libwavmodapi.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8ABCDEF1234567890000021 /* libwavmodapi.dylib */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		8A2345671234567800000010 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
+		8A2345671234567800000011 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
+		8A2345671234567800000012 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
+		8ABCDEF1234567890000000 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = ../Frameworks;
+			dstSubfolderSpec = 16;
+			files = (
+				8ABCDEF123456789000001 /* libwaapi.dylib in CopyFiles */,
+				8ABCDEF123456789000002 /* libwaaddon.dylib in CopyFiles */,
+				8ABCDEF123456789000003 /* libwacollector.dylib in CopyFiles */,
+				8ABCDEF123456789000004 /* libwadeviceinfo.dylib in CopyFiles */,
+				8ABCDEF123456789000005 /* libwadriver.dylib in CopyFiles */,
+				8ABCDEF123456789000006 /* libwainfection.dylib in CopyFiles */,
+				8ABCDEF123456789000007 /* libwalocal.dylib in CopyFiles */,
+				8ABCDEF123456789000008 /* libwaremoval.dylib in CopyFiles */,
+				8ABCDEF123456789000009 /* libwaresource.dylib in CopyFiles */,
+				8ABCDEF123456789000010 /* libwautils.dylib in CopyFiles */,
+				8ABCDEF123456789000011 /* libwavmodapi.dylib in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		8A2345671234567800000013 /* DetectProducts */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = DetectProducts; sourceTree = BUILT_PRODUCTS_DIR; };
+		8A2345671234567800000014 /* GetOSInfo */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = GetOSInfo; sourceTree = BUILT_PRODUCTS_DIR; };
+		8A2345671234567800000015 /* GetMissingPatches */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = GetMissingPatches; sourceTree = BUILT_PRODUCTS_DIR; };
+		8A2345671234567800000021 /* DetectProducts.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = DetectProducts.cpp; path = ../src/DetectProducts/DetectProducts.cpp; sourceTree = "<group>"; };
+		8A2345671234567800000022 /* Util.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Util.cpp; path = ../src/DetectProducts/Util.cpp; sourceTree = "<group>"; };
+		8A2345671234567800000023 /* SDKInit.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SDKInit.cpp; path = ../src/DetectProducts/SDKInit.cpp; sourceTree = "<group>"; };
+		8A2345671234567800000024 /* GetOSInfo.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = GetOSInfo.cpp; path = ../src/GetOSInfo/GetOSInfo.cpp; sourceTree = "<group>"; };
+		8A2345671234567800000025 /* Util.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Util.cpp; path = ../src/GetOSInfo/Util.cpp; sourceTree = "<group>"; };
+		8A2345671234567800000026 /* SDKInit.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SDKInit.cpp; path = ../src/GetOSInfo/SDKInit.cpp; sourceTree = "<group>"; };
+		8A2345671234567800000027 /* GetMissingPatches.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = GetMissingPatches.cpp; path = ../src/GetMissingPatches/GetMissingPatches.cpp; sourceTree = "<group>"; };
+		8A2345671234567800000028 /* Util.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Util.cpp; path = ../src/GetMissingPatches/Util.cpp; sourceTree = "<group>"; };
+		8A2345671234567800000029 /* SDKInit.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SDKInit.cpp; path = ../src/GetMissingPatches/SDKInit.cpp; sourceTree = "<group>"; };
+		8A2345671234567800000030 /* Util.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Util.h; path = ../src/DetectProducts/Util.h; sourceTree = "<group>"; };
+		8A2345671234567800000031 /* SDKInit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SDKInit.h; path = ../src/DetectProducts/SDKInit.h; sourceTree = "<group>"; };
+		8A2345671234567800000032 /* Util.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Util.h; path = ../src/GetOSInfo/Util.h; sourceTree = "<group>"; };
+		8A2345671234567800000033 /* SDKInit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SDKInit.h; path = ../src/GetOSInfo/SDKInit.h; sourceTree = "<group>"; };
+		8A2345671234567800000034 /* Util.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Util.h; path = ../src/GetMissingPatches/Util.h; sourceTree = "<group>"; };
+		8A2345671234567800000035 /* SDKInit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SDKInit.h; path = ../src/GetMissingPatches/SDKInit.h; sourceTree = "<group>"; };
+		8ABCDEF1234567890000011 /* libwaapi.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libwaapi.dylib; path = ../src/Frameworks/libwaapi.dylib; sourceTree = "<group>"; };
+		8ABCDEF1234567890000012 /* libwaaddon.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libwaaddon.dylib; path = ../src/Frameworks/libwaaddon.dylib; sourceTree = "<group>"; };
+		8ABCDEF1234567890000013 /* libwacollector.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libwacollector.dylib; path = ../src/Frameworks/libwacollector.dylib; sourceTree = "<group>"; };
+		8ABCDEF1234567890000014 /* libwadeviceinfo.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libwadeviceinfo.dylib; path = ../src/Frameworks/libwadeviceinfo.dylib; sourceTree = "<group>"; };
+		8ABCDEF1234567890000015 /* libwadriver.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libwadriver.dylib; path = ../src/Frameworks/libwadriver.dylib; sourceTree = "<group>"; };
+		8ABCDEF1234567890000016 /* libwainfection.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libwainfection.dylib; path = ../src/Frameworks/libwainfection.dylib; sourceTree = "<group>"; };
+		8ABCDEF1234567890000017 /* libwalocal.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libwalocal.dylib; path = ../src/Frameworks/libwalocal.dylib; sourceTree = "<group>"; };
+		8ABCDEF1234567890000018 /* libwaremoval.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libwaremoval.dylib; path = ../src/Frameworks/libwaremoval.dylib; sourceTree = "<group>"; };
+		8ABCDEF1234567890000019 /* libwaresource.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libwaresource.dylib; path = ../src/Frameworks/libwaresource.dylib; sourceTree = "<group>"; };
+		8ABCDEF1234567890000020 /* libwautils.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libwautils.dylib; path = ../src/Frameworks/libwautils.dylib; sourceTree = "<group>"; };
+		8ABCDEF1234567890000021 /* libwavmodapi.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libwavmodapi.dylib; path = ../src/Frameworks/libwavmodapi.dylib; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		8A2345671234567800000040 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		8A2345671234567800000041 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		8A2345671234567800000042 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		8A2345671234567800000050 = {
+			isa = PBXGroup;
+			children = (
+				8A2345671234567800000051 /* DetectProducts */,
+				8A2345671234567800000052 /* GetOSInfo */,
+				8A2345671234567800000053 /* GetMissingPatches */,
+				8A2345671234567800000054 /* Products */,
+				8ABCDEF1234567890000030 /* Frameworks */,
+			);
+			sourceTree = "<group>";
+		};
+		8A2345671234567800000051 /* DetectProducts */ = {
+			isa = PBXGroup;
+			children = (
+				8A2345671234567800000021 /* DetectProducts.cpp */,
+				8A2345671234567800000022 /* Util.cpp */,
+				8A2345671234567800000023 /* SDKInit.cpp */,
+				8A2345671234567800000030 /* Util.h */,
+				8A2345671234567800000031 /* SDKInit.h */,
+			);
+			name = DetectProducts;
+			sourceTree = "<group>";
+		};
+		8A2345671234567800000052 /* GetOSInfo */ = {
+			isa = PBXGroup;
+			children = (
+				8A2345671234567800000024 /* GetOSInfo.cpp */,
+				8A2345671234567800000025 /* Util.cpp */,
+				8A2345671234567800000026 /* SDKInit.cpp */,
+				8A2345671234567800000032 /* Util.h */,
+				8A2345671234567800000033 /* SDKInit.h */,
+			);
+			name = GetOSInfo;
+			sourceTree = "<group>";
+		};
+		8A2345671234567800000053 /* GetMissingPatches */ = {
+			isa = PBXGroup;
+			children = (
+				8A2345671234567800000027 /* GetMissingPatches.cpp */,
+				8A2345671234567800000028 /* Util.cpp */,
+				8A2345671234567800000029 /* SDKInit.cpp */,
+				8A2345671234567800000034 /* Util.h */,
+				8A2345671234567800000035 /* SDKInit.h */,
+			);
+			name = GetMissingPatches;
+			sourceTree = "<group>";
+		};
+		8A2345671234567800000054 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				8A2345671234567800000013 /* DetectProducts */,
+				8A2345671234567800000014 /* GetOSInfo */,
+				8A2345671234567800000015 /* GetMissingPatches */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		8ABCDEF1234567890000030 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				8ABCDEF1234567890000011 /* libwaapi.dylib */,
+				8ABCDEF1234567890000012 /* libwaaddon.dylib */,
+				8ABCDEF1234567890000013 /* libwacollector.dylib */,
+				8ABCDEF1234567890000014 /* libwadeviceinfo.dylib */,
+				8ABCDEF1234567890000015 /* libwadriver.dylib */,
+				8ABCDEF1234567890000016 /* libwainfection.dylib */,
+				8ABCDEF1234567890000017 /* libwalocal.dylib */,
+				8ABCDEF1234567890000018 /* libwaremoval.dylib */,
+				8ABCDEF1234567890000019 /* libwaresource.dylib */,
+				8ABCDEF1234567890000020 /* libwautils.dylib */,
+				8ABCDEF1234567890000021 /* libwavmodapi.dylib */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		8A2345671234567800000060 /* DetectProducts */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 8A2345671234567800000061 /* Build configuration list for PBXNativeTarget "DetectProducts" */;
+			buildPhases = (
+				8A2345671234567800000062 /* Sources */,
+				8A2345671234567800000040 /* Frameworks */,
+				8A2345671234567800000010 /* CopyFiles */,
+				8ABCDEF1234567890000000 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = DetectProducts;
+			productName = DetectProducts;
+			productReference = 8A2345671234567800000013 /* DetectProducts */;
+			productType = "com.apple.product-type.tool";
+		};
+		8A2345671234567800000070 /* GetOSInfo */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 8A2345671234567800000071 /* Build configuration list for PBXNativeTarget "GetOSInfo" */;
+			buildPhases = (
+				8A2345671234567800000072 /* Sources */,
+				8A2345671234567800000041 /* Frameworks */,
+				8A2345671234567800000011 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = GetOSInfo;
+			productName = GetOSInfo;
+			productReference = 8A2345671234567800000014 /* GetOSInfo */;
+			productType = "com.apple.product-type.tool";
+		};
+		8A2345671234567800000080 /* GetMissingPatches */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 8A2345671234567800000081 /* Build configuration list for PBXNativeTarget "GetMissingPatches" */;
+			buildPhases = (
+				8A2345671234567800000082 /* Sources */,
+				8A2345671234567800000042 /* Frameworks */,
+				8A2345671234567800000012 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = GetMissingPatches;
+			productName = GetMissingPatches;
+			productReference = 8A2345671234567800000015 /* GetMissingPatches */;
+			productType = "com.apple.product-type.tool";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		8A2345671234567800000090 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastUpgradeCheck = 1630;
+				TargetAttributes = {
+					8A2345671234567800000060 = {
+						CreatedOnToolsVersion = 16.3;
+					};
+					8A2345671234567800000070 = {
+						CreatedOnToolsVersion = 16.3;
+					};
+					8A2345671234567800000080 = {
+						CreatedOnToolsVersion = 16.3;
+					};
+				};
+			};
+			buildConfigurationList = 8A2345671234567800000091 /* Build configuration list for PBXProject "Examples" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 8A2345671234567800000050;
+			productRefGroup = 8A2345671234567800000054 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				8A2345671234567800000060 /* DetectProducts */,
+				8A2345671234567800000070 /* GetOSInfo */,
+				8A2345671234567800000080 /* GetMissingPatches */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		8A2345671234567800000062 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8A2345671234567800000001 /* DetectProducts.cpp in Sources */,
+				8A2345671234567800000002 /* Util.cpp in Sources */,
+				8A2345671234567800000003 /* SDKInit.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		8A2345671234567800000072 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8A2345671234567800000004 /* GetOSInfo.cpp in Sources */,
+				8A2345671234567800000005 /* Util.cpp in Sources */,
+				8A2345671234567800000006 /* SDKInit.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		8A2345671234567800000082 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8A2345671234567800000007 /* GetMissingPatches.cpp in Sources */,
+				8A2345671234567800000008 /* Util.cpp in Sources */,
+				8A2345671234567800000009 /* SDKInit.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		8A2345671234567800000100 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = (
+					/opt/homebrew/include,
+					/usr/local/include,
+					"$(SRCROOT)/../src/sdk/inc",
+				);
+				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../Frameworks";
+				LIBRARY_SEARCH_PATHS = (
+					"$(SRCROOT)/../src/sdk/lib/$(ARCH)",
+					/opt/homebrew/lib,
+					/usr/local/lib,
+					"$(SRCROOT)/../src/Frameworks",
+				);
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				OTHER_LDFLAGS = (
+					"-lwaapi",
+					"-I/opt/homebrew/include",
+					"-I/usr/local/include",
+					"-L/opt/homebrew/lib",
+					"-L/usr/local/lib",
+				);
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		8A2345671234567800000101 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = (
+					/opt/homebrew/include,
+					/usr/local/include,
+					"$(SRCROOT)/../src/sdk/inc",
+				);
+				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../Frameworks";
+				LIBRARY_SEARCH_PATHS = (
+					"$(SRCROOT)/../src/sdk/lib/$(ARCH)",
+					/opt/homebrew/lib,
+					/usr/local/lib,
+					"$(SRCROOT)/../src/Frameworks",
+				);
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				OTHER_LDFLAGS = (
+					"-lwaapi",
+					"-I/opt/homebrew/include",
+					"-I/usr/local/include",
+					"-L/opt/homebrew/lib",
+					"-L/usr/local/lib",
+				);
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		8A2345671234567800000102 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../Frameworks";
+			};
+			name = Debug;
+		};
+		8A2345671234567800000103 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../Frameworks";
+			};
+			name = Release;
+		};
+		8A2345671234567800000104 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		8A2345671234567800000105 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+		8A2345671234567800000106 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		8A2345671234567800000107 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		8A2345671234567800000061 /* Build configuration list for PBXNativeTarget "DetectProducts" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				8A2345671234567800000102 /* Debug */,
+				8A2345671234567800000103 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		8A2345671234567800000071 /* Build configuration list for PBXNativeTarget "GetOSInfo" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				8A2345671234567800000104 /* Debug */,
+				8A2345671234567800000105 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		8A2345671234567800000081 /* Build configuration list for PBXNativeTarget "GetMissingPatches" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				8A2345671234567800000106 /* Debug */,
+				8A2345671234567800000107 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		8A2345671234567800000091 /* Build configuration list for PBXProject "Examples" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				8A2345671234567800000100 /* Debug */,
+				8A2345671234567800000101 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 8A2345671234567800000090 /* Project object */;
+}
