@@ -80,9 +80,12 @@ echo "--- Preparing Example: $TARGET_EXAMPLE ---"
 
 # --- Copy License Files ---
 echo "Copying license files to $EXAMPLE_DIR..."
-# Create license directory if it doesn't exist in the example folder
+# Copy license files directly to the example's root directory (not to a license subdirectory)
+cp "$SRC_DIR/$LICENSE_DIR/license.cfg" "$EXAMPLE_DIR/"
+cp "$SRC_DIR/$LICENSE_DIR/pass_key.txt" "$EXAMPLE_DIR/"
+
+# Also copy to license dir for backward compatibility if needed
 mkdir -p "$EXAMPLE_DIR/$LICENSE_DIR"
-# Copy contents of the main license folder to the example's license folder
 cp -R "$SRC_DIR/$LICENSE_DIR/"* "$EXAMPLE_DIR/$LICENSE_DIR/"
 
 

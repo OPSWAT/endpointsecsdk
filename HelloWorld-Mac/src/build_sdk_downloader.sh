@@ -104,6 +104,17 @@ fi
 
 cd ..
 
+# Copy required data files for the GetProductVulnerability module
+echo "Copying vulnerability data files to GetProductVulnerability directory..."
+if [ -f "vapm/mav.dat" ] && [ -f "vapm/v2mod.dat" ]; then
+    mkdir -p "GetProductVulnerability"
+    cp "vapm/mav.dat" "GetProductVulnerability/"
+    cp "vapm/v2mod.dat" "GetProductVulnerability/"
+    echo "Data files copied successfully to GetProductVulnerability directory."
+else
+    echo "Warning: Vulnerability data files not found in vapm directory. GetProductVulnerability example may not work correctly."
+fi
+
 # Clean up SDKDownloader temporary files if any (e.g., stage)
 echo "Cleaning up temporary files..."
 rm -rf stage

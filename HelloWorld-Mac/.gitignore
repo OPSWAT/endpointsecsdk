@@ -23,12 +23,26 @@ src/*/license/license.cfg
 src/*/license/download_token.txt
 src/*/license/pass_key.txt
 
+# License files anywhere in the project
+**/license.cfg
+**/pass_key.txt
+**/download_token.txt
+
+# Data files anywhere in the project
+**/*.dat
+
 # Example project executables and symlinks
 src/DetectProducts/detect_products
 src/GetOSInfo/get-os-info
 src/GetMissingPatches/get-missing-patches
 src/GetProductVulnerability/get-product-vulnerability
 src/*/libwa*.dylib
+
+# SDKDownloader binaries
+src/SDKDownloader/SDKDownloader
+src/SDKDownloader/sdk_downloader
+**/SDKDownloader
+**/sdk_downloader
 
 # Build artifacts
 build/
