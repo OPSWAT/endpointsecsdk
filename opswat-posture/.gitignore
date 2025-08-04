@@ -1,0 +1,12 @@
+.vs/
+src/packages/
+src/opswat-posture/bin/
+src/opswat-posture/obj/
+src/opswat-posture/.vs/
+src/opswat-posture/opswat-posture.csproj.user
+
+src/OPSWAT-Adapter/bin/
+src/OPSWAT-Adapter/obj/
+src/OPSWAT-Adapter/.vs/
+src/OPSWAT-Adapter/OPSWAT-Adapter.csproj.user
+

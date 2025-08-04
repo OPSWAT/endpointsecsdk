@@ -1,0 +1,66 @@
+################################################################################
+# OPSWAT MetaDefender Security Endpoint SDK - macOS Sample Applications
+################################################################################
+
+# OS and IDE files
+.DS_Store
+*.xcuserstate
+xcuserdata/
+.xcode-select/
+.xcworkspace/
+
+# SDK-related directories and files
+src/sdk/
+src/Frameworks/
+sdk/
+vapm/
+
+# License files (containing credentials/tokens)
+src/license/license.cfg
+src/license/download_token.txt
+src/license/pass_key.txt
+src/*/license/license.cfg
+src/*/license/download_token.txt
+src/*/license/pass_key.txt
+
+# License files anywhere in the project
+**/license.cfg
+**/pass_key.txt
+**/download_token.txt
+
+# Data files anywhere in the project
+**/*.dat
+
+# Example project executables and symlinks
+src/DetectProducts/detect_products
+src/GetOSInfo/get-os-info
+src/GetMissingPatches/get-missing-patches
+src/GetProductVulnerability/get-product-vulnerability
+src/*/libwa*.dylib
+
+# SDKDownloader binaries
+src/SDKDownloader/SDKDownloader
+src/SDKDownloader/sdk_downloader
+**/SDKDownloader
+**/sdk_downloader
+
+# Build artifacts
+build/
+*.o
+*.dSYM
+copydev
+run
+
+# Downloaded and extracted files
+stage/
+*.zip
+*.tar
+*.tar.gz
+*.tar.bz2
+*.sig
+*.gpg
+
+# Log files
+*.log
+*/log.txt
+*/logs/*.txt
