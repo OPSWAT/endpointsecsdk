@@ -33,7 +33,6 @@ namespace SDKDownloadLib
 
         public static string GetTokenDownloadURL(string fileName)
         {
-            Console.WriteLine("Can not find Token");
             string DOWNLOAD_TOKEN = File.ReadAllText("download_token.txt");
             string result = VCR_URL.Replace("%token%", DOWNLOAD_TOKEN);
             result = result.Replace("%file%", fileName);
