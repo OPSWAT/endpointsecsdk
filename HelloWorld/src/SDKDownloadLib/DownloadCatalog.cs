@@ -7,6 +7,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
 using SDKDownloader;
+using System;
 using System.IO;
 
 namespace SDKDownloadLib
@@ -32,6 +33,7 @@ namespace SDKDownloadLib
 
         public static string GetTokenDownloadURL(string fileName)
         {
+            string DOWNLOAD_TOKEN = File.ReadAllText("download_token.txt");
             string result = VCR_URL.Replace("%token%", DOWNLOAD_TOKEN);
             result = result.Replace("%file%", fileName);
             return result;
