@@ -36,3 +36,24 @@ src/Patch/.vs/
 src/Patch/Patch.csproj.user
 
 src/vapm/
+
+# Vulnerability-WOS project
+src/Vulnerability-WOS/bin/
+src/Vulnerability-WOS/obj/
+src/Vulnerability-WOS/.vs/
+src/Vulnerability-WOS/Vulnerability-WOS.csproj.user
+
+# License files
+**/*license*
+**/pass_key.txt
+**/license.cfg
+
+# Download tokens
+**/*token*
+**/download_token.txt
+**/token.cfg
+
+# Claude AI files
+.claude/
+**/.claude/
+CLAUDE.md
