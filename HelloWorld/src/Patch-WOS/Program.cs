@@ -381,6 +381,7 @@ namespace PatchWOS
                 int index = 0;
 
                 // load multiple installDetails using GetInstallerDetailList pattern
+                // simply while loop to call DownloadValidFile in this while loop
                 while (installerStillExists)
                 {
                     try
@@ -426,6 +427,7 @@ namespace PatchWOS
                             Console.WriteLine("Installing " + current.title);
 
                             // Install the patch - following reference pattern call to InstallFromFiles
+                            // ensure to pass in the patch_id from getLatestInstaller
                             string installResult = InstallFromFiles(signatureToInstall, current.path, current.patch_id);
                             Console.WriteLine("Install result: " + installResult);
                             
@@ -443,6 +445,8 @@ namespace PatchWOS
                         // Continue processing remaining patches even if one fails
                     }
                 }
+
+                // If requires_restart == 1 print out a message that states that the user needs to restart the computer
 
                 // STEP 6: Clean up OESIS framework resources
                 OESISAdapter.wa_api_teardown();
