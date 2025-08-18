@@ -212,14 +212,45 @@ namespace PatchWOS
                 result.patch_id = jsonOut.result.patch_id;
                 result.language = jsonOut.result.language;
 
-                // Extract SHA256 checksums for file validation
+                // Extract checksums for file validation (supports SHA1, SHA256, SHA512, MD5)
                 var sha256Array = jsonOut.result.expected_sha256;
+                var sha1Array = jsonOut.result.expected_sha1;
+                var sha512Array = jsonOut.result.expected_sha512;
+                var md5Array = jsonOut.result.expected_md5;
+                
                 if (sha256Array != null)
                 {
                     for (int i = 0; i < sha256Array.Count; i++)
                     {
                         string sha256 = sha256Array[i];
                         result.checksumList.Add(sha256);
+                    }
+                }
+                
+                if (sha1Array != null)
+                {
+                    for (int i = 0; i < sha1Array.Count; i++)
+                    {
+                        string sha1 = sha1Array[i];
+                        result.checksumList.Add(sha1);
+                    }
+                }
+                
+                if (sha512Array != null)
+                {
+                    for (int i = 0; i < sha512Array.Count; i++)
+                    {
+                        string sha512 = sha512Array[i];
+                        result.checksumList.Add(sha512);
+                    }
+                }
+                
+                if (md5Array != null)
+                {
+                    for (int i = 0; i < md5Array.Count; i++)
+                    {
+                        string md5 = md5Array[i];
+                        result.checksumList.Add(md5);
                     }
                 }
 
@@ -267,7 +298,13 @@ namespace PatchWOS
             string result = "";
             // Build JSON request to query patch database for this component and index
             string json_in = "{\"input\": { \"method\": 50300, \"signature\": " + signatureId + ", \"index\": " + index + " } }";
+            
+            Console.WriteLine("JSON INPUT: " + json_in);
+            
             int rc = Invoke(json_in, out result);
+            
+            Console.WriteLine("JSON OUTPUT: " + result);
+            
             //-1039, results when you reach the end of the index
             if (rc != -1039 && rc < 0)
             {
@@ -373,16 +410,14 @@ namespace PatchWOS
                 int signatureToInstall = 1103; // Windows OS signature (works with wuo.dat)
                 Console.WriteLine("Checking for Windows OS patches...");
 
-                // STEP 4: Collect all available installer details using index-based iteration
-                // Following reference pattern: Loop through multiple installer details using index
+                // STEP 4 & 5: Query, download, and install patches in single loop
+                // Simplified approach: process each patch immediately instead of collecting first
                 Console.WriteLine("loaded both patch databases, now querying for available patches and installers...");
-                List<InstallerDetail> installerDetailList = new List<InstallerDetail>();
-                bool installerStillExists = true;
                 int index = 0;
+                int patchesProcessed = 0;
+                bool requiresRestart = false;
 
-                // load multiple installDetails using GetInstallerDetailList pattern
-                // simply while loop to call DownloadValidFile in this while loop
-                while (installerStillExists)
+                while (true)
                 {
                     try
                     {
@@ -391,62 +426,62 @@ namespace PatchWOS
                         InstallerDetail installerDetail = GetInstallerDetail(installerJson);
 
                         // Check if the installer is valid
-                        if (installerDetail.result_code != -1039)
+                        if (installerDetail.result_code == -1039)
                         {
-                            installerDetailList.Add(installerDetail);
-                            index++; // Move to next potential installer
+                            Console.WriteLine(patchesProcessed + " patches available for Windows OS components");
+                            break; // No more installers available at this index
+                        }
+
+                        // Process the patch immediately
+                        Console.WriteLine("Downloading " + installerDetail.title + " " + installerDetail.url);
+                        
+                        // Download and validate the patch file
+                        bool downloadResult = HttpClientUtils.DownloadValidFile(installerDetail.url, installerDetail.path, null);
+
+                        if (downloadResult)
+                        {
+                            Console.WriteLine("Installing " + installerDetail.title);
+
+                            // Install the patch
+                            string installResult = InstallFromFiles(signatureToInstall, installerDetail.path, installerDetail.patch_id);
+                            Console.WriteLine("Install result: " + installResult);
+                            
+                            // Check if restart is required
+                            dynamic installJson = JObject.Parse(installResult);
+                            if (installJson.result != null && installJson.result.requires_restart == 1)
+                            {
+                                requiresRestart = true;
+                            }
+                            
+                            // Cleanup the installer file after successful install
+                            File.Delete(installerDetail.path);
                         }
                         else
                         {
-                            Console.WriteLine(index + "Pathes available for Windows OS components");
-                            break; // No more installers available at this index
+                            Console.WriteLine("Failed to download installer: " + installerDetail.url);
                         }
+
+                        patchesProcessed++;
+                        index++; // Move to next potential installer
                     }
                     catch (Exception e)
                     {
                         Console.WriteLine("No more installers available at index " + index + ": " + e.Message);
+                        Console.WriteLine(patchesProcessed + " patches processed for Windows OS components");
                         break;
                     }
                 }
 
-                // STEP 5: Process and install each available patch
-                // Following reference pattern: Loop through each installer detail and install
-                foreach (InstallerDetail current in installerDetailList)
+                // Check if restart is required and notify user
+                if (requiresRestart)
                 {
-                    try
-                    {
-                        Console.WriteLine("Downloading " + current.title + " " + current.url);
-                        
-                        // Download and validate the patch file using SHA256 verification, SHA256 is null for now
-                        bool downloadResult = HttpClientUtils.DownloadValidFile(current.url, current.path, null);
-
-       
-                        if (downloadResult)
-                        {
-
-                            Console.WriteLine("Installing " + current.title);
-
-                            // Install the patch - following reference pattern call to InstallFromFiles
-                            // ensure to pass in the patch_id from getLatestInstaller
-                            string installResult = InstallFromFiles(signatureToInstall, current.path, current.patch_id);
-                            Console.WriteLine("Install result: " + installResult);
-                            
-                            // Cleanup the installer file after successful install
-                            File.Delete(current.path);
-                        }
-                        else
-                        {
-                            Console.WriteLine("Failed to download installer: " + current.url);
-                        }
-                    }
-                    catch (Exception e)
-                    {
-                        Console.WriteLine("Failed to install patch: " + e.Message);
-                        // Continue processing remaining patches even if one fails
-                    }
+                    Console.WriteLine();
+                    Console.WriteLine("=============================================================");
+                    Console.WriteLine("RESTART REQUIRED: One or more patches require a system restart.");
+                    Console.WriteLine("Please restart your computer to complete the installation.");
+                    Console.WriteLine("=============================================================");
+                    Console.WriteLine();
                 }
-
-                // If requires_restart == 1 print out a message that states that the user needs to restart the computer
 
                 // STEP 6: Clean up OESIS framework resources
                 OESISAdapter.wa_api_teardown();
