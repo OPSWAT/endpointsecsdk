@@ -95,7 +95,6 @@ namespace PatchWOS
         {
             bool result = false;
 
-            Console.WriteLine("DownloadValidFile");
 
             HttpClientUtils.DownloadFileSynchronous(url, localFilePath);
 
@@ -135,11 +134,9 @@ namespace PatchWOS
         /// <param name="destPath">The local file path where the downloaded file will be saved.</param>
         public static void DownloadFileSynchronous(string url, string destPath)
         {
-            Console.WriteLine("DownloadFileSynchronous 1 ");
 
             using (var client = new System.Net.Http.HttpClient()) // WebClient
             {
-                Console.WriteLine("DownloadFileSynchronous 2 ");
 
                 var fileName = destPath;
                 var uri = new Uri(url);
@@ -164,16 +161,13 @@ namespace PatchWOS
         public static async Task DownloadFileTaskAsync(this HttpClient client, Uri uri, string FileName)
         {
 
-            Console.WriteLine("DownloadFileTaskAsync 1 ");
 
             using (var s = await client.GetStreamAsync(uri))
             {
-                Console.WriteLine("DownloadFileTaskAsync 2 ");
 
                 using (var fs = new FileStream(FileName, FileMode.CreateNew))
                 {
                     await s.CopyToAsync(fs);
-                    Console.WriteLine("DownloadFileTaskAsync 3 ");
                 }
             }
         }
