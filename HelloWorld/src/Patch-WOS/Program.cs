@@ -435,8 +435,8 @@ namespace PatchWOS
                         // Process the patch immediately
                         Console.WriteLine("Downloading " + installerDetail.title + " " + installerDetail.url);
                         
-                        // Download and validate the patch file
-                        bool downloadResult = HttpClientUtils.DownloadValidFile(installerDetail.url, installerDetail.path, null);
+                        // Download and validate the patch file with checksums
+                        bool downloadResult = HttpClientUtils.DownloadValidFile(installerDetail.url, installerDetail.path, installerDetail.checksumList);
 
                         if (downloadResult)
                         {
