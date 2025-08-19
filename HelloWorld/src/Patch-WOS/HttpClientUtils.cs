@@ -65,7 +65,7 @@ namespace PatchWOS
 
                         string newHashString = ByteArrayToString(hashValue);
 
-                        if (expectedHash == newHashString)
+                        if (expectedHash.Equals(newHashString, StringComparison.OrdinalIgnoreCase))
                         {
                             result = true;
                         }
@@ -85,43 +85,123 @@ namespace PatchWOS
         }
 
         /// <summary>
-        /// Downloads a file from the specified URL and validates its SHA256 hash.
+        /// Checks the SHA1 hash of a file against an expected hash.
         /// </summary>
-        /// <param name="url">The URL of the file to download.</param>
-        /// <param name="localFilePath">The local file path where the downloaded file will be saved.</param>
-        /// <param name="sha256Hash">The expected SHA256 hash of the file.</param>
-        /// <returns>True if the file was downloaded and validated successfully, otherwise false.</returns>
-        public static bool DownloadValidFile(string url, string localFilePath, string sha256Hash)
+        /// <param name="file">The file to check.</param>
+        /// <param name="expectedHash">The expected SHA1 hash.</param>
+        /// <returns>True if the hash matches, otherwise false.</returns>
+        private static bool CheckSha1(string file, string expectedHash)
         {
             bool result = false;
 
+            using (SHA1 mySHA1 = SHA1.Create())
+            {
+                FileInfo fileInfo = new FileInfo(file);
+
+                using (FileStream fileStream = fileInfo.Open(FileMode.Open))
+                {
+                    try
+                    {
+                        fileStream.Position = 0;
+                        byte[] hashValue = mySHA1.ComputeHash(fileStream);
+                        string newHashString = ByteArrayToString(hashValue);
+
+                        if (expectedHash.Equals(newHashString, StringComparison.OrdinalIgnoreCase))
+                        {
+                            result = true;
+                        }
+                    }
+                    catch (IOException e)
+                    {
+                        Console.WriteLine($"I/O Exception: {e.Message}");
+                    }
+                    catch (UnauthorizedAccessException e)
+                    {
+                        Console.WriteLine($"Access Exception: {e.Message}");
+                    }
+                }
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Downloads a file from the specified URL and validates its hash using multiple hash types.
+        /// </summary>
+        /// <param name="url">The URL of the file to download.</param>
+        /// <param name="localFilePath">The local file path where the downloaded file will be saved.</param>
+        /// <param name="checksums">List of expected checksums (SHA1, SHA256, etc.). Hash type is auto-detected by length.</param>
+        /// <returns>True if the file was downloaded and validated successfully, otherwise false.</returns>
+        public static bool DownloadValidFile(string url, string localFilePath, System.Collections.Generic.List<string> checksums)
+        {
+            bool result = false;
 
             HttpClientUtils.DownloadFileSynchronous(url, localFilePath);
 
             if (File.Exists(localFilePath))
             {
-                if (sha256Hash != null)
+                if (checksums != null && checksums.Count > 0)
                 {
-
-                    if (CheckSha256(localFilePath, sha256Hash))
+                    bool hashValid = false;
+                    
+                    foreach (string checksum in checksums)
+                    {
+                        if (string.IsNullOrEmpty(checksum))
+                            continue;
+                            
+                        // Auto-detect hash type by length
+                        if (checksum.Length == 40) // SHA1
+                        {
+                            Console.WriteLine("Validating SHA1: " + checksum);
+                            if (CheckSha1(localFilePath, checksum))
+                            {
+                                Console.WriteLine("SHA1 validation successful");
+                                hashValid = true;
+                                break;
+                            }
+                            else
+                            {
+                                Console.WriteLine("SHA1 validation failed for: " + checksum);
+                            }
+                        }
+                        else if (checksum.Length == 64) // SHA256
+                        {
+                            Console.WriteLine("Validating SHA256: " + checksum);
+                            if (CheckSha256(localFilePath, checksum))
+                            {
+                                Console.WriteLine("SHA256 validation successful");
+                                hashValid = true;
+                                break;
+                            }
+                            else
+                            {
+                                Console.WriteLine("SHA256 validation failed for: " + checksum);
+                            }
+                        }
+                        else
+                        {
+                            Console.WriteLine("Unsupported hash length (" + checksum.Length + "): " + checksum);
+                        }
+                    }
+                    
+                    if (hashValid)
                     {
                         result = true;
                     }
                     else
                     {
-                        Console.WriteLine("Failed to validate hash : " + localFilePath);
-                        Console.WriteLine("Failed to validate hash : " + sha256Hash);
+                        Console.WriteLine("Failed to validate any checksums for: " + localFilePath);
                     }
                 }
                 else
                 {
+                    Console.WriteLine("No checksums provided, skipping validation");
                     result = true;
                 }
-
             }
             else
             {
-                Console.WriteLine("Downlaod Failed URL: " + url);
+                Console.WriteLine("Download Failed URL: " + url);
             }
 
             return result;
