@@ -3,7 +3,7 @@ import xml.etree.ElementTree as ET
 import Util
 import Constants
 import HttpClientUtils
-
+import concurrent.futures
 from Util import Util
 from Constants import Constants
 from HttpClientUtils import HttpClientUtils
@@ -16,20 +16,30 @@ class Downloader:
         return ""
 
     @staticmethod
+    #File check if exists before downloading
     def download_release_files(release_element, dest_path):
+        def should_download(file_name):
+            return ("Adapter" not in file_name and "offline" not in file_name and
+                        (file_name.endswith(".zip") or file_name.endswith(".tar")))
+        def download_task(file_url, local_file_path, sha256_hash):
+            HttpClientUtils.download_valid_file(file_url, local_file_path, sha256_hash)
+            return 
+        task=[]
         if release_element is not None:
             for package_element in release_element:
                 if package_element.tag == "Package":
                     file_url = Downloader.get_attribute(package_element, "Link")
                     sha256_hash = Downloader.get_attribute(package_element, "sha256")
-
                     file_name = os.path.basename(file_url)
                     local_file_path = os.path.join(dest_path, file_name)
 
                     # Only Download the static release files
-                    if ("Adapter" not in file_name and "offline" not in file_name and
-                        (file_name.endswith(".zip") or file_name.endswith(".tar"))):
-                        HttpClientUtils.download_valid_file(file_url, local_file_path, sha256_hash)
+                    if should_download(file_name):
+                        task.append((file_url, local_file_path, sha256_hash))
+        with concurrent.futures.ThreadPoolExecutor(max_threads=4) as executor:
+            futures = [executor.submit(download_task, file_url, local_file_path, sha256_hash) for file_url, local_file_path, sha256_hash in task]
+            concurrent.futures.wait(futures)
+                        
 
     @staticmethod
     def download_platform(platform_element, dest_path):
