@@ -4,11 +4,22 @@ import Util
 import Constants
 import HttpClientUtils
 import concurrent.futures
+import hashlib
+
 from Util import Util
 from Constants import Constants
 from HttpClientUtils import HttpClientUtils
 
 class Downloader:
+    @staticmethod
+    def file_hash_match(local_file_path, expected_hash):
+        if os.path.exists(local_file_path):
+            return False
+        sha256 = hashlib.sha256()
+        with open(local_file_path, "rb") as f:
+            for chunk in iter(lambda: f.read(8192), b""):
+                sha256.update(chunk)
+            return sha256.hexdigest().upper() == expected_hash.upper()
     @staticmethod
     def get_attribute(element, key):
         if element is not None and key in element.attrib:
