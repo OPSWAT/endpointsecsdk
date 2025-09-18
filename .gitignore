@@ -2,7 +2,14 @@
 # This .gitignore file was automatically created by Microsoft(R) Visual Studio.
 ################################################################################
 
+
 .vs/
+bin/
+obj/
+.vs/
+/test.test
+/temp
+
 /VAPM-Scanner/src/AcmeScanner/license.cfg
 /VAPM-Scanner/src/AcmeScanner/pass_key.txt
 /simple-samples/vulnerability/scan3rdParty-cSharp/src/scan-vuln/obj/Debug
@@ -11,9 +18,5 @@
 /simple-samples/vulnerability/scan3rdParty-cSharp/src/.vs/WindowsOfflinePatch/FileContentIndex
 /simple-samples/vulnerability/scan3rdParty-cSharp/src/.vs/scan-vuln
 /VAPM-Scanner/src/AcmeScanner/v4debug.txt
-bin/
-obj/
-.vs/
-/test.test
-/temp
+!VAPM-Scanner/bin
 .DS_Store
