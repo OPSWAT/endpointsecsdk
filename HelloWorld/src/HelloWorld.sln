@@ -32,6 +32,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Vulnerability-WOS", "Vulner
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Patch-WOS", "Patch-WOS\Patch-WOS.csproj", "{9D0C832C-BCC5-424C-BB7B-C0031277C4EE}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sandbox", "Sandbox\Sandbox.csproj", "{0E1AD1F3-0271-40E0-8B03-4BBA4AD01634}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -138,6 +140,18 @@ Global
 		{9D0C832C-BCC5-424C-BB7B-C0031277C4EE}.Release|x64.Build.0 = Release|x64
 		{9D0C832C-BCC5-424C-BB7B-C0031277C4EE}.Release|x86.ActiveCfg = Release|x86
 		{9D0C832C-BCC5-424C-BB7B-C0031277C4EE}.Release|x86.Build.0 = Release|x86
+		{0E1AD1F3-0271-40E0-8B03-4BBA4AD01634}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0E1AD1F3-0271-40E0-8B03-4BBA4AD01634}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0E1AD1F3-0271-40E0-8B03-4BBA4AD01634}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{0E1AD1F3-0271-40E0-8B03-4BBA4AD01634}.Debug|x64.Build.0 = Debug|Any CPU
+		{0E1AD1F3-0271-40E0-8B03-4BBA4AD01634}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{0E1AD1F3-0271-40E0-8B03-4BBA4AD01634}.Debug|x86.Build.0 = Debug|Any CPU
+		{0E1AD1F3-0271-40E0-8B03-4BBA4AD01634}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0E1AD1F3-0271-40E0-8B03-4BBA4AD01634}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0E1AD1F3-0271-40E0-8B03-4BBA4AD01634}.Release|x64.ActiveCfg = Release|Any CPU
+		{0E1AD1F3-0271-40E0-8B03-4BBA4AD01634}.Release|x64.Build.0 = Release|Any CPU
+		{0E1AD1F3-0271-40E0-8B03-4BBA4AD01634}.Release|x86.ActiveCfg = Release|Any CPU
+		{0E1AD1F3-0271-40E0-8B03-4BBA4AD01634}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
