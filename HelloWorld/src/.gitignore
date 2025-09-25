@@ -1,7 +1,7 @@
 .vs/
 src/packages/
 src/lib/
-src/.dll
+src/*.dll
 
 src/Compliance/bin/
 src/Compliance/obj/
