@@ -102,7 +102,7 @@
   </PropertyGroup>
   <PropertyGroup>
     <PostBuildEvent>copy $(SolutionDir)\license $(ProjectDir)$(OutDir)
-copy $(SolutionDir)\lib\$(PlatformName) $(ProjectDir)$(OutDir)
-</PostBuildEvent>
+
+copy $(SolutionDir)\lib\$(PlatformName) $(ProjectDir)$(OutDir)</PostBuildEvent>
   </PropertyGroup>
 </Project>
