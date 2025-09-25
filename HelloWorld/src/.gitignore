@@ -1,42 +1,43 @@
 .vs/
 src/packages/
 src/lib/
-src/*.dll
+src/license/
+src/**/*.dll
 
 src/Compliance/bin/
 src/Compliance/obj/
 src/Compliance/.vs/
-src/Compliance/.dll
+
 src/Compliance/Compliance.csproj.user
 
 src/SDKDownloader/bin/
 src/SDKDownloader/obj/
 src/SDKDownloader/.vs/
-src/SDKDownloader/.dll
+
 src/SDKDownloader/SDKDownloader.csproj.user
 
 src/SDKDownloadLib/bin/
 src/SDKDownloadLib/obj/
 src/SDKDownloadLib/.vs/
-src/SDKDownloadLib/.dll
+
 src/SDKDownloadLib/SDKDownloadLib.csproj.user
 
 src/Vulnerability/bin/
 src/Vulnerability/obj/
 src/Vulnerability/.vs/
-src/Vulnerability/.dll
+
 src/Vulnerability/Vulnerability.csproj.user
 
 src/Patch/bin/
 src/Patch/obj/
 src/Patch/.vs/
-src/Patch/.dll
+
 src/Patch/Patch.csproj.user
 
 src/Sandbox/bin/
 src/Sandbox/obj/
 src/Sandbox/.vs/
-src/Sandbox/.dll
+
 src/Sandbox/Sandbox.csproj.user
 
 
