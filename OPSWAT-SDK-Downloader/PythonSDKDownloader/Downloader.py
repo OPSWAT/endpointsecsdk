@@ -3,6 +3,8 @@ import xml.etree.ElementTree as ET
 import Util
 import Constants
 import HttpClientUtils
+import concurrent.futures
+import hashlib
 
 from Util import Util
 from Constants import Constants
@@ -10,26 +12,45 @@ from HttpClientUtils import HttpClientUtils
 
 class Downloader:
     @staticmethod
+    def file_hash_match(local_file_path, expected_hash):
+        if os.path.exists(local_file_path):
+            return False
+        sha256 = hashlib.sha256()
+        with open(local_file_path, "rb") as f:
+            for chunk in iter(lambda: f.read(8192), b""):
+                sha256.update(chunk)
+            return sha256.hexdigest().upper() == expected_hash.upper()
+    @staticmethod
     def get_attribute(element, key):
         if element is not None and key in element.attrib:
             return element.attrib[key]
         return ""
 
     @staticmethod
+    #File check if exists before downloading
     def download_release_files(release_element, dest_path):
+        def should_download(file_name):
+            return ("Adapter" not in file_name and "offline" not in file_name and
+                        (file_name.endswith(".zip") or file_name.endswith(".tar")))
+        def download_task(file_url, local_file_path, sha256_hash):
+            HttpClientUtils.download_valid_file(file_url, local_file_path, sha256_hash)
+            return 
+        task=[]
         if release_element is not None:
             for package_element in release_element:
                 if package_element.tag == "Package":
                     file_url = Downloader.get_attribute(package_element, "Link")
                     sha256_hash = Downloader.get_attribute(package_element, "sha256")
-
                     file_name = os.path.basename(file_url)
                     local_file_path = os.path.join(dest_path, file_name)
 
                     # Only Download the static release files
-                    if ("Adapter" not in file_name and "offline" not in file_name and
-                        (file_name.endswith(".zip") or file_name.endswith(".tar"))):
-                        HttpClientUtils.download_valid_file(file_url, local_file_path, sha256_hash)
+                    if should_download(file_name):
+                        task.append((file_url, local_file_path, sha256_hash))
+        with concurrent.futures.ThreadPoolExecutor(max_threads=4) as executor:
+            futures = [executor.submit(download_task, file_url, local_file_path, sha256_hash) for file_url, local_file_path, sha256_hash in task]
+            concurrent.futures.wait(futures)
+                        
 
     @staticmethod
     def download_platform(platform_element, dest_path):
