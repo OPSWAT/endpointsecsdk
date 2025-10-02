@@ -1,11 +1,4 @@
-﻿///////////////////////////////////////////////////////////////////////////////////////////////
-///  Sample Code for HelloWorld
-///  Reference Implementation using OPSWAT MetaDefender Endpoint Security SDK
-///  
-///  Created by Chris Seiler
-///  OPSWAT OEM Solutions Architect
-///////////////////////////////////////////////////////////////////////////////////////////////
-
+﻿
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -266,8 +259,13 @@ namespace Sandbox
             Console.WriteLine("16: Remote Desktop Control");
             Console.WriteLine("17: Peer to Peer");
             Console.WriteLine("18: Web Conference");
+            Console.WriteLine("-1: Exit");
+
             Console.Write("Enter category number: ");
-            if (int.TryParse(Console.ReadLine(), out int category))
+            string input = Console.ReadLine();
+            if (input.Trim().ToLower() == "-1")
+                return -1;
+            if (int.TryParse(input, out int category))
                 return category;
             return 0;
         }
@@ -281,28 +279,30 @@ namespace Sandbox
                 InitializeFramework();
 
 
-                // Detect all of the products
-                // Note using the 7 which maps to the Firewall Category
-                int category = PromptForCategory();
-                Console.WriteLine($"Discovering products in category {category}...");
-                CheckSuccess(DetectProducts(category, out products_json));
-                // Print raw JSON for exploration
-                Console.WriteLine("Raw JSON output:");
-                Console.WriteLine(products_json);
-
-                List<Product> productList = GetProductList(products_json);
-                foreach (Product product in productList)
+                while (true)
                 {
-                    // Each product is identified with a product ID and signature ID.  The signature ID is the one to use
-                    // to look up different details.
-                    bool firewallRunning = IsFirewallRunning(product.signatureId);
-                    Console.WriteLine("Found: " + product.name + "  Running: " + firewallRunning);
-                    Console.WriteLine($"Name: {product.name}");
-                    Console.WriteLine($"Vendor: {product.vendor}");
-                    Console.WriteLine($"Version: {product.version}");
-                    Console.WriteLine($"Install Path: {product.installPath}");
-                    Console.WriteLine($"Status: {product.status}");
-                    Console.WriteLine("-----");
+                    int? category = PromptForCategory();
+                    if (category == -1)
+                        break;
+
+                    Console.WriteLine($"Discovering products in category {category}...");
+                    CheckSuccess(DetectProducts(category.Value, out products_json));
+                    // Print raw JSON for exploration
+                    Console.WriteLine("Raw JSON output:");
+                    Console.WriteLine(products_json);
+
+                    List<Product> productList = GetProductList(products_json);
+                    foreach (Product product in productList)
+                    {
+                        bool firewallRunning = IsFirewallRunning(product.signatureId);
+                        Console.WriteLine("Found: " + product.name + "  Running: " + firewallRunning);
+                        Console.WriteLine($"Name: {product.name}");
+                        Console.WriteLine($"Vendor: {product.vendor}");
+                        Console.WriteLine($"Version: {product.version}");
+                        Console.WriteLine($"Install Path: {product.installPath}");
+                        Console.WriteLine($"Status: {product.status}");
+                        Console.WriteLine("-----");
+                    }
                 }
 
                 OESISAdapter.wa_api_teardown();
