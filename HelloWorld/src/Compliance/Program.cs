@@ -1,271 +1,200 @@
-﻿///////////////////////////////////////////////////////////////////////////////////////////////
-///  Sample Code for HelloWorld
-///  Reference Implementation using OPSWAT MetaDefender Endpoint Security SDK
-///  
-///  Created by Chris Seiler
-///  OPSWAT OEM Solutions Architect
-///////////////////////////////////////////////////////////////////////////////////////////////
-
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
+using System.Xml.Schema;
+using Vulnerability;
 
-namespace Vulnerability
+
+namespace Products
 {
     internal class Program
     {
-
         private static void InitializeFramework()
         {
-            string currentPath = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
-            string passKeyPath = Path.Combine(currentPath, "pass_key.txt");
-
-            // Check to makes sure the license is in the directory
-            if(!File.Exists(passKeyPath))
+            string passkeypath = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "pass_key.txt");
+            if (!File.Exists(passkeypath))
             {
-                Console.WriteLine("Could not find a pass_key.txt file.  Make sure that the license provided during evaluation is in the 'solutionRoot/license' directory.  That will compy the file to each sample code.");
-                throw new Exception("License pass_key.txt file not found");
+                Console.WriteLine("Pass_key.txt file not found in the directory");
+                throw new Exception("Pass_key.txt not found");
             }
 
-
-            // This code is used to initialize the OESIS Framework
-            // The folling linkk describes the setup
-            // https://software.opswat.com/OESIS_V4/html/c_sdk.html
-            //
-            string passkey = File.ReadAllText(passKeyPath);
-            string config = "{ \"config\" : { \"passkey_string\": \"" + passkey + "\", \"enable_pretty_print\": true, \"online_mode\": true, \"silent_mode\": true } }";
-
+            string keypass = File.ReadAllText(passkeypath);
+            string json_config = "{\"config\": { \"passkey_string\":\"" + keypass + "\", \"enable_pretty_print\": true, \"silent_mode\": true}}";
+            string json_out = "{ }";
 
             IntPtr outPtr = IntPtr.Zero;
-            // Note if you get a Bad Image exception, that may be because Prefer 32-bit is checked
-            int rc = OESISAdapter.wa_api_setup(config, out outPtr);
-            string json_out = "{ }";
+            int return_codes = OESISAdapter.wa_api_setup(json_config, out outPtr);
             if (outPtr != IntPtr.Zero)
+            {
+                json_out = XStringMarshaler.PtrToString(outPtr);
+             }
+            else
+            {
+                Console.WriteLine("Fail to initialize OESIS " + return_codes);
+
+                throw new Exception("Fail to initialize");
+            }
+            OESISAdapter.wa_api_free(outPtr);
+        }
+
+        private static string JsonStructure(int methodNumber, string SecondArgumentName, string SecondArgumentValue)
+        {
+            string jsonConfig;
+            if (SecondArgumentName == "" && SecondArgumentValue == "")
+            {
+                jsonConfig = $"{{ \"input\": {{ \"method\": {methodNumber} }} }}";
+                return jsonConfig;
+            }
+            string safeValue = SecondArgumentValue.Replace(@"\", @"\\");
+
+            bool isNumeric = int.TryParse(SecondArgumentValue, out _);
+
+            if (isNumeric)
+            {
+                jsonConfig = $"{{ \"input\": {{ \"method\": {methodNumber}, \"{SecondArgumentName}\": {safeValue} }} }}";
+            }
+            else
+            {
+                jsonConfig = $"{{ \"input\": {{ \"method\": {methodNumber}, \"{SecondArgumentName}\": \"{safeValue}\" }} }}";
+            }
+
+            return jsonConfig;
+        }
+
+        private static void DetectInstalledProducts(int category_number, out List<Product> products_json)
+        {
+
+            string json_out;
+            string json_config = ApiInvoke(0, "category", category_number.ToString(), out json_out);
+            Console.Out.WriteLine(json_out);
+
+            dynamic jsonOut = JObject.Parse(json_out);
+            var products = jsonOut.result.detected_products;
+            List<Product> productList = new List<Product>();
+            foreach (var prod in products)
+            {
+                Product newProduct = new Product();
+                newProduct.signatureId = (int)prod.signature;
+                newProduct.name = (string)prod.product.name;
+                newProduct.vendor = (string)prod.vendor.name;
+                newProduct.sig_name = (string)prod.sig_name;
+
+                //Getting product version
+                dynamic versionStatus = JObject.Parse(ApiInvoke(100, "signature", (newProduct.signatureId).ToString(), out _));
+                string versionNumber = (string)versionStatus.result.version;
+                newProduct.version = versionNumber;
+
+                // Checking product vulnerability
+                dynamic vulnerabilityStatus = JObject.Parse(ApiInvoke(50505, "signature", (newProduct.signatureId).ToString(), out _));
+                var results = vulnerabilityStatus.result;
+                if (results.has_vulnerability == true)
+                {
+                    newProduct.vulnerability = (string)results.cves.severity;
+                    //newProduct.vulnerability_detail = (string)vulnerabilityStatus.cves;
+                }
+                else
+                {
+                    newProduct.vulnerability = "Clean";
+                }
+
+
+                productList.Add(newProduct);
+            }
+            products_json = productList;
+
+        }
+
+        // private static void CheckRunningApps(out List<RunningProducts> products_json)
+        // {
+        //     string jsonOutput;
+        //     string jsonConfig = ApiInvoke(100001, "","", out jsonOutput);
+
+        //     dynamic jsonOut = JObject.Parse(jsonOutput);
+        //     var products = jsonOut.result.detected_products;
+        //     List<RunningProducts> productList = new List<RunningProducts>();
+        //     foreach (var prod in products)
+        //     {
+        //         RunningProducts newProduct = new RunningProducts();
+        //         //TO-DO: Create cases where some properties are missing
+        //         newProduct.name = (string)prod.product.name;
+        //         newProduct.version = (string)prod.version;
+            
+        //         if (prod.running_processes != null)
+        //         {
+        //             newProduct.isRunning = true;
+        //         }
+        //         else
+        //         {
+        //             newProduct.isRunning = false;
+        //         }
+
+        //         productList.Add(newProduct);
+        //     }
+        //     products_json = productList;
+        // }
+
+        // result is the return code, while outPtr contains all the information that returns for that method choice
+        public static string ApiInvoke(int methodChoice, string SecondArgumentName, string SecondArgumentValue, out string json_out)
+        {
+            string json_config = JsonStructure(methodChoice, SecondArgumentName, SecondArgumentValue);
+            Console.Out.WriteLine(json_config);
+            IntPtr outPtr = IntPtr.Zero;
+            json_out = "{ }";
+            int result = OESISAdapter.wa_api_invoke(json_config, out outPtr);
+
+            if (outPtr != IntPtr.Zero) // Checking outPtr is not null
             {
                 json_out = XStringMarshaler.PtrToString(outPtr);
                 OESISAdapter.wa_api_free(outPtr);
             }
             else
             {
-                Console.Out.WriteLine("Failed to initialize OESIS: " + rc);
-                // Refer to the following doc for errors:  https://software.opswat.com/OESIS_V4/html/c_return_codes.html
-
-                throw new Exception("Failed to initialize");
+                Console.Out.WriteLine($"⚠️ Method {methodChoice} returned no output (result={result})");
             }
-        }
 
-
-
-
-        // 
-        // This will return JSON for all of the products found in the system
-        // https://software.opswat.com/OESIS_V4/html/c_method.html
-        // on the left select OESIS Core/Discover Products
-        //
-        //
-        // All Categories
-        /* Defines common product classification.This classification includes all product categories
-
-         #define WAAPI_CATEGORY_ALL 0
-                 Public File Sharing
-                 Defines public file sharing product classification
-
-         #define WAAPI_CATEGORY_PUBLIC_FILE_SHARING 1
-                 Backup
-         Defines backup client product classification
-
-         #define WAAPI_CATEGORY_BACKUP_CLIENT 2
-         Encryption
-         Defines disk encryption product classification
-
-         #define WAAPI_CATEGORY_DISK_ENCRYPTION 3
-         Antiphishing
-         Defines antiphishing product classification
-
-          #define WAAPI_CATEGORY_ANTIPHISHING 4
-         Antimalware
-         Defines antimalware product classification
-
-         #define WAAPI_CATEGORY_ANTIMALWARE 5
-         Browser
-         Defines browser product classification
-
-          #define WAAPI_CATEGORY_BROWSER 6
-         Firewall
-         Defines firewall product classification
-
-         #define WAAPI_CATEGORY_FIREWALL 7
-         Messenger
-         Defines instant messenger product classification
-
-         #define WAAPI_CATEGORY_INSTANT_MESSENGER 8
-         Cloud Storage
-         Defines cloud storage product classification
-
-          #define WAAPI_CATEGORY_CLOUD_STORAGE 9
-         Data Loss Prevention
-         Defines data loss prevention product classification
-
-         #define WAAPI_CATEGORY_DATA_LOSS_PREVENTION 11
-         Patch Management
-         Defines patch management product classification
-
-          #define WAAPI_CATEGORY_PATCH_MANAGEMENT 12
-         VPN Client
-         Defines VPN client product classification
-
-         #define WAAPI_CATEGORY_VPN_CLIENT 13
-         Virtual Machine
-         Defines Virtual Machine product classification
-
-          #define WAAPI_CATEGORY_VIRTUAL_MACHINE 14
-         Health Agent
-         Defines health agent product classification
-
-         #define WAAPI_CATEGORY_HEALTH_AGENT 15
-         Remote Desktop Control
-         Defines remote desktop control classification
-
-         #define WAAPI_CATEGORY_REMOTE_CONTROL 16
-         P2P Agent
-         Defines a peer to peer application classification
-
-          #define WAAPI_CATEGORY_PEER_TO_PEER 17
-         Web Conference
-         Defines that the product has an online video and audio conferencing classification
-
-          #define WAAPI_CATEGORY_WEB_CONFERENCE 18
-         Unclassified
-         Defines that the product does not have an official classification
-
-         #define WAAPI_CATEGORY_UNCLASSIFIED 10*/
-        public static int DetectProducts(int category, out string json_out)
-        {
-            int result = 0;
-            string json_in = "{\"input\": { \"method\": 0, \"category\": " + category + " } }";
-            result = Invoke(json_in, out json_out);
-            return result;
-        }
-
-
-        // 
-        // This will return JSON details on whether a firewall is enabled
-        // https://software.opswat.com/OESIS_V4/html/c_method.html
-        // on the left select Manageability/GetFirewallState
-        public static bool IsFirewallRunning(int signature)
-        {
-            bool result = false;
-            string json_in = "{\"input\": { \"method\": 1007 \"signature\":" + signature + " } }";
-            string json_out = "";
-            int callResult = Invoke(json_in, out json_out);
-
-            if (callResult >= 0)
+            if (result < 0)
             {
-                dynamic parsedObject = JObject.Parse(json_out);
-                result = parsedObject["result"]["enabled"];
+                throw new Exception("Method call failed to run correctly: " + result);
             }
-
-            return result;
+            return json_out;
         }
-
-
-        // Note this is just passing in the json_result to be able to print it out on a failure
-        private static void CheckSuccess(int rc)
-        {
-            // Return code link: https://software.opswat.com/OESIS_V4/html/c_return_codes.html
-            // Note any code above 0 is a SUCCESS
-            if (rc < 0)
-            {
-                Console.Out.WriteLine("Failed to execute call: " + rc);
-                throw new Exception();
-            }
-        }
-
-
-        // This is the main call used to send JSON in and out of the API
-        private static int Invoke(string json_config, out string json_out)
-        {
-            IntPtr outPtr = IntPtr.Zero;
-            int rc = OESISAdapter.wa_api_invoke(json_config, out outPtr);
-            json_out = "{ }";
-            if (outPtr != IntPtr.Zero)
-            {
-                json_out = XStringMarshaler.PtrToString(outPtr);
-                OESISAdapter.wa_api_free(outPtr);
-            }
-            return rc;
-        }
-
-        // Expects JSON from DETECT Products
-        public static List<Product> GetProductList(string detect_product_json)
-        {
-            List<Product> result = new List<Product>();
-
-            dynamic jsonOut = JObject.Parse(detect_product_json);
-            var products = jsonOut.result.detected_products;
-
-            for (int i = 0; i < products.Count; i++)
-            {
-                Product newProduct = new Product();
-                newProduct.signatureId = products[i].signature;
-                newProduct.name = (string)products[i].product.name;
-                newProduct.vendor = (string)products[i].vendor.name;
-                result.Add(newProduct);
-            }
-
-            return result;
-        }
-
-
-
-        // 
-        // This will return JSON details on whether a firewall is enabled
-        // https://software.opswat.com/OESIS_V4/html/c_method.html
-        // on the left select Manageability/GetFirewallState
-        public static bool GetDeviceIdentity()
-        {
-            bool result = false;
-            string json_in = "{\"input\": { \"method\": 30010 } }";
-            string json_out = "";
-            int callResult = Invoke(json_in, out json_out);
-
-            if (callResult >= 0)
-            {
-                dynamic parsedObject = JObject.Parse(json_out);
-                result = parsedObject["result"]["enabled"];
-            }
-
-            return result;
-        }
-
-
-
 
         static void Main(string[] args)
         {
-            string products_json = "";
+            List<Product> products_json = new List<Product>();
+            // List<RunningProducts> running_products = new List<RunningProducts>();
             try
             {
-                // Setup the default initialization
                 InitializeFramework();
+                ApiInvoke(50520, "dat_input_source_file", "v2mod.dat", out _);
 
+                DetectInstalledProducts(0, out products_json);
+                // CheckRunningApps(out products_json);
 
-                // Detect all of the products
-                // Note using the 7 which maps to the Firewall Category
-                Console.WriteLine("Discovering Firewall Products");
-                CheckSuccess(DetectProducts(7, out products_json));
+                // Console.Out.WriteLine(products_json);
 
-                List<Product> productList = GetProductList(products_json);
-                foreach(Product product in productList)
+                // string jsonOutput = " ";
+                // dynamic versionStatus = JObject.Parse(ApiInvoke(100001, "", "", out jsonOutput));
+                // Console.Out.WriteLine("<-- Received from API: " + jsonOutput);
+                foreach (var product in products_json)
                 {
-                    // Each product is identified with a product ID and signature ID.  The signature ID is the one to use
-                    // to look up different details.
-                    bool firewallRunning = IsFirewallRunning(product.signatureId);
-                    Console.WriteLine("Found: " + product.name + "  Running: " + firewallRunning);
+                    Console.Out.WriteLine("Product Name: " + product.name);
+                    Console.Out.WriteLine("Product Signature ID: " + product.signatureId);
+                    Console.Out.WriteLine("Product Version: " + product.version);
+                    Console.Out.WriteLine("Product Vulnerability Status: " + product.vulnerability);
+                    //Console.Out.WriteLine("Product isRunning: " + product.isRunning);
+                    Console.Out.WriteLine("---------------------------------");
                 }
 
+                // foreach (var product in running_products)
+                // {
+                //     Console.Out.WriteLine("Product Name: " + product.name);
+                //     Console.Out.WriteLine("Product Version: " + product.version);
+                //     Console.Out.WriteLine("Product Running: " + product.isRunning);
+                // }
                 OESISAdapter.wa_api_teardown();
             }
             catch (Exception e)
@@ -274,5 +203,12 @@ namespace Vulnerability
                 Console.Out.WriteLine("JSON_RESULT: " + products_json);
             }
         }
+
+
+        }
     }
-}
+
+
+
+/* After calling the product, it immediately check for product's vulnerability rate. */
+/*research winget, how integrate to sdk. the best way to integrate, would it be better to use winget or sdk.*/

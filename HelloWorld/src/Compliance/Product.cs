@@ -8,10 +8,23 @@
 
 namespace Vulnerability
 {
-    internal class Product
+    public class Product
     {
+        //public int productId;
         public int signatureId;
         public string name;
         public string vendor;
+        public string sig_name;
+        public string version;
+        public string vulnerability;
+        //public boolean isRunning;
+        // public List<string> vulnerability_detail;
+    }
+
+    public class RunningProducts
+    {
+        public string name;
+        public string version;
+        public bool isRunning;
     }
 }
