@@ -69,7 +69,6 @@ namespace Products
 
             string json_out;
             string json_config = ApiInvoke(0, "category", category_number.ToString(), out json_out);
-            Console.Out.WriteLine(json_out);
 
             dynamic jsonOut = JObject.Parse(json_out);
             var products = jsonOut.result.detected_products;
@@ -107,40 +106,49 @@ namespace Products
 
         }
 
-        // private static void CheckRunningApps(out List<RunningProducts> products_json)
-        // {
-        //     string jsonOutput;
-        //     string jsonConfig = ApiInvoke(100001, "","", out jsonOutput);
+        private static void CheckRunningApps(out List<RunningProducts> products_json)
+        {
+            string jsonOutput;
+            string jsonConfig = ApiInvoke(100001, "","", out jsonOutput);
 
-        //     dynamic jsonOut = JObject.Parse(jsonOutput);
-        //     var products = jsonOut.result.detected_products;
-        //     List<RunningProducts> productList = new List<RunningProducts>();
-        //     foreach (var prod in products)
-        //     {
-        //         RunningProducts newProduct = new RunningProducts();
-        //         //TO-DO: Create cases where some properties are missing
-        //         newProduct.name = (string)prod.product.name;
-        //         newProduct.version = (string)prod.version;
-            
-        //         if (prod.running_processes != null)
-        //         {
-        //             newProduct.isRunning = true;
-        //         }
-        //         else
-        //         {
-        //             newProduct.isRunning = false;
-        //         }
+            dynamic jsonOut = JObject.Parse(jsonOutput);
+            var products = jsonOut.result.detected_products;
+            List<RunningProducts> productList = new List<RunningProducts>();
+            HashSet<string> seen = new HashSet<string>();
+            foreach (var prod in products)
+            {
+                string appName = (string)prod.product.name;
 
-        //         productList.Add(newProduct);
-        //     }
-        //     products_json = productList;
-        // }
+                // Skip duplicates
+                if (seen.Contains(appName))
+                {
+                    continue;
+                }
+
+                RunningProducts newProduct = new RunningProducts();
+                //TO-DO: Create cases where some properties are missing
+                newProduct.name = (string)prod.product.name;
+                newProduct.version = (string)prod.version;
+
+                if (prod.running_processes != null)
+                {
+                    newProduct.isRunning = true;
+                }
+                else
+                {
+                    newProduct.isRunning = false;
+                }
+
+                productList.Add(newProduct);
+                seen.Add(appName);
+            }
+            products_json = productList;
+        }
 
         // result is the return code, while outPtr contains all the information that returns for that method choice
         public static string ApiInvoke(int methodChoice, string SecondArgumentName, string SecondArgumentValue, out string json_out)
         {
             string json_config = JsonStructure(methodChoice, SecondArgumentName, SecondArgumentValue);
-            Console.Out.WriteLine(json_config);
             IntPtr outPtr = IntPtr.Zero;
             json_out = "{ }";
             int result = OESISAdapter.wa_api_invoke(json_config, out outPtr);
@@ -162,39 +170,79 @@ namespace Products
             return json_out;
         }
 
+        private static void showMenu()
+        {
+            bool running = true;
+            Console.WriteLine("====OPSWAT Security SDK====");
+            Console.WriteLine("1. Detected all products");
+            Console.WriteLine("2. Detected running products");
+            Console.WriteLine("3. Exit");
+            Console.Write("\nSelect choice: ");
+
+            string input = Console.ReadLine();
+            switch (input)
+            {
+                case "1":
+                    List<Product> products_json = new List<Product>();
+                    DetectInstalledProducts(0, out products_json);
+                    foreach (var product in products_json)
+                    {
+                        Console.Out.WriteLine("Product Name: " + product.name);
+                        Console.Out.WriteLine("Product Signature ID: " + product.signatureId);
+                        Console.Out.WriteLine("Product Version: " + product.version);
+                        Console.Out.WriteLine("Product Vulnerability Status: " + product.vulnerability);
+                        //Console.Out.WriteLine("Product isRunning: " + product.isRunning);
+                        Console.Out.WriteLine("---------------------------------");
+                    }
+                    break;
+                case "2":
+                    List<RunningProducts> running_products = new List<RunningProducts>();
+                    CheckRunningApps(out running_products);
+                    int running_count = 0;
+                    int total_app = 1;
+                    foreach (var product in running_products)
+                    {
+                        if (product.isRunning)
+                        {
+                            Console.Out.WriteLine("Product Name: " + product.name);
+                            Console.Out.WriteLine("Product Version: " + product.version);
+                            Console.Out.WriteLine("Product Running: " + product.isRunning);
+                            Console.Out.WriteLine("---------------------------------");
+                            running_count += 1;
+                        }
+                        total_app += 1;
+
+                    }
+                    Console.WriteLine("Total running product: " + running_count);
+                    Console.WriteLine("Total products detected: " + total_app);
+                    break;
+                case "3":
+                    running = false;
+                    Console.WriteLine("Exiting...");
+                    break;
+                default:
+                    Console.WriteLine("Invalid choice. Try again.");
+                    break;
+            };
+
+            if (running)
+            {
+                Console.WriteLine("\nPress any key to return to menu...");
+                Console.ReadKey();
+            }
+        }
+
         static void Main(string[] args)
         {
             List<Product> products_json = new List<Product>();
-            // List<RunningProducts> running_products = new List<RunningProducts>();
+            List<RunningProducts> running_products = new List<RunningProducts>();
             try
             {
                 InitializeFramework();
                 ApiInvoke(50520, "dat_input_source_file", "v2mod.dat", out _);
 
-                DetectInstalledProducts(0, out products_json);
-                // CheckRunningApps(out products_json);
+                showMenu();
 
-                // Console.Out.WriteLine(products_json);
-
-                // string jsonOutput = " ";
-                // dynamic versionStatus = JObject.Parse(ApiInvoke(100001, "", "", out jsonOutput));
-                // Console.Out.WriteLine("<-- Received from API: " + jsonOutput);
-                foreach (var product in products_json)
-                {
-                    Console.Out.WriteLine("Product Name: " + product.name);
-                    Console.Out.WriteLine("Product Signature ID: " + product.signatureId);
-                    Console.Out.WriteLine("Product Version: " + product.version);
-                    Console.Out.WriteLine("Product Vulnerability Status: " + product.vulnerability);
-                    //Console.Out.WriteLine("Product isRunning: " + product.isRunning);
-                    Console.Out.WriteLine("---------------------------------");
-                }
-
-                // foreach (var product in running_products)
-                // {
-                //     Console.Out.WriteLine("Product Name: " + product.name);
-                //     Console.Out.WriteLine("Product Version: " + product.version);
-                //     Console.Out.WriteLine("Product Running: " + product.isRunning);
-                // }
                 OESISAdapter.wa_api_teardown();
             }
             catch (Exception e)

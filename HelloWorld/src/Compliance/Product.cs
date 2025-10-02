@@ -8,7 +8,7 @@
 
 namespace Vulnerability
 {
-    public class Product
+    internal class Product
     {
         //public int productId;
         public int signatureId;
@@ -21,7 +21,7 @@ namespace Vulnerability
         // public List<string> vulnerability_detail;
     }
 
-    public class RunningProducts
+    internal class RunningProducts
     {
         public string name;
         public string version;
