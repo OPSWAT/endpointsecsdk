@@ -89,6 +89,7 @@ def main():
     ap.add_argument("--extract-dir", default="./CatalogExtract", help="Where to extract files (default: ./AnalogExtract)")
     args = ap.parse_args()
 
+
     token = read_token(args.token_file)
     download_and_extract_analog(token, args.url_template, args.zip_path, args.extract_dir)
 
