@@ -8,7 +8,7 @@
     <OutputType>Exe</OutputType>
     <RootNamespace>Compliance</RootNamespace>
     <AssemblyName>Compliance</AssemblyName>
-    <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <Deterministic>true</Deterministic>
@@ -75,6 +75,7 @@
   <ItemGroup>
     <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.13.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -102,7 +103,7 @@
     </PreBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
-    <PostBuildEvent>copy $(SolutionDir)\license $(ProjectDir)$(OutDir)
-copy $(SolutionDir)\lib\$(PlatformName) $(ProjectDir)$(OutDir)</PostBuildEvent>
+    <PostBuildEvent>copy "$(SolutionDir)\license" "$(ProjectDir)$(OutDir)"
+copy "$(SolutionDir)\lib\$(PlatformName)" "$(ProjectDir)$(OutDir)"</PostBuildEvent>
   </PropertyGroup>
 </Project>

@@ -20,6 +20,8 @@ obj/
 /VAPM-Scanner/src/AcmeScanner/v4debug.txt
 !VAPM-Scanner/bin
 .DS_Store
+/HelloWorld/src/vapm x64
+/HelloWorld/src/license/download_token.txt
 /catalog-scripts/AppCentricFile/AppCentricFile/analog/analog
 /catalog-scripts/AppCentricFile/FindCVE/CatalogExtract/analog
 *.txt

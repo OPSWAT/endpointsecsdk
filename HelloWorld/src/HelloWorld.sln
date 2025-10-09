@@ -29,8 +29,14 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Patch", "Patch\Patch.csproj
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Vulnerability-WOS", "Vulnerability-WOS\Vulnerability-WOS.csproj", "{E67F1E5B-FD59-4A74-864D-CCE02EB2B395}"
+	ProjectSection(ProjectDependencies) = postProject
+		{B91CB1E4-F12F-443A-B0B5-6F61190AAB3F} = {B91CB1E4-F12F-443A-B0B5-6F61190AAB3F}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Patch-WOS", "Patch-WOS\Patch-WOS.csproj", "{9D0C832C-BCC5-424C-BB7B-C0031277C4EE}"
+	ProjectSection(ProjectDependencies) = postProject
+		{B91CB1E4-F12F-443A-B0B5-6F61190AAB3F} = {B91CB1E4-F12F-443A-B0B5-6F61190AAB3F}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

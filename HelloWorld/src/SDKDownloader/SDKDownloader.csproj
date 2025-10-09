@@ -8,7 +8,7 @@
     <OutputType>Exe</OutputType>
     <RootNamespace>SDKDownloader</RootNamespace>
     <AssemblyName>SDKDownloader</AssemblyName>
-    <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <Deterministic>true</Deterministic>
@@ -101,11 +101,10 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>$(SolutionDir)\SDKDownloader\$(OutDir)\SDKDownloader.exe download-copy-windows $(SolutionDir)\lib $(PlatformName)
-$(SolutionDir)\SDKDownloader\$(OutDir)\SDKDownloader.exe download-copy-vapm-windows $(SolutionDir)\vapm $(PlatformName)
-</PostBuildEvent>
+    <PostBuildEvent>"$(SolutionDir)\SDKDownloader\$(OutDir)\SDKDownloader.exe" download-copy-windows "$(SolutionDir)\lib" $(PlatformName)
+"$(SolutionDir)\SDKDownloader\$(OutDir)\SDKDownloader.exe" download-copy-vapm-windows "$(SolutionDir)\vapm" $(PlatformName)</PostBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
-    <PreBuildEvent>copy $(SolutionDir)\license $(ProjectDir)$(OutDir)</PreBuildEvent>
+    <PreBuildEvent>copy "$(SolutionDir)\license" "$(ProjectDir)$(OutDir)"</PreBuildEvent>
   </PropertyGroup>
 </Project>

@@ -56,10 +56,10 @@ namespace SDKDownloader
         public static void CreateCleanDir(string dir)
         {
             if (Directory.Exists(dir))
-            {
                 Directory.Delete(dir,true);
-            }
-            Directory.CreateDirectory(dir);
+
+            if (!Directory.Exists(dir))
+                Directory.CreateDirectory(dir);
         }
     }
 }
