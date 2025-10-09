@@ -16,7 +16,6 @@ namespace Vulnerability
         public string vendor;
         public string sig_name;
         public string version;
-        public string vulnerability;
         //public boolean isRunning;
         // public List<string> vulnerability_detail;
     }
