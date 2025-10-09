@@ -20,3 +20,8 @@ obj/
 /VAPM-Scanner/src/AcmeScanner/v4debug.txt
 !VAPM-Scanner/bin
 .DS_Store
+/catalog-scripts/AppCentricFile/AppCentricFile/analog/analog
+/catalog-scripts/AppCentricFile/FindCVE/CatalogExtract/analog
+*.txt
+/catalog-scripts/AppCentricFile/FindCVE/app_centric.json
+/catalog-scripts/AppCentricFile/FindCVE/analog.zip

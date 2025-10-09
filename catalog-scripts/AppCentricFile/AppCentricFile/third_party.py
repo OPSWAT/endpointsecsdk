@@ -200,6 +200,7 @@ def get_3rd_party_products(
     Iterate over all products and their signatures to build a list of 3rd party product dictionaries.
     """
     results = []
+    max_products = -1 # This is used to limit the file size by default -1 means no limit
     count = 0
 
     passoc_path = find_case_insensitive(server_folder, "patch_associations.json")
@@ -254,5 +255,10 @@ def get_3rd_party_products(
 
             if count % 100 == 0 and count > 0:
                 print(f"Processed {count} signatures...")
+
+        if max_products > 0 and count >= max_products:
+            print(f"Reached maximum product limit of {max_products}. Stopping further processing.")
+            break
+
 
     return results

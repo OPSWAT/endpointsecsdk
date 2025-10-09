@@ -183,3 +183,34 @@ class Product:
         if self.vulnerabilities:
             result["vulnerabilities"] = [vuln.to_dict() for vuln in self.vulnerabilities]
         return result
+
+@dataclass
+class Metadata:
+    """Metadata for the Product class."""
+    release_date: Optional[str] = None
+
+    def to_dict(self) -> dict:
+        """Convert Meta object to a dictionary."""
+        result = {
+            "release_date": self.release_date
+            }
+            
+        return result
+
+
+@dataclass
+class Data:
+    """Holds metadata and product list."""
+    meta: Optional[Metadata] = None
+    products: List['Product'] = field(default_factory=list)
+
+    def to_dict(self) -> dict:
+        """Convert Data object to a dictionary."""
+        # Handle nested dataclasses properly
+        return {
+            "meta": self.meta.to_dict() if self.meta else None,
+            "products": [
+    p.to_dict() if hasattr(p, "to_dict") else p
+    for p in self.products
+]
+        }
