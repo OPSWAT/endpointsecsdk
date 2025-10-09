@@ -85,6 +85,13 @@ namespace SDKDownloader
         static int Main(string[] args)
         {
             Console.WriteLine("SDKDownloader Started");
+
+
+            //for(int i=0; i < 100; i++)
+            //{
+            //    Thread.Sleep(1000);
+           //}
+
             if(ValidateCommandLine(args))
             {
                 string command = args[0];
