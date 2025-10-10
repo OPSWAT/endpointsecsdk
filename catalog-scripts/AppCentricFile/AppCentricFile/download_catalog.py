@@ -147,8 +147,40 @@ def remove_readonly(func, path, _):
     func(path)
 
 
+def dir_age_seconds(path: str) -> float:
+    """Return the age in seconds of the newest file in the directory, or 0 if empty/nonexistent."""
+    if not os.path.isdir(path):
+        return 0
+    newest = 0
+    for d, _, files in os.walk(path):
+        for f in files:
+            fp = os.path.join(d, f)
+            try:
+                mtime = os.path.getmtime(fp)
+                if mtime > newest:
+                    newest = mtime
+            except Exception:
+                continue
+    if newest == 0:
+        return 0
+    return time.time() - newest
+
 def download_and_extract_analog(token: str, url: str, zip_path: str, extract_dir: str) -> None:
-    
+    # Check if extract_dir exists and is younger than 1 hour
+    reuse_extract = False
+    if os.path.isdir(extract_dir):
+        age = dir_age_seconds(extract_dir)
+        if age < 3600 and age > 0:
+            print(f"[+] Keeping existing extracted folder {extract_dir} (age ~{age/60:.1f} min)")
+            reuse_extract = True
+        else:
+            shutil.rmtree(extract_dir, onerror=remove_readonly)
+            print(f"[+] Removed existing folder {extract_dir}")
+
+    if reuse_extract:
+        print("[+] Extraction folder is fresh, skipping extraction.")
+        return
+
     # Remove existing extraction folder
     if os.path.isdir(extract_dir):
         shutil.rmtree(extract_dir, onerror=remove_readonly)

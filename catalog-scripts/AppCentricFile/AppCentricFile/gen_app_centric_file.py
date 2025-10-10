@@ -36,7 +36,7 @@ from third_party import get_3rd_party_products
 from patch_classes import Product, Metadata, Data
 from util import load_json, to_dict, group_associations_by_product_id, load_moby, find_case_insensitive, get_section
 from download_catalog import read_token, download_and_extract_analog
-from system_patch import get_system_products
+from system_patch import get_windows_system_product
 
 # -------------------- Constants --------------------
 
@@ -103,8 +103,10 @@ def build_products_by_signature(folder: str, only_patches=False) -> Dict[str, An
     products = to_dict(get_section(load_json(products_path), ["products"]))
 
     product_results = get_3rd_party_products(server_folder, products, moby_data)
-    #system_results = get_system_products(server_folder, products, moby_data) 
+    windows_system_product = get_windows_system_product(server_folder, products) 
     
+    product_results.append(windows_system_product)
+
     return {
         "generated_at": datetime.utcnow().isoformat() + "Z",
         "products": product_results

@@ -169,9 +169,12 @@ class Product:
         result = {
             "name": self.name,
             "signature_id": self.signature_id,
-            "vendor": self.vendor.to_dict() if self.vendor else None,
-            "product_line": self.product_line.to_dict() if self.product_line else None,
         }
+
+        if(self.product_line):
+            result["product_line"] = self.product_line.to_dict() 
+        if(self.vendor):
+            result["vendor"] = self.vendor.to_dict()
         if self.uninstallable:
             result["uninstallable"] = self.uninstallable
         if self.marketing_names:
