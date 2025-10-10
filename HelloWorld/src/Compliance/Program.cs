@@ -458,9 +458,14 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
 using System.Reflection;
+using System.Text;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using Vulnerability;
 
 namespace Products
@@ -469,6 +474,60 @@ namespace Products
 
     internal class Program
     {
+        
+        private static readonly HttpClient GptClient = new HttpClient();
+        private static List<Product> CachedProducts = new List<Product>();
+
+        // Helper constant for robust winget parsing and display alignment
+        private const int NameColumnWidth = 36;
+        private const int IdColumnWidth = 36;
+        private const int VersionColumnWidth = 16;
+        private const int UpgradeColumnWidth = 16;
+
+        class WingetProduct
+        {
+            public string name { get; set; }
+            public string vendor { get; set; }
+            public string version { get; set; }
+            public string status { get; set; }
+            public bool isCompliant { get; set; }
+            public string lastUpdate { get; set; }
+            public string Id { get; set; }
+            // This is the core data point provided by WinGet, enriching our Product model.
+            public string UpgradeVersion { get; set; }
+        }
+
+        class SecurityReport
+        {
+            public int Score { get; set; }
+            public List<string> Reasons { get; set; }
+        }
+
+        class Tool
+        {
+            public string type { get; set; } = "function";
+            public Function function { get; set; } = new Function();
+        }
+
+        class Function
+        {
+            public string name { get; set; } = "ExecuteWingetCommandFromAI";
+            public string description { get; set; } = "Execute a winget command (install, upgrade, uninstall) on the local system. For complex tasks like downgrading, this tool can execute chained commands.";
+            public Parameters parameters { get; set; } = new Parameters();
+        }
+
+        class Parameters
+        {
+            public string type { get; set; } = "object";
+            public Dictionary<string, object> properties { get; set; } = new Dictionary<string, object>
+            {
+                // Updated description to allow command chaining
+                { "command", new { type = "string", description = "The full, validated winget command(s) to run. For multi-step tasks like downgrade, use chained commands separated by '&&', e.g., 'winget uninstall Adobe.Reader --silent && winget install Adobe.Reader --version 20.1.0.1 --silent --accept-source-agreements --accept-package-agreements'"} }
+            };
+            public List<string> required { get; set; } = new List<string> { "command" };
+        }
+
+
         #region OESIS SDK Core Interaction
 
         /// <summary>
@@ -609,6 +668,7 @@ namespace Products
                 productList.Add(newProduct);
             }
             products_json = productList;
+            CachedProducts = products_json;
         }
 
         /// <summary>
@@ -685,8 +745,10 @@ namespace Products
                 Console.WriteLine($"\n--- Checking Product: {productName} (Signature ID: {signatureId}) ---");
 
                 string patchInfoJson;
+                string latestInstallerJson;
                 // Pass the product's signatureId to the API call as requested
-                int resultCode = ApiInvoke(50500, "signature", signatureId.ToString(), out patchInfoJson);
+                int resultCode = ApiInvoke(50500, "signature", signatureId.ToString(), out patchInfoJson); //Returns the product Patch Level
+                int resultCode2 = ApiInvoke(50300, "signature", signatureId.ToString(), out latestInstallerJson); // 50500 is not always correct, so we call this
 
                 if (resultCode >= 0)
                 {
@@ -701,18 +763,319 @@ namespace Products
                         Console.WriteLine(patchInfoJson);
                     }
                 }
+                else if (resultCode2 == -12)
+                {
+                    Console.WriteLine($"This product is not supported by the method");
+                }
                 else
                 {
-                    Console.WriteLine($"API call failed with result code: {resultCode}");
+                    Console.WriteLine($"Method failed successfully with code {resultCode}");
+                }
+
+                if (resultCode2 >= 0)
+                {
+                    try
+                    {
+                        var getLatestInstallerInfo = JObject.Parse(latestInstallerJson);
+                        Console.WriteLine(getLatestInstallerInfo.ToString(Formatting.Indented));
+                    }
+                    catch (JsonReaderException)
+                    {
+                        Console.WriteLine("Received non-JSON response or empty result:");
+                        Console.WriteLine(latestInstallerJson);
+                    }
+                }
+                else if (resultCode2 == -1026)
+                {
+                    Console.WriteLine($"Method returns the following: \"An error when a product is not supported\"");
+                }
+                else
+                {
+                    Console.WriteLine($"Method failed successfully with code {resultCode2}");
                 }
             }
         }
+
+        // =====AI Winget Integration below ======
+
+        private static async Task<Dictionary<string, string>> GetWingetUpgrades()
+        {
+            var upgrades = new Dictionary<string, string>();
+            string output = await ExecuteCommand("winget list --upgrade-available");
+
+            var lines = output.Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
+            // Regex to robustly capture the fixed-width columns from winget's output
+            var regex = new Regex(@"^(.{36})(.{36})(.{16})(.{16})", RegexOptions.Multiline);
+
+            // Find the start of the data rows (after the "----" line)
+            int dataStartIndex = Array.FindIndex(lines, l => l.Contains("----"));
+            if (dataStartIndex == -1) return upgrades; // No upgrades or unexpected format
+
+            for (int i = dataStartIndex + 1; i < lines.Length; i++)
+            {
+                var match = regex.Match(lines[i]);
+                if (match.Success)
+                {
+                    string name = match.Groups[1].Value.Trim();
+                    string availableVersion = match.Groups[4].Value.Trim();
+
+                    if (!string.IsNullOrEmpty(name) && !string.IsNullOrEmpty(availableVersion))
+                    {
+                        upgrades[name.ToLower()] = availableVersion;
+                    }
+                }
+            }
+            return upgrades;
+        }
+
+        private static async Task<string> ExecuteCommand(string command)
+        {
+            try
+            {
+                Console.WriteLine($"\n[EXEC] Running command: {command}");
+                var process = new Process
+                {
+                    StartInfo = new ProcessStartInfo
+                    {
+                        FileName = "cmd.exe",
+                        Arguments = $"/C {command}", // /C allows command chaining
+                        RedirectStandardOutput = true,
+                        RedirectStandardError = true,
+                        UseShellExecute = false,
+                        CreateNoWindow = true,
+                        StandardOutputEncoding = Encoding.UTF8
+                    }
+                };
+
+                process.Start();
+                string output = await process.StandardOutput.ReadToEndAsync();
+                string error = await process.StandardError.ReadToEndAsync();
+                await Task.Run(() => process.WaitForExit());
+
+                if (process.ExitCode != 0)
+                {
+                    // Report failure, but include all output for context
+                    return $"[Command Failed] Exit Code: {process.ExitCode}\nError: {error}\nOutput: {output}";
+                }
+
+                return output;
+            }
+            catch (Exception ex)
+            {
+                return $"[Execution Error] {ex.Message}";
+            }
+        }
+
+        /// <summary>
+        /// Tool function that the AI calls to execute a winget command.
+        /// </summary>
+
+        private static async Task<Dictionary<string, string>> GetWingetPackageInfo()
+        {
+            var packages = new Dictionary<string, string>();
+            string output = await ExecuteCommand("winget list");
+
+            var lines = output.Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
+            var regex = new Regex(@"^(.{36})(.{36})", RegexOptions.Multiline); // Capture only Name and ID
+
+            int dataStartIndex = Array.FindIndex(lines, l => l.Contains("----"));
+            if (dataStartIndex == -1) return packages;
+
+            for (int i = dataStartIndex + 1; i < lines.Length; i++)
+            {
+                var match = regex.Match(lines[i]);
+                if (match.Success)
+                {
+                    string name = match.Groups[1].Value.Trim();
+                    string id = match.Groups[2].Value.Trim();
+
+                    if (!string.IsNullOrEmpty(name) && !string.IsNullOrEmpty(id))
+                    {
+                        packages[name.ToLower()] = id;
+                    }
+                }
+            }
+            return packages;
+        }
+        
+        private static string ExecuteWingetCommandFromAI(string command)
+        {
+            // Ensure only winget or chained winget commands are attempted
+            if (string.IsNullOrWhiteSpace(command) || !command.ToLower().Contains("winget"))
+            {
+                return "Error: Only 'winget' commands or chained 'winget' commands are permitted for execution.";
+            }
+
+            // Run the winget command(s) and wait for the result
+            string result = ExecuteCommand(command).GetAwaiter().GetResult();
+
+            // Re-scan products after the action to update status
+            DetectInstalledProducts(out CachedProducts);
+
+            return $"Command executed successfully. New system status scanned. Output:\n{result}";
+        }
+
+        private static async Task<string> CallGPTWithContext(
+            string userPrompt,
+            List<Product> installedProducts)
+        {
+            // Use your actual API Key or set environment variable OPENAI_API_KEY
+            string apiKey = Environment.GetEnvironmentVariable("OPENAI_API_KEY") ?? "";
+
+            var contextBuilder = new StringBuilder();
+
+            contextBuilder.AppendLine("You are the official MetaDefender Core Zero Trust Assistant, with the ability to execute winget commands on the local machine.");
+            contextBuilder.AppendLine("Your goal is to provide concise, authoritative risk management guidance based on the scanned system data and to execute requested actions using the provided tool.");
+
+            // *** UPDATED Instruction for SDK Context ***
+            contextBuilder.AppendLine("Note that the application list is generated by an **SDK-Integrated Scanner** that uses deep system checks, providing a more complete list and better version coverage than simple WinGet lists.");
+            contextBuilder.AppendLine("To reliably **uninstall, downgrade, or install a specific version** of an application, you MUST recommend a two-step process.");
+            contextBuilder.AppendLine("1. **Uninstall:** Use 'winget uninstall <Winget ID> --silent'");
+            contextBuilder.AppendLine("2. **Install Specific Version:** Use 'winget install <ID> --version <X.Y.Z> --silent --accept-source-agreements --accept-package-agreements'");
+            contextBuilder.AppendLine("Chain these commands together using '&&' in a single tool call for reliability (e.g., 'winget uninstall APP.ID --silent && winget install APP.ID --version X.Y.Z --silent ...').");
+            contextBuilder.AppendLine("For simple upgrades, 'winget upgrade --all' or 'winget upgrade <ID>' is sufficient. If the user asks to **install** a new app (like Facebook or a package not already listed), you MUST use **'winget install <ID>'** not 'winget upgrade --all'. All upgrade/install commands MUST include the flags: '--silent --accept-source-agreements --accept-package-agreements'.");
+            contextBuilder.AppendLine("If the installation of an app is not found online, then try to search via Microsoft Store. You can search for the app via the following command: winget search \"<app name>\" --source msstore. Do not prompt back to user to ask if they want to proceed with that, just install" );
+            contextBuilder.AppendLine("ONLY use the ExecuteWingetCommandFromAI tool if the user explicitly requests an action like 'update', 'install', 'downgrade', 'delete', 'version' or 'uninstall'.  You MUST use the string-based 'Winget ID'. Do not invent commands.");
+            contextBuilder.AppendLine("If you decide to use the tool, respond ONLY with the JSON function call. Do NOT provide any preceding or subsequent text in that turn.");
+            // *** End UPDATED Instruction ***
+
+            contextBuilder.AppendLine("\n=== End-Device Trust Posture (Installed Apps) ===");
+            foreach (var p in installedProducts)
+            {
+                string wingetIdText = string.IsNullOrEmpty(p.WingetId) ? "Not Found" : p.WingetId;
+                contextBuilder.AppendLine($"- Product: {p.name} (Winget ID: {wingetIdText}) (SDK ID: {p.signatureId}) v{p.version}");
+            }
+            contextBuilder.AppendLine("\nRespond to the user's query.");
+            string context = contextBuilder.ToString();
+
+            var tools = new List<Tool> { new Tool() };
+
+            var initialMessages = new List<object>
+            {
+                new { role = "system", content = context },
+                new { role = "user", content = userPrompt }
+            };
+            
+            var payload = new { model = "gpt-4o-mini", temperature = 0.1, messages = initialMessages.ToArray(), tools = tools };
+
+            GptClient.DefaultRequestHeaders.Clear();
+            GptClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {apiKey}");
+
+            string json = JsonConvert.SerializeObject(payload);
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+            var resp = await GptClient.PostAsync("https://api.openai.com/v1/chat/completions", content);
+            string respJson = await resp.Content.ReadAsStringAsync();
+            dynamic parsed = JObject.Parse(respJson);
+            
+            var assistantMessage = parsed["choices"]?[0]?["message"];
+            
+            if (assistantMessage?["tool_calls"] != null)
+            {
+                var assistantToolCallMessage = assistantMessage;
+                var toolCall = assistantToolCallMessage["tool_calls"][0];
+                string functionName = toolCall["function"]["name"].ToString();
+                string argumentsJson = toolCall["function"]["arguments"].ToString();
+                string toolCallId = toolCall["id"].ToString();
+
+                if (functionName == "ExecuteWingetCommandFromAI")
+                {
+                    var args = JObject.Parse(argumentsJson);
+                    string wingetCommand = args["command"].ToString();
+
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    // CHANGED: Updated the logging message.
+                    Console.WriteLine($"\n[AI Action Request] Tool: ExecuteWingetCommandFromAI");
+                    Console.WriteLine($"[AI Action Request] Command: {wingetCommand}");
+                    Console.ResetColor();
+
+                    string toolResult = ExecuteWingetCommandFromAI(wingetCommand);
+                    
+                    var toolResultMessage = new
+                    {
+                        role = "tool",
+                        tool_call_id = toolCallId,
+                        name = functionName,
+                        content = toolResult
+                    };
+
+                    Console.ForegroundColor = ConsoleColor.Magenta;
+                    // CHANGED: Updated the logging message.
+                    Console.WriteLine("\n[AI Summary] Sending result back to AI for summarization...");
+                    Console.ResetColor();
+
+                    var toolCallsList = ((JArray)assistantToolCallMessage["tool_calls"]).ToList();
+                    var cleanAssistantMessage = new
+                    {
+                        role = "assistant",
+                        tool_calls = toolCallsList
+                    };
+
+                    var conversationMessages = new List<object>
+                    {
+                        new { role = "system", content = context },
+                        new { role = "user", content = userPrompt },
+                        cleanAssistantMessage,
+                        toolResultMessage 
+                    };
+
+                    var secondPayload = new { model = "gpt-4o-mini", messages = conversationMessages.ToArray() };
+                    json = JsonConvert.SerializeObject(secondPayload);
+                    content = new StringContent(json, Encoding.UTF8, "application/json");
+                    resp = await GptClient.PostAsync("https://api.openai.com/v1/chat/completions", content);
+                    respJson = await resp.Content.ReadAsStringAsync();
+                    parsed = JObject.Parse(respJson);
+                }
+            }
+
+            if (parsed["error"] != null)
+            {
+                return $"API Error: {(string)parsed["error"]["message"]}";
+            }
+
+            return (string)(parsed["choices"]?[0]?["message"]?["content"] ?? "No response received.");
+        }
+
+        
+        private static async Task RunAiAssistant()
+        {
+            Console.WriteLine("\n=== OESIS AI Security Assistant ===");
+            Console.WriteLine("Running SDK scan to get product list...");
+            DetectInstalledProducts(out CachedProducts); // Always get fresh SDK data
+
+            Console.WriteLine("Checking for available upgrades via Winget...");
+            var availableUpgrades = await GetWingetUpgrades();
+
+            Console.WriteLine("Getting Winget package IDs...");
+            var wingetPackages = await GetWingetPackageInfo();
+
+            while (true)
+            {
+                Console.ForegroundColor = ConsoleColor.Cyan;
+                Console.Write("\n[You]: ");
+                Console.ResetColor();
+                string userPrompt = Console.ReadLine();
+                if (string.IsNullOrWhiteSpace(userPrompt) || userPrompt.ToLower() == "exit") break;
+
+                Console.ForegroundColor = ConsoleColor.Magenta;
+                Console.WriteLine("\n[Assistant]: Thinking...");
+                Console.ResetColor();
+
+                string response = await CallGPTWithContext(userPrompt, CachedProducts);
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine(response);
+                Console.ResetColor();
+            }
+        }
+
 
         #endregion
 
         #region UI and Main Program Flow
 
-        private static void ShowMenu()
+
+
+        private static async Task ShowMenu()
         {
             bool running = true;
             while (running)
@@ -721,7 +1084,8 @@ namespace Products
                 Console.WriteLine("1. Detect All Products and Vulnerabilities");
                 Console.WriteLine("2. Detect Running Products");
                 Console.WriteLine("3. Check for Missing Patches (Method 50500)");
-                Console.WriteLine("4. Exit");
+                Console.WriteLine("4. AI Assistant");
+                Console.WriteLine("5. Exit");
                 Console.Write("\nSelect choice: ");
 
                 string input = Console.ReadLine();
@@ -763,6 +1127,9 @@ namespace Products
                         CheckForMissingPatches();
                         break;
                     case "4":
+                        await RunAiAssistant();
+                        break;
+                    case "5":
                         running = false;
                         break;
                     default:
@@ -773,7 +1140,7 @@ namespace Products
             }
         }
 
-        static void Main(string[] args)
+        static async Task Main(string[] args)
         {
             try
             {
@@ -782,7 +1149,7 @@ namespace Products
                 LoadPatchDatabase("patch.dat", "ap_checksum.dat");
                 ApiInvoke(50520, "dat_input_source_file", "v2mod.dat", out _);
 
-                ShowMenu();
+                await ShowMenu();
 
                 OESISAdapter.wa_api_teardown();
                 Console.WriteLine("\nApplication terminated.");
@@ -794,7 +1161,7 @@ namespace Products
                 Console.ResetColor();
             }
         }
-
         #endregion
     }
 }
+

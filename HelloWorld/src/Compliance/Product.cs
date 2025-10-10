@@ -18,6 +18,8 @@ namespace Vulnerability
         public string version;
         //public boolean isRunning;
         // public List<string> vulnerability_detail;
+        public string UpgradeVersion { get; set; }
+        public string WingetId { get; set; }
     }
 
     internal class RunningProducts
