@@ -228,22 +228,6 @@ def find_case_insensitive(root: str, filename: str) -> Optional[str]:
                 return os.path.join(d, f)
     return None
 
-def group_associations_by_product_id(vuln_associations: list) -> dict:
-    """
-    Group vulnerability associations by product ID.
-    Returns a dict mapping product_id to a list of associations.
-    """
-    result = {}
-    for assoc in vuln_associations.values():
-        pid_list = assoc.get("v4_pids")
-        if pid_list is not None:
-            for product_id in pid_list:
-                result.setdefault(str(product_id), []).append(assoc)
-        else:
-            product_id = assoc.get("v4_pid")
-            if product_id is not None:
-                result.setdefault(str(product_id), []).append(assoc)
-    return result
 
 def is_recent_cve(cve_id, years=10):
     """

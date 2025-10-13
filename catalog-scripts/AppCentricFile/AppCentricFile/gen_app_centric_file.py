@@ -34,7 +34,7 @@ from typing import Any, Dict, Iterable, List, Optional
 from dataclasses import dataclass, field
 from third_party import get_3rd_party_products
 from patch_classes import Product, Metadata, Data
-from util import load_json, to_dict, group_associations_by_product_id, load_moby, find_case_insensitive, get_section
+from util import load_json, to_dict, load_moby, find_case_insensitive, get_section
 from download_catalog import read_token, download_and_extract_analog
 from system_patch import get_windows_system_product
 

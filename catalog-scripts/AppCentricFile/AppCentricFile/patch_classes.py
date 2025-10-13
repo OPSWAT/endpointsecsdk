@@ -123,10 +123,12 @@ class Patch:
     language_default: Optional[str] = None
     platform: Optional[str] = None
     patch_type: Optional[str] = None
+    delivery_mode: Optional[str] = None
 
     def to_dict(self) -> dict:
         """Convert Patch to a dictionary for JSON serialization."""
-        return {
+        """Convert Patch to a dictionary for JSON serialization, skipping None or 0 values."""
+        data = {
             "name": self.name,
             "bulletin": self.bulletin,
             "patch_id": self.patch_id,
@@ -146,10 +148,14 @@ class Patch:
             "reboot_required": self.reboot_required,
             "architectures": self.architectures,
             "language_default": self.language_default,
+            "delivery_mode": self.delivery_mode,
             "properties": [prop.to_dict() for prop in self.properties],
             "cve": self.cve,
             "packages": [p.to_dict() for p in self.packages],
         }
+
+        # remove any keys where the value is None or 0
+        return {k: v for k, v in data.items() if v not in (None, 0)}
 
 @dataclass
 class Product:

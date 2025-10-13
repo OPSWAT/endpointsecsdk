@@ -23,7 +23,6 @@ from util import (
     generate_bulletin_id,
     get_platform_from_signature,
     to_dict,
-    group_associations_by_product_id,
     find_case_insensitive,
     load_json,
     get_section
@@ -70,6 +69,7 @@ def get_3rd_party_patch(
     patch_aggr: Dict[str, Any],
     background_patching: bool,
     validation: bool,
+    delivery_mode: str,
     properties: List[Property]
 ) -> Optional[Patch]:
     """
@@ -129,6 +129,7 @@ def get_3rd_party_patch(
         architectures=architectures,
         language_default=lang_default,
         release_date=release_date,
+        delivery_mode=delivery_mode,
         patch_type="3rd_party"
     )
 
@@ -140,6 +141,7 @@ def get_3rd_party_patches(
     patch_aggr: Dict[str, Any],
     background_patching: bool,
     validation: bool,
+    delivery_mode: str,
     properties: List[Property]
 ) -> List[Patch]:
     """
@@ -153,7 +155,7 @@ def get_3rd_party_patches(
             sigs = association.get("v4_signatures") or []
             if str(signature_id) in [str(s) for s in sigs]:
                 patch_id = association.get("patch_id") or []
-                patch = get_3rd_party_patch(signature_id, patch_id, vuln_associations, patch_aggr, background_patching, validation, properties)
+                patch = get_3rd_party_patch(signature_id, patch_id, vuln_associations, patch_aggr, background_patching, validation, delivery_mode, properties)
                 if patch is not None:
                     patch_list.append(patch)
     return patch_list
@@ -191,6 +193,37 @@ def get_cves_and_cpes_for_3rd_party(
                 vulnerability_list.append(vuln)
     return vulnerability_list
 
+def group_associations_by_product_id(vuln_associations: list) -> dict:
+    """
+    Group vulnerability associations by product ID.
+    Returns a dict mapping product_id to a list of associations.
+    """
+    result = {}
+    for assoc in vuln_associations.values():
+        pid_list = assoc.get("v4_pids")
+        if pid_list is not None:
+            for product_id in pid_list:
+                result.setdefault(str(product_id), []).append(assoc)
+        else:
+            product_id = assoc.get("v4_pid")
+            if product_id is not None:
+                result.setdefault(str(product_id), []).append(assoc)
+    return result
+
+def group_status_by_signature_id(status_list: list) -> dict:
+    """
+    Group vulnerability associations by product ID.
+    Returns a dict mapping product_id to a list of associations.
+    """
+    result: dict[str, Any] = {}
+    for status in status_list:
+        sig_id = status.get("signature_id")
+        if sig_id is not None:
+            result[str(sig_id)] = status
+    return result
+
+
+
 def get_3rd_party_products(
     server_folder: str,
     products: Dict[str, Any],
@@ -206,11 +239,15 @@ def get_3rd_party_products(
     passoc_path = find_case_insensitive(server_folder, "patch_associations.json")
     paggr_path = find_case_insensitive(server_folder, "patch_aggregation.json")
     vulnassoc_path = find_case_insensitive(server_folder, "vuln_associations.json")
+    patch_status_path = find_case_insensitive(server_folder, "patch_status.json")
 
     # Load Associations
     patch_assoc_sec = group_associations_by_product_id(get_section(load_json(passoc_path), ["patch_associations", "patch_associations_1.2", "patch_associations_1.1"]))
     vulnassoc = group_associations_by_product_id(get_section(load_json(vulnassoc_path), ["vuln_associations", "vuln_associations_1.1"]))
     patch_aggr = to_dict(get_section(load_json(paggr_path), ["patch_aggregations"]))
+
+    patch_status_doc = load_json(patch_status_path)
+    patch_status_dict = group_status_by_signature_id(patch_status_doc.get("patch_status"))
 
     for prod in products.values():
         product_data = prod.get("product", {})
@@ -239,10 +276,25 @@ def get_3rd_party_products(
                 product_result.categories = moby.get("categories", [])
                 product_result.uninstallable = moby.get("support_app_remover", False)
 
+            
+            delivery_mode = None
+
+            if str(sig_id) in patch_status_dict:
+                product_status = patch_status_dict.get(str(sig_id),any)
+                if product_status:
+                    method_status = product_status.get("method_status")
+                    if method_status:
+                        delivery_mode = "url" # Set the default if there is a method_status
+                        download = method_status.get("get_latest_installer").get("download_0").get("is_supported")
+    
+                        if download is False:
+                            delivery_mode = "orchestrated"
+
+
             # Add patches and vulnerabilities
             product_result.patches = get_3rd_party_patches(
                 sig_id, product_id, patch_assoc_sec, vulnassoc,
-                patch_aggr, background_patching, validation, properties
+                patch_aggr, background_patching, validation, delivery_mode, properties
             )
 
             product_result.vulnerabilities = get_cves_and_cpes_for_3rd_party(
