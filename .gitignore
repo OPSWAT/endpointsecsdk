@@ -4,7 +4,6 @@
 
 
 .vs/
-bin/
 obj/
 .vs/
 /test.test
@@ -27,3 +26,14 @@ obj/
 *.txt
 /catalog-scripts/AppCentricFile/FindCVE/app_centric.json
 /catalog-scripts/AppCentricFile/FindCVE/analog.zip
+/eval-license/license.cfg
+/HelloWorld/src/SDKDownloader/packages.config
+/HelloWorld/src/SDKDownloadLib/packages.config
+/archives
+/OPSWAT-SDK
+/OPSWAT-SDK-Downloader/C-Sharp/src/packages
+/OPSWAT-SDK-Downloader/PythonSDKDownloader/src/__pycache__
+/HelloWorld/src/Patch-WOS/bin/x64/Debug
+/OPSWAT-SDK-Downloader/C-Sharp/bin/Downloader.log
+/OPSWAT-SDK-Downloader/C-Sharp/src/bin/Debug
+/OPSWAT-SDK-Downloader/C-Sharp/src/bin/Release

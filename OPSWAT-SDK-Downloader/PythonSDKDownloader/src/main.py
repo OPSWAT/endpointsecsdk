@@ -13,9 +13,7 @@ from Util import Util
 def main(args):
     print("SDKDownloader Started")
 
-    sdk_root = os.path.abspath(
-        os.path.join(os.getcwd(), "..", "..", "..", "OPSWAT-SDK")
-    )
+    sdk_root = Util.get_sdk_root()
 
     if len(args) > 1:
         sdk_root = args[1]

@@ -56,14 +56,68 @@ class Util:
                     return True
         return False
 
+    
     @staticmethod
-    def get_download_token():
+    def get_sdk_root() -> str:
+        """
+        Searches upward from the current directory for a file named 'sdkroot'.
+        Returns the directory where it's found, or the current directory if not found.
+        """
+        search_directory = os.getcwd()
+        found = False
+
+        while True:
+            sdkroot_file = os.path.join(search_directory, "sdkroot")
+            if os.path.isfile(sdkroot_file):
+                found = True
+                break
+
+            parent_dir = os.path.dirname(search_directory)
+            if parent_dir == search_directory:  # reached filesystem root
+                break
+            search_directory = parent_dir
+
+        if not found:
+            search_directory = os.getcwd()
+
+        return search_directory
+
+
+    @staticmethod
+    def get_download_token() -> str:
+        """
+        Reads the download token from 'download_token.txt' in the current directory
+        or from the '%sdkroot%/eval-license' directory if present.
+        Raises an exception if the token file cannot be found.
+        """
         sdk_token_file = "download_token.txt"
-        if not os.path.exists(sdk_token_file):
-            raise Exception("Make sure there is a download token file available in the running directory: " + os.getcwd())
-        with open(sdk_token_file, "r") as f:
+
+        # Check local directory first
+        if not os.path.isfile(sdk_token_file):
+            from pathlib import Path
+
+            sdk_root = Util.get_sdk_root()
+            license_path = os.path.join(sdk_root, "eval-license")
+
+            if os.path.isdir(license_path):
+                sdk_token_file = os.path.join(license_path, sdk_token_file)
+                if not os.path.isfile(sdk_token_file):
+                    raise FileNotFoundError(
+                        f"Make sure there is a download token file available in the "
+                        f"%sdk-root%/eval-license directory: {license_path}"
+                    )
+            else:
+                raise FileNotFoundError(
+                    f"Make sure there is a download token file available in the running "
+                    f"directory: {os.getcwd()}"
+                )
+
+        # Read and return token
+        with open(sdk_token_file, "r", encoding="utf-8") as f:
             download_token = f.read().strip()
+
         return download_token
+
 
     @staticmethod
     def get_token_download_url(file_name):
@@ -101,3 +155,5 @@ class Util:
             if os.path.isfile(src_file):
                 if overwrite or not os.path.exists(dst_file):
                     shutil.copy2(src_file, dst_file)
+
+

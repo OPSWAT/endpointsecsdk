@@ -1,7 +1,7 @@
 import os
 import hashlib
-import requests
 import logging
+import requests
 
 class HttpClientUtils:
     @staticmethod

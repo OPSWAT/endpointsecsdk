@@ -18,7 +18,7 @@ namespace SDKDownloader
         {
             Console.WriteLine("SDKDownloader Started");
 
-            string sdkRoot = Directory.GetParent(Directory.GetCurrentDirectory()).Parent.Parent.Parent.FullName;
+            string sdkRoot = Util.GetSDKRoot();
             sdkRoot = Path.Combine(sdkRoot, "OPSWAT-SDK");
 
 
@@ -28,14 +28,35 @@ namespace SDKDownloader
                 sdkRoot = Path.Combine(sdkRoot, args[2]);
             }
 
-            Downloader.Download(sdkRoot);
-            Extractor.Extract(sdkRoot);
-            ClientFiles.PrepareFiles(sdkRoot);
+            //
+            // Check to see if the downloaded files are up to date only download once a day
+            //
+            bool update= true;
+            string analogHeader = Path.Combine(sdkRoot, "extract/analog/header.json");
+            FileInfo analogHeaderInfo = new FileInfo(analogHeader);
+            if (analogHeaderInfo.Exists)
+            {
+                if(analogHeaderInfo.LastWriteTime.AddDays(1) > DateTime.Now)
+                {
+                    update = false;
+                }
 
-            //
-            // Cleanup the Archives directory
-            //
-            Directory.Delete(Util.GetArchivesPath(sdkRoot), true);
+
+            }
+
+
+            if (update)
+            {
+                Downloader.Download(sdkRoot);
+                Extractor.Extract(sdkRoot);
+                ClientFiles.PrepareFiles(sdkRoot);
+
+                //
+                // Cleanup the Archives directory
+                //
+                Directory.Delete(Util.GetArchivesPath(sdkRoot), true);
+            }
+
 
             Console.WriteLine("SDKDownloader Complete");
             return 0;

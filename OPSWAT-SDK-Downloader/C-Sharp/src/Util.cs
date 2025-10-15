@@ -114,7 +114,20 @@ namespace SDKDownloader
             string sdk_token_file = "download_token.txt";
             if (!File.Exists(sdk_token_file))
             {
-                throw new Exception("Make sure there is a download token file available in the running directory: " + Directory.GetCurrentDirectory());
+                string sdkRoot = GetSDKRoot();
+                string licensePath = Path.Combine(sdkRoot, "eval-license");
+
+                if (Directory.Exists(licensePath))
+                {
+                    sdk_token_file = Path.Combine(licensePath, sdk_token_file);
+                    if (!File.Exists(sdk_token_file))
+                        throw new Exception("Make sure there is a download token file available in the %sdk-root%/eval-license directory: " + licensePath);
+                }
+                else
+                {
+                    throw new Exception("Make sure there is a download token file available in the running directory: " + Directory.GetCurrentDirectory());
+                }
+
             }
 
             string downloadToken = File.ReadAllText(sdk_token_file);
@@ -173,5 +186,37 @@ namespace SDKDownloader
                 File.Copy(filePath, destFilePath, overwrite);
             }
         }
+    
+        public static string GetSDKRoot()
+        {
+            bool found = false;
+            string searchDirectory = Directory.GetCurrentDirectory();
+
+            while(!found)
+            {
+                string sdkrootFile = Path.Combine(searchDirectory, "sdkroot");
+                if(File.Exists(sdkrootFile))
+                {
+                    found = true;
+                }
+                else
+                {
+                    DirectoryInfo parentDir = Directory.GetParent(searchDirectory);
+                    if (parentDir != null)
+                        searchDirectory = parentDir.FullName;
+                    else
+                        break;
+                }
+            }
+
+            if (!found)
+                searchDirectory = Directory.GetCurrentDirectory();
+
+            return searchDirectory;
+        }
+
+
     }
+
+
 }
