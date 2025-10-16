@@ -100,9 +100,14 @@ download_token.txt
 > ```powershell
 > go version
 > ```
+---
+You can bypass the signature check on the script by running it like this:
+
+powershell -ExecutionPolicy Bypass -File .\build.ps1
+
 
 ---
 
 ### 🏁 Author Notes
 
-This guide was generated to ensure a clear and visually friendly onboarding for engineers integrating OPSWAT SDK in Go across Windows and macOS environments.
+This guide was generated to ensure a clear and visually friendly onboarding for engineers integrating OPSWAT SDK in Go Windows.
