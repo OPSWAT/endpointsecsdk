@@ -23,7 +23,6 @@ obj/
 /HelloWorld/src/license/download_token.txt
 /catalog-scripts/AppCentricFile/AppCentricFile/analog/analog
 /catalog-scripts/AppCentricFile/FindCVE/CatalogExtract/analog
-*.txt
 /catalog-scripts/AppCentricFile/FindCVE/app_centric.json
 /catalog-scripts/AppCentricFile/FindCVE/analog.zip
 /eval-license/license.cfg
@@ -41,3 +40,10 @@ obj/
 /language-examples/go/inc
 /language-examples/go/libs/win
 /language-examples/go/license
+/language-examples/go/download_token.txt
+/language-examples/go/pass_key.txt
+/eval-license/download_token.txt
+/eval-license/pass_key.txt
+/catalog-scripts/AppCentricFile/FindCVE/download_token.txt
+/catalog-scripts/AppCentricFile/FindCVE/results_CVE-2008-4434_20251009_151048.txt
+/catalog-scripts/AppCentricFile/FindCVE/results_CVE-2008-4434_20251010_154046.txt
