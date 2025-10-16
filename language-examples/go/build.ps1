@@ -159,41 +159,6 @@ function Set-CgoEnvironment {
     if ($env:CXX) { Write-Status "  CXX: $env:CXX" }
 }
 
-function Copy-SDK-Files1 {
-    # Set your directories
-    $LibPath = "libs"
-    $IncPath = "inc"
-    $SDKSourcePath = "..\..\OPSWAT-SDK"
-    $CopySDK = $true
-
-    # Define age threshold (in days)
-    $AgeThreshold = 7
-
-
-    Write-Host "Checking files in lib directory: $LibPath" -ForegroundColor Cyan
-
-    if ($CopySDK) {
-
-            Write-Host "Copying over the SDK Files" -ForegroundColor Green
-
-            # Clear the directory
-            Remove-Item -Path "$LibPath\*" -Recurse -Force -ErrorAction SilentlyContinue
-            # Copy fresh files
-            Copy-Item -Path "$SDKSourcePath\client\windows" -Destination $LibPath -Recurse -Force
-            Rename-Item -Path "$LibPath\windows" -NewName "win"
-
-            #Copy-Item -Path "$SDKSourcePath\client\mac" -Destination $LibPath\mac -Recurse -Force
-            #Copy-Item -Path "$SDKSourcePath\client\linux" -Destination $LibPath\linux -Recurse -Force
-
-            Remove-Item -Path "$IncPath\*" -Recurse -Force
-            # Copy fresh files
-            Copy-Item -Path "$SDKSourcePath\extract\windows\inc" -Destination $ . -Recurse -Force
-
-            Write-Host "Stage directory refreshed successfully." -ForegroundColor Green
-
-    }
-}
-
 function Copy-SDK-Files {
     param(
         [string]$LibPath       = "libs",
@@ -237,7 +202,7 @@ function Copy-SDK-Files {
             #Copy-Item -Path "$SDKSourcePath\client\mac" -Destination $LibPath\mac -Recurse -Force
             #Copy-Item -Path "$SDKSourcePath\client\linux" -Destination $LibPath\linux -Recurse -Force
 
-            Remove-Item -Path "$IncPath\*" -Recurse -Force
+            Remove-Item -Path "$IncPath\*" -Recurse -Force -ErrorAction SilentlyContinue
             # Copy fresh files
             Copy-Item -Path "$SDKSourcePath\extract\windows\inc" -Destination . -Recurse -Force
 
