@@ -19,8 +19,7 @@ All samples and programs here require a license of the MetaDefender Endpoint SDK
 | **opswat-posture**                                       | Device Posture Example       | Illustrates how to collect device posture data and evaluate compliance policies.                                                     |
 | **language-examples/go**                                 | Go Integration Sample        | Shows how to call the SDK from Go using `cgo` bindings. Includes `build.ps1` automation.                                             |
 | **catalog-scripts/AppCentricFile**                       | Patch Catalog Tools          | Scripts to build and update the patch catalog and JSON schemas. Useful for backend catalog generation or validation.                 |
-| **download-patch**                                       | Patch Download Example       | Example for downloading and applying SDK-provided patches.                                                                           |
-| **simple-samples/vulnerability/scan3rdParty-cSharp/src** | C# Vulnerability Sample      | Simple 3rd-party scanning sample demonstrating vulnerability API usage.                                                              |
+                                                              |
 
 ---
 
