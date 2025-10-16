@@ -37,3 +37,7 @@ obj/
 /OPSWAT-SDK-Downloader/C-Sharp/bin/Downloader.log
 /OPSWAT-SDK-Downloader/C-Sharp/src/bin/Debug
 /OPSWAT-SDK-Downloader/C-Sharp/src/bin/Release
+/language-examples/go/build
+/language-examples/go/inc
+/language-examples/go/libs/win
+/language-examples/go/license
