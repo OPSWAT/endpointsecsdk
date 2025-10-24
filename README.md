@@ -12,7 +12,7 @@ Sample projects demonstrating basic SDK usage across multiple platforms and prog
 Each sample shows how to initialize the SDK, run a basic scan, and query endpoint posture data.  
 Examples include:
 - Windows (C#, C++)
-- macOS (Objective-C, Swift)
+- macOS (C++)
 - Linux (C++)
 
 ### **tools/**
