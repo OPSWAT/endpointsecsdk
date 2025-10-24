@@ -47,3 +47,6 @@ obj/
 /catalog-scripts/AppCentricFile/FindCVE/download_token.txt
 /catalog-scripts/AppCentricFile/FindCVE/results_CVE-2008-4434_20251009_151048.txt
 /catalog-scripts/AppCentricFile/FindCVE/results_CVE-2008-4434_20251010_154046.txt
+/scripts/catalog/appcentric/AppCentricFile/CatalogExtract/analog
+/scripts/catalog/appcentric/AppCentricFile/__pycache__
+/scripts/catalog/appcentric/AppCentricFile/download_token.txt
