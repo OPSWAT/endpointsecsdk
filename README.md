@@ -59,3 +59,43 @@ If you do not yet have a license, see the section below for requesting one.
 1. **Clone the repository**
    ```bash
    git clone https://github.com/OPSWAT/endpointsecsdk.git
+   ```
+2. **Navigate to a sample directory**
+   ```bash
+   cd endpointsecsdk/helloworld/windows
+   ```
+3. **Build using your platform toolchain**
+   - Windows: Visual Studio (C++, C#, or Go)
+   - macOS: Xcode (C++)
+   - Linux: GCC/Clang (C++)
+4. **Run the sample** to confirm SDK initialization and license validation.
+
+---
+
+## 🔧 Requirements
+
+- MetaDefender Endpoint SDK evaluation or production license  
+- Supported build environments:
+  - Visual Studio (Windows)
+  - Xcode (macOS)
+  - GCC/Clang (Linux)
+  - Go 1.21+ (for Windows Go example)
+- Python 3.9+ (for `scripts/` utilities)
+
+---
+
+## 📄 License and Use
+
+All samples, scripts, and tools are provided for demonstration and integration purposes only.  
+Redistribution or production use requires permission under your OPSWAT OEM license agreement.
+
+---
+
+## ✉️ Request an Evaluation License
+
+To request an evaluation key or additional information about the MetaDefender Endpoint SDK,  
+please email: **[oem@opswat.com](mailto:oem@opswat.com)**.
+
+---
+
+© OPSWAT Inc. – “Trust No File, Trust No Device.”
