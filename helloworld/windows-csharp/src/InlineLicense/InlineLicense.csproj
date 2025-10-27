@@ -102,7 +102,6 @@
     </PreBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
-    <PostBuildEvent>copy "$(SolutionDir)\license" "$(ProjectDir)$(OutDir)"
-copy "$(SolutionDir)\lib\$(PlatformName)" "$(ProjectDir)$(OutDir)"</PostBuildEvent>
+    <PostBuildEvent>powershell -ExecutionPolicy Bypass -NoProfile -File "$(SolutionDir)copysdkfiles.ps1" -Architecture $(PlatformTarget) -OutputDir $(TargetDir)</PostBuildEvent>
   </PropertyGroup>
 </Project>
