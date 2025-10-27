@@ -50,3 +50,4 @@ obj/
 /scripts/catalog/appcentric/AppCentricFile/CatalogExtract/analog
 /scripts/catalog/appcentric/AppCentricFile/__pycache__
 /scripts/catalog/appcentric/AppCentricFile/download_token.txt
+/helloworld/windows-csharp/src/Patch-WOS/bin

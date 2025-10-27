@@ -1,112 +1,101 @@
-# OPSWAT Endpoint SDK Samples
+# MetaDefender Endpoint SDK – Sample and Utility Repository
 
-This repository contains example integrations, sample applications, and utilities demonstrating how to use the **OPSWAT Endpoint Security SDK**. These samples provide reference implementations for device posture, patch management, and vulnerability scanning.  
-
-All samples and programs here require a license of the MetaDefender Endpoint SDK.  To obtain an evaluation copy email OEM@OPSWAT.com.
-
----
-
-## 📁 Repository Structure
-
-| Folder                                                   | Purpose / Use Case           | Description                                                                                                                          |
-| -------------------------------------------------------- | ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
-| **HelloWorld-CPP**                                       | C++ Sample                   | Minimal example showing basic SDK initialization and product query.                                                                  |
-| **HelloWorld-Linux**                                     | Linux Native Sample          | Linux version of HelloWorld demonstrating platform build differences.                                                                |
-| **HelloWorld-Mac**                                       | macOS Native Sample          | macOS build configuration and usage example.                                                                                         |
-| **HelloWorld**                                           | Cross-Platform Wrapper       | General HelloWorld sample that uses the SDK Downloader to fetch required libs.                                                       |
-| **OPSWAT-SDK-Downloader**                                | SDK Download Utility         | C# utility to automatically download the SDK components and place them in the expected structure (e.g., `libs` and `inc`).           |
-| **VAPM-Scanner**                                         | Vulnerability & Patch Module | Demonstrates how to scan systems for missing patches and vulnerabilities. Supports both online and offline patch catalog operations. |
-| **opswat-posture**                                       | Device Posture Example       | Illustrates how to collect device posture data and evaluate compliance policies.                                                     |
-| **language-examples/go**                                 | Go Integration Sample        | Shows how to call the SDK from Go using `cgo` bindings. Includes `build.ps1` automation.                                             |
-| **catalog-scripts/AppCentricFile**                       | Patch Catalog Tools          | Scripts to build and update the patch catalog and JSON schemas. Useful for backend catalog generation or validation.                 |
-                                                              |
+This repository provides example projects, utilities, and data management scripts to support development and integration with the **MetaDefender Endpoint SDK**.  
+It serves as a reference base for both partners and internal developers working with OPSWAT’s Device Trust, Vulnerability, and Patch Management modules.
 
 ---
 
-## ⚙️ Typical Workflow
+## 📁 Repository Overview
 
-1. **Download the SDK Libraries**
-   Run the downloader to fetch all SDK binaries and header files.
+### **helloworld/**
+Sample projects demonstrating basic SDK usage across multiple platforms and programming languages.  
+Each example shows how to initialize the SDK, perform a scan, and query endpoint posture data.
 
-   ```powershell
-   cd OPSWAT-SDK-Downloader\C-Sharp\bin
-   .\SDKDownloader.exe
+**Available samples:**
+- **Windows:** C++, C#, and Go examples demonstrating SDK setup, detection, and product discovery workflows  
+- **macOS:** C++ sample built with Xcode showing cross-platform SDK integration  
+- **Linux:** C++ sample demonstrating patch and vulnerability queries  
+
+These projects provide the most direct way to learn the SDK API structure and core integration sequence.
+
+---
+
+### **tools/**
+Utility projects and extended sample applications built on top of the SDK.  
+These examples demonstrate broader endpoint management use cases, including:
+
+- Posture evaluation workflows  
+- Patch and vulnerability scanning  
+- Remediation testing and compliance validation  
+- SDK feature coverage across multiple modules  
+
+These tools are designed as **advanced integration examples** and can serve as the foundation for OEM partner implementations.
+
+---
+
+### **scripts/**
+Python scripts for data catalog processing, offline patch preparation, and SDK automation tasks.  
+They provide functions for:
+
+- Merging and normalizing catalog data (`patch.dat`, `checksum.dat`, etc.)  
+- Building unified aggregation files (`patch_aggregation.json`, `vuln_associations.json`)  
+- Supporting offline scanning, delta updates, and data validation workflows  
+
+These scripts are primarily used on the **server side** to prepare data consumed by the SDK and tool samples.
+
+---
+
+### **eval-license/**
+Contains instructions and supporting files for **extracting and placing your evaluation license**.  
+When you receive the evaluation ZIP from OPSWAT, extract its contents into this directory.  
+This allows all samples to load and validate the license automatically during initialization.
+
+If you do not yet have a license, see the section below for requesting one.
+
+---
+
+## 🧩 Getting Started
+
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/OPSWAT/endpointsecsdk.git
    ```
-
-2. **Pick a Sample**
-   Choose a relevant sample depending on your target language or platform. Examples:
-
-   * `HelloWorld-CPP` → for C++
-   * `VAPM-Scanner` → for vulnerability scanning
-   * `language-examples/go` → for Go
-
-3. **Build the Sample**
-
-   * Windows: run PowerShell build scripts (`build.ps1`)
-   * Linux/macOS: use provided Makefiles or `cmake`
-
-4. **Run and Test**
-   Execute the built sample to validate SDK setup and integration.
+2. **Navigate to a sample directory**
+   ```bash
+   cd endpointsecsdk/helloworld/windows
+   ```
+3. **Build using your platform toolchain**
+   - Windows: Visual Studio (C++, C#, or Go)
+   - macOS: Xcode (C++)
+   - Linux: GCC/Clang (C++)
+4. **Run the sample** to confirm SDK initialization and license validation.
 
 ---
 
-## 🔑 Key Features Demonstrated
+## 🔧 Requirements
 
-* **Device Trust** – Detecting and reporting endpoint posture (AV, EDR, firewall, encryption, etc.)
-* **Patch & Vulnerability Management** – Identifying missing patches, mapping CVEs, and performing offline scans
-* **Cross-Platform SDK Integration** – Using the same core API on Windows, macOS, and Linux
-* **Evaluation License & Token Handling** – Using license files and tokens for SDK activation
-
----
-
-## 🧱 Folder Relationships
-
-* `OPSWAT-SDK-Downloader` → Downloads core SDK binaries
-* `HelloWorld-*` → Entry-level integrations
-* `VAPM-Scanner` & `opswat-posture` → Feature demonstrations
-* `catalog-scripts` → Backend data processing tools
-* `language-examples` → Multi-language bindings (C++, C#, Go)
+- MetaDefender Endpoint SDK evaluation or production license  
+- Supported build environments:
+  - Visual Studio (Windows)
+  - Xcode (macOS)
+  - GCC/Clang (Linux)
+  - Go 1.21+ (for Windows Go example)
+- Python 3.9+ (for `scripts/` utilities)
 
 ---
 
-## 🧰 Prerequisites
+## 📄 License and Use
 
-* **Windows:** Visual Studio or GCC (MinGW)
-* **macOS:** Xcode command-line tools
-* **Linux:** GCC and Make
-* **Go:** Version 1.22 or newer (for Go bindings)
-
-Ensure your environment variables and license files are properly configured before running samples.
+All samples, scripts, and tools are provided for demonstration and integration purposes only.  
+Redistribution or production use requires permission under your OPSWAT OEM license agreement.
 
 ---
 
-## 🧠 Troubleshooting
+## ✉️ Request an Evaluation License
 
-| Issue                          | Possible Fix                                                         |
-| ------------------------------ | -------------------------------------------------------------------- |
-| SDK not found                  | Verify SDKDownloader completed successfully and `libs` folder exists |
-| Permission denied              | Run PowerShell as Administrator or use `sudo` on Unix systems        |
-| Build fails on missing headers | Check `inc` folder placement and environment paths                   |
+To request an evaluation key or additional information about the MetaDefender Endpoint SDK,  
+please email: **[oem@opswat.com](mailto:oem@opswat.com)**.
 
 ---
 
-## 🧩 Contributing
-
-Pull requests are welcome! If you’d like to add new samples or update an existing one, please follow these steps:
-
-1. Fork the repository
-2. Create a feature branch
-3. Submit a PR with clear description and test results
-
----
-
-## 📄 License
-
-This repository is provided for demonstration purposes under the OPSWAT SDK evaluation terms. Redistribution or public hosting of SDK binaries requires an active OPSWAT license agreement.
-
----
-
-
-**Author:** OPSWAT OEM Solutions Team
-**Contact:** [https://www.opswat.com](https://www.opswat.com)
-**Last Updated:** October 2025
+© OPSWAT Inc. – “Trust No File, Trust No Device.”
