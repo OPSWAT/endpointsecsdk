@@ -14,6 +14,7 @@ def main(args):
     print("SDKDownloader Started")
 
     sdk_root = Util.get_sdk_root()
+    sdk_root = os.path.join(sdk_root,"OPSWAT-SDK")
 
     if len(args) > 1:
         sdk_root = args[1]

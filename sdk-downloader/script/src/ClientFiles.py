@@ -4,9 +4,11 @@ import shutil
 import Util
 
 from Util import Util
+from typing import Optional
 
 
 class ClientFiles:
+
     @staticmethod
     def _copy_extracted_folder(dest_path, root_path, subfolder):
         source_file_folder = os.path.join(root_path, subfolder)
@@ -22,6 +24,60 @@ class ClientFiles:
             os.makedirs(dest_path)
 
         shutil.copy2(source_file_path, dest_file)
+
+
+    @staticmethod
+    def find_file(root_path: str, file_name: str) -> Optional[str]:
+        """
+        Recursively searches for a file starting from a given root directory.
+
+        Args:
+            root_path: The root directory to start searching from.
+            file_name: The name of the file to find (e.g., "wuov2_delta.dat").
+
+        Returns:
+            The full absolute path to the first matching file (case-insensitive),
+            or None if not found.
+        """
+        if not os.path.isdir(root_path):
+            print(f"Root path not found: {root_path}")
+            return None
+
+        target = file_name.lower()
+        try:
+            for dirpath, dirnames, filenames in os.walk(root_path, topdown=True, onerror=lambda e: None):
+                # Case-insensitive filename comparison
+                for fname in filenames:
+                    if fname.lower() == target:
+                        return os.path.abspath(os.path.join(dirpath, fname))
+        except Exception as ex:
+            print(f"Error searching for {file_name}: {ex}")
+
+        return None
+
+    @staticmethod
+    def copy_windows_offline_dat_files(dest_path: str, catalog_path: str):
+       
+        """
+        Python equivalent of the C# CopyWindowsOfflineDatFiles.
+
+        Copies:
+          - wuov2.dat from catalog root
+          - wuov2_delta.dat from its located subdirectory under catalog_path
+        """
+        # Copy wuov2.dat from the catalog root
+        ClientFiles._copy_extracted_file(dest_path, catalog_path, "", "wuov2.dat")
+
+        # Find wuov2_delta.dat somewhere under catalog_path
+        wuov2_delta_path = ClientFiles.find_file(catalog_path, "wuov2_delta.dat")
+        if wuov2_delta_path is None:
+            print("wuov2_delta.dat not found under catalog path.")
+            return
+
+        # Copy wuov2_delta.dat from its discovered subdirectory
+        subdir = os.path.dirname(os.path.relpath(wuov2_delta_path, start=catalog_path))
+        ClientFiles._copy_extracted_file(dest_path, catalog_path, subdir, "wuov2_delta.dat")
+
 
     @staticmethod
     def _copy_windows_architecture(extract_path, client_path, arch):
@@ -48,12 +104,13 @@ class ClientFiles:
         resource_path = os.path.join(extract_path, "compliance/windows/bin")
         ClientFiles._copy_extracted_file(dest_path, resource_path, "", "libwaresource.dll")
 
-        patch_catalog_path = os.path.join(extract_path, "analog/client")
+        patch_catalog_path = os.path.join(extract_path, "client")
         ClientFiles._copy_extracted_file(dest_path, patch_catalog_path, "", "ap_checksum.dat")
         ClientFiles._copy_extracted_file(dest_path, patch_catalog_path, "", "patch.dat")
         ClientFiles._copy_extracted_file(dest_path, patch_catalog_path, "", "v2mod.dat")
-        ClientFiles._copy_extracted_file(dest_path, patch_catalog_path, "", "wuo.dat")
         ClientFiles._copy_extracted_file(dest_path, patch_catalog_path, "", "wiv-lite.dat")
+
+        ClientFiles.copy_windows_offline_dat_files(dest_path, patch_catalog_path)
 
     @staticmethod
     def _copy_windows_files(extract_dir, client_path):
@@ -77,7 +134,7 @@ class ClientFiles:
         resource_path = os.path.join(extract_path, "compliance/mac/bin")
         ClientFiles._copy_extracted_file(dest_path, resource_path, "", "libwaresource.dylib")
 
-        patch_catalog_path = os.path.join(extract_path, "analog/client")
+        patch_catalog_path = os.path.join(extract_path, "client")
         ClientFiles._copy_extracted_file(dest_path, patch_catalog_path, "", "ap_checksum_mac.dat")
         ClientFiles._copy_extracted_file(dest_path, patch_catalog_path, "", "patch_mac.dat")
         ClientFiles._copy_extracted_file(dest_path, patch_catalog_path, "", "v2mod.dat")
@@ -100,7 +157,7 @@ class ClientFiles:
         resource_path = os.path.join(extract_path, f"compliance/linux/bin/{arch}")
         ClientFiles._copy_extracted_file(dest_path, resource_path, "", "libwaresource.so")
 
-        patch_catalog_path = os.path.join(extract_path, "analog/client")
+        patch_catalog_path = os.path.join(extract_path, "client")
         ClientFiles._copy_extracted_file(dest_path, patch_catalog_path, "", "ap_checksum.dat")
         ClientFiles._copy_extracted_file(dest_path, patch_catalog_path, "", "patch_linux.dat")
         ClientFiles._copy_extracted_file(dest_path, patch_catalog_path, "", "v2mod.dat")

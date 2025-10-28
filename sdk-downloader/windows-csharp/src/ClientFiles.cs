@@ -28,6 +28,51 @@ namespace SDKDownloader
             File.Copy(sourceFilePath, destFile, true);
         }
 
+        /// <summary>
+        /// Recursively searches for a file starting from a given root directory.
+        /// </summary>
+        /// <param name="rootPath">The root directory to start searching from.</param>
+        /// <param name="fileName">The name of the file to find (e.g., "wuov2_delta").</param>
+        /// <returns>The full path to the file if found, or null if not found.</returns>
+        public static string FindFile(string rootPath, string fileName)
+        {
+            try
+            {
+                if (!Directory.Exists(rootPath))
+                {
+                    Console.WriteLine($"Root path not found: {rootPath}");
+                    return null;
+                }
+
+                // Search all directories recursively
+                foreach (var file in Directory.EnumerateFiles(rootPath, "*", SearchOption.AllDirectories))
+                {
+                    if (Path.GetFileName(file).Equals(fileName, StringComparison.OrdinalIgnoreCase))
+                    {
+                        return Path.GetFullPath(file);
+                    }
+                }
+            }
+            catch (UnauthorizedAccessException)
+            {
+                // Skip folders we can’t access
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error searching for {fileName}: {ex.Message}");
+            }
+
+            return null; // Not found
+        }
+
+        private static void CopyWindowsOfflineDatFiles(string destPath, string catalogPath)
+        {
+            CopyExtractedFile(destPath, catalogPath, "", "wuov2.dat");
+
+            string wuov2DeltaPath = FindFile(catalogPath, "wuov2_delta.dat");
+            CopyExtractedFile(destPath,catalogPath, Path.GetDirectoryName(wuov2DeltaPath), "wuov2_delta.dat");
+        }
+
         private static void CopyWindowsArchitecture(string extractPath, string clientPath, string arch)
         {
             Console.WriteLine("Copying Windows Client Files with Architecture: " + arch);
@@ -71,12 +116,12 @@ namespace SDKDownloader
             //
             // Copy the dynamic files - NOTE These are related to Patch and Vulnerability - This file changes every 4 hours
             //
-            string patchCatalogPath = Path.Combine(extractPath, "analog/client");
+            string patchCatalogPath = Path.Combine(extractPath, "client");
             CopyExtractedFile(destPath, patchCatalogPath, "", "ap_checksum.dat");
             CopyExtractedFile(destPath, patchCatalogPath, "", "patch.dat");
             CopyExtractedFile(destPath, patchCatalogPath, "", "v2mod.dat");
-            CopyExtractedFile(destPath, patchCatalogPath, "", "wuo.dat");
             CopyExtractedFile(destPath, patchCatalogPath, "", "wiv-lite.dat");
+            CopyWindowsOfflineDatFiles(destPath, patchCatalogPath);
         }
         private static void CopyWindowsFiles(string extractDir, string clientPath)
         {
@@ -111,7 +156,7 @@ namespace SDKDownloader
             //
             // Copy the dynamic files - NOTE These are related to Patch and Vulnerability - This file changes every 4 hours
             //
-            string patchCatalogPath = Path.Combine(extractPath, "analog/client");
+            string patchCatalogPath = Path.Combine(extractPath, "client");
             CopyExtractedFile(destPath, patchCatalogPath, "", "ap_checksum_mac.dat");
             CopyExtractedFile(destPath, patchCatalogPath, "", "patch_mac.dat");
             CopyExtractedFile(destPath, patchCatalogPath, "", "v2mod.dat");
@@ -146,7 +191,7 @@ namespace SDKDownloader
             //
             // Copy the dynamic files - NOTE These are related to Patch and Vulnerability - This file changes every 4 hours
             //
-            string patchCatalogPath = Path.Combine(extractPath, "analog/client");
+            string patchCatalogPath = Path.Combine(extractPath, "client");
             CopyExtractedFile(destPath, patchCatalogPath, "", "ap_checksum.dat");
             CopyExtractedFile(destPath, patchCatalogPath, "", "patch_linux.dat");
             CopyExtractedFile(destPath, patchCatalogPath, "", "v2mod.dat");

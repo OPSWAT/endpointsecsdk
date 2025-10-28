@@ -10,7 +10,7 @@
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>
-    <Name>SDKDownloader</Name>
+    <Name>sdkdownloader</Name>
     <RootNamespace>PythonApplication1</RootNamespace>
     <IsWindowsApplication>False</IsWindowsApplication>
     <InterpreterId>Global|PythonCore|3.13</InterpreterId>
