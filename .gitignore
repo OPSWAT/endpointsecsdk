@@ -51,3 +51,8 @@ obj/
 /scripts/catalog/appcentric/AppCentricFile/__pycache__
 /scripts/catalog/appcentric/AppCentricFile/download_token.txt
 /helloworld/windows-csharp/src/Patch-WOS/bin
+/helloworld/windows-go/build
+/helloworld/windows-go/inc
+/helloworld/windows-go/libs/win/arm64
+/helloworld/windows-go/libs/win/win32
+/helloworld/windows-go/libs/win/x64
