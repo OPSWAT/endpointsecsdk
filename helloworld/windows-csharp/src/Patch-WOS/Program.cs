@@ -404,7 +404,7 @@ namespace PatchWOS
                 LoadPatchDatabase("patch.dat","ap_checksum.dat");
                 
                 // Additionally load Windows OS patch database for Windows-specific patches
-                LoadPatchDatabase("wuo.dat",""); // Windows OS patches database (no checksum file needed)
+                LoadPatchDatabase("wuov2.dat",""); // Windows OS patches database (no checksum file needed)
 
                 // STEP 3: Configure signature for Windows OS components
                 int signatureToInstall = 1103; // Windows OS signature (works with wuo.dat)
