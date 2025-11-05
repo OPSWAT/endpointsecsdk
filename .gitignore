@@ -74,3 +74,5 @@ obj/
 /sdk-downloader/script/src/__pycache__
 /sdk-downloader/windows-csharp/src/bin
 /sdk-downloader/windows-csharp/src/packages
+/scripts/catalog-appcentric/GenChanges/CatalogExtract/analog
+/scripts/catalog-appcentric/GenChanges/analog.zip
