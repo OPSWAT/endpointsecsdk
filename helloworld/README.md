@@ -1,6 +1,6 @@
 # MetaDefender Endpoint SDK — HelloWorld
 
-The **HelloWorld** directory contains minimal, cross-platform examples that demonstrate how to integrate and use the **OPSWAT MetaDefender Endpoint Security SDK (OESIS)**.
+The **HelloWorld** directory contains minimal, cross-platform examples that demonstrate how to integrate and use the **OESIS Framework (OESIS)**.
 
 Each sample shows how to:
 - Initialize the SDK  

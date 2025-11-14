@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////
 ///  Sample Code for HelloWorld
-///  Reference Implementation using OPSWAT MetaDefender Endpoint Security SDK
+///  Reference Implementation using OESIS Framework
 ///  
 ///  Created by Chris Seiler
 ///  OPSWAT OEM Solutions Architect

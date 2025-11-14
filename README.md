@@ -1,6 +1,6 @@
-# MetaDefender Endpoint Security SDK Samples and Utilities
+# OESIS Framework Samples and Utilities
 
-This repository contains sample applications, scripts, and supporting utilities for evaluating and integrating the **OPSWAT MetaDefender Endpoint Security SDK (OESIS SDK)** across Windows, macOS, and Linux.  
+This repository contains sample applications, scripts, and supporting utilities for evaluating and integrating the **OESIS Framework (OESIS SDK)** across Windows, macOS, and Linux.  
 It includes everything needed to get started with vulnerability, patch, and compliance detection, as well as SDK integration examples.
 
 ---
@@ -43,7 +43,7 @@ Use the `sdk-downloader` utility to download the correct binaries for your platf
 
 ## 🚀 SDK Downloader
 
-The **sdk-downloader** automates the process of retrieving platform-specific client libraries for the MetaDefender Endpoint Security SDK.
+The **sdk-downloader** automates the process of retrieving platform-specific client libraries for the OESIS Framework.
 
 | Platform | Downloader Type | Location | Output |
 |-----------|-----------------|-----------|---------|

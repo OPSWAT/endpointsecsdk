@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////
-///  Header File for OPSWAT MetaDefender Endpoint Security SDK (macOS)
+///  Header File for OESIS Framework (macOS)
 ///  
 ///  Created by Chris Seiler
 ///  OPSWAT OEM Solutions Architect

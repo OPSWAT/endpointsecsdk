@@ -1,6 +1,6 @@
-# OPSWAT MetaDefender Security Endpoint SDK - Sample Applications
+# OESIS Framework - Sample Applications
 
-This repository provides sample applications that demonstrate how to integrate with the OPSWAT MetaDefender Security Endpoint SDK. The examples are written in C++ and cover various endpoint security use cases such as product detection.
+This repository provides sample applications that demonstrate how to integrate with the OESIS Framework. The examples are written in C++ and cover various endpoint security use cases such as product detection.
 
 ---
 

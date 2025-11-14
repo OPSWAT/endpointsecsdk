@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////
-///  Header File for OPSWAT MetaDefender Endpoint Security SDK (Linux)
+///  Header File for OESIS Framework (Linux)
 ///  
 ///  Created by Chris Seiler
 ///  OPSWAT OEM Solutions Architect

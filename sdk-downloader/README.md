@@ -1,6 +1,6 @@
 # SDK Downloader
 
-The **SDK Downloader** is a cross-platform utility for downloading and organizing the latest **MetaDefender Endpoint Security SDK** client binaries and supporting files for all platforms.  
+The **SDK Downloader** is a cross-platform utility for downloading and organizing the latest **OESIS Framework** client binaries and supporting files for all platforms.  
 It ensures local sample applications (such as those in `/helloworld`) always reference the correct and most current SDK build.
 
 ---

@@ -1,6 +1,6 @@
-# OPSWAT MetaDefender Security Endpoint SDK - Mac Sample Applications
+# OESIS Framework - Mac Sample Applications
 
-This repository provides sample applications that demonstrate how to integrate with the OPSWAT MetaDefender Security Endpoint SDK for macOS. The examples are written in C++ and cover various endpoint security use cases such as product detection.
+This repository provides sample applications that demonstrate how to integrate with the OESIS Framework for macOS. The examples are written in C++ and cover various endpoint security use cases such as product detection.
 
 ---
 

@@ -1,4 +1,4 @@
-# OPSWAT MetaDefender Security Endpoint SDK - Getting Started Samples
+# OESIS Framework - Getting Started Samples
 
 
 ### Compiling the Samples

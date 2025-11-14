@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////
 ///  Header File for OESIS Setup and Configuration (Linux)
-///  Reference Implementation using OPSWAT MetaDefender Endpoint Security SDK
+///  Reference Implementation using OESIS Framework
 ///  
 ///  Created by Chris Seiler
 ///  OPSWAT OEM Solutions Architect
