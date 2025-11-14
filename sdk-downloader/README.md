@@ -9,7 +9,7 @@ It ensures local sample applications (such as those in `/helloworld`) always ref
 
 | Folder | Description |
 |:-------|:-------------|
-| **`script/src`** | Python-based downloader for Linux and macOS (AnalogV2 compatible). |
+| **`script/src`** | Python-based downloader for Linux and macOS. |
 | **`windows-csharp`** | C# .NET version of the downloader for Windows, including a pre-compiled executable. |
 
 Both implementations retrieve the SDK client libraries from OPSWAT’s distribution endpoint and organize them into the `/OPSWAT-SDK/client/<platform>/<architecture>` directory.
@@ -85,7 +85,6 @@ The script will:
 
 ## 🧠 Notes
 
-- Both downloaders are compatible with the **AnalogV2** SDK release format.  
 - The Windows executable and Python script produce the same directory layout for consistency across platforms.  
 - If `download-token.txt` is missing or invalid, the downloader will fail authentication.  
 - All downloader source code is included in this directory for developer reference and customization.
