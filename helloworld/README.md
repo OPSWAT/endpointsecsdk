@@ -1,4 +1,4 @@
-# MetaDefender Endpoint SDK — HelloWorld
+# OESIS Framework — HelloWorld
 
 The **HelloWorld** directory contains minimal, cross-platform examples that demonstrate how to integrate and use the **OESIS Framework (OESIS)**.
 

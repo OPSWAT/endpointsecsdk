@@ -1,4 +1,4 @@
-# build.ps1 - Windows PowerShell build script for MetaDefender SDK Go project
+# build.ps1 - Windows PowerShell build script for OESIS Framework Go project
 
 param(
     [string]$Action = "build",
@@ -338,7 +338,7 @@ function Clear-BuildDirectory {
 # Show help information
 function Show-Help {
     Write-Host ""
-    Write-Host "MetaDefender SDK Go Build Script for Windows" -ForegroundColor $Colors.Blue
+    Write-Host "OESIS Framework Go Build Script for Windows" -ForegroundColor $Colors.Blue
     Write-Host "=============================================" -ForegroundColor $Colors.Blue
     Write-Host ""
     Write-Host "Usage: .\build.ps1 [Action] [Options]" -ForegroundColor $Colors.White
@@ -358,9 +358,9 @@ function Show-Help {
     Write-Host ""
     Write-Host "This script will:" -ForegroundColor $Colors.Green
     Write-Host "  1. Detect your Windows architecture (x64/ARM64)" -ForegroundColor $Colors.White
-    Write-Host "  2. Check for required Go installation and MDES SDK files" -ForegroundColor $Colors.White
+    Write-Host "  2. Check for required Go installation and OESIS Framework files" -ForegroundColor $Colors.White
     Write-Host "  3. Set up CGO environment variables" -ForegroundColor $Colors.White
-    Write-Host "  4. Build the MetaDefender SDK Go project" -ForegroundColor $Colors.White
+    Write-Host "  4. Build the OESIS Framework Go project" -ForegroundColor $Colors.White
     Write-Host "  5. Copy required DLLs to build directory" -ForegroundColor $Colors.White
     Write-Host ""
 }

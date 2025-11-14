@@ -148,4 +148,4 @@ For evaluation access, SDK updates, or OEM integration inquiries, contact:
 **📧 oem@opswat.com**
 
 For general information, visit:  
-👉 [https://www.opswat.com/products/metadefender/endpoint](https://www.opswat.com/products/metadefender/endpoint)
+👉 [https://www.opswat.com/products/oesis-framework](https://www.opswat.com/products/oesis-framework)
