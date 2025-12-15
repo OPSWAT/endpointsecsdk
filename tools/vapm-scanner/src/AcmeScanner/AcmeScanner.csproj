@@ -1,0 +1,37 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net9.0-windows7.0</TargetFramework>
+    <Nullable>disable</Nullable>
+    <UseWindowsForms>true</UseWindowsForms>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <Version>1.0.0.416</Version>
+  </PropertyGroup>
+ 
+  <ItemGroup>
+    <PackageReference Include="MaterialSkin.2.RTL" Version="2.3.1.1" />
+    <PackageReference Include="MessagePack" Version="2.5.187" />
+    <PackageReference Include="MessagePack.Annotations" Version="2.5.187" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\VAPMAdapter\VAPMAdapter.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Update="Dialogs\InstallPatchMessageDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Properties\Resources.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Update="Dialogs\CVEListDialog.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Update="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+</Project>

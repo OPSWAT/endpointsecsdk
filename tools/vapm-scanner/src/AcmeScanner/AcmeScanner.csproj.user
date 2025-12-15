@@ -1,0 +1,29 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="Current" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Compile Update="Dialogs\CustomMessageDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Dialogs\CVEListDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Dialogs\LookupCVEBox.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="ScannerForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="ScannerListView.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Update="Dialogs\TextDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Dialogs\ViewMobyJsonDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="testDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+  </ItemGroup>
+</Project>

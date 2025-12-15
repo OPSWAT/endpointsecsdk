@@ -1,0 +1,24 @@
+﻿///////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////
+
+using MessagePack;
+
+///  Sample Code for Acme Scanner
+///  Reference Implementation using OPSWAT Endpoint SDK Patch and Vulnerability Modules
+///  
+///  Created by Chris Seiler
+///  OPSWAT OEM Solutions Architect
+///////////////////////////////////////////////////////////////////////////////////////////////
+
+namespace VAPMAdapter.Catalog.POCO
+{
+    [MessagePackObject]
+    public class CatalogRange
+    {
+        [Key(0)]
+        public string Start { get; set; }
+        [Key(1)]
+        public string Limit { get; set; }
+    }
+
+}

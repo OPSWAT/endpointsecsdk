@@ -1,0 +1,206 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.com/schemas/app_centric_product.schema.json",
+  "title": "App-Centric Catalog",
+  "type": "object",
+  "additionalProperties": true,
+  "properties": {
+    "generated_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "products": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": true,
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "signature_id": {
+            "type": "integer"
+          },
+          "vendor": {
+            "type": "object",
+            "additionalProperties": true,
+            "properties": {
+              "id": {
+                "type": "integer"
+              },
+              "name": {
+                "type": "string"
+              }
+            }
+          },
+          "product_line": {
+            "type": "object",
+            "additionalProperties": true,
+            "properties": {
+              "id": {
+                "type": "integer"
+              },
+              "name": {
+                "type": "string"
+              }
+            }
+          },
+          "uninstallable": {
+            "type": "boolean"
+          },
+          "categories": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "patches": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": true,
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "bulletin": {
+                  "type": "string"
+                },
+                "patch_id": {
+                  "type": "string"
+                },
+                "platform": {
+                  "type": "string"
+                },
+                "patch_type": {
+                  "type": "string"
+                },
+                "kb_article": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "latest": {
+                  "type": "boolean"
+                },
+                "language": {
+                  "type": "string"
+                },
+                "fresh_installable": {
+                  "type": "boolean"
+                },
+                "background_patching": {
+                  "type": "boolean"
+                },
+                "validation_supported": {
+                  "type": "boolean"
+                },
+                "version": {
+                  "type": "string"
+                },
+                "release_notes": {
+                  "type": "string",
+                  "format": "uri"
+                },
+                "release_date": {
+                  "type": "string"
+                },
+                "eula": {
+                  "type": "string",
+                  "format": "uri"
+                },
+                "uninstall_required": {
+                  "type": "boolean"
+                },
+                "reboot_required": {
+                  "type": "string"
+                },
+                "architectures": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "language_default": {
+                  "type": "string"
+                },
+                "properties": {
+                  "type": "array",
+                  "items": {}
+                },
+                "cve": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "packages": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": true,
+                    "properties": {
+                      "name": {
+                        "type": "string"
+                      },
+                      "package_id": {
+                        "type": "string"
+                      },
+                      "url": {
+                        "type": "string",
+                        "format": "uri"
+                      },
+                      "sha256": {
+                        "type": "string"
+                      },
+                      "language": {
+                        "type": "string"
+                      },
+                      "architecture": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "vulnerabilities": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": true,
+              "properties": {
+                "cve": {
+                  "type": "string"
+                },
+                "cpe": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "ranges": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": true,
+                    "properties": {
+                      "start": {
+                        "type": "string"
+                      },
+                      "end": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

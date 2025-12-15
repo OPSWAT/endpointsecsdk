@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.36511.14
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "AppCentricFile", "AppCentricFile\AppCentricFile.pyproj", "{D52918C1-E8BF-48E1-9CFB-C15754CCA49E}"
+EndProject
+Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "FindCVE", "FindCVE\FindCVE.pyproj", "{63A2D934-EBF9-4652-A23E-E3C73B6196A9}"
+EndProject
+Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "GenChanges", "GenChanges\GenChanges.pyproj", "{5F79D60A-337A-4161-97F3-B448A5856857}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D52918C1-E8BF-48E1-9CFB-C15754CCA49E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D52918C1-E8BF-48E1-9CFB-C15754CCA49E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{63A2D934-EBF9-4652-A23E-E3C73B6196A9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{63A2D934-EBF9-4652-A23E-E3C73B6196A9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5F79D60A-337A-4161-97F3-B448A5856857}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5F79D60A-337A-4161-97F3-B448A5856857}.Release|Any CPU.ActiveCfg = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {E5AF2175-0490-4F41-A178-F47115BD7090}
+	EndGlobalSection
+EndGlobal

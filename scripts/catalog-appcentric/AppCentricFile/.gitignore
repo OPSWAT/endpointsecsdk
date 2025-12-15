@@ -1,0 +1,12 @@
+# Ignore specific JSON and token files
+app_centric.json
+download_token.txt
+
+# Ignore analog.zip file
+analog.zip
+
+# Ignore Python cache directories
+__pycache__/
+
+# Ignore CatalogExtract directory
+CatalogExtract/
