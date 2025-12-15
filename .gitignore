@@ -76,3 +76,8 @@ obj/
 /sdk-downloader/windows-csharp/src/packages
 /scripts/catalog-appcentric/GenChanges/CatalogExtract/analog
 /scripts/catalog-appcentric/GenChanges/analog.zip
+*.cfg
+/eval-license/*/pass_key.txt
+/eval-license/*/download_token.txt
+/eval-license/*.zip
+*.log
