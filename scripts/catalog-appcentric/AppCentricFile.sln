@@ -9,6 +9,8 @@ Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "FindCVE", "FindCVE\FindCVE.
 EndProject
 Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "GenChanges", "GenChanges\GenChanges.pyproj", "{5F79D60A-337A-4161-97F3-B448A5856857}"
 EndProject
+Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "GetDeltaSigs", "GetListOfChangedSigs\GetDeltaSigs.pyproj", "{1E9C1D93-A615-4139-B9BD-14A63A2152D0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,8 @@ Global
 		{63A2D934-EBF9-4652-A23E-E3C73B6196A9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5F79D60A-337A-4161-97F3-B448A5856857}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{5F79D60A-337A-4161-97F3-B448A5856857}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1E9C1D93-A615-4139-B9BD-14A63A2152D0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1E9C1D93-A615-4139-B9BD-14A63A2152D0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

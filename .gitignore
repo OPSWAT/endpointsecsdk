@@ -81,3 +81,8 @@ obj/
 /eval-license/*/download_token.txt
 /eval-license/*.zip
 *.log
+/scripts/catalog-appcentric/GetListOfChangedSigs/CatalogExtract/analog
+/scripts/catalog-appcentric/GetListOfChangedSigs/analog.zip
+/scripts/catalog-appcentric/GetListOfChangedSigs/download_token.txt
+/scripts/catalog-appcentric/GetListOfChangedSigs/app_centric.json
+/scripts/catalog-appcentric/GetListOfChangedSigs/cve_delta.json
