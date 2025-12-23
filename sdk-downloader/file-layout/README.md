@@ -8,7 +8,6 @@ This folder contains GitHub-ready documentation that describes the directory str
 - [`EXTRACT.md`](EXTRACT.md) – `extract/` reference datasets overview
 - [`ANALOG.md`](ANALOG.md) – `extract/analog/` structure and purpose
 - [`DATASETS.md`](DATASETS.md) – Key `.dat` datasets and what they represent
-- [`WINDOWS_OFFLINE_PATCH_DETECTION.md`](WINDOWS_OFFLINE_PATCH_DETECTION.md) – `wuo*` and `wuov2*` details
 - [`COMPLIANCE.md`](COMPLIANCE.md) – Compliance / Device Trust artifacts
 - [`SUMMARY.md`](SUMMARY.md) – Quick reference
 
