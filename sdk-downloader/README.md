@@ -14,6 +14,8 @@ It ensures local sample applications (such as those in `/helloworld`) always ref
 
 Both implementations retrieve the SDK client libraries from OPSWAT’s distribution endpoint and organize them into the `/OPSWAT-SDK/client/<platform>/<architecture>` directory.
 
+More information on the resulting file layout can be found in the [file-layout](../file-layout/README.md) documentation.
+
 ---
 
 ## ⚙️ Prerequisites

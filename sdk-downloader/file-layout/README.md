@@ -1,0 +1,15 @@
+# Resulting File Descriptions (Split Docs)
+
+This folder contains GitHub-ready documentation that describes the directory structure and key files produced when extracting the **OPSWAT Endpoint Security SDK** package.
+
+## Contents
+- [`TOP_LEVEL.md`](TOP_LEVEL.md) – Top-level layout and where to start
+- [`CLIENT.md`](CLIENT.md) – `client/` runtime binaries and datasets overview
+- [`EXTRACT.md`](EXTRACT.md) – `extract/` reference datasets overview
+- [`ANALOG.md`](ANALOG.md) – `extract/analog/` structure and purpose
+- [`DATASETS.md`](DATASETS.md) – Key `.dat` datasets and what they represent
+- [`WINDOWS_OFFLINE_PATCH_DETECTION.md`](WINDOWS_OFFLINE_PATCH_DETECTION.md) – `wuo*` and `wuov2*` details
+- [`COMPLIANCE.md`](COMPLIANCE.md) – Compliance / Device Trust artifacts
+- [`SUMMARY.md`](SUMMARY.md) – “What most partners need” quick reference
+
+> Tip: For partner enablement, link **SUMMARY.md** first.
