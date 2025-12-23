@@ -2,6 +2,9 @@
 
 This page documents common datasets found under `extract/analog/client/`.
 
+## Device Posture Scripts
+- `compliance/**/libwaresource.*` – This file contains device posture scripts used for compliance checks across various platforms.
+
 ## Checksums
 - `ap_checksum.dat` – Checksums for patch content
 - `ap_checksum_mac.dat` – Checksums for patch content on macOS
