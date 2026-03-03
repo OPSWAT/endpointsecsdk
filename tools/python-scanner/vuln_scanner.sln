@@ -1,0 +1,23 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.36518.9 d17.14
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "vuln_scanner", "vuln_scanner.pyproj", "{8BD0FEB2-CEBC-4430-B194-B2687DB2059A}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{8BD0FEB2-CEBC-4430-B194-B2687DB2059A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8BD0FEB2-CEBC-4430-B194-B2687DB2059A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {FE3C869F-1B32-4885-9163-4F937BD9A54C}
+	EndGlobalSection
+EndGlobal
