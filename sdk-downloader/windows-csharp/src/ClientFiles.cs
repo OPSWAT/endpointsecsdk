@@ -90,9 +90,11 @@ namespace SDKDownloader
             CopyExtractedFile(destPath, sourcePath, "bin/manageability/" + arch + "/release", "libwalocal.dll");
             CopyExtractedFile(destPath, sourcePath, "bin/vulnerability/" + arch + "/release", "libwavmodapi.dll");
             CopyExtractedFile(destPath, sourcePath, "bin/deviceinfo/" + arch + "/release", "libwadeviceinfo.dll");
+            CopyExtractedFile(destPath, sourcePath, "bin/removal/" + arch + "/release", "libwaremoval.dll");
+
 
             // Copy the Windows interaction files
-            if(arch == "arm64")
+            if (arch == "arm64")
             {
                 CopyExtractedFile(destPath, sourcePath, "bin/manageability/" + arch + "/release", "wa_3rd_party_host_ARM64.exe");
             }
@@ -147,6 +149,7 @@ namespace SDKDownloader
             CopyExtractedFile(destPath, sourcePath, "bin/manageability/release", "libwalocal.dylib");
             CopyExtractedFile(destPath, sourcePath, "bin/vulnerability/release", "libwavmodapi.dylib");
             CopyExtractedFile(destPath, sourcePath, "bin/deviceinfo/release", "libwadeviceinfo.dylib");
+            CopyExtractedFile(destPath, sourcePath, "bin/removal/release", "libwaremoval.dylib");
 
             //
             // Copy the dyanmic resource file.  This contains the version information - This file changes every 4 hours

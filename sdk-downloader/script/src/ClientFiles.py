@@ -93,6 +93,7 @@ class ClientFiles:
         ClientFiles._copy_extracted_file(dest_path, source_path, f"bin/manageability/{arch}/release", "libwalocal.dll")
         ClientFiles._copy_extracted_file(dest_path, source_path, f"bin/vulnerability/{arch}/release", "libwavmodapi.dll")
         ClientFiles._copy_extracted_file(dest_path, source_path, f"bin/deviceinfo/{arch}/release", "libwadeviceinfo.dll")
+        ClientFiles._copy_extracted_file(dest_path, source_path, f"bin/removal/{arch}/release", "libwaremoval.dll")
 
         if arch == "arm64":
             ClientFiles._copy_extracted_file(dest_path, source_path, f"bin/manageability/{arch}/release", "wa_3rd_party_host_ARM64.exe")
@@ -131,6 +132,8 @@ class ClientFiles:
         ClientFiles._copy_extracted_file(dest_path, source_path, "bin/manageability/release", "libwalocal.dylib")
         ClientFiles._copy_extracted_file(dest_path, source_path, "bin/vulnerability/release", "libwavmodapi.dylib")
         ClientFiles._copy_extracted_file(dest_path, source_path, "bin/deviceinfo/release", "libwadeviceinfo.dylib")
+        ClientFiles._copy_extracted_file(dest_path, source_path, "bin/removal/release", "libwaremoval.dylib")
+
 
         resource_path = os.path.join(extract_path, "compliance/mac/bin")
         ClientFiles._copy_extracted_file(dest_path, resource_path, "", "libwaresource.dylib")
