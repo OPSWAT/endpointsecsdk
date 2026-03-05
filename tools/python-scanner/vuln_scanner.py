@@ -265,13 +265,10 @@ def _run(args, log_file):
         if "product" in scans_to_run:
             product_result = product_scan(sdk, args.dat_path)
             
-            if product_result is not None and product_result.values is not None:
-
+            if product_result is not None:
                 paths = write_output(product_result, args.output_dir,
                                      "product_scan", hostname)
                 output_files.extend(paths)
-            else:
-                logger.info("No product vulnerabilities found")
 
         # System scan
         if "system" in scans_to_run:
@@ -299,6 +296,12 @@ def _run(args, log_file):
             logger.info(f"  {f}")
     else:
         logger.info("No output files generated.")
+
+    # Use os._exit to bypass Python's GC cleanup phase. The native SDK library
+    # (libwaapi) can segfault on dlclose() when Python garbage collects the
+    # ctypes handle after teardown. Since the scan is complete and files are
+    # written, hard-exiting here is safe and avoids the crash.
+    os._exit(0)
 
 
 if __name__ == "__main__":
