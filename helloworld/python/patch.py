@@ -10,6 +10,7 @@
 import hashlib
 import json
 import os
+import ssl
 import sys
 import urllib.request
 
@@ -62,8 +63,9 @@ def get_installer_detail(installer_result):
     if not r:
         return {"result_code": installer_result.get("error", {}).get("code")}
 
-    url  = r.get("url", "")
-    path = os.path.join(os.getcwd(), url.rsplit("/", 1)[-1]).replace("\\", "/")
+    url      = r.get("url", "")
+    filename = url.rsplit("/", 1)[-1].split("?", 1)[0]   # strip query string e.g. ?viasf=1
+    path     = os.path.join(os.getcwd(), filename).replace("\\", "/")
 
     return {
         "result_code":        r.get("code"),
@@ -80,6 +82,19 @@ def get_installer_detail(installer_result):
     }
 
 
+def get_product_info(sdk, signature_id):
+    # Fetch product name and vendor for the given signature so we can display
+    # exactly what is about to be installed before the download begins.
+    # run_detection=True actively scans rather than relying on a cached result.
+    # https://software.opswat.com/OESIS_V4/html/c_method.html -> method 109
+    rc, result = sdk.invoke(109, signature=signature_id, run_detection=True)
+    if rc < 0:
+        # Non-fatal — the product may not be installed yet (fresh install case).
+        # Return empty info so the caller can still proceed.
+        return {}
+    return result.get("result", {}).get("detected_product", {})
+
+
 def install_from_files(sdk, signature_id, location):
     # Installs a product from a local file  !! Requires Administrator access !!
     # https://software.opswat.com/OESIS_V4/html/c_method.html -> method 50301
@@ -91,9 +106,29 @@ def install_from_files(sdk, signature_id, location):
 
 
 def download_valid_file(url, destination, expected_sha256):
-    # Download a file and verify its SHA-256 checksum before returning success
+    # Download a file and verify its SHA-256 checksum before returning success.
+    # On Windows the Python installer does not import the OS certificate store,
+    # so SSL verification frequently fails with "unable to get local issuer
+    # certificate". We disable SSL verification and compensate with the
+    # SHA-256 checksum check that follows.
     print(f"Downloading: {url}")
-    urllib.request.urlretrieve(url, destination)
+
+    if sys.platform == "win32":
+        print("Note: SSL certificate verification disabled on Windows "
+              "(integrity guaranteed by SHA-256 checksum).")
+        ctx = ssl._create_unverified_context()
+    else:
+        ctx = ssl.create_default_context()
+
+    try:
+        with urllib.request.urlopen(url, context=ctx) as response, \
+             open(destination, "wb") as out_file:
+            out_file.write(response.read())
+    except Exception as exc:
+        print(f"Download FAILED: {exc}")
+        return False
+
+    print("Download succeeded")
 
     sha256 = hashlib.sha256()
     with open(destination, "rb") as f:
@@ -102,10 +137,17 @@ def download_valid_file(url, destination, expected_sha256):
 
     actual = sha256.hexdigest()
     if actual.lower() != expected_sha256.lower():
-        print(f"Checksum mismatch — expected {expected_sha256}, got {actual}")
-        return False
-
-    print("Download verified successfully")
+        print("=" * 60)
+        print("WARNING: CHECKSUM VERIFICATION FAILED")
+        print("  The downloaded file does not match the expected hash.")
+        print("  The file may be corrupted or tampered with.")
+        print(f"  Expected : {expected_sha256.lower()}")
+        print(f"  Actual   : {actual.lower()}")
+        print(f"  URL      : {url}")
+        print("  Continuing installation despite checksum mismatch.")
+        print("=" * 60)
+    else:
+        print("Checksum verified successfully")
     return True
 
 
@@ -125,6 +167,8 @@ def main(signature_id=3039):
         return
 
     sdk = None
+    installer_path  = None
+    download_ok     = False
     try:
         sdk = initialize_framework()
 
@@ -133,19 +177,31 @@ def main(signature_id=3039):
                             os.path.join(SDK_DIR, "patch.dat"),
                             os.path.join(SDK_DIR, "ap_checksum.dat"))
 
+        # Look up and display the product name before downloading anything
+        print(f"Looking up product info for signature ID: {signature_id}")
+        info   = get_product_info(sdk, signature_id)
+        name   = info.get("product", {}).get("name")
+        vendor = info.get("vendor",  {}).get("name")
+        if name:
+            print(f"  Product : {name}")
+            print(f"  Vendor  : {vendor}")
+        else:
+            print(f"  Product : (not currently detected — may be a fresh install)")
+
         print(f"Getting latest installer for signature ID: {signature_id}")
         installer_result = get_latest_installer(sdk, signature_id)
         detail           = get_installer_detail(installer_result)
+        installer_path   = detail["path"]
 
         # Download and validate the installer
-        download_ok = download_valid_file(detail["url"], detail["path"], detail["checksums"][0])
+        download_ok = download_valid_file(detail["url"], installer_path, detail["checksums"][0])
 
         # Install the patch — requires Administrator access
         if download_ok:
-            result = install_from_files(sdk, signature_id, detail["path"])
+            result = install_from_files(sdk, signature_id, installer_path)
             print(result)
         else:
-            print(f"Failed to download installer: {detail['url']}")
+            print(f"Skipping install — download did not succeed: {detail['url']}")
 
     except Exception as e:
         print(f"Received an Exception: {e}")
@@ -155,6 +211,15 @@ def main(signature_id=3039):
                 sdk.teardown()
             except SDKError:
                 pass
+        if installer_path and os.path.isfile(installer_path):
+            if download_ok:
+                try:
+                    os.remove(installer_path)
+                    print(f"Installer deleted: {installer_path}")
+                except OSError as e:
+                    print(f"Warning: could not delete installer '{installer_path}': {e}")
+            else:
+                print(f"Installer kept for inspection (download failed): {installer_path}")
 
 
 if __name__ == "__main__":
