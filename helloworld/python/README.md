@@ -10,7 +10,15 @@ These scripts are a direct Python translation of the official C# sample code, sh
 
 ### 1. OESIS SDK Libraries
 
-The native SDK libraries (`libwaapi` and its dependencies) are **not included** in this repository. Use the **SDK_Downloader** tool provided by OPSWAT to fetch them. The downloader will populate the following structure:
+For Mac, Linux and Windows you can use the python script to download the build
+Navigate to %samples_root%\sdk-downloader\script\src
+run "python3 main.py"
+
+On Windows there is also native executable for downloading the build 
+Navigate to %samples_root%\sdk-downloader\windows-csharp\bin
+run SDKDownloader.exe
+
+The downloader will populate the following structure:
 
 ```
 OPSWAT-SDK/
@@ -21,6 +29,9 @@ OPSWAT-SDK/
     windows/
       arm64/   win32/   x64/
 ```
+
+
+
 
 ### 2. License Files
 
