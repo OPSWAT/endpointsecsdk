@@ -8,15 +8,17 @@ These scripts are a direct Python translation of the official C# sample code, sh
 
 ## Prerequisites
 
-### 1. OESIS SDK Libraries
+### 1. Download the OESIS SDK Libraries
 
 For Mac, Linux and Windows you can use the python script to download the build
 Navigate to %samples_root%\sdk-downloader\script\src
-run "python3 main.py"
+**run "python3 main.py"**
 
-On Windows there is also native executable for downloading the build 
+OR
+
+On Windows there is also a native executable for downloading the build 
 Navigate to %samples_root%\sdk-downloader\windows-csharp\bin
-run SDKDownloader.exe
+**run SDKDownloader.exe**
 
 The downloader will populate the following structure:
 
