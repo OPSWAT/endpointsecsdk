@@ -12,6 +12,7 @@ import os
 
 from sdk_wrapper import OESISWrapper, SDKError
 from platform_utils import validate_sdk_environment
+from platform_utils import get_lib_filename
 
 # Hardcoded SDK directory relative to this script
 SDK_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "sdk")
@@ -29,7 +30,7 @@ def initialize_framework():
         print("Could not find pass_key.txt. Make sure the license is in the sdk directory.")
         raise Exception("License pass_key.txt file not found")
 
-    sdk = OESISWrapper(os.path.join(SDK_DIR, "libwaapi.dll"))
+        sdk = OESISWrapper(os.path.join(SDK_DIR, get_lib_filename()))
     sdk.load()
     sdk.setup(license_path, pass_key_path)
     return sdk

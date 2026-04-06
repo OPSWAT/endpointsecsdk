@@ -98,3 +98,10 @@ obj/
 /tools/python-scanner/__pycache__
 /helloworld/python/sdk
 /helloworld/python/__pycache__
+/helloworld/python/*.exe
+/helloworld/python/*.json
+/helloworld/python/*.dat
+
+
+/helloworld/python/analog/moby_platforms.json
+/helloworld/python/analog

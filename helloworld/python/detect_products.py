@@ -41,6 +41,7 @@ import sys
 
 from sdk_wrapper import OESISWrapper, SDKError
 from platform_utils import validate_sdk_environment
+from platform_utils import get_lib_filename
 
 # Hardcoded SDK directory relative to this script
 SDK_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "sdk")
@@ -73,7 +74,7 @@ def initialize_framework():
     # Load the SDK and initialize with the pass_key.txt in the sdk directory
     # https://software.opswat.com/OESIS_V4/html/c_sdk.html
     pass_key_path = os.path.join(SDK_DIR, "pass_key.txt")
-    sdk = OESISWrapper(os.path.join(SDK_DIR, "libwaapi.dll"))
+    sdk = OESISWrapper(os.path.join(SDK_DIR, get_lib_filename()))
     sdk.load()
     sdk.setup(os.path.join(SDK_DIR, "license.cfg"), pass_key_path)
     return sdk

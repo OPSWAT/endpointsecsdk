@@ -36,6 +36,11 @@ def get_os_type():
 def get_lib_filename():
     """Return the libwaapi filename for the current OS."""
     os_type = get_os_type()
+
+    logger.info(
+        f"Finding files for  {os_type}"
+    )
+
     if os_type == OS_TYPE_WINDOWS:
         return "libwaapi.dll"
     elif os_type == OS_TYPE_MACOS:
