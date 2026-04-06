@@ -36,7 +36,8 @@ def initialize_framework():
     # Load the SDK and initialize with the pass_key.txt in the sdk directory
     # https://software.opswat.com/OESIS_V4/html/c_sdk.html
     pass_key_path = os.path.join(SDK_DIR, "pass_key.txt")
-        sdk = OESISWrapper(os.path.join(SDK_DIR, get_lib_filename()))
+    
+    sdk = OESISWrapper(os.path.join(SDK_DIR, get_lib_filename()))
     sdk.load()
     sdk.setup(os.path.join(SDK_DIR, "license.cfg"), pass_key_path)
     return sdk

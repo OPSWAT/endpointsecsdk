@@ -30,7 +30,7 @@ def initialize_framework():
         print("Could not find pass_key.txt. Make sure the license is in the sdk directory.")
         raise Exception("License pass_key.txt file not found")
 
-        sdk = OESISWrapper(os.path.join(SDK_DIR, get_lib_filename()))
+    sdk = OESISWrapper(os.path.join(SDK_DIR, get_lib_filename()))
     sdk.load()
     sdk.setup(os.path.join(SDK_DIR, "license.cfg"), pass_key_path)
     return sdk
