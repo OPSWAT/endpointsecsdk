@@ -101,6 +101,7 @@ obj/
 /helloworld/python/*.exe
 /helloworld/python/*.json
 /helloworld/python/*.dat
+!/helloworld/python/request.json
 
 
 /helloworld/python/analog/moby_platforms.json

@@ -1,7 +1,9 @@
 import os
 import hashlib
 import logging
-import requests
+from DependencyUtils import DependencyUtils
+
+requests = DependencyUtils.import_required_module("requests")
 
 class HttpClientUtils:
     @staticmethod

@@ -177,6 +177,24 @@ class OESISWrapper:
 
         return rc, parsed
 
+    def invokeJSON(self, json_in):
+        """Call wa_api_invoke with the given method ID and parameters.
+
+        Returns (rc, parsed_json_response).
+        """
+        json_str = json.dumps(json_in)
+        rc, result_str = self._call("wa_api_invoke", json_str)
+
+        parsed = {}
+        if result_str:
+            try:
+                parsed = json.loads(result_str)
+            except json.JSONDecodeError:
+                parsed = {"raw": result_str}
+
+        return rc, parsed
+
+
     def teardown(self):
         """Deinitialize the SDK."""
         if not self._loaded:

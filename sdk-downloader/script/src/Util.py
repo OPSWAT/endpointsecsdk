@@ -2,6 +2,7 @@ import os
 import shutil
 import zipfile
 import tarfile
+import tempfile
 
 from datetime import datetime, timedelta
 
@@ -16,7 +17,6 @@ class Util:
 
     @staticmethod
     def extract_file(archive_file, dest_dir):
-        print("Howdy")
         if archive_file.endswith(".zip"):
             print(f"Extracting ZIP file: {archive_file} to {dest_dir}")
             with zipfile.ZipFile(archive_file, 'r') as zip_ref:
