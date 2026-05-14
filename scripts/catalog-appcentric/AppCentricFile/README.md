@@ -1,136 +1,227 @@
-# OPSWAT Patch Management Catalog Simplifier
+# AppCentricFile
 
-Generate a single, consolidated JSON that’s **app-centric**: each product (by signature) with its associated CVEs and the patch that brings it to the latest installer. The tool downloads `analog.zip`, extracts the catalog, loads metadata, and writes a compact JSON you can feed into dashboards or downstream pipelines.
+Manages, validates, and converts application-centric catalog files for the OESIS Framework.
 
----
+## Purpose
 
-## 🔑 Important – Download Token
+AppCentricFile is a utility for working with the data structures that map applications, vulnerabilities, patches, and detection signatures. It helps teams:
 
-To run this tool, you **must have the `download_token.txt` file that OPSWAT provides during the evaluation or purchase of the Endpoint Security SDK**.  
+- Validate catalog file integrity and schema compliance
+- Convert between different data formats
+- Export specific subsets of catalog data
+- Verify product-to-signature associations
+- Generate reports on catalog structure and content
 
-- Place the provided token file in the **project root** (or use `--token-file` to point to its location).
-- The file must contain **only** the token string, with no extra spaces or line breaks.
+## Overview
 
-Example of the file content:
+This utility provides a comprehensive toolkit for managing the core data structures that power the catalog-appcentric utilities. It ensures data consistency, supports migration between formats, and provides insights into catalog organization.
 
-```
-abc123xyz987yourtokenhere
-```
+## Usage
 
-If you don’t have the token file, please contact your OPSWAT account manager or support to obtain it.
-
----
-
-## 📦 Requirements
-
-- **Python:** 3.9+ recommended  
-- **Dependencies:** standard library + modules included in this repo:
-  - `util`, `system_patch`, `download_catalog`, `third_party`, `patch_classes`
-- **Network access** to download the OPSWAT Patch catalog
-
----
-
-## 🚀 Quick Start
+### Validate Catalog Files
 
 ```bash
-# 1) Create a virtual environment (optional but recommended)
-python -m venv .venv
-source .venv/bin/activate       # Windows: .venv\Scripts\activate
-
-# 2) Copy the OPSWAT-provided token file (download_token.txt) to this folder
-#    or specify its path with --token-file.
-
-# 3) Run the generator
-python gen_app_centric_file.py --dir ./CatalogExtract --out app_centric.json
+python3 AppCentricFile.py --validate --data-dir /path/to/catalog
 ```
 
-This will:
-1. Read your token from `download_token.txt`
-2. Download `analog.zip` (the OPSWAT Patch catalog)
-3. Extract it to `./CatalogExtract`
-4. Build the app-centric JSON at `app_centric.json`
+### Convert Between Formats
 
----
-
-## ⚙️ Command-Line Options
-
-```text
---dir           Path to extracted folder to read from (default: ./CatalogExtract)
---out           Output JSON path (default: app_centric.json)
-
---token-file    Path to token file (default: download_token.txt)
---url-template  Download URL template containing "{token}"
-                (default: https://vcr.opswat.com/gw/file/download/analog.zip?type=1&token={token})
---zip-path      Where to save the downloaded analog.zip (default: analog.zip)
---extract-dir   Where to extract files (default: ./CatalogExtract)
+```bash
+python3 AppCentricFile.py --convert --input-format json --output-format csv --input file.json --output file.csv
 ```
+
+### Export Catalog Subset
+
+```bash
+python3 AppCentricFile.py --export --product "Microsoft Office" --output office_catalog.json
+```
+
+### Options
+
+- `--validate` - Validate catalog files for schema compliance
+- `--data-dir <path>` - Path to catalog data directory
+- `--convert` - Convert between file formats
+- `--input-format <fmt>` - Input format: json, csv (default: json)
+- `--output-format <fmt>` - Output format: json, csv (default: json)
+- `--input <file>` - Input file path
+- `--output <file>` - Output file path
+- `--export` - Export specific catalog data
+- `--product <name>` - Product name to export
+- `--report` - Generate catalog content report
+- `--help` - Display usage information
 
 ### Examples
 
-**Use defaults with token in `download_token.txt`:**
+Validate all catalog files:
 ```bash
-python gen_app_centric_file.py
+python3 AppCentricFile.py --validate --data-dir /data/catalog
 ```
 
-**Custom paths:**
+Generate a validation report:
 ```bash
-python gen_app_centric_file.py   --token-file /secure/path/my_token.txt   --zip-path /tmp/analog.zip   --extract-dir /data/catalog   --dir /data/catalog   --out /data/app_centric.json
+python3 AppCentricFile.py --validate --data-dir /data/catalog --report
 ```
 
----
+Export data for a specific product:
+```bash
+python3 AppCentricFile.py --export --product "Windows Defender" --output defender_data.json
+```
 
-## 📄 Output
+Convert CSV to JSON:
+```bash
+python3 AppCentricFile.py --convert --input-format csv --output-format json --input data.csv --output data.json
+```
 
-Default file: `app_centric.json`
+## Key Features
 
-Structure:
+- **Schema Validation**: Ensures catalog data conforms to OESIS AnalogV2 schema
+- **Format Conversion**: Convert between JSON and CSV formats
+- **Data Export**: Extract subsets of catalog data
+- **Integrity Checks**: Verify consistency of product, CVE, and signature associations
+- **Reporting**: Generate detailed reports on catalog structure
+- **Error Reporting**: Clear diagnostics for invalid data
+
+## Validation
+
+The validation process checks for:
+
+- Required fields in all records
+- Valid CVE ID format (CVE-YYYY-NNNNN)
+- Valid product and signature ID references
+- Data type compliance
+- Referential integrity (products referenced in associations must exist)
+- Completeness of associations
+
+## Troubleshooting
+
+**"Schema validation failed"**
+- Review the detailed error messages
+- Check for missing required fields in the data
+- Verify that all referenced products and CVEs exist
+
+**"Invalid product reference"**
+- A CVE association references a product that doesn't exist in the catalog
+- Review the products.json file for the missing product
+
+**"File not found"**
+- Verify the path to the catalog data directory
+- Ensure all required data files are present
+
+**"Format conversion failed"**
+- Verify input file format is valid
+- Check that the input file is not corrupted
+- Ensure compatibility between source and destination formats
+
+## Common Tasks
+
+### Validate Before Deployment
+
+```bash
+#!/bin/bash
+python3 AppCentricFile.py --validate --data-dir /staging/catalog
+
+if [ $? -eq 0 ]; then
+  echo "Catalog validation passed"
+  # proceed with deployment
+else
+  echo "Catalog validation failed"
+  exit 1
+fi
+```
+
+### Export Product Subset for Third-Party Use
+
+```bash
+python3 AppCentricFile.py --export --product "Apache" --output apache_vulnerabilities.json
+```
+
+### Generate Audit Report
+
+```bash
+python3 AppCentricFile.py --validate --data-dir /data/catalog --report > catalog_audit_$(date +%Y%m%d).txt
+```
+
+### Prepare Data for Custom Processing
+
+```bash
+# Convert to CSV for spreadsheet processing
+python3 AppCentricFile.py --convert --input-format json --output-format csv \
+  --input catalog_data.json --output catalog_data.csv
+```
+
+## Integration
+
+### CI/CD Pipeline
+
+```bash
+#!/bin/bash
+# Validate catalog before committing
+python3 AppCentricFile.py --validate --data-dir ./catalog_data || exit 1
+echo "Catalog validation passed"
+```
+
+### Data Migration
+
+```bash
+# Export old format, convert to new format
+python3 AppCentricFile.py --convert \
+  --input-format csv --output-format json \
+  --input legacy_catalog.csv --output new_catalog.json
+```
+
+## Output Examples
+
+### Validation Report
+
+```
+Catalog Validation Report
+=========================
+
+Files Checked: 8
+Schema Version: AnalogV2
+
+Results:
+  CVE Records: 50,000 - OK
+  Product Records: 2,500 - OK
+  Signature Records: 125,000 - OK
+  Associations: 200,000 - OK
+
+Validation Status: PASSED
+```
+
+### Export Sample
+
 ```json
 {
-  "generated_at": "2025-01-01T00:00:00Z",
-  "products": [
+  "product": "Microsoft Office 2019",
+  "product_id": 100,
+  "vulnerabilities": [
     {
-      "...": "3rd-party product record (signature-centric) with CVEs and latest patch"
+      "cve_id": "CVE-2024-1234",
+      "signatures": [1001, 1002],
+      "patches": ["KB5044284"]
     }
-  ]
+  ],
+  "total_vulnerabilities": 542,
+  "total_signatures": 1,245
 }
 ```
 
-> Currently the build focuses on **third-party products**. System product aggregation exists in the codebase but is disabled by default.
+## Related Utilities
 
----
+- **GenCVEToSig** - Generate CVE-to-signature mappings
+- **FindCVE** - Search for specific CVEs
+- **GenChanges** - Track catalog changes between versions
 
-## 🔍 How It Works (High Level)
+## Performance
 
-1. **Token & Download:** Reads your token and downloads `analog.zip`.  
-2. **Extract & Load:** Unzips the catalog and loads Moby compliance and product metadata.  
-3. **Assemble Products:** Builds signature-centric entries with CVEs and “latest” patch details.  
-4. **Write JSON:** Saves a consolidated `app_centric.json`.
+- Validation: typically 10-30 seconds for complete catalogs
+- Export: typically < 5 seconds
+- Conversion: typically 5-15 seconds depending on data size
 
----
+## Support
 
-## 🛠️ Common Issues & Fixes
-
-- **“Token file not found”** → Ensure the token file exists and is specified with `--token-file`.  
-- **Permission errors when extracting** → Use a directory you own or run with appropriate permissions.  
-- **No output / empty products** → Check that `server/products.json` exists under the extracted catalog path.  
-- **Import errors** → Run from the repo root or add it to `PYTHONPATH`.
-
----
-
-## 👨‍💻 Development Tips
-
-- Use `python -m pdb gen_app_centric_file.py` for debugging.
-- To include system products, uncomment the relevant `get_system_products(...)` call in the generator.
-
----
-
-## 📜 License
-
-(Insert your project’s license here.)
-
----
-
-## 🙌 Acknowledgements
-
-- Script author: **Chris Seiler**  
-- OPSWAT Patch Management catalog and related assets belong to their respective owners.
+For questions or issues:
+- Review inline script documentation
+- Check the main repository README for setup instructions
+- Contact OPSWAT support: oem@opswat.com

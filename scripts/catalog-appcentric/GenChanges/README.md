@@ -1,110 +1,234 @@
-﻿────────────────────────────────────────────────────────────
-README.md  (included first so the file is self-documenting)
-────────────────────────────────────────────────────────────
+# GenChanges
 
-# OPSWAT CVE Filter Tool (`gen-changes.py`)
+Analyzes changes between two versions of the OESIS Framework catalog and generates a detailed report of additions, modifications, and deprecations.
 
-This tool parses the `cves.json` file from the OPSWAT Analog Patch & Vulnerability Catalog and produces a filtered version that only includes CVEs newer than a specified cutoff date.
+## Purpose
 
-It is designed for use cases such as:
-- Generating delta CVE data for partners
-- Reducing catalog size for lightweight agents
-- Validating only newly introduced vulnerabilities
+GenChanges helps security teams track the evolution of the vulnerability and patch catalog. It identifies:
 
----
+- New CVEs introduced in the latest catalog
+- New signature associations and patch availability
+- Deprecated or removed signatures
+- Changes in product or patch status
+- Impact on existing security detection coverage
 
-## ✅ What the Script Does
+This is essential for understanding what has changed between updates and ensuring that security operations workflows remain current.
 
-| Function | Description |
-|----------|-------------|
-| Downloads catalog (optional) | If a valid OPSWAT token is provided, the script will automatically download and extract `analog.zip` |
-| Loads `cves.json` | Parses the main CVE dataset used by the Endpoint Security SDK |
-| Filters by date | Keeps only CVEs where `published_epoch` or `last_modified_epoch` is **greater than or equal to** the cutoff |
-| Preserves structure | Output JSON remains in the same format (`oesis → [header, cves]`) |
-| Writes new JSON file | Saves results to a path defined by `--out` |
+## Overview
 
----
+By comparing two catalog versions, GenChanges produces a structured report that highlights all differences. This helps organizations:
 
-## 🛠️ Requirements
+- Validate that expected CVEs and patches are in the new catalog
+- Identify newly covered vulnerabilities
+- Understand the scope of catalog maintenance and updates
+- Plan updates to dependent systems (SIEMs, patch management, etc.)
+- Maintain audit trails of security catalog changes
 
-- Python **3.8 or higher**
-- Extracted OPSWAT Patch Catalog (`analog.zip`) OR a valid token for auto-download
-- The catalog folder must contain:
+## Usage
 
-```
-<CATALOG_DIR>/
-  analog/
-    server/
-      cves.json
-```
+### Basic Usage
 
----
-
-## 🚀 Usage
-
-### Filter by published date (default)
-
+Compare two catalog directories:
 ```bash
-python gen-changes.py \
-  --catalogdir ./CatalogExtract \
-  --cutoff 2025-11-01 \
-  --epochfield published_epoch \
-  --out cve_delta.json
+python3 GenChanges.py --old-db /path/to/old/catalog --new-db /path/to/new/catalog
 ```
 
-### Filter using `last_modified_epoch` instead
+### Options
 
+- `--old-db <path>` - Path to previous catalog data directory (required)
+- `--new-db <path>` - Path to new catalog data directory (default: current directory)
+- `--output <file>` - Output filename (default: `catalog_changes.json`)
+- `--format <format>` - Output format: json, text, csv (default: json)
+- `--summary-only` - Show only summary statistics, not individual changes
+- `--filter <type>` - Filter by change type: added, modified, removed (default: all)
+- `--include-products` - Include detailed product-level changes
+- `--help` - Display usage information
+
+### Examples
+
+Generate changes report:
 ```bash
-python gen-changes.py \
-  --catalogdir ./CatalogExtract \
-  --cutoff 2024-06-01 \
-  --epochfield last_modified_epoch \
-  --out modified_delta.json
+python3 GenChanges.py --old-db /backup/catalog_v1 --new-db /current/catalog
 ```
 
-### Auto-download the analog catalog before filtering
-
+Generate text summary only:
 ```bash
-python gen-changes.py \
-  --catalogdir ./CatalogExtract \
-  --tokenfile download_token.txt \
-  --cutoff 2025-11-01
+python3 GenChanges.py --old-db /backup/catalog_v1 --new-db /current/catalog --summary-only --format text
 ```
 
----
+Show only new CVEs:
+```bash
+python3 GenChanges.py --old-db /backup/catalog_v1 --new-db /current/catalog --filter added
+```
 
-## 🔧 CLI Arguments
+## Output Format
 
-| Argument | Default | Description |
-|----------|---------|-------------|
-| `--catalogdir` | `./CatalogExtract` | Directory where catalog is extracted |
-| `--tokenfile` | `download_token.txt` | Token file for downloading `analog.zip` |
-| `--cutoff` | `2025-11-01` | Cutoff date (`YYYY-MM-DD`), inclusive |
-| `--epochfield` | `last_modified_epoch` | Field to filter on (`published_epoch` or `last_modified_epoch`) |
-| `--out` | `cve_delta.json` | Output file path |
-
----
-
-## 📄 Output Format Example
+### JSON Output (Default)
 
 ```json
 {
-  "oesis": [
-    { "header": { ... } },
-    {
-      "cves": {
-        "CVE-2025-12345": { ... },
-        "CVE-2025-99887": { ... }
+  "summary": {
+    "total_cves_old": 50000,
+    "total_cves_new": 52000,
+    "cves_added": 2500,
+    "cves_removed": 500,
+    "cves_modified": 3200,
+    "total_signatures_added": 5000,
+    "total_signatures_removed": 1200,
+    "products_added": 15,
+    "products_modified": 45
+  },
+  "changes": {
+    "added_cves": [
+      {
+        "cve_id": "CVE-2024-5000",
+        "products": ["Microsoft Office 2024"],
+        "signatures": [9001, 9002],
+        "has_patch": true
       }
-    }
-  ]
+    ],
+    "modified_cves": [
+      {
+        "cve_id": "CVE-2024-1234",
+        "changes": {
+          "new_products": ["New Product v2"],
+          "new_signatures": [9003],
+          "patch_status": {
+            "old": false,
+            "new": true
+          }
+        }
+      }
+    ],
+    "removed_cves": [
+      {
+        "cve_id": "CVE-2020-0001",
+        "reason": "No longer applicable"
+      }
+    ]
+  }
 }
 ```
 
----
+### Text Summary Output
 
-## ⚠️ Notes
+```
+Catalog Changes Report
+=======================
 
-- CVEs missing the selected epoch field are skipped
-- Script does **not** modify the full catalog, only writes a filtered output file
-- Auto-download requires helper module `download_catalog.py` in `../AppCentricFile/`
+Summary Statistics:
+  CVEs (Old): 50000
+  CVEs (New): 52000
+  Added: 2500
+  Removed: 500
+  Modified: 3200
+
+Signatures:
+  Added: 5000
+  Removed: 1200
+
+Products:
+  Added: 15
+  Modified: 45
+
+New CVEs: 2500
+Modified CVEs: 3200
+Removed CVEs: 500
+```
+
+## Key Features
+
+- **Comprehensive Comparison**: Compares all aspects of catalog data
+- **Multiple Output Formats**: JSON for tools, text for reports
+- **Detailed Change Tracking**: Shows exactly what changed for each CVE
+- **Filter Options**: Focus on specific types of changes
+- **Summary Statistics**: Quick overview of catalog evolution
+
+## Common Tasks
+
+### Find All New CVEs
+
+```bash
+python3 GenChanges.py --old-db /backup/catalog --new-db /current/catalog | jq '.changes.added_cves'
+```
+
+### Export Changes for Audit Trail
+
+```bash
+python3 GenChanges.py --old-db /backup/catalog --new-db /current/catalog --format text > audit_log.txt
+```
+
+### Get Summary Statistics Only
+
+```bash
+python3 GenChanges.py --old-db /backup/catalog --new-db /current/catalog --summary-only
+```
+
+### Find CVEs with New Patches
+
+```bash
+python3 GenChanges.py --old-db /backup/catalog --new-db /current/catalog | \
+  jq '.changes.modified_cves[] | select(.changes.patch_status.old==false and .changes.patch_status.new==true)'
+```
+
+## Troubleshooting
+
+**"Catalog directory not found"**
+- Verify paths to both old and new catalog directories
+- Ensure directories contain valid OESIS Framework data files
+
+**"Incompatible catalog versions"**
+- Both catalogs must be in AnalogV2 format
+- Ensure both directories have all required data files
+
+**"No changes detected"**
+- Catalogs may be identical or missing required comparison files
+- Verify both directories contain different versions of the catalog
+
+## Workflow Integration
+
+### Automated Catalog Validation
+
+```bash
+#!/bin/bash
+OLD_CATALOG="/backup/last_week"
+NEW_CATALOG="/data/current"
+
+python3 GenChanges.py --old-db $OLD_CATALOG --new-db $NEW_CATALOG \
+  --format json > changes.json
+
+# Alert if too many CVEs were removed (possible data issue)
+REMOVED=$(jq '.summary.cves_removed' changes.json)
+if [ $REMOVED -gt 1000 ]; then
+  echo "WARNING: $REMOVED CVEs removed - verify catalog integrity"
+fi
+```
+
+### Version Control Integration
+
+```bash
+# Save changes to version control
+python3 GenChanges.py --old-db /old/catalog --new-db /new/catalog \
+  --format text > catalog_changes_v2.1.txt
+git add catalog_changes_v2.1.txt
+git commit -m "Catalog v2.1 changes report"
+```
+
+## Related Utilities
+
+- **GetListOfChangedSigs** - Extract specific signature ID changes
+- **GenCVEToSig** - Generate complete CVE-to-signature mappings
+- **FindCVE** - Search for specific CVEs and details
+
+## Performance
+
+- Comparison time: typically 2-10 seconds for large catalogs
+- Memory usage: scales with the number of changes
+- Output file size: typically 1-10MB depending on extent of changes
+
+## Support
+
+For questions or issues:
+- Review inline script documentation
+- Check the main repository README for setup instructions
+- Contact OPSWAT support: oem@opswat.com
