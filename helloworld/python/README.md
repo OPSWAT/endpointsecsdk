@@ -80,7 +80,10 @@ Python 3.7 or later is required. No third-party packages are needed — all depe
 ├── detect_products.py      # List all installed applications on the endpoint
 ├── product_detail.py       # Full detail report for a single product by signature ID
 ├── patch_status.py         # Missing and installed patches for all patch management agents
-└── uninstall_product.py    # Uninstall a product by signature ID
+├── uninstall_product.py    # Uninstall a product by signature ID
+├── security_score.py       # OPSWAT device security score with per-category breakdown
+├── collect_device_inventory.py     # Collect system/OS/BIOS/device inventory (Windows only)
+└── detect_driver_firmware_patches.py  # Detect driver/firmware patches (Windows only)
 ```
 
 ---
@@ -310,6 +313,81 @@ Run detect_products.py to list all installed products and their signature IDs.
 **SDK methods used:**
 - `3` — GetProductInfo (with `run_detection=True`)
 - `50303` — UninstallProduct
+
+---
+
+### `security_score.py`
+
+Calculates the OPSWAT device security score and prints the overall score plus a per-category breakdown (Anti Malware, Antiphishing, Patch Management, Vulnerabilities, Encryption, Firewall, Backup, Unwanted Apps). Loads the offline CVE database first so the Vulnerabilities category is scored against real CVE data. Writes the full result to `security_score.json`.
+
+```bash
+python security_score.py            # force a fresh refresh (default)
+python security_score.py cached     # use cached values, no refresh
+```
+
+> The overall `score_status` reflects the **weakest** category, so a single `poor` category reports the device as `poor` even when the numeric total is high.
+
+**SDK methods used:**
+- `50520` — ConsumeOfflineVmodDatabase (so the Vulnerabilities category has CVE data)
+- `111` — GetSecurityScore
+
+**Output:**
+```
+  Total Score   : 90 / 100
+  Score Status  : poor
+
+  Anti Malware              30/30       good
+  Vulnerabilities           0/10        poor
+  Firewall                  10/10       good
+```
+
+---
+
+### `collect_device_inventory.py`
+
+> **Windows only.** Requires a license that entitles the driver/firmware feature.
+
+Collects endpoint inventory data (system, OS, BIOS, and hardware devices) used for driver/firmware patch matching. Prints a summary with a per-device-class count and writes the full inventory to `device_inventory.json` (or a custom path).
+
+```bash
+python collect_device_inventory.py                 # writes device_inventory.json
+python collect_device_inventory.py D:\inv.json     # custom output path
+```
+
+**SDK methods used:**
+- `50900` — LoadDriverFirmwareDatabase (initializes the driver/firmware vmod; uses `patch_driver_firmware.dat`)
+- `50901` — CollectDeviceInventory
+
+**Output:**
+```
+  System
+    Vendor        : Dell Inc.
+    Product Name  : Latitude 5450
+
+  Devices: 305 detected
+    Net                       16
+    USB                       16
+    Firmware                  2
+```
+
+---
+
+### `detect_driver_firmware_patches.py`
+
+> **Windows only.** Requires a license that entitles the driver/firmware feature.
+
+Detects applicable driver/firmware patches by matching the device inventory against the loaded driver/firmware database. Maps each patch's `reboot_required` code to a label and preserves the full `download_urls` array (URLs + SHA1/256/512/MD5 + size) in `driver_firmware_patches.json`. Optionally accepts a prebuilt inventory file from `collect_device_inventory.py`.
+
+```bash
+python detect_driver_firmware_patches.py                      # collect inventory internally
+python detect_driver_firmware_patches.py device_inventory.json  # use a prebuilt inventory
+```
+
+> If the device model is not in the loaded catalog the SDK returns `WA_VMOD_ERROR_MODEL_NOT_SUPPORTED` (rc `-1067`); the script reports this as a clean "no coverage" result rather than failing.
+
+**SDK methods used:**
+- `50900` — LoadDriverFirmwareDatabase
+- `50902` — DetectDriverFirmwarePatches
 
 ---
 
