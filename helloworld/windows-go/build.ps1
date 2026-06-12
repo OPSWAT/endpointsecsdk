@@ -106,7 +106,7 @@ function Test-RequiredFiles {
     # Check SDK directory
     if (-not (Test-Path "../../OPSWAT-SDK" -PathType Container)) {
         Write-Error "OPSWAT-SDK directory not found"
-        Write-Status "Run the SDK Downloader tool to download the SDK. It should be in %root%/OPSWAT-SDK-Downloader/C-Sharp/bin"
+        Write-Status "The SDK downloader must be run first. From the repo root run: sdk-downloader\windows-csharp\bin\SDKDownloader.exe (or: python sdk-downloader\script\src\main.py)"
         return $false
     }
     

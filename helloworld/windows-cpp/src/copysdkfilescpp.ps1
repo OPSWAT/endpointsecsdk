@@ -68,12 +68,15 @@ $sdkLib = Join-Path $sdkBase "OPSWAT-SDK\extract\windows\lib"
 $sdkLibDest = Join-Path $SolutionDir "sdk\lib"
 
 if (-not (Test-Path $sdkPath)) {
-    Write-Error "❌ Source path not found: $sdkPath"
-    exi
+    Write-Error "❌ SDK files not found: $sdkPath"
+    Write-Error "   The SDK downloader must be run first. From the repo root run:"
+    Write-Error "       sdk-downloader\windows-csharp\bin\SDKDownloader.exe"
+    Write-Error "   (or: python sdk-downloader\script\src\main.py), then rebuild."
+    exit 1
 }
 
 if (-not (Test-Path $licensePath\license.cfg)) {
-    Write-Error "❌ Unable to find license.cfg: $licensePat"
+    Write-Error "❌ Unable to find license.cfg in: $licensePath"
     exit 1
 }
 
