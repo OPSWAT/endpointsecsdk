@@ -42,8 +42,9 @@ obj/
 /language-examples/go/license
 /language-examples/go/download_token.txt
 /language-examples/go/pass_key.txt
-/eval-license/download_token.txt
-/eval-license/pass_key.txt
+# eval-license — license secrets, never commit (keep only the README)
+/eval-license/*
+!/eval-license/README.md
 /catalog-scripts/AppCentricFile/FindCVE/download_token.txt
 /catalog-scripts/AppCentricFile/FindCVE/results_CVE-2008-4434_20251009_151048.txt
 /catalog-scripts/AppCentricFile/FindCVE/results_CVE-2008-4434_20251010_154046.txt

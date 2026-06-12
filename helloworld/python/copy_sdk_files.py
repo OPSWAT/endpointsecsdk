@@ -91,6 +91,26 @@ def copy_files(src_dir, dst_dir, label):
             print(f"  Copied {filename}")
 
 
+def copy_driver_firmware_db(src_file, dst_dir):
+    """Copy the driver/firmware database into dst_dir if it is present.
+
+    patch_driver_firmware.dat is produced by the SDK Downloader under
+    OPSWAT-SDK/extract/analog/client and is required by the Windows-only
+    CollectDeviceInventory / DetectDriverFirmwarePatches samples. It is not
+    part of the client binaries, so it is copied separately and treated as
+    optional (only present after the analog data has been downloaded).
+    """
+    if not os.path.isfile(src_file):
+        print(f"Driver/firmware database not found (skipping): {src_file}")
+        return
+
+    os.makedirs(dst_dir, exist_ok=True)
+    dst = os.path.join(dst_dir, os.path.basename(src_file))
+    print(f"Copying driver/firmware database:\n  {src_file}\n  -> {dst}")
+    shutil.copy2(src_file, dst)
+    print(f"  Copied {os.path.basename(src_file)}")
+
+
 def copy_analog_files(src_dir, dst_dir):
     """Recursively copy the analog moby directory tree into dst_dir."""
     if not os.path.isdir(src_dir):
@@ -135,6 +155,11 @@ def main():
 
     license_src = os.path.join(repo_root, "eval-license")
 
+    # Driver/firmware database source path (lives alongside the analog client data)
+    driver_firmware_db_src = os.path.join(
+        repo_root, "OPSWAT-SDK", "extract", "analog", "client", "patch_driver_firmware.dat"
+    )
+
     # Analog moby source path (Windows-only, path is fixed per spec)
     analog_src = os.path.join(
         repo_root, "OPSWAT-SDK", "extract", "analog", "client",
@@ -151,6 +176,8 @@ def main():
     try:
         copy_files(sdk_src,     sdk_dst, "SDK binaries")
         copy_files(license_src, sdk_dst, "license files")
+        # Driver/firmware database (optional — only present after analog download)
+        copy_driver_firmware_db(driver_firmware_db_src, sdk_dst)
         print(f"\nDone. SDK ready at: {sdk_dst}")
     except FileNotFoundError as e:
         print(f"ERROR: {e}")
