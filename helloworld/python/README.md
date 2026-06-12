@@ -77,6 +77,7 @@ Python 3.7 or later is required. No third-party packages are needed — all depe
 ├── vulnerability.py        # Scan all products for CVE vulnerabilities
 ├── patch.py                # Download and install the latest patch for a product
 ├── inline_license.py       # SDK initialisation using inline license bytes
+├── invoke.py               # Invoke any SDK method from a JSON request (--json or --file)
 ├── detect_products.py      # List all installed applications on the endpoint
 ├── product_detail.py       # Full detail report for a single product by signature ID
 ├── patch_status.py         # Missing and installed patches for all patch management agents
@@ -190,6 +191,23 @@ Minimal example demonstrating SDK initialisation using inline license bytes read
 ```bash
 python inline_license.py
 ```
+
+---
+
+### `invoke.py`
+
+A general-purpose tool for invoking **any** OESIS SDK method from a raw JSON request — useful for ad-hoc calls and experimentation without writing a dedicated script. The request is read from either a `--json` string or a `--file`; the script prints the input request and the raw JSON response. Use `--debug` for diagnostics (paths, Python/platform info, request method) and `--trace` for a full Python traceback on error.
+
+```bash
+python invoke.py --file request.json                       # uses the bundled request.json (DetectProducts)
+python invoke.py --json "{ \"input\": { \"method\": 0 } }"   # inline JSON (escape quotes on Windows)
+python invoke.py --file request.json --debug               # with diagnostics
+```
+
+The bundled `request.json` performs a DetectProducts (`method 0`) call. Edit it — or pass your own `--file`/`--json` — to invoke any method in the [Method Reference](https://software.opswat.com/OESIS_V4/html/c_method.html). The JSON must wrap the call in an `input` object, e.g. `{ "input": { "method": 50505, "signature": 3039 } }`.
+
+**SDK methods used:**
+- Any — the method is taken from the `input.method` field in your JSON request.
 
 ---
 
