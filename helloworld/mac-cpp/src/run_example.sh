@@ -8,7 +8,7 @@ SRC_DIR="." # Assuming the script is run from the src directory
 SDK_DIR="sdk"
 LICENSE_DIR="license"
 FRAMEWORKS_DIR="Frameworks"
-EXCLUDE_DIRS=("SDKDownloader" "sdk" "license" "Frameworks" ".") # Directories to exclude when detecting examples
+EXCLUDE_DIRS=("sdk" "license" "Frameworks" ".") # Directories to exclude when detecting examples
 
 # --- Detect Examples ---
 EXAMPLES=()

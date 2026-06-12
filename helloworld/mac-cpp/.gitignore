@@ -38,12 +38,6 @@ src/GetMissingPatches/get-missing-patches
 src/GetProductVulnerability/get-product-vulnerability
 src/*/libwa*.dylib
 
-# SDKDownloader binaries
-src/SDKDownloader/SDKDownloader
-src/SDKDownloader/sdk_downloader
-**/SDKDownloader
-**/sdk_downloader
-
 # Build artifacts
 build/
 *.o

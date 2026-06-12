@@ -14,12 +14,6 @@ src/Vulnerability/obj/
 src/Vulnerability/.vs/
 src/Vulnerability/Vulnerability.csproj.user
 
-
-src/SDKDownloader/bin/
-src/SDKDownloader/obj/
-src/SDKDownloader/.vs/
-src/SDKDownloader/SDKDownloader.csproj.user
-
 src/SDKDownloadLib/bin/
 src/SDKDownloadLib/obj/
 src/SDKDownloadLib/.vs/

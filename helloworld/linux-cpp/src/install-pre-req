@@ -14,8 +14,37 @@ sudo apt-get install libtinyxml2-dev
 sudo apt-get install unzip
 sudo apt-get install nlohmann-json3-dev
 
-cd SDKDownloader
-make
-./SDKDownloader
+# ---------------------------------------------------------------------------
+# SDK files come from the cross-platform SDK downloader at the repo root.
+# IMPORTANT: the SDK downloader MUST be run before these samples can build.
+# This script runs it for you below; it resolves the repo root via the
+# sdkroot marker and populates OPSWAT-SDK/. If you skip/abort that step the
+# staging guard further down will fail with a clear message.
+# ---------------------------------------------------------------------------
+( cd ../../../sdk-downloader/script/src && python3 main.py )
 
-cd ..
+# Paths produced by the SDK downloader (Linux x64, matching the sample Makefiles)
+OPSWAT_SDK="../../../OPSWAT-SDK"
+SDK_LIB_SRC="$OPSWAT_SDK/client/linux/x64"
+SDK_INC_SRC="$OPSWAT_SDK/extract/linux/inc"
+SDK_DST="sdk"
+
+# Guard: the SDK downloader must have produced these files. If it was not run
+# (or failed), stop here with a clear, actionable error instead of letting the
+# sample build fail later with confusing compiler/linker errors.
+if [ ! -e "$SDK_LIB_SRC/libwaapi.so" ] || [ ! -d "$SDK_INC_SRC" ]; then
+    echo "ERROR: SDK files were not found under OPSWAT-SDK."
+    echo "       Expected: $SDK_LIB_SRC/libwaapi.so and $SDK_INC_SRC/"
+    echo "       The SDK downloader must be run first. From the repo root run:"
+    echo "           cd sdk-downloader/script/src && python3 main.py"
+    echo "       Then re-run this install-pre-req script."
+    exit 2
+fi
+
+# Stage the SDK headers and libraries into src/sdk where the sample Makefiles
+# expect them (-I../sdk/inc, -L../sdk/lib/x64, -Wl,-rpath=../sdk/lib/x64).
+echo "Staging SDK files into $SDK_DST ..."
+mkdir -p "$SDK_DST/inc" "$SDK_DST/lib/x64"
+cp -a "$SDK_INC_SRC/." "$SDK_DST/inc/"
+cp -a "$SDK_LIB_SRC/." "$SDK_DST/lib/x64/"
+echo "SDK staged: headers in $SDK_DST/inc, libraries in $SDK_DST/lib/x64"

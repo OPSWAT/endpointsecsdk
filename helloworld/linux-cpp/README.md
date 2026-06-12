@@ -7,14 +7,16 @@ This repository provides sample applications that demonstrate how to integrate w
 ## Getting Started
 
 ### Prerequisites
-These are using g++ for compiling and using the SDK.  There is a script there will install the corresponding libraries for downloading, parsing and running the SDK.
+These are using g++ for compiling and using the SDK. There is a script that will install the corresponding libraries for downloading, parsing and running the SDK.
+
+> **The SDK downloader must be run before the samples can build.** The `install-pre-req` script runs it for you (`sdk-downloader/script/src/main.py`) and then stages the downloaded headers and libraries into `src/sdk`. If the downloader has not produced the SDK files, `install-pre-req` stops with a clear error (exit code `2`) telling you to run it first.
 
 ### Compiling the Samples
 1. First run the Prerequisites script to install the necessary dependencies. This can be done by running the following command in your terminal:
    ```bash
    src/install-pre-req
    ```
-   This will install all the required libraries and dependencies for the SDK.
+   This installs the required build dependencies, **runs the SDK downloader** to populate `OPSWAT-SDK/`, and stages the SDK headers and libraries into `src/sdk` (`src/sdk/inc` and `src/sdk/lib/x64`) where the sample Makefiles expect them.
 
 2. Try running the Detect Products example.  Navidate to the DetectProducts Folder and type 'make' in the terminal. This will compile the DetectProducts example and create an executable file.
 
@@ -29,7 +31,7 @@ These are using g++ for compiling and using the SDK.  There is a script there wi
    ```
 
 ### Notes
-- The `SDKDownloader` utility downloads the latest SDK files into `HelloWorld-Linux/src/sdk`.  This will also be built and when you run with the install-pre-req script.
+- The SDK files are downloaded by the cross-platform downloader at the repo root (`sdk-downloader/script/src/main.py`), which the `install-pre-req` script runs for you. It resolves the repo root via the `sdkroot` marker and populates `OPSWAT-SDK/`.
 ---
 
 ## Sample Applications

@@ -26,16 +26,19 @@ You can build and run the samples using either Xcode (recommended) or the termin
 
 ### Method 1: Using Xcode (Recommended)
 
-This repository includes an Xcode workspace with projects for the SDK Downloader and all examples, making it easy to build and debug directly within Xcode.
+This repository includes an Xcode workspace with projects for all examples, making it easy to build and debug directly within Xcode.
 
 1.  **Open the Xcode Workspace:**
     Open `HelloWorld-Mac.xcworkspace` in Xcode.
 
 2.  **Download the SDK First:**
-    Before running any examples, you must first build and run the SDK Downloader:
-    - In Xcode, select the `SDKDownloader` scheme from the scheme selector
-    - Click the Run button (or press ⌘R) to build and run
-    - This will download the necessary SDK files to the `src/sdk` directory
+    Before running any examples, you must download and stage the SDK from a terminal:
+    ```bash
+    cd src
+    chmod +x build_sdk_downloader.sh
+    ./build_sdk_downloader.sh
+    ```
+    This runs the cross-platform SDK downloader at the repo root and stages the SDK files into `src/sdk`, where the Xcode projects expect them.
 
 3.  **Run an Example:**
     After the SDK has been downloaded, you can build and run any of the examples:
@@ -45,7 +48,7 @@ This repository includes an Xcode workspace with projects for the SDK Downloader
 4.  **Debugging:**
     You can set breakpoints in the code and use Xcode's debugging tools to step through the execution.
 
-*Note: The Xcode projects are configured to use the SDK files in the `src/sdk` directory, so make sure to run the SDK Downloader first.*
+*Note: The Xcode projects are configured to use the SDK files in the `src/sdk` directory, so make sure to run `build_sdk_downloader.sh` first.*
 
 ### Method 2: Using Terminal Scripts
 
@@ -56,7 +59,7 @@ This repository includes an Xcode workspace with projects for the SDK Downloader
     chmod +x build_sdk_downloader.sh
     ./build_sdk_downloader.sh
     ```
-    *Note: This script requires the license file (`src/license/license.cfg`) to be present.* 
+    *Note: The SDK downloader must run first — `build_sdk_downloader.sh` runs it for you. The downloader uses `eval-license/download_token.txt` at the repo root, and the samples use `src/license/license.cfg` + `pass_key.txt` at runtime.* 
 
 2.  **Run an Example:**
     Use the `run_example.sh` script to build and run a specific example. Provide the name of the example directory as an argument.
@@ -84,7 +87,7 @@ The SDK needs to scan your system for installed applications and security produc
 These permission requests are normal and necessary for the SDK to function correctly. After accepting these permissions, the examples will be able to properly detect installed products, missing patches, and other system information.
 
 ### Notes
-- The `build_sdk_downloader.sh` script downloads the latest SDK files into `src/sdk`. It uses the `SDKDownloader` utility located in `src/SDKDownloader`.
+- The `build_sdk_downloader.sh` script runs the cross-platform SDK downloader at the repo root (`sdk-downloader/script/src/main.py`), then stages the macOS headers and libraries into `src/sdk`. If the SDK files are missing it stops with an error (exit code `2`) telling you to run the downloader first.
 ---
 
 ## Sample Applications

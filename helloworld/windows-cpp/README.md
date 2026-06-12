@@ -23,8 +23,8 @@ Or download from: [https://visualstudio.microsoft.com/vs/community/](https://vis
 3. Compile the `DetectProducts` project.
 
 ### Notes
-- The `SDKDownloader` utility downloads the latest SDK files into `/src/HelloWorldCPP/SDK`.
-- These files refresh every 7 days. To force a new download, delete the `SDK` directory and rebuild the project.
+- **The SDK downloader must be run before building.** Use the cross-platform downloader at the repo root — `sdk-downloader\windows-csharp\bin\SDKDownloader.exe` (or `sdk-downloader\script\src\main.py`) — which resolves the repo root via the `sdkroot` marker and populates `OPSWAT-SDK\`.
+- Each project's post-build step runs `copysdkfilescpp.ps1`, which stages the SDK headers, libraries, and binaries from `OPSWAT-SDK\` (and license files from `eval-license\`) into the build output. If the SDK files are missing, the build stops with an error telling you to run the downloader first.
 
 ---
 

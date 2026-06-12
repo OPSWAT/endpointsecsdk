@@ -18,7 +18,7 @@ Compile the Compliance project.
 
 #### Notes:
 
-SDKDownloader is used to download the latest SDK files to the /src/HelloWorld/lib directory.  The files will only be updated every 7 days.  If there is a need to download the latest files again delete the directory and recompile.  
+The SDK downloader at the repo root must be run before building — run `sdk-downloader\windows-csharp\bin\SDKDownloader.exe` (or `python sdk-downloader\script\src\main.py`), which populates `OPSWAT-SDK\`. Each project's post-build step then runs `copysdkfiles.ps1` to stage the SDK from `OPSWAT-SDK\` into the build output. If the SDK files are missing, the build stops with an error telling you to run the downloader first.
 
 
 ### Running the Samples

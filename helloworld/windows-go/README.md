@@ -55,13 +55,15 @@ download_token.txt
 * Navigate to:
 
   ```
-  %source-root%\OPSWAT-SDK-Downloader\C-Sharp\bin
+  %source-root%\sdk-downloader\windows-csharp\bin
   ```
 * Run:
 
   ```powershell
   .\SDKDownloader.exe
   ```
+
+  (Or use the cross-platform Python downloader: `python %source-root%\sdk-downloader\script\src\main.py`.) This must be run before building — it populates `OPSWAT-SDK\`.
 
 ---
 
