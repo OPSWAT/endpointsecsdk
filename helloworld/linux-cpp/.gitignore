@@ -4,6 +4,7 @@
 
 .vs/
 src/license/*
+src/sdk/
 build
 copydev
 run
