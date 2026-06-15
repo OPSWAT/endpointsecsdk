@@ -104,7 +104,7 @@ cd src
 
 **Files:**
 - `DetectProducts.cpp`: Core logic of product detection.
-- `Utils.cpp`: Utility functions for string processing.
+- `Util.cpp`: Utility functions for string processing.
 - `SDKInit.cpp`: Contains functions that setup the SDK configuration
 
 ---
@@ -120,7 +120,7 @@ cd src
 
 **Files:**
 - `GetMissingPatches.cpp`: Core logic of GetMissingPatches.
-- `Utils.cpp`: Utility functions for string processing.
+- `Util.cpp`: Utility functions for string processing.
 - `SDKInit.cpp`: Contains functions that setup the SDK configuration
 
 ---
@@ -136,7 +136,7 @@ cd src
 
 **Files:**
 - `GetOSInfo.cpp`: Core logic of GetOSInfo.
-- `Utils.cpp`: Utility functions for string processing.
+- `Util.cpp`: Utility functions for string processing.
 - `SDKInit.cpp`: Contains functions that setup the SDK configuration
 
 ---
