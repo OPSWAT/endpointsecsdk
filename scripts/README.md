@@ -57,4 +57,4 @@ For questions about specific scripts or data format issues, please refer to:
 - OPSWAT documentation: https://software.opswat.com/OESIS_V4/html/index.html
 
 For additional assistance, contact:
-📧 oem@opswat.com
+oem@opswat.com

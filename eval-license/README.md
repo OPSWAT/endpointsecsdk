@@ -1,7 +1,7 @@
-# 🔐 OPSWAT SDK – Evaluation License Setup
+# 🔐 OESIS Framework – Evaluation License Setup
 
-Welcome to the **OPSWAT Endpoint SDK Evaluation License** directory.  
-This folder contains the license and token files required to activate and validate your OPSWAT SDK evaluation.
+Welcome to the **OESIS Framework Evaluation License** directory.  
+This folder contains the license and token files required to activate and validate your OESIS Framework evaluation.
 
 ---
 

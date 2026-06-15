@@ -1,6 +1,6 @@
 # client/ – Runtime Libraries & Datasets
 
-The `client/` directory contains platform-specific runtime components consumed by applications integrating the OPSWAT Endpoint Security SDK.
+The `client/` directory contains platform-specific runtime components consumed by applications integrating the OESIS Framework.
 
 ```
 client/

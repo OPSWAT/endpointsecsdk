@@ -1,230 +1,142 @@
 # GenChanges
 
-Analyzes changes between two versions of the OESIS Framework catalog and generates a detailed report of additions, modifications, and deprecations.
+Filters the OESIS Framework `cves.json` by a cutoff date and produces a delta file of
+CVEs that changed (or were published) on or after that date.
 
 ## Purpose
 
-GenChanges helps security teams track the evolution of the vulnerability and patch catalog. It identifies:
+GenChanges helps security teams focus on recent activity in the vulnerability catalog.
+It downloads and refreshes the catalog as needed, then keeps only the CVEs whose
+chosen epoch field (published or last-modified) is at or after a cutoff date. Each
+retained CVE is mapped to the products that reference it.
 
-- New CVEs introduced in the latest catalog
-- New signature associations and patch availability
-- Deprecated or removed signatures
-- Changes in product or patch status
-- Impact on existing security detection coverage
+This is useful for:
 
-This is essential for understanding what has changed between updates and ensuring that security operations workflows remain current.
+- Producing a periodic delta of newly published or recently modified CVEs
+- Limiting downstream processing to CVEs that changed since the last run
+- Mapping recent CVEs to the affected products
 
 ## Overview
 
-By comparing two catalog versions, GenChanges produces a structured report that highlights all differences. This helps organizations:
-
-- Validate that expected CVEs and patches are in the new catalog
-- Identify newly covered vulnerabilities
-- Understand the scope of catalog maintenance and updates
-- Plan updates to dependent systems (SIEMs, patch management, etc.)
-- Maintain audit trails of security catalog changes
+GenChanges relies on the app-centric file produced by AppCentricFile. If the
+app-centric file is missing or older than two hours, it is regenerated first (which
+downloads and extracts the catalog). The script then reads `cves.json` from the
+extracted catalog, filters by the cutoff, and writes a delta JSON file that preserves
+the original `oesis` structure with a filtered `cves` block keyed to the matching
+products.
 
 ## Usage
 
 ### Basic Usage
 
-Compare two catalog directories:
+Filter CVEs by a cutoff date:
 ```bash
-python3 GenChanges.py --old-db /path/to/old/catalog --new-db /path/to/new/catalog
+python3 gen-changes.py --catalogdir ./CatalogExtract --cutoff 2025-11-01 --out cve_delta.json
 ```
 
 ### Options
 
-- `--old-db <path>` - Path to previous catalog data directory (required)
-- `--new-db <path>` - Path to new catalog data directory (default: current directory)
-- `--output <file>` - Output filename (default: `catalog_changes.json`)
-- `--format <format>` - Output format: json, text, csv (default: json)
-- `--summary-only` - Show only summary statistics, not individual changes
-- `--filter <type>` - Filter by change type: added, modified, removed (default: all)
-- `--include-products` - Include detailed product-level changes
+- `--catalogdir <path>` - Extracted catalog directory (default: `./CatalogExtract`)
+- `--tokenfile <file>` - Token file used to download analog.zip (default: `download_token.txt`)
+- `--cutoff <datetime>` - Cutoff date, inclusive, in UTC. Accepts `YYYY-MM-DD`, `YYYY-MM-DDTHH:MM`, or `YYYY-MM-DDTHH:MM:SS` (default: `2025-11-01T00:00:00`)
+- `--epochfield <field>` - Which epoch field to compare against: `published_epoch` or `last_modified_epoch` (default: `last_modified_epoch`)
+- `--appcentric <file>` - App-centric JSON path (default: `app_centric.json`)
+- `--out <file>` - Output delta JSON path (default: `cve_delta.json`)
 - `--help` - Display usage information
 
 ### Examples
 
-Generate changes report:
+Filter using the last-modified epoch (default):
 ```bash
-python3 GenChanges.py --old-db /backup/catalog_v1 --new-db /current/catalog
+python3 gen-changes.py --catalogdir ./CatalogExtract --cutoff 2025-11-01 --out cve_delta.json
 ```
 
-Generate text summary only:
+Filter using the published epoch:
 ```bash
-python3 GenChanges.py --old-db /backup/catalog_v1 --new-db /current/catalog --summary-only --format text
+python3 gen-changes.py --catalogdir ./CatalogExtract --cutoff 2025-11-01 --epochfield published_epoch --out cve_delta.json
 ```
 
-Show only new CVEs:
+Use a specific cutoff time and token file:
 ```bash
-python3 GenChanges.py --old-db /backup/catalog_v1 --new-db /current/catalog --filter added
+python3 gen-changes.py --cutoff 2025-11-01T12:00:00 --tokenfile download_token.txt
 ```
 
 ## Output Format
 
-### JSON Output (Default)
+The output preserves the original `oesis` structure. The header is annotated with the
+cutoff, and the `cves` block contains only CVEs at or after the cutoff, each mapped to
+the products that reference it:
 
 ```json
 {
-  "summary": {
-    "total_cves_old": 50000,
-    "total_cves_new": 52000,
-    "cves_added": 2500,
-    "cves_removed": 500,
-    "cves_modified": 3200,
-    "total_signatures_added": 5000,
-    "total_signatures_removed": 1200,
-    "products_added": 15,
-    "products_modified": 45
-  },
-  "changes": {
-    "added_cves": [
-      {
-        "cve_id": "CVE-2024-5000",
-        "products": ["Microsoft Office 2024"],
-        "signatures": [9001, 9002],
-        "has_patch": true
+  "oesis": [
+    {
+      "header": {
+        "cutoff_timestamp": 1761955200,
+        "cutoff_time": "2025-11-01T00:00:00"
       }
-    ],
-    "modified_cves": [
-      {
-        "cve_id": "CVE-2024-1234",
-        "changes": {
-          "new_products": ["New Product v2"],
-          "new_signatures": [9003],
-          "patch_status": {
-            "old": false,
-            "new": true
-          }
-        }
+    },
+    {
+      "cves": {
+        "CVE-2025-5000": ["9001-Microsoft Office 2024"]
       }
-    ],
-    "removed_cves": [
-      {
-        "cve_id": "CVE-2020-0001",
-        "reason": "No longer applicable"
-      }
-    ]
-  }
+    }
+  ]
 }
 ```
 
-### Text Summary Output
+On completion the script prints a summary line, for example:
 
 ```
-Catalog Changes Report
-=======================
-
-Summary Statistics:
-  CVEs (Old): 50000
-  CVEs (New): 52000
-  Added: 2500
-  Removed: 500
-  Modified: 3200
-
-Signatures:
-  Added: 5000
-  Removed: 1200
-
-Products:
-  Added: 15
-  Modified: 45
-
-New CVEs: 2500
-Modified CVEs: 3200
-Removed CVEs: 500
+[OK] 2500 CVEs kept where last_modified_epoch >= 2025-11-01. Wrote: cve_delta.json
 ```
 
 ## Key Features
 
-- **Comprehensive Comparison**: Compares all aspects of catalog data
-- **Multiple Output Formats**: JSON for tools, text for reports
-- **Detailed Change Tracking**: Shows exactly what changed for each CVE
-- **Filter Options**: Focus on specific types of changes
-- **Summary Statistics**: Quick overview of catalog evolution
+- **Date-Based Filtering**: Keep only CVEs at or after a cutoff date
+- **Selectable Epoch Field**: Compare against published or last-modified epoch
+- **Auto-Refresh**: Regenerates the app-centric file if missing or over two hours old
+- **Product Mapping**: Maps each retained CVE to the products that reference it
+- **Structure-Preserving Output**: Keeps the original `oesis` envelope
 
 ## Common Tasks
 
-### Find All New CVEs
+### Generate a Recent-CVE Delta
 
 ```bash
-python3 GenChanges.py --old-db /backup/catalog --new-db /current/catalog | jq '.changes.added_cves'
+python3 gen-changes.py --catalogdir ./CatalogExtract --cutoff 2025-11-01 --out cve_delta.json
 ```
 
-### Export Changes for Audit Trail
+### Inspect the Delta with jq
 
 ```bash
-python3 GenChanges.py --old-db /backup/catalog --new-db /current/catalog --format text > audit_log.txt
-```
-
-### Get Summary Statistics Only
-
-```bash
-python3 GenChanges.py --old-db /backup/catalog --new-db /current/catalog --summary-only
-```
-
-### Find CVEs with New Patches
-
-```bash
-python3 GenChanges.py --old-db /backup/catalog --new-db /current/catalog | \
-  jq '.changes.modified_cves[] | select(.changes.patch_status.old==false and .changes.patch_status.new==true)'
+python3 gen-changes.py --cutoff 2025-11-01 --out cve_delta.json
+jq '.oesis[1].cves | keys | length' cve_delta.json
 ```
 
 ## Troubleshooting
 
-**"Catalog directory not found"**
-- Verify paths to both old and new catalog directories
-- Ensure directories contain valid OESIS Framework data files
+**"Could not find cves.json"**
+- Verify the path passed to `--catalogdir` points to the extracted catalog
+- The expected file is at `<catalogdir>/analog/server/cves.json`
 
-**"Incompatible catalog versions"**
-- Both catalogs must be in AnalogV2 format
-- Ensure both directories have all required data files
+**"Could not find app_centric.json"**
+- Ensure the token file exists so the app-centric file can be generated
+- Verify the path passed to `--appcentric`
 
-**"No changes detected"**
-- Catalogs may be identical or missing required comparison files
-- Verify both directories contain different versions of the catalog
-
-## Workflow Integration
-
-### Automated Catalog Validation
-
-```bash
-#!/bin/bash
-OLD_CATALOG="/backup/last_week"
-NEW_CATALOG="/data/current"
-
-python3 GenChanges.py --old-db $OLD_CATALOG --new-db $NEW_CATALOG \
-  --format json > changes.json
-
-# Alert if too many CVEs were removed (possible data issue)
-REMOVED=$(jq '.summary.cves_removed' changes.json)
-if [ $REMOVED -gt 1000 ]; then
-  echo "WARNING: $REMOVED CVEs removed - verify catalog integrity"
-fi
-```
-
-### Version Control Integration
-
-```bash
-# Save changes to version control
-python3 GenChanges.py --old-db /old/catalog --new-db /new/catalog \
-  --format text > catalog_changes_v2.1.txt
-git add catalog_changes_v2.1.txt
-git commit -m "Catalog v2.1 changes report"
-```
+**"Invalid cutoff_date"**
+- Use `YYYY-MM-DD`, `YYYY-MM-DDTHH:MM`, or `YYYY-MM-DDTHH:MM:SS`
 
 ## Related Utilities
 
-- **GetListOfChangedSigs** - Extract specific signature ID changes
+- **GetListOfChangedSigs** - Search the app-centric file for a CVE
 - **GenCVEToSig** - Generate complete CVE-to-signature mappings
 - **FindCVE** - Search for specific CVEs and details
 
 ## Performance
 
-- Comparison time: typically 2-10 seconds for large catalogs
-- Memory usage: scales with the number of changes
-- Output file size: typically 1-10MB depending on extent of changes
+- Filtering time scales with the number of CVEs in the catalog
+- Download and extraction time depends on catalog size and network speed
 
 ## Support
 

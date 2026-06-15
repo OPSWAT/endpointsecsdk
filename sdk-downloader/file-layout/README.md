@@ -1,6 +1,6 @@
-# File Layout of the OPSWAT Endpoint Security SDK Downloaded files and extract structure
+# OESIS Framework SDK — File Layout
 
-This folder contains GitHub-ready documentation that describes the directory structure and key files produced when extracting the **OPSWAT Endpoint Security SDK** package.
+Documentation describing the directory structure and key files produced when downloading and extracting the **OESIS Framework** SDK package (the `OPSWAT-SDK/` directory created by the [SDK downloader](../README.md)).
 
 ## Contents
 - [`TOP_LEVEL.md`](TOP_LEVEL.md) – Top-level layout and where to start

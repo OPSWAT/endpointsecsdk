@@ -1,6 +1,6 @@
 # Top-Level Structure
 
-This documentation describes the directory structure and key files produced when extracting the **OPSWAT Endpoint Security SDK** package.
+This documentation describes the directory structure and key files produced when extracting the **OESIS Framework** SDK package.
 
 ```
 OPSWAT-SDK/

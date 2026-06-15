@@ -1,331 +1,84 @@
-# VAPM Scanner
+# VAPM Scanner (AcmeScanner)
 
-Vulnerability and Patch Management Scanner. Tracks vulnerability and patch status across systems, identifies remediation opportunities, and generates prioritized recommendations for security teams.
+A Windows desktop reference application that demonstrates Vulnerability And Patch Management (VAPM) using the OESIS Framework. It scans the local machine for installed third-party and operating-system software, reports known vulnerabilities (CVEs) and patch status, browses the OESIS product/patch catalog, and can download and install patches.
 
-## Purpose
-
-The VAPM scanner helps organizations manage vulnerabilities and patches by:
-
-- Tracking vulnerability status by product and platform
-- Identifying available patches and their remediation coverage
-- Prioritizing vulnerabilities by severity and exploitability
-- Generating remediation roadmaps and action plans
-- Providing trend analysis and metrics tracking
-- Supporting patch deployment planning and validation
-
-## Overview
-
-This tool combines vulnerability detection with patch management capabilities to provide comprehensive remediation guidance. It helps security teams:
-
-- Plan and prioritize patch deployments
-- Understand patch coverage and effectiveness
-- Track remediation progress over time
-- Meet compliance requirements for vulnerability management
-- Reduce time-to-remediation for critical vulnerabilities
-
-## Usage
-
-### Basic Vulnerability and Patch Scan
-
-```bash
-python3 scan_patches.py
-```
-
-### Scan with Options
-
-```bash
-python3 scan_patches.py --output results.json --format json
-```
-
-### Options
-
-- `--output <file>` - Output filename (default: vapm_results.json)
-- `--format <format>` - Output format: json, csv, html (default: json)
-- `--severity <level>` - Filter by severity: critical, high, medium, low
-- `--product <name>` - Focus on specific product
-- `--remediation-plan` - Generate prioritized remediation recommendations
-- `--trend-analysis` - Compare with previous scans
-- `--export-kb` - Include knowledge base articles
-- `--help` - Display usage information
-
-### Generate Remediation Plan
-
-```bash
-python3 remediation_plan.py --output plan.json
-```
-
-### Remediation Plan Options
-
-- `--severity <level>` - Filter by severity for plan
-- `--max-items <number>` - Limit number of recommendations
-- `--exclude-product <name>` - Exclude specific products from plan
-- `--timeline <days>` - Show remediation timeline (default: 30 days)
-
-### Examples
-
-Basic scan:
-```bash
-python3 scan_patches.py --output today_scan.json
-```
-
-Find critical patches needed:
-```bash
-python3 scan_patches.py --severity critical --output critical_patches.json
-```
-
-Generate remediation plan:
-```bash
-python3 remediation_plan.py --severity critical,high --output remediation_plan.json
-```
-
-Track trends:
-```bash
-python3 scan_patches.py --trend-analysis --compare previous_scan.json
-```
-
-## Output Format
-
-### JSON Scan Results
-
-```json
-{
-  "scan_date": "2024-05-14T10:30:00Z",
-  "summary": {
-    "total_vulnerabilities": 25,
-    "critical": 2,
-    "high": 5,
-    "medium": 10,
-    "low": 8,
-    "total_patches_available": 18,
-    "patch_coverage": 72
-  },
-  "products": [
-    {
-      "name": "Microsoft Office 2019",
-      "vulnerabilities": 8,
-      "patches_available": 6,
-      "coverage": 75,
-      "details": [
-        {
-          "cve_id": "CVE-2024-1234",
-          "severity": "critical",
-          "patch_available": true,
-          "kb_article": "KB5044284"
-        }
-      ]
-    }
-  ],
-  "remediation_opportunities": [
-    {
-      "product": "Microsoft Office 2019",
-      "fixes": 6,
-      "coverage": "75%",
-      "estimated_time": "2 hours"
-    }
-  ]
-}
-```
-
-### Remediation Plan
-
-```json
-{
-  "plan_date": "2024-05-14",
-  "timeline": 30,
-  "total_recommendations": 8,
-  "by_priority": {
-    "critical": [
-      {
-        "priority": 1,
-        "cve": "CVE-2024-1234",
-        "product": "Microsoft Office 2019",
-        "patch": "KB5044284",
-        "risk": "Critical remote code execution",
-        "remediation": "Apply security patch immediately",
-        "estimated_effort": "30 minutes"
-      }
-    ],
-    "high": [
-      {
-        "priority": 2,
-        "cve": "CVE-2024-5678",
-        "product": "Windows Defender",
-        "patch": "Monthly update (May 2024)",
-        "risk": "Privilege escalation",
-        "remediation": "Install latest definitions",
-        "estimated_effort": "15 minutes"
-      }
-    ]
-  },
-  "deployment_phases": {
-    "immediate": {
-      "target_days": "1-2",
-      "items": 2,
-      "total_patches": 2
-    },
-    "urgent": {
-      "target_days": "3-7",
-      "items": 3,
-      "total_patches": 3
-    },
-    "planned": {
-      "target_days": "8-30",
-      "items": 3,
-      "total_patches": 3
-    }
-  }
-}
-```
-
-### HTML Report
-
-Professional report format showing vulnerability timeline, patch coverage, and remediation recommendations.
-
-## Key Features
-
-- **Comprehensive Analysis**: Vulnerability and patch status in one tool
-- **Prioritization**: Severity-based and risk-adjusted prioritization
-- **Coverage Metrics**: Understand what percentage of vulnerabilities have patches
-- **Trend Tracking**: Compare results between scans to monitor progress
-- **Actionable Recommendations**: Specific remediation steps with effort estimates
-- **Timeline Planning**: Phased approach to managing remediation workload
-- **Integration Ready**: JSON output for tool integration and automation
-
-## Common Tasks
-
-### Identify Patches That Fix Most Vulnerabilities
-
-```bash
-python3 scan_patches.py --format json --output patch_analysis.json | \
-  jq '.remediation_opportunities | sort_by(-.coverage) | .[0:5]'
-```
-
-### Create 30-Day Remediation Plan
-
-```bash
-python3 remediation_plan.py \
-  --timeline 30 \
-  --output remediation_plan_30days.json
-```
-
-### Find Products with No Patch Coverage
-
-```bash
-python3 scan_patches.py --format json | \
-  jq '.products[] | select(.coverage == 0)'
-```
-
-### Generate Executive Dashboard Report
-
-```bash
-python3 scan_patches.py --format html --output executive_dashboard.html
-```
-
-### Track Remediation Progress
-
-```bash
-#!/bin/bash
-# Baseline scan
-python3 vapm-scanner/scan_patches.py --output baseline.json
-
-# ... implement patches ...
-
-# Progress check
-python3 vapm-scanner/scan_patches.py --trend-analysis --compare baseline.json
-```
-
-## Troubleshooting
-
-**"No patches found"**
-- System may be fully patched (good sign)
-- Verify OESIS Framework data is current
-- Run with `--verbose` for detailed analysis
-
-**"Remediation plan empty"**
-- May indicate all vulnerabilities already have solutions planned
-- Check specific products with `--product` option
-
-**"SDK not found"**
-- Run SDK downloader from main repository
-- Verify all data files are present
-
-## Integration Examples
-
-### Automated Patch Planning
-
-```bash
-#!/bin/bash
-# Generate weekly remediation plan
-python3 tools/vapm-scanner/remediation_plan.py \
-  --timeline 7 \
-  --output weekly_plan_$(date +%Y%m%d).json
-
-# Notify team
-send_notification weekly_plan_$(date +%Y%m%d).json
-```
-
-### Patch Deployment Workflow
-
-```bash
-#!/bin/bash
-# Scan for patches
-python3 tools/vapm-scanner/scan_patches.py --output pre_patch_scan.json
-
-# Deploy patches (your script)
-deploy_patches.sh
-
-# Verify patching
-python3 tools/vapm-scanner/scan_patches.py --trend-analysis --compare pre_patch_scan.json
-```
-
-### Compliance Reporting
-
-```bash
-# Generate monthly compliance report
-python3 tools/vapm-scanner/scan_patches.py \
-  --format html \
-  --output monthly_compliance_$(date +%B_%Y).html
-```
-
-### Management Dashboard
-
-```bash
-python3 scan_patches.py --format json --output patch_status.json
-
-# Update dashboard
-update_management_dashboard patch_status.json
-```
-
-## Performance
-
-- Patch scan: typically 5-10 minutes
-- Remediation plan generation: typically 1-2 minutes
-- Report generation: typically 1-3 minutes
-- Memory usage: typically 100-300MB
-
-## Metrics Explained
-
-- **Patch Coverage**: Percentage of vulnerabilities that have available patches
-- **Remediation Opportunity**: Groups of patches that address multiple vulnerabilities
-- **Priority Score**: Risk-adjusted severity considering exploitability and impact
-- **Estimated Effort**: Time required to plan, test, and deploy patches
+This is sample/reference code intended to show how to integrate the OESIS Framework's vulnerability and patch modules from a .NET application. It is not a command-line tool.
+
+## What It Is
+
+The solution builds a single WinForms GUI executable (`AcmeScanner.exe`). There is no Python entrypoint and no command-line scanning interface — the tool is driven entirely through its graphical interface.
+
+The application is organized into two projects:
+
+| Project | Description |
+|---------|-------------|
+| `AcmeScanner` | The WinForms desktop application (`net9.0-windows`, `WinExe`). Contains the UI, scan workflows, catalog browser, and export functions. |
+| `VAPMAdapter` | A .NET class library (`net8.0`) that wraps the OESIS Framework. It P/Invokes the native `libwaapi` library (`wa_api_setup` / `wa_api_invoke` / `wa_api_teardown`), parses the OESIS and catalog data, and exposes the scan, lookup, install, and update tasks used by the UI. |
+
+Note: the `VAPMAdapter` folder contains two project files — `VAPMAdapter.csproj` (the one referenced by the solution and by `AcmeScanner`) and a misspelled `VAPMAdapater.csproj`. The solution uses `VAPMAdapter.csproj`.
+
+## Capabilities
+
+The UI exposes the following tabs and actions (driven by the OESIS Framework through `VAPMAdapter`):
+
+- **Offline scan** — Detects installed products on the local machine, reports their version, latest available version, patch status ("Missing"/patched), CVE count, and OPSWAT severity. Optionally includes OS-level CVEs.
+- **Online / orchestration scan (Windows)** — Detects missing Windows (KB) patches with severity and description, and can download and install them.
+- **Catalog browser** — Loads the OESIS product/signature catalog, shows install/patch/fresh-install support, CVE counts, and supports text search. CVEs for a selected signature can be listed, and a specific CVE can be looked up by ID.
+- **Patch install** — For a scanned product or a catalog signature that supports it, downloads and installs the latest version (auto-patch or fresh install), with options for background install, install validation, and force-close.
+- **Exports** — Writes CSV files to the working directory: `ProductSupport.csv` (catalog product support), `urls.csv` and `domains.csv` (patch download URLs and their hosts), and `vapm-list.csv` (Moby product/signature list).
+- **Developer tabs** — Additional Status, Moby, and Vulnerabilities tabs are shown when the app is launched with the `--dev` argument (or by pressing Ctrl+D in the app).
+
+## Prerequisites
+
+- Windows (the application targets `net9.0-windows` and uses Windows Forms).
+- Visual Studio 2022 (or the corresponding .NET SDK) with the .NET desktop development workload.
+- The OESIS Framework client binaries and data files (see "Obtaining the SDK" below).
+- License and authentication files in the run directory:
+  - `license.cfg` and `pass_key.txt` — required; the application will not run without them.
+  - `download_token.txt` — required for the in-app SDK / database / catalog downloaders to authenticate. If you need a download token or evaluation license, contact `oem@opswat.com`.
+
+## Obtaining the SDK
+
+The application depends on the OESIS Framework native libraries (notably `libwaapi`, `libwavmodapi.dll`, and supporting `libwa*.dll` files) plus database files (e.g. `patch.dat`, vulnerability/patch `.dat` files).
+
+There are two ways these can be put in place:
+
+1. **Repository SDK downloader (recommended, run first).** Run the repo-root `sdk-downloader` utility, which authenticates with `eval-license/download_token.txt` and populates the `OPSWAT-SDK/` directory with the OESIS Framework client binaries. See [`../../sdk-downloader/README.md`](../../sdk-downloader/README.md). Run this before using the tool so the required SDK libraries are available.
+
+2. **In-app download/update.** When `download_token.txt` is present in the run directory, the application can download and update the SDK and database files itself:
+   - The **Download SDK / Update SDK** button calls `UpdateSDK.DownloadAndInstall_OPSWAT_SDK()`, which downloads the OESIS package (via the `OesisPackageLinks.xml` descriptor), extracts it, and copies the required `libwa*` binaries (including `libwavmodapi.dll`) into the working directory.
+   - The **Download DB / Update DB** button (`UpdateDBFiles.DownloadFiles()`) downloads the vulnerability and patch database files (`patch.dat`, `v2mod.dat`, `wuo.dat`, `wiv-lite.dat`, `ap_checksum.dat`).
+   - A separate **Update Moby** action downloads the Moby data file.
+
+   The app considers the SDK/DB "current" if `libwavmodapi.dll` / `patch.dat` were updated within the last 7 days; otherwise it highlights the update buttons. Scanning and install actions stay disabled until both the SDK and the database files are present.
+
+## Build and Run
+
+1. Run the repository SDK downloader first (see above) so the OESIS Framework libraries are available.
+2. Open the solution in Visual Studio 2022:
+   ```
+   tools/vapm-scanner/src/AcmeScanner/AcmeScanner.sln
+   ```
+3. Build the solution (Build > Build Solution). This builds both `AcmeScanner` and the `VAPMAdapter` library.
+4. Ensure `license.cfg`, `pass_key.txt`, and `download_token.txt` are present in the output (run) directory.
+5. Run `AcmeScanner` (F5 / Start). On first launch, use the Download SDK and Download DB buttons if the SDK and database files are not already in the run directory.
+
+To launch the developer tabs (Status, Moby, Vulnerabilities), start the app with the `--dev` argument, or press Ctrl+D once it is running.
+
+## Output
+
+The application is interactive; results are displayed in the GUI (scan result lists, catalog views, and CVE detail dialogs). The export actions additionally write the following files to the working directory:
+
+- `ProductSupport.csv` — catalog product/signature support summary.
+- `urls.csv` / `domains.csv` — patch download URLs and their distinct hosts.
+- `vapm-list.csv` — Moby product/signature listing.
 
 ## Related Tools
 
-- **Posture** - Endpoint security posture assessment
-- **python-scanner** - Multi-platform vulnerability detection
-- **Catalog Scripts** - Detailed CVE and patch lookup
-
-## Requirements
-
-- Python 3.6 or later
-- OESIS Framework SDK
-- 500MB+ available disk space
-- Administrator/root privileges for full scanning
+- [SDK Downloader](../../sdk-downloader/README.md) — downloads the OESIS Framework client binaries into `OPSWAT-SDK/`.
+- [posture](../posture/README.md) — endpoint security posture assessment.
+- [python-scanner](../python-scanner/README.md) — multi-platform vulnerability and patch scanner.
 
 ## Support
 
-For questions or issues:
-- Review inline script documentation
-- Check the tools directory README
-- Contact OPSWAT support: oem@opswat.com
+For evaluation licenses, download tokens, or SDK assistance, contact `oem@opswat.com`.

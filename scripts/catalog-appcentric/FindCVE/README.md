@@ -18,172 +18,112 @@ This utility reads OESIS Framework catalog data and provides a fast, flexible se
 
 ## Usage
 
+FindCVE searches the consolidated app-centric file (`app_centric.json`) for a CVE
+and reports the products that reference it. If the app-centric file is missing or
+older than two hours, it is regenerated first (which downloads and extracts the
+catalog). Results are printed to the console and also written to a timestamped
+`results_<cve>_<timestamp>.txt` file in the current directory.
+
 ### Basic Search
 
 Find a specific CVE:
 ```bash
-python3 FindCVE.py CVE-2024-1234
+python3 FindCVE.py --cve CVE-2024-1234
 ```
 
-### Search Options
+### Options
 
-- `CVE-ID` - CVE identifier to search for
-- `--product <name>` - Filter results to a specific product
-- `--format <format>` - Output format: json, text, csv (default: text)
-- `--include-patches` - Show available patches for the CVE
-- `--include-kb` - Show associated knowledge base articles
-- `--db-dir <path>` - Path to OESIS Framework data directory
+- `--cve <CVE-ID>` - CVE identifier to search for (default: `UNKNOWN`)
+- `--appcentric <file>` - Path to the app-centric JSON file (default: `app_centric.json`)
+- `--catalogdir <path>` - Path to the extracted catalog directory (default: `./CatalogExtract`)
+- `--tokenfile <file>` - Path to the download token file (default: `download_token.txt`)
 - `--help` - Display usage information
 
 ### Examples
 
 Search for a CVE:
 ```bash
-python3 FindCVE.py CVE-2024-1234
+python3 FindCVE.py --cve CVE-2024-1234
 ```
 
-Search with JSON output:
+Search using a specific app-centric file:
 ```bash
-python3 FindCVE.py CVE-2024-1234 --format json
+python3 FindCVE.py --cve CVE-2024-1234 --appcentric app_centric.json
 ```
 
-Find CVEs affecting a specific product:
+Search using a specific catalog directory and token file:
 ```bash
-python3 FindCVE.py CVE-2024-1234 --product "Microsoft Office"
-```
-
-Include patch and KB information:
-```bash
-python3 FindCVE.py CVE-2024-1234 --include-patches --include-kb
+python3 FindCVE.py --cve CVE-2024-1234 --catalogdir ./CatalogExtract --tokenfile download_token.txt
 ```
 
 ## Output Format
 
-### Text Output (Default)
+### Console / Text Output
+
+Both the console output and the generated results file use the same human-readable
+format:
 
 ```
-CVE-2024-1234
-  Description: [CVE description]
-  CVSS Score: 7.5
-  Products Affected:
-    - Microsoft Office 2019 (Product ID: 100)
-      Signatures: 1001, 1002, 1003
-      Patches: Yes (3rd-party)
-    - Microsoft Office 365 (Product ID: 101)
-      Signatures: 1004, 1005
-      Patches: Yes (System)
-  Knowledge Base: KB5044284, KB5044285
-```
+Products referencing CVE-2024-1234:
+------------------------------------------------------------
+Product: Microsoft Office 2019  (sig_id: 100)
+Vendor:  Microsoft
+Line:    Office
+Vulnerabilities:
+  CVE: CVE-2024-1234, CPE: cpe:/a:microsoft:office, Ranges: [...]
+Patch Hits:
+  Patch: Microsoft Office 2019, Version: ..., Bulletin: KB5044284, Release Date: ..., Reboot Required: ..., Architectures: ...
 
-### JSON Output
-
-```json
-{
-  "cve_id": "CVE-2024-1234",
-  "description": "...",
-  "cvss_score": 7.5,
-  "products": [
-    {
-      "id": 100,
-      "name": "Microsoft Office 2019",
-      "signatures": [1001, 1002, 1003],
-      "has_patch": true,
-      "patch_type": "third_party"
-    }
-  ],
-  "knowledge_base": ["KB5044284", "KB5044285"]
-}
-```
-
-### CSV Output
-
-```
-CVE ID,Product ID,Product Name,Signature IDs,Has Patch,Patch Type,KB Articles
-CVE-2024-1234,100,Microsoft Office 2019,"1001,1002,1003",true,third_party,"KB5044284,KB5044285"
+Catalog release date (local time): 2024-10-10 00:46:31
+Results written to: results_CVE-2024-1234_20240612_120000.txt
 ```
 
 ## Key Features
 
-- **Fast Lookup**: Indexed search for quick results
-- **Multi-Format Output**: JSON, CSV, and human-readable text
-- **Comprehensive Details**: Product, signature, patch, and KB information in one query
-- **Flexible Filtering**: Search by CVE, product, or other criteria
-- **Cross-Platform**: Works on Windows, macOS, and Linux
+- **App-Centric Search**: Looks up CVEs in the consolidated `app_centric.json` file
+- **Auto-Refresh**: Regenerates the app-centric file if it is missing or over two hours old
+- **Product Details**: Reports product name, signature ID, vendor, and product line
+- **Vulnerability and Patch Hits**: Shows both vulnerability matches and patch matches for the CVE
+- **Results File**: Writes a timestamped results file alongside console output
 
 ## Common Tasks
 
-### Check if a CVE has Patches
+### Search for a CVE and Capture Results
 
 ```bash
-python3 FindCVE.py CVE-2024-1234 --include-patches | grep -i "patch"
+python3 FindCVE.py --cve CVE-2024-1234
+# Results are also written to results_CVE-2024-1234_<timestamp>.txt
 ```
 
-### Export CVE Data to CSV
-
-```bash
-python3 FindCVE.py CVE-2024-1234 --format csv > cve_data.csv
-```
-
-### Find All CVEs Affecting a Product
-
-```bash
-python3 FindCVE.py --product "Microsoft Office" --format json
-```
-
-### Get JSON Output for Integration
-
-```bash
-python3 FindCVE.py CVE-2024-1234 --format json | jq '.products[] | .id'
-```
-
-## Troubleshooting
-
-**"CVE not found"**
-- Verify the CVE ID format (should be CVE-YYYY-NNNNN)
-- Check that catalog data is up-to-date
-- The CVE may not be in the current dataset
-
-**"No products found"**
-- The CVE may exist but have no associated product signatures in this catalog
-- Try searching with different products or check KB information
-
-**"Database not found"**
-- Ensure you're in the correct directory or use `--db-dir` to specify the data location
-- Verify OESIS Framework data files are present
-
-## Integration
-
-### With Other Tools
-
-Export JSON for processing in other security tools:
-
-```bash
-# Get CVE data and pipe to another tool
-python3 FindCVE.py CVE-2024-1234 --format json | process_cve_data.py
-```
-
-### With Scripts
-
-Use FindCVE output in bash scripts:
+### Search Multiple CVEs
 
 ```bash
 #!/bin/bash
 for cve in CVE-2024-1234 CVE-2024-5678; do
-  python3 FindCVE.py $cve --format json >> all_cves.json
+  python3 FindCVE.py --cve $cve
 done
 ```
 
-## Performance
+## Troubleshooting
 
-- Single CVE lookup: typically < 100ms
-- Large product filters: may take 1-5 seconds depending on catalog size
-- Memory usage: scales with catalog size (typically < 500MB)
+**"No products reference <CVE>"**
+- Verify the CVE ID format (should be CVE-YYYY-NNNNN)
+- The CVE may not be associated with any product in the current catalog
+- Check that the app-centric file is up to date
+
+**"Could not find app_centric.json"**
+- Ensure the token file exists so the app-centric file can be generated
+- Verify the path passed to `--appcentric`
+
+**Download or extraction errors during refresh**
+- Confirm the token in `--tokenfile` is valid
+- Verify network connectivity to the download URL
 
 ## Related Utilities
 
 - **GenCVEToSig** - Generate complete CVE-to-signature mappings
-- **GenChanges** - Track changes between catalog versions
-- **AppCentricFile** - Manage and validate catalog data
+- **GenChanges** - Filter CVEs by cutoff date
+- **AppCentricFile** - Build and refresh the app-centric catalog data
 
 ## Support
 
