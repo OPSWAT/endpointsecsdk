@@ -41,17 +41,31 @@ After extraction, you should see a file named `sdkroot` at the project root — 
 
 ---
 
-### 3. Run the SDK Downloader
+### 3. Place Your License
 
-The SDK Downloader retrieves the latest OPSWAT SDK client binaries for your platform and architecture.
+Copy your evaluation license files into `eval-license/` at the repository root:
+```
+eval-license/
+  ├── license.cfg
+  ├── pass_key.txt
+  └── download_token.txt
+```
+
+The SDK Downloader (next step) reads `download_token.txt` to authenticate, and all HelloWorld samples reference these files when initializing the SDK. See [eval-license/README.md](../eval-license/README.md) for details.
+
+---
+
+### 4. Run the SDK Downloader
+
+The SDK Downloader retrieves the latest OPSWAT SDK client binaries for your platform and architecture and organizes them under `OPSWAT-SDK/`.
 
 #### 🪟 **Windows**
 
 Run the precompiled downloader executable:
 
 ```powershell
-cd sdk-downloader\C-Sharp\bin
-.\sdk-downloader.exe
+cd sdk-downloader\windows-csharp\bin
+.\SDKDownloader.exe
 ```
 
 This will create the following structure:
@@ -71,8 +85,8 @@ OPSWAT-SDK/
 Run the Python version of the SDK Downloader:
 
 ```bash
-cd sdk-downloader/PythonSDKDownloader/src
-python3 sdk_downloader.py
+cd sdk-downloader/script/src
+python3 main.py
 ```
 
 This will populate:
@@ -80,24 +94,13 @@ This will populate:
 OPSWAT-SDK/
   └── client/
       ├── linux/
-      └── macos/
+      └── mac/
 ```
 
-> **Note:** You may need to install Python dependencies (e.g., `requests`, `os`, `json`) using:
+> **Note:** The Python downloader requires Python 3 and the `requests` package:
 > ```bash
-> pip3 install -r requirements.txt
+> pip3 install requests
 > ```
-
----
-
-### 4. Place Your License
-
-Copy your evaluation license files into:
-```
-eval-license/
-```
-
-All HelloWorld samples automatically reference this folder when initializing the SDK.
 
 ---
 

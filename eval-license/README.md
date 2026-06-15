@@ -1,7 +1,7 @@
-# 🔐 OPSWAT SDK – Evaluation License Setup
+# 🔐 OESIS Framework – Evaluation License Setup
 
-Welcome to the **OPSWAT Endpoint SDK Evaluation License** directory.  
-This folder contains the license and token files required to activate and validate your OPSWAT SDK evaluation.
+Welcome to the **OESIS Framework Evaluation License** directory.  
+This folder contains the license and token files required to activate and validate your OESIS Framework evaluation.
 
 ---
 
@@ -19,24 +19,23 @@ These files are critical for initializing the SDK and downloading evaluation com
 
 ## ⚙️ How to Use
 
-1. Place this `eval-license` directory in the **root** of your extracted SDK package.  
+1. Place this `eval-license` directory at the **repository root** (next to the `sdkroot` marker file).  
    Example structure:
    ```
    endpointsecsdk/
-   ├── client/
-   ├── inc/
-   ├── libs/
+   ├── sdkroot
    ├── eval-license/
    │   ├── license.cfg
    │   ├── pass_key.txt
    │   └── download_token.txt
-   ├── HelloWorld-CPP/
-   ├── OPSWAT-SDK-Downloader/
+   ├── sdk-downloader/        # downloads + organizes the SDK into OPSWAT-SDK/
+   ├── OPSWAT-SDK/            # created by the downloader (client/, inc/, libs/, ...)
+   └── helloworld/           # sample projects (windows-cpp, mac-cpp, python, ...)
    ```
 
 2. When you run the **SDK Downloader** or any SDK sample project, the tools automatically read from this directory:
    ```powershell
-   cd OPSWAT-SDK-Downloader\C-Sharp\bin
+   cd sdk-downloader\windows-csharp\bin
    .\SDKDownloader.exe
    ```
 
@@ -67,7 +66,7 @@ They can provide a trial license ZIP containing all required files for evaluatio
 ## 🧩 Additional Resources
 
 For full setup and integration instructions, refer to the main SDK README:  
-👉 [Root README.md](https://github.com/OPSWAT/endpointsecsdk/blob/main/README.md)
+👉 [Root README.md](../README.md)
 
 ---
 

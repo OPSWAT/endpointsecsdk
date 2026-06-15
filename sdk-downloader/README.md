@@ -21,9 +21,9 @@ More information on the resulting file layout can be found in the [file-layout](
 ## ⚙️ Prerequisites
 
 1. Ensure your repository root contains the **`sdkroot`** marker file.  
-2. Verify that the following folder exists:
+2. Verify that the following file exists:
    ```
-   eval-license/download-token.txt
+   eval-license/download_token.txt
    ```
    This file must contain your **valid download token** — required for authentication when retrieving SDK packages.  
    If you need a token or evaluation license, contact **oem@opswat.com**.
@@ -37,13 +37,13 @@ More information on the resulting file layout can be found in the [file-layout](
 You can use the **pre-compiled executable** provided in the repository to download the Windows SDK libraries.
 
 ```powershell
-cd sdk-downloader\windows-csharp\bin\Debug
+cd sdk-downloader\windows-csharp\bin
 .\SDKDownloader.exe
 ```
 
 This executable will:
 - Detect the SDK root automatically using `sdkroot`.
-- Authenticate using the token in `eval-license/download-token.txt`.
+- Authenticate using the token in `eval-license/download_token.txt`.
 - Download or update the Windows SDK binaries (`x64`, `win32`, `arm64`).
 - Place them under:
   ```
@@ -60,12 +60,12 @@ For Linux and macOS users, the downloader is implemented as a Python script.
 
 ```bash
 cd sdk-downloader/script/src
-python3 sdk_downloader.py
+python3 main.py
 ```
 
 The script will:
 - Locate the SDK root.
-- Use `eval-license/download-token.txt` for authentication.
+- Use `eval-license/download_token.txt` for authentication.
 - Download and organize client binaries for your current platform.
 - Output files to:
   ```
@@ -77,7 +77,7 @@ The script will:
 
 ## 🧩 Integration Flow
 
-1. **Ensure `eval-license/download-token.txt` is present.**  
+1. **Ensure `eval-license/download_token.txt` is present.**  
 2. **Run the appropriate downloader** (Python or Windows executable) for your platform.  
 3. The SDK binaries will populate the `/OPSWAT-SDK/client` directory.  
 4. The `/helloworld` and other sample projects automatically locate these files using the `sdkroot` file.  
@@ -88,7 +88,7 @@ The script will:
 ## 🧠 Notes
 
 - The Windows executable and Python script produce the same directory layout for consistency across platforms.  
-- If `download-token.txt` is missing or invalid, the downloader will fail authentication.  
+- If `download_token.txt` is missing or invalid, the downloader will fail authentication.  
 - All downloader source code is included in this directory for developer reference and customization.
 
 ---
@@ -98,9 +98,9 @@ The script will:
 | Issue | Likely Cause | Resolution |
 |--------|---------------|-------------|
 | “SDK root not found” | Missing `sdkroot` file | Ensure you run from repository root. |
-| “Authentication failed” | Missing or invalid `download-token.txt` | Verify token exists in `eval-license/`. |
+| “Authentication failed” | Missing or invalid `download_token.txt` | Verify token exists in `eval-license/`. |
 | “Access denied” | Permission issue | Run as administrator (Windows) or with `sudo` (Linux/macOS). |
-| Incorrect architecture downloaded | Wrong parameter or environment | Specify `-Architecture x64`, `win32`, or `arm64` as needed. |
+| Incorrect architecture downloaded | Wrong environment | The downloader auto-detects your platform and architecture — run it on the target machine/architecture you intend to build for. |
 
 ---
 

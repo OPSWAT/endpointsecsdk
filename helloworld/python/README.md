@@ -412,19 +412,16 @@ python detect_driver_firmware_patches.py device_inventory.json  # use a prebuilt
 ## Quick Start
 
 ```bash
-# 1. Download SDK libraries using SDK_Downloader (provided by OPSWAT)
-SDK_Downloader
+# 1. Place license.cfg, pass_key.txt, download_token.txt in <repo_root>/eval-license/
 
-# 2. Place license.cfg and pass_key.txt in <repo_root>/eval-license/
+# 2. Download the SDK libraries with the repo-root SDK downloader
+#    Windows:      sdk-downloader\windows-csharp\bin\SDKDownloader.exe
+#    Linux/macOS:  python3 sdk-downloader/script/src/main.py
 
-# 3. Create the sdkroot marker file at the repo root
-touch sdkroot          # macOS / Linux
-echo. > sdkroot        # Windows
-
-# 4. Copy SDK binaries and license files into the local sdk/ directory
+# 3. Stage the SDK binaries + license files into the local sdk/ directory
 python copy_sdk_files.py
 
-# 5. Run any sample
+# 4. Run any sample
 python detect_products.py
 python vulnerability.py
 python product_detail.py 3039

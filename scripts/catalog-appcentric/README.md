@@ -35,9 +35,9 @@ The catalog-appcentric utilities provide a suite of Python scripts that work tog
 Each utility can be run independently and provides help documentation:
 
 ```bash
-python3 GenCVEToSig.py --help
+python3 gen-cve-to-sig.py --help
 python3 FindCVE.py --help
-python3 GenChanges.py --help
+python3 gen-changes.py --help
 ```
 
 ### Typical Workflow

@@ -81,31 +81,40 @@ The output JSON file contains a mapping of CVEs with the following structure:
 ### Basic Usage
 
 ```bash
-python3 GenCVEToSig.py
+python3 gen-cve-to-sig.py
 ```
+
+When `--db-dir` is omitted, the script looks for `cves.json` in the current
+directory, then walks up the tree looking for
+`OPSWAT-SDK/extract/analog/server/`.
 
 ### Options
 
-- `--output <file>` - Specify output filename (default: `cve_remediation_map.json`)
-- `--pretty` - Format output with full indentation for readability
-- `--db-dir <path>` - Path to OESIS Framework data directory (default: current directory)
+- `--db-dir <path>` - Path to the Analog `server/` directory (default: auto-discovered)
+- `--out <file>` - Output JSON file path (default: `cve_remediation_map.json`)
+- `--pretty` - Pretty-print JSON with indentation (human readable, larger file)
 - `--help` - Display usage information
 
 ### Examples
 
-Generate default mapping:
+Generate default mapping (auto-discover the db directory):
 ```bash
-python3 GenCVEToSig.py
+python3 gen-cve-to-sig.py
 ```
 
-Generate with custom output path:
+Generate with an explicit db directory:
 ```bash
-python3 GenCVEToSig.py --output my_cve_mapping.json
+python3 gen-cve-to-sig.py --db-dir ./server
+```
+
+Generate with a custom output path:
+```bash
+python3 gen-cve-to-sig.py --out my_cve_mapping.json
 ```
 
 Generate prettified output for easy inspection:
 ```bash
-python3 GenCVEToSig.py --pretty --output cve_mapping_pretty.json
+python3 gen-cve-to-sig.py --pretty --out cve_mapping_pretty.json
 ```
 
 ## Key Features

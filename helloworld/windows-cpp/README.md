@@ -9,17 +9,21 @@ This repository provides sample applications that demonstrate how to integrate w
 ### Prerequisites
 These samples are developed using **Visual Studio 2022 Community Edition**. You can install it via `winget` or download it manually:
 
+```powershell
 winget install --id=Microsoft.VisualStudio.2022.Community -e
+```
 > This command installs Visual Studio 2022 Community Edition via the Windows Package Manager (`winget`).
 
 Or download from: [https://visualstudio.microsoft.com/vs/community/](https://visualstudio.microsoft.com/vs/community/)
 
 ### Compiling the Samples
-1. Open the solution file: `/src/HelloWorldCPP.sln`
-2. Copy the following required files into `/src/HelloWorldCPP/license/`:
-   - `download_token.txt`
+1. Open the solution file: `src/HelloWorldCPP.sln`
+2. Place your license files in the `eval-license/` directory at the repository root:
    - `license.cfg`
    - `pass_key.txt`
+   - `download_token.txt`
+
+   Each project's post-build step (`copysdkfilescpp.ps1`) stages them — and the SDK binaries — into the build output automatically. See [eval-license/README.md](../../eval-license/README.md).
 3. Compile the `DetectProducts` project.
 
 ### Notes

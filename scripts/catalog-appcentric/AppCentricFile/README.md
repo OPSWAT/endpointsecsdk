@@ -1,152 +1,121 @@
 # AppCentricFile
 
-Manages, validates, and converts application-centric catalog files for the OESIS Framework.
+Builds a consolidated application-centric catalog file for the OESIS Framework.
 
 ## Purpose
 
-AppCentricFile is a utility for working with the data structures that map applications, vulnerabilities, patches, and detection signatures. It helps teams:
+AppCentricFile is a utility for building the data structure that maps applications, vulnerabilities, patches, and detection signatures. It helps teams:
 
-- Validate catalog file integrity and schema compliance
-- Convert between different data formats
-- Export specific subsets of catalog data
-- Verify product-to-signature associations
-- Generate reports on catalog structure and content
+- Download and extract the OESIS Framework catalog (analog.zip)
+- Consolidate product, patch, and vulnerability data into a single file
+- List each product by signature ID with its associated CVEs
+- Resolve the patch needed to reach the latest installer for each product
+- Produce input data consumed by the other catalog-appcentric utilities
 
 ## Overview
 
-This utility provides a comprehensive toolkit for managing the core data structures that power the catalog-appcentric utilities. It ensures data consistency, supports migration between formats, and provides insights into catalog organization.
+This utility is the main entry point and orchestrator for the catalog simplification process. It loads product, patch, and vulnerability data from an extracted catalog directory and writes a single consolidated app-centric JSON file.
 
 ## Usage
 
-### Validate Catalog Files
+The entry point is `gen_app_centric_file.py`. It downloads and extracts the OESIS
+Framework catalog (analog.zip), then writes a consolidated app-centric JSON file
+that lists each product by signature ID along with its associated CVEs and the
+patch needed to reach the latest installer.
+
+### Generate the App-Centric File
 
 ```bash
-python3 AppCentricFile.py --validate --data-dir /path/to/catalog
-```
-
-### Convert Between Formats
-
-```bash
-python3 AppCentricFile.py --convert --input-format json --output-format csv --input file.json --output file.csv
-```
-
-### Export Catalog Subset
-
-```bash
-python3 AppCentricFile.py --export --product "Microsoft Office" --output office_catalog.json
+python3 gen_app_centric_file.py --dir ./CatalogExtract --out app_centric.json
 ```
 
 ### Options
 
-- `--validate` - Validate catalog files for schema compliance
-- `--data-dir <path>` - Path to catalog data directory
-- `--convert` - Convert between file formats
-- `--input-format <fmt>` - Input format: json, csv (default: json)
-- `--output-format <fmt>` - Output format: json, csv (default: json)
-- `--input <file>` - Input file path
-- `--output <file>` - Output file path
-- `--export` - Export specific catalog data
-- `--product <name>` - Product name to export
-- `--report` - Generate catalog content report
+- `--dir <path>` - Path to the extracted catalog folder (default: `./CatalogExtract`)
+- `--out <file>` - Output JSON path (default: `app_centric.json`)
+- `--token-file <file>` - Path to the download token file (default: `download_token.txt`)
+- `--url-template <url>` - Download URL template containing `{token}` (default: `https://vcr.opswat.com/gw/file/download/analog.zip?type=1&token={token}`)
+- `--zip-path <file>` - Where to save the downloaded analog.zip (default: `analog.zip`)
+- `--extract-dir <path>` - Where to extract the downloaded files (default: `./CatalogExtract`)
 - `--help` - Display usage information
 
 ### Examples
 
-Validate all catalog files:
+Generate with defaults (downloads, extracts, and writes `app_centric.json`):
 ```bash
-python3 AppCentricFile.py --validate --data-dir /data/catalog
+python3 gen_app_centric_file.py
 ```
 
-Generate a validation report:
+Generate to a custom output path:
 ```bash
-python3 AppCentricFile.py --validate --data-dir /data/catalog --report
+python3 gen_app_centric_file.py --out office_catalog.json
 ```
 
-Export data for a specific product:
+Use a specific token file and extract directory:
 ```bash
-python3 AppCentricFile.py --export --product "Windows Defender" --output defender_data.json
-```
-
-Convert CSV to JSON:
-```bash
-python3 AppCentricFile.py --convert --input-format csv --output-format json --input data.csv --output data.json
+python3 gen_app_centric_file.py --token-file my_token.txt --extract-dir ./CatalogExtract
 ```
 
 ## Key Features
 
-- **Schema Validation**: Ensures catalog data conforms to OESIS AnalogV2 schema
-- **Format Conversion**: Convert between JSON and CSV formats
-- **Data Export**: Extract subsets of catalog data
-- **Integrity Checks**: Verify consistency of product, CVE, and signature associations
-- **Reporting**: Generate detailed reports on catalog structure
-- **Error Reporting**: Clear diagnostics for invalid data
+- **Catalog Download**: Fetches and extracts analog.zip using a download token
+- **Product Consolidation**: Lists each product by signature ID with its associated CVEs
+- **Patch Resolution**: Selects the patch needed to reach the latest installer
+- **Single Output File**: Produces one consolidated app-centric JSON document
+- **Helper Modules**: Built from reusable helpers (`download_catalog.py`, `patch_classes.py`, `system_patch.py`, `third_party.py`, `util.py`)
 
-## Validation
+## How It Works
 
-The validation process checks for:
+The build process:
 
-- Required fields in all records
-- Valid CVE ID format (CVE-YYYY-NNNNN)
-- Valid product and signature ID references
-- Data type compliance
-- Referential integrity (products referenced in associations must exist)
-- Completeness of associations
+- Downloads and extracts the OESIS Framework catalog (analog.zip) using the token
+- Loads product, patch, and vulnerability data from the extracted `analog/server` directory
+- Loads additional product metadata from the Moby compliance data
+- Builds third-party product records and the Windows system product record
+- Writes the consolidated app-centric JSON with a metadata block and a `products` list
 
 ## Troubleshooting
 
-**"Schema validation failed"**
-- Review the detailed error messages
-- Check for missing required fields in the data
-- Verify that all referenced products and CVEs exist
-
-**"Invalid product reference"**
-- A CVE association references a product that doesn't exist in the catalog
-- Review the products.json file for the missing product
+**"Folder not found"**
+- Verify the path passed to `--dir` (or `--extract-dir`) points to the extracted catalog
+- Ensure the catalog was downloaded and extracted successfully
 
 **"File not found"**
-- Verify the path to the catalog data directory
-- Ensure all required data files are present
+- Confirm the token file exists at the path passed to `--token-file`
+- Ensure required files (e.g. `analog/server/products.json`, `analog/header.json`) are present after extraction
 
-**"Format conversion failed"**
-- Verify input file format is valid
-- Check that the input file is not corrupted
-- Ensure compatibility between source and destination formats
+**"Download failed"**
+- Verify the token in the token file is valid and not expired
+- Check the `--url-template` value and network connectivity
 
 ## Common Tasks
 
-### Validate Before Deployment
+### Generate Before Deployment
 
 ```bash
 #!/bin/bash
-python3 AppCentricFile.py --validate --data-dir /staging/catalog
+python3 gen_app_centric_file.py --dir ./CatalogExtract --out app_centric.json
 
 if [ $? -eq 0 ]; then
-  echo "Catalog validation passed"
+  echo "App-centric file generated"
   # proceed with deployment
 else
-  echo "Catalog validation failed"
+  echo "Generation failed"
   exit 1
 fi
 ```
 
-### Export Product Subset for Third-Party Use
+### Generate to a Dated Output File
 
 ```bash
-python3 AppCentricFile.py --export --product "Apache" --output apache_vulnerabilities.json
+python3 gen_app_centric_file.py --out app_centric_$(date +%Y%m%d).json
 ```
 
-### Generate Audit Report
+### Use a Custom Download URL Template
 
 ```bash
-python3 AppCentricFile.py --validate --data-dir /data/catalog --report > catalog_audit_$(date +%Y%m%d).txt
-```
-
-### Prepare Data for Custom Processing
-
-```bash
-# Convert to CSV for spreadsheet processing
-python3 AppCentricFile.py --convert --input-format json --output-format csv \
-  --input catalog_data.json --output catalog_data.csv
+python3 gen_app_centric_file.py \
+  --url-template "https://vcr.opswat.com/gw/file/download/analog.zip?type=1&token={token}"
 ```
 
 ## Integration
@@ -155,55 +124,46 @@ python3 AppCentricFile.py --convert --input-format json --output-format csv \
 
 ```bash
 #!/bin/bash
-# Validate catalog before committing
-python3 AppCentricFile.py --validate --data-dir ./catalog_data || exit 1
-echo "Catalog validation passed"
-```
-
-### Data Migration
-
-```bash
-# Export old format, convert to new format
-python3 AppCentricFile.py --convert \
-  --input-format csv --output-format json \
-  --input legacy_catalog.csv --output new_catalog.json
+# Generate the app-centric file before committing
+python3 gen_app_centric_file.py --dir ./CatalogExtract --out app_centric.json || exit 1
+echo "App-centric file generated"
 ```
 
 ## Output Examples
 
-### Validation Report
+### Console Output
 
 ```
-Catalog Validation Report
-=========================
-
-Files Checked: 8
-Schema Version: AnalogV2
-
-Results:
-  CVE Records: 50,000 - OK
-  Product Records: 2,500 - OK
-  Signature Records: 125,000 - OK
-  Associations: 200,000 - OK
-
-Validation Status: PASSED
+Loading Moby data for additional product metadata...
+Wrote app_centric.json with 2500 signature entries.
 ```
 
-### Export Sample
+### Output Sample
 
 ```json
 {
-  "product": "Microsoft Office 2019",
-  "product_id": 100,
-  "vulnerabilities": [
+  "meta": {
+    "release_date": 1728520991
+  },
+  "products": [
     {
-      "cve_id": "CVE-2024-1234",
-      "signatures": [1001, 1002],
-      "patches": ["KB5044284"]
+      "name": "Microsoft Office 2019",
+      "signature_id": 100,
+      "vulnerabilities": [
+        {
+          "cve": "CVE-2024-1234",
+          "cpe": "cpe:/a:microsoft:office",
+          "ranges": []
+        }
+      ],
+      "patches": [
+        {
+          "name": "Microsoft Office 2019",
+          "bulletin": "KB5044284"
+        }
+      ]
     }
-  ],
-  "total_vulnerabilities": 542,
-  "total_signatures": 1,245
+  ]
 }
 ```
 
@@ -215,9 +175,8 @@ Validation Status: PASSED
 
 ## Performance
 
-- Validation: typically 10-30 seconds for complete catalogs
-- Export: typically < 5 seconds
-- Conversion: typically 5-15 seconds depending on data size
+- Download and extraction time depends on catalog size and network speed
+- Build time scales with the number of products and associations in the catalog
 
 ## Support
 
