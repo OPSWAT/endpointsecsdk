@@ -70,8 +70,9 @@ The script will:
 - Output files to:
   ```
   OPSWAT-SDK/client/linux/<architecture>/
-  OPSWAT-SDK/client/macos/<architecture>/
+  OPSWAT-SDK/client/mac/
   ```
+  (macOS is a flat directory — no architecture subfolder; the dylibs are universal binaries.)
 
 ---
 

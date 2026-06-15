@@ -16,6 +16,7 @@ Each sample shows how to:
 |--------|--------------|
 | **linux-cpp** | C++ HelloWorld sample for Linux |
 | **mac-cpp** | C++ HelloWorld sample for macOS |
+| **python** | Python HelloWorld samples — cross-platform (Windows, macOS, Linux) |
 | **windows-cpp** | C++ HelloWorld sample for Windows |
 | **windows-csharp** | .NET (C#) HelloWorld sample for Windows |
 | **windows-go** | Go (Golang) HelloWorld sample for Windows |
@@ -164,8 +165,23 @@ make
 
 If required, set the library path:
 ```bash
-export DYLD_LIBRARY_PATH=../../OPSWAT-SDK/client/macos/x64:$DYLD_LIBRARY_PATH
+export DYLD_LIBRARY_PATH=../../OPSWAT-SDK/client/mac:$DYLD_LIBRARY_PATH
 ```
+
+---
+
+### 🐍 **Python** (cross-platform)
+
+```bash
+cd python
+python copy_sdk_files.py     # stage SDK binaries + license into ./sdk
+python detect_products.py    # then run any sample
+```
+
+The Python samples run on Windows, macOS, and Linux. `copy_sdk_files.py` stages the
+correct SDK binaries from `OPSWAT-SDK/` and your license files into a local `sdk/`
+directory. See [python/README.md](python/README.md) for the full list of samples and
+usage. Python 3.7+ is required; the samples use only the standard library.
 
 ---
 
@@ -188,7 +204,7 @@ These examples serve as the foundation for OEM partners to build integrations wi
 | **License not found** | Missing files | Copy license files into `eval-license/` |
 | **Illegal characters in path (Windows)** | Trailing backslash in post-build output path | Use `"$(TargetDir)."` in post-build event |
 | **Architecture mismatch** | SDK binaries don’t match build target | Build with the same arch as the SDK (`x64`, `win32`, `arm64`) |
-| **Python module not found** | Missing dependencies | Run `pip3 install -r requirements.txt` |
+| **Python: SDK / license not found** | `copy_sdk_files.py` not run | In `python/`, run `python copy_sdk_files.py` to stage the SDK + license before running a sample |
 
 ---
 
