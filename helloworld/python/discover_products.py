@@ -25,10 +25,18 @@
 
 import json
 import os
+import sys
 
 from sdk_wrapper import OESISWrapper, SDKError
 from platform_utils import validate_sdk_environment
 from platform_utils import get_lib_filename
+
+# Product names can contain non-ASCII characters. On Windows the console
+# defaults to a legacy code page (cp1252) and printing them raises
+# UnicodeEncodeError ('charmap' codec can't encode ...). Force UTF-8 output
+# where the runtime supports it so discovery never crashes on a product name.
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 
 
 # Hardcoded SDK directory relative to this script
