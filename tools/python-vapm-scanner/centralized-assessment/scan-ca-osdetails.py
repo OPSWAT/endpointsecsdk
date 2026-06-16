@@ -24,6 +24,7 @@ import sys
 from sdk_wrapper import OESISWrapper, SDKError
 from platform_utils import validate_sdk_environment
 from platform_utils import get_lib_filename
+from platform_utils import get_os_type, OS_TYPE_WINDOWS
 
 # Force UTF-8 console output so non-ASCII patch text doesn't crash on Windows (cp1252).
 if hasattr(sys.stdout, "reconfigure"):
@@ -35,6 +36,11 @@ SDK_DIR = os.path.join(SCRIPT_DIR, "sdk")
 
 # OESIS category for patch-management products
 CATEGORY_PATCH_MANAGEMENT = 12
+
+# On Windows the OS patch source is the Windows Update Agent (signature 1103). Other
+# detected patch-management agents (RMM, Intune, Dell, etc.) do not support
+# GetMissingPatches, so on Windows we limit the scan to this product.
+WINDOWS_UPDATE_AGENT_SIGNATURE = 1103
 
 
 def initialize_framework():
@@ -106,6 +112,16 @@ def main():
 
         print("\nDetecting patch-management products (category 12)...")
         raw_products = detect_patch_management_products(sdk)
+
+        # On Windows, limit to the Windows Update Agent (signature 1103). On Linux/macOS,
+        # assess every detected patch-management product.
+        if get_os_type() == OS_TYPE_WINDOWS:
+            raw_products = [
+                p for p in raw_products
+                if p.get("signature") == WINDOWS_UPDATE_AGENT_SIGNATURE
+            ]
+            print(f"  Windows: limiting to the Windows Update Agent (signature "
+                  f"{WINDOWS_UPDATE_AGENT_SIGNATURE}).")
 
         if not raw_products:
             print("  No patch-management products detected on this endpoint.")
