@@ -1,17 +1,22 @@
 #!/usr/bin/env python3
 ###############################################################################################
-##  VAPM Centralized Assessment — OS Details / Missing Patches
+##  VAPM Centralized Assessment — OS Details / Patches
 ##  Reference Implementation using OESIS Framework
 ##
-##  Detects the patch-management products on the endpoint (category 12) and calls
-##  GetMissingPatches (method 1013) for each one, reporting the missing patches /
-##  available packages the product knows about. Results are written to a JSON file.
+##  Collects operating-system details and patch status for the endpoint:
+##    - GetOSInfo         (method 1)    -> OS name / version / details
+##    - GetMissingPatches (method 1013) -> missing patches per patch-management product
+##    - GetInstalledPatches (method 1023) -> installed patches per patch-management product
+##
+##  On Windows the scan is limited to the Windows Update Agent (signature 1103); on
+##  Linux/macOS every detected patch-management product (category 12) is assessed.
+##  All results are written to scan-ca-osdetails-result.json.
 ##
 ##  Usage:
 ##      python3 copysdk.py             # stage the SDK + license into ./sdk first
 ##      python3 scan-ca-osdetails.py
 ##
-##  https://software.opswat.com/OESIS_V4/html/c_method.html -> method 1013
+##  https://software.opswat.com/OESIS_V4/html/c_method.html -> methods 1, 1013, 1023
 ##
 ##  Created by Chris Seiler
 ##  OPSWAT OEM Solutions Architect
@@ -58,6 +63,15 @@ def initialize_framework():
     return sdk
 
 
+def get_os_info(sdk):
+    # Retrieve operating-system information for the endpoint.
+    # https://software.opswat.com/OESIS_V4/html/c_method.html -> method 1 (GetOSInfo)
+    rc, result = sdk.invoke(1)
+    if rc < 0:
+        return None, rc
+    return result.get("result", {}), rc
+
+
 def detect_patch_management_products(sdk):
     # Detect all products in the patch-management category (12)
     # https://software.opswat.com/OESIS_V4/html/c_method.html -> OESIS Core / Discover Products
@@ -70,11 +84,23 @@ def detect_patch_management_products(sdk):
 def get_missing_patches(sdk, signature_id):
     # Retrieve the missing patches / available packages reported by the product.
     # https://software.opswat.com/OESIS_V4/html/c_method.html -> method 1013
-    #   timeout=0                 use the SDK default (infinite) timeout
-    #   retry_internet_services   (Windows Update Agent) fall back to internet services
-    #   mode=0                    standard query
     rc, result = sdk.invoke(
         1013,
+        signature=signature_id,
+        timeout=0,
+        retry_internet_services=True,
+        mode=0,
+    )
+    if rc < 0:
+        return None, rc
+    return result.get("result", {}).get("patches", []), rc
+
+
+def get_installed_patches(sdk, signature_id):
+    # Retrieve the patches already installed on the endpoint for this product.
+    # https://software.opswat.com/OESIS_V4/html/c_method.html -> method 1023
+    rc, result = sdk.invoke(
+        1023,
         signature=signature_id,
         timeout=0,
         retry_internet_services=True,
@@ -102,14 +128,27 @@ def main():
         return
 
     sdk = None
+    os_info = {}
     all_results = []
 
     try:
         sdk = initialize_framework()
 
-        print("\nVAPM Centralized Assessment — Missing Patches (GetMissingPatches / 1013)")
+        print("\nVAPM Centralized Assessment — OS Details / Patches")
         print("=" * 70)
 
+        # --- OS info (GetOSInfo / method 1) ---
+        print("\nOperating system (GetOSInfo / 1):")
+        os_info, os_rc = get_os_info(sdk)
+        if os_info is None:
+            print(f"  GetOSInfo failed (rc={os_rc}).")
+            os_info = {}
+        else:
+            print(f"  Name        : {os_info.get('os_name', os_info.get('name', 'Unknown'))}")
+            print(f"  Version     : {os_info.get('os_version', os_info.get('version', 'Unknown'))}")
+            print(f"  Architecture: {os_info.get('architecture', 'Unknown')}")
+
+        # --- Patch-management products ---
         print("\nDetecting patch-management products (category 12)...")
         raw_products = detect_patch_management_products(sdk)
 
@@ -125,9 +164,8 @@ def main():
 
         if not raw_products:
             print("  No patch-management products detected on this endpoint.")
-            return
-
-        print(f"  Found {len(raw_products)} patch-management product(s).")
+        else:
+            print(f"  Found {len(raw_products)} patch-management product(s).")
 
         for product in raw_products:
             sig_id = product.get("signature")
@@ -138,37 +176,52 @@ def main():
             print(f"  {name}  ({vendor})    Signature ID: {sig_id}")
             print(f"{'=' * 70}")
 
-            patches, rc = get_missing_patches(sdk, sig_id)
-            if patches is None:
-                print(f"  GetMissingPatches not supported / failed for this product (rc={rc}).")
+            # Missing patches (1013)
+            missing, m_rc = get_missing_patches(sdk, sig_id)
+            if missing is None:
+                print(f"  Missing patches: not supported / failed (rc={m_rc}).")
                 missing = []
             else:
-                missing = patches
                 print(f"  Missing patches: {len(missing)}")
                 print_patch_list(missing)
 
+            # Installed patches (1023)
+            installed, i_rc = get_installed_patches(sdk, sig_id)
+            if installed is None:
+                print(f"  Installed patches: not supported / failed (rc={i_rc}).")
+                installed = []
+            else:
+                print(f"  Installed patches: {len(installed)}")
+                print_patch_list(installed)
+
             all_results.append({
-                "signature_id":   sig_id,
-                "name":           name,
-                "vendor":         vendor,
-                "missing_count":  len(missing),
-                "missing_patches": missing,
+                "signature_id":     sig_id,
+                "name":             name,
+                "vendor":           vendor,
+                "missing_count":    len(missing),
+                "installed_count":  len(installed),
+                "missing_patches":  missing,
+                "installed_patches": installed,
             })
 
-        total_missing = sum(r["missing_count"] for r in all_results)
+        total_missing   = sum(r["missing_count"]   for r in all_results)
+        total_installed = sum(r["installed_count"] for r in all_results)
         print(f"\n{'=' * 70}")
-        print(f"  Total missing patches across {len(all_results)} product(s): {total_missing}")
+        print(f"  Products assessed : {len(all_results)}")
+        print(f"  Total missing     : {total_missing}")
+        print(f"  Total installed   : {total_installed}")
         print(f"{'=' * 70}")
 
-        # Write full results to a JSON output file (alongside this script)
+        # Write the full result set to JSON
         output = {
-            "method":        1013,
-            "method_name":   "GetMissingPatches",
-            "total_products": len(all_results),
-            "total_missing_patches": total_missing,
-            "products":      all_results,
+            "os_info":  os_info,
+            "methods":  {"os_info": 1, "missing_patches": 1013, "installed_patches": 1023},
+            "total_products":          len(all_results),
+            "total_missing_patches":   total_missing,
+            "total_installed_patches": total_installed,
+            "products": all_results,
         }
-        output_file = os.path.join(SCRIPT_DIR, "ca_missing_patches.json")
+        output_file = os.path.join(SCRIPT_DIR, "scan-ca-osdetails-result.json")
         with open(output_file, "w", encoding="utf-8") as f:
             json.dump(output, f, indent=2, default=str)
         print(f"\n  Full results written to: {output_file}")
