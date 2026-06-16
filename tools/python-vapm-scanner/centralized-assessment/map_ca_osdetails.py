@@ -148,8 +148,18 @@ def main():
     cve_index  = build_cve_index(server_dir)
     print(f"  Catalog      : {len(kb_to_cves)} KB articles mapped to CVEs for os_id {os_id}")
 
+    # CVEs already remediated by patches that are INSTALLED on the endpoint. A missing
+    # cumulative update lists many CVEs, but ones an earlier installed patch already
+    # fixed are not real exposure — subtract them for the most accurate result.
+    covered_cves = set()
+    for product in scan.get("products", []):
+        for patch in product.get("installed_patches", []):
+            for kb in kb_candidates(patch):
+                covered_cves |= kb_to_cves.get(kb, set())
+
     mapped_patches = []
-    cve_to_patches = {}   # cve -> set(kb) that would fix it
+    cve_to_patches = {}   # cve -> set(kb) that would fix it (net of installed coverage)
+    raw_exposed = set()   # all CVEs implied by missing patches, before subtracting installed
 
     for product in scan.get("products", []):
         for patch in product.get("missing_patches", []):
@@ -157,6 +167,10 @@ def main():
             cves = set()
             for kb in cands:
                 cves |= kb_to_cves.get(kb, set())
+            raw_exposed |= cves
+
+            # Net exposure = CVEs this missing patch fixes that are not already covered.
+            net_cves = cves - covered_cves
 
             kb_display = next(iter(sorted(cands)), "N/A")
             mapped_patches.append({
@@ -164,10 +178,10 @@ def main():
                 "title":     patch.get("title", "Unknown"),
                 "severity":  patch.get("severity"),
                 "product":   product.get("name"),
-                "cve_count": len(cves),
-                "cves":      sorted(cves),
+                "cve_count": len(net_cves),
+                "cves":      sorted(net_cves),
             })
-            for cve in cves:
+            for cve in net_cves:
                 cve_to_patches.setdefault(cve, set()).add(kb_display)
 
     # Consolidated, de-duplicated CVE list with enrichment.
@@ -186,9 +200,11 @@ def main():
     print("-" * 70)
     for mp in mapped_patches:
         print(f"  KB {mp['kb']:<10} [{mp['severity'] or 'unknown'}]  {mp['title'][:48]}")
-        print(f"     -> {mp['cve_count']} CVE(s) remediated by this patch")
+        print(f"     -> {mp['cve_count']} net CVE(s) remediated by this patch")
 
-    print(f"\n  Total distinct CVEs the endpoint is exposed to: {len(cve_list)}")
+    print(f"\n  CVEs implied by missing patches (raw):        {len(raw_exposed)}")
+    print(f"  CVEs already covered by installed patches:    {len(covered_cves & raw_exposed)}")
+    print(f"  Net distinct CVEs the endpoint is exposed to: {len(cve_list)}")
     if cve_list:
         print("-" * 70)
         for c in cve_list[:25]:
@@ -205,10 +221,12 @@ def main():
             "os_type": os_type,
         },
         "source": "Analog vuln_system_associations (offline catalog)",
-        "total_missing_patches": len(mapped_patches),
-        "total_cves":            len(cve_list),
-        "missing_patches":       mapped_patches,
-        "cves":                  cve_list,
+        "total_missing_patches":           len(mapped_patches),
+        "total_cves_raw":                  len(raw_exposed),
+        "total_cves_covered_by_installed": len(covered_cves & raw_exposed),
+        "total_cves":                      len(cve_list),  # net exposure
+        "missing_patches":                 mapped_patches,
+        "cves":                            cve_list,
     }
     with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
         json.dump(output, f, indent=2, default=str)

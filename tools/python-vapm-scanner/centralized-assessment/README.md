@@ -33,7 +33,7 @@ python map_ca_osdetails.py    # missing patches + CVEs from the Analog offline c
 - `scan-ca-endpoint.py` — orchestrator that runs `scan-ca-osdetails.py` and `scan-ca-third-party.py` in turn (as subprocesses) and prints a summary.
 - `scan-ca-osdetails.py` — collects OS details (`GetOSInfo`, method 1) and, per patch-management product (Windows: signature 1103), the missing patches (`GetMissingPatches`, 1013) and installed patches (`GetInstalledPatches`, 1023); writes `scan-ca-osdetails-result.json`.
 - `scan-ca-third-party.py` — detects installed products (`DetectProducts`, method 0) and resolves each product's version (`GetVersion`, method 100); writes `ca_third_party.json`.
-- `map_ca_osdetails.py` — maps `scan-ca-osdetails-result.json` against the Analog offline catalog (`OPSWAT-SDK/extract/analog/server/vuln_system_associations.json` + `cves.json`) to produce a list of missing patches and the CVEs each remediates; writes `map-ca-osdetails-result.json`. (Follows the Windows approach in the Analog ruby sample `get_system_vuln.rb`.)
+- `map_ca_osdetails.py` — maps `scan-ca-osdetails-result.json` against the Analog offline catalog (`OPSWAT-SDK/extract/analog/server/vuln_system_associations.json` + `cves.json`) to produce a list of missing patches and the CVEs each remediates. CVEs already covered by **installed** patches are subtracted, so the result is the *net* exposure. Writes `map-ca-osdetails-result.json`. (Follows the Windows approach in the Analog ruby sample `get_system_vuln.rb`.)
 - `sdk_wrapper.py` — `ctypes` wrapper around the OESIS `libwaapi` native library.
 - `platform_utils.py` — platform/architecture detection and SDK environment validation.
 
