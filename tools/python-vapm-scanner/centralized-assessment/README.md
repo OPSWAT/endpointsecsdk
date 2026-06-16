@@ -19,7 +19,7 @@ python vapm_scanner.py        # combined centralized assessment (stub)
 
 # Or run an individual scan:
 python scan-ca-endpoint.py    # overall endpoint product inventory (stub)
-python scan-ca-osdetails.py   # operating-system details (stub)
+python scan-ca-osdetails.py   # missing patches per patch-management product (GetMissingPatches / 1013)
 python scan-ca-third-party.py # third-party application vuln/patch scan (stub)
 ```
 
@@ -28,7 +28,7 @@ python scan-ca-third-party.py # third-party application vuln/patch scan (stub)
 - `copysdk.py` — stages the SDK client binaries and license files into a local `sdk/` directory (resolves the repo root via the `sdkroot` marker).
 - `vapm_scanner.py` — the combined centralized patch + vulnerability assessment (stub).
 - `scan-ca-endpoint.py` — endpoint product-inventory scan (stub).
-- `scan-ca-osdetails.py` — operating-system details scan (stub).
+- `scan-ca-osdetails.py` — detects patch-management products (category 12) and calls `GetMissingPatches` (method 1013) for each, reporting missing patches; writes `ca_missing_patches.json`.
 - `scan-ca-third-party.py` — third-party (non-OS) application vulnerability/patch scan (stub).
 - `sdk_wrapper.py` — `ctypes` wrapper around the OESIS `libwaapi` native library.
 - `platform_utils.py` — platform/architecture detection and SDK environment validation.
