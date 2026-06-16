@@ -1,11 +1,14 @@
 #!/usr/bin/env python3
 ###############################################################################################
-##  VAPM Centralized Assessment — Endpoint Scan  (STUB)
+##  VAPM Centralized Assessment — Endpoint Scan (Orchestrator)
 ##  Reference Implementation using OESIS Framework
 ##
-##  Centralized-assessment scan that produces the overall endpoint view: enumerate the
-##  device's installed products as the basis for downstream vulnerability and patch
-##  assessment. This is an initial stub: it initializes the SDK and outlines the workflow.
+##  Runs the full centralized endpoint assessment by invoking the individual scans in turn:
+##      scan-ca-osdetails.py    -> missing patches (GetMissingPatches / 1013)
+##      scan-ca-third-party.py  -> detected products + versions (DetectProducts / GetVersion)
+##
+##  Each scan is a standalone script (it stages nothing itself — run copysdk.py first) and
+##  is executed as a subprocess so its own SDK setup/teardown is self-contained.
 ##
 ##  Usage:
 ##      python3 copysdk.py            # stage the SDK + license into ./sdk first
@@ -16,65 +19,57 @@
 ###############################################################################################
 
 import os
+import subprocess
 import sys
 
-from sdk_wrapper import OESISWrapper, SDKError
-from platform_utils import validate_sdk_environment
-from platform_utils import get_lib_filename
-
-# Force UTF-8 console output so non-ASCII product names don't crash on Windows (cp1252).
+# Force UTF-8 console output so non-ASCII child output doesn't crash on Windows (cp1252).
 if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 
-# Hardcoded SDK directory relative to this script (populated by copysdk.py)
-SDK_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "sdk")
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+
+# The individual scans this orchestrator runs, in order.
+SCANS = [
+    ("OS Details / Missing Patches", "scan-ca-osdetails.py"),
+    ("Third-Party Products",         "scan-ca-third-party.py"),
+]
 
 
-def initialize_framework():
-    # Load the SDK and initialize with the pass_key.txt in the sdk directory
-    # https://software.opswat.com/OESIS_V4/html/c_sdk.html
-    pass_key_path = os.path.join(SDK_DIR, "pass_key.txt")
+def run_scan(label, script_name):
+    script_path = os.path.join(SCRIPT_DIR, script_name)
+    print(f"\n{'#' * 70}")
+    print(f"#  {label}  ({script_name})")
+    print(f"{'#' * 70}")
 
-    if not os.path.isfile(pass_key_path):
-        print("Could not find pass_key.txt. Make sure the license is in the sdk directory.")
-        raise Exception("License pass_key.txt file not found")
+    if not os.path.isfile(script_path):
+        print(f"  ERROR: scan script not found: {script_path}")
+        return 1
 
-    sdk = OESISWrapper(os.path.join(SDK_DIR, get_lib_filename()))
-    sdk.load()
-    sdk.setup(os.path.join(SDK_DIR, "license.cfg"), pass_key_path)
-    return sdk
-
-
-def scan_endpoint(sdk):
-    # TODO: implement the centralized endpoint scan.
-    # Planned flow: enumerate all installed products (method 0, category 0 = All) to
-    # build the endpoint inventory that the OS-details and third-party scans assess.
-    # https://software.opswat.com/OESIS_V4/html/c_method.html
-    print("  [endpoint scan] not yet implemented (stub)")
-    return []
+    # Run the scan as a subprocess using the same Python interpreter, from this
+    # directory so each scan finds its local sdk/ and shared modules.
+    result = subprocess.run([sys.executable, script_path], cwd=SCRIPT_DIR)
+    return result.returncode
 
 
 def main():
-    if not validate_sdk_environment(SDK_DIR):
-        return
+    print("VAPM Centralized Assessment — Endpoint Scan (orchestrator)")
+    print("Running all centralized scans. Make sure 'python copysdk.py' has been run first.")
 
-    sdk = None
-    try:
-        sdk = initialize_framework()
+    results = []
+    for label, script_name in SCANS:
+        rc = run_scan(label, script_name)
+        results.append((label, script_name, rc))
 
-        print("\nVAPM Centralized Assessment — Endpoint Scan (stub)")
-        print("-" * 60)
-        scan_endpoint(sdk)
-        print("\nScan complete (stub — no findings produced yet).")
+    print(f"\n{'=' * 70}")
+    print("  Endpoint Scan Summary")
+    print(f"{'=' * 70}")
+    for label, script_name, rc in results:
+        status = "ok" if rc == 0 else f"FAILED (exit {rc})"
+        print(f"  {label:<34} {script_name:<24} {status}")
 
-    except Exception as e:
-        print(f"Received an Exception: {e}")
-    finally:
-        if sdk:
-            try:
-                sdk.teardown()
-            except SDKError:
-                pass
+    # Non-zero overall exit if any scan failed
+    if any(rc != 0 for _, _, rc in results):
+        sys.exit(1)
 
 
 if __name__ == "__main__":
