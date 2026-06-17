@@ -18,6 +18,7 @@
 ##  OPSWAT OEM Solutions Architect
 ###############################################################################################
 
+import json
 import os
 import subprocess
 import sys
@@ -28,11 +29,14 @@ if hasattr(sys.stdout, "reconfigure"):
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 
-# The individual scans this orchestrator runs, in order.
+# The individual scans this orchestrator runs, in order, with the result file each writes.
 SCANS = [
-    ("OS Details / Missing Patches", "scan-ca-osdetails.py"),
-    ("Third-Party Products",         "scan-ca-third-party.py"),
+    ("OS Details / Missing Patches", "scan-ca-osdetails.py",   "scan-ca-osdetails-result.json"),
+    ("Third-Party Products",         "scan-ca-third-party.py", "scan-ca-third-party-result.json"),
 ]
+
+# The single, consolidated endpoint scan file that the server-side mappers consume.
+COMBINED_RESULT = os.path.join(SCRIPT_DIR, "scan-ca-endpoint-result.json")
 
 
 def run_scan(label, script_name):
@@ -51,21 +55,39 @@ def run_scan(label, script_name):
     return result.returncode
 
 
+def load_json(name):
+    path = os.path.join(SCRIPT_DIR, name)
+    if not os.path.isfile(path):
+        return None
+    with open(path, "r", encoding="utf-8") as f:
+        return json.load(f)
+
+
 def main():
     print("VAPM Centralized Assessment — Endpoint Scan (orchestrator)")
     print("Running all centralized scans. Make sure 'python copysdk.py' has been run first.")
 
     results = []
-    for label, script_name in SCANS:
+    for label, script_name, _ in SCANS:
         rc = run_scan(label, script_name)
         results.append((label, script_name, rc))
+
+    # Combine the individual scan outputs into a single endpoint scan file. This is the
+    # one minimal file the endpoint would hand to the server for mapping.
+    combined = {
+        "osdetails":   load_json("scan-ca-osdetails-result.json"),
+        "third_party": load_json("scan-ca-third-party-result.json"),
+    }
+    with open(COMBINED_RESULT, "w", encoding="utf-8") as f:
+        json.dump(combined, f, indent=2, default=str)
 
     print(f"\n{'=' * 70}")
     print("  Endpoint Scan Summary")
     print(f"{'=' * 70}")
     for label, script_name, rc in results:
         status = "ok" if rc == 0 else f"FAILED (exit {rc})"
-        print(f"  {label:<34} {script_name:<24} {status}")
+        print(f"  {label:<34} {script_name:<26} {status}")
+    print(f"\n  Endpoint scan written to: {COMBINED_RESULT}")
 
     # Non-zero overall exit if any scan failed
     if any(rc != 0 for _, _, rc in results):

@@ -151,6 +151,22 @@ def main():
     assoc_by_pid, agg_latest = build_patch_indexes(find_analog_server_dir())
 
     products = []
+    by_sig = {}
+
+    def add(entry):
+        # Merge entries that share a signature_id (the OS / Windows Update Agent is
+        # both the OS product and a DetectProducts result, both signature 1103).
+        sig = entry["signature_id"]
+        existing = by_sig.get(sig)
+        if existing is None:
+            by_sig[sig] = entry
+            products.append(entry)
+            return
+        existing["cves"] = sorted(set(existing.get("cves", [])) | set(entry.get("cves", [])))
+        existing["cpes"] = sorted(set(existing.get("cpes", [])) | set(entry.get("cpes", [])))
+        for k in ("product_id", "name", "version", "latest_version"):
+            if not existing.get(k) and entry.get(k):
+                existing[k] = entry[k]
 
     # The OS as a single product entry (its CVEs/CPEs come from the live OS scan; the
     # latest version is the OS patch's target version from GetLatestInstaller).
@@ -158,16 +174,13 @@ def main():
         os_info = osd.get("os_info", {})
         os_cves = sorted({c.get("cve") for c in osd.get("cves", []) if c.get("cve")})
         os_cpes = sorted({cpe for c in osd.get("cves", []) for cpe in (c.get("cpes") or [])})
-        os_latest = None
         mp = osd.get("missing_patches", [])
-        if mp:
-            os_latest = mp[0].get("version")
-        products.append({
+        add({
             "signature_id":   osd.get("signature"),
             "product_id":     None,
             "name":           os_info.get("name"),
             "version":        os_info.get("version"),
-            "latest_version": os_latest,
+            "latest_version": mp[0].get("version") if mp else None,
             "cves":           os_cves,
             "cpes":           os_cpes,
         })
@@ -175,7 +188,7 @@ def main():
     # Third-party products, enriched with the latest available version (offline catalog).
     if tp:
         for p in tp.get("products", []):
-            products.append({
+            add({
                 "signature_id":   p.get("signature_id"),
                 "product_id":     p.get("product_id"),
                 "name":           p.get("name"),

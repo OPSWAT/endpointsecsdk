@@ -45,6 +45,7 @@ PIPELINE = [
 # Intermediate JSON produced by the gather/map steps. After the final report is written
 # to results/ca-result.json, these are removed so there is a single, clear output.
 INTERMEDIATE_JSON = [
+    "scan-ca-endpoint-result.json",
     "scan-ca-osdetails-result.json",
     "scan-ca-third-party-result.json",
     "map-ca-osdetails-result.json",
@@ -88,6 +89,22 @@ def build_final_report(combined):
     tp_assessment = combined.get("third_party_assessment") or {}
 
     products = []
+    by_sig = {}
+
+    def add(entry):
+        # Merge entries that share a signature_id (the OS / Windows Update Agent is both
+        # the OS product and a DetectProducts result, both signature 1103).
+        sig = entry["signature_id"]
+        existing = by_sig.get(sig)
+        if existing is None:
+            by_sig[sig] = entry
+            products.append(entry)
+            return
+        existing["cves"] = sorted(set(existing.get("cves", [])) | set(entry.get("cves", [])))
+        existing["cpes"] = sorted(set(existing.get("cpes", [])) | set(entry.get("cpes", [])))
+        for k in ("product_id", "name", "version", "latest_version"):
+            if not existing.get(k) and entry.get(k):
+                existing[k] = entry[k]
 
     # The OS as a single product entry (signature 1103 = Windows Update Agent).
     os_info = os_assessment.get("os_info") or {}
@@ -99,7 +116,7 @@ def build_final_report(combined):
         m = re.search(r"\((\d+\.\d[\d.]*)\)\s*$", mps[0].get("title", "") or "")
         os_latest = m.group(1) if m else None
     if os_info or os_cves:
-        products.append({
+        add({
             "signature_id":   1103,
             "product_id":     None,
             "name":           os_info.get("name"),
@@ -111,7 +128,7 @@ def build_final_report(combined):
 
     # Third-party products (trimmed to the shared schema).
     for p in tp_assessment.get("products", []):
-        products.append({
+        add({
             "signature_id":   p.get("signature_id"),
             "product_id":     p.get("product_id"),
             "name":           p.get("name"),

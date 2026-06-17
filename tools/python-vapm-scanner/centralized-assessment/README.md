@@ -7,9 +7,9 @@ The scripts here are deliberately split into the two halves of that workflow:
 ```
    ENDPOINT (minimal scan, no catalog DB files)          SERVER (has the catalog DB files)
    ───────────────────────────────────────────          ──────────────────────────────────
-   scan-ca-osdetails.py    ─┐                            map_ca_osdetails.py   ─┐
-   scan-ca-third-party.py  ─┤ scan-ca-*-result.json ───▶ map_ca_third_party.py ─┤ map-ca-result.json
-   (scan-ca-endpoint.py)    ┘   (small, no CVE data)     (map-ca.py)             ┘  ──▶ ca-result.json
+   scan-ca-osdetails.py    ─┐                                 map_ca_osdetails.py   ─┐
+   scan-ca-third-party.py  ─┼─▶ scan-ca-endpoint-result.json ─▶ map_ca_third_party.py ─┤ map-ca-result.json
+   scan-ca-endpoint.py     ─┘      (small, no CVE data)         (map-ca.py)             ┘  ──▶ ca-result.json
 ```
 
 ## Prerequisites
@@ -24,9 +24,11 @@ These scripts perform only detection and patch queries via the SDK — they do *
 
 ```bash
 python copysdk.py             # stage the SDK runtime + license into ./sdk
-python scan-ca-endpoint.py    # orchestrator: runs both endpoint scans below
-#   scan-ca-osdetails.py      # OS info + missing/installed patches -> scan-ca-osdetails-result.json
-#   scan-ca-third-party.py    # detected products + versions        -> scan-ca-third-party-result.json
+python scan-ca-endpoint.py    # runs both endpoint scans below and writes the single
+                              # consolidated scan-ca-endpoint-result.json (the file the
+                              # server maps)
+#   scan-ca-osdetails.py      # OS info + missing/installed patches
+#   scan-ca-third-party.py    # detected products + versions
 ```
 
 ## Step 2 — On the server (catalog database files required)
@@ -51,13 +53,13 @@ python scan-ca.py             # endpoint scan -> server mapping -> results/ca-re
 
 **Endpoint scan (Step 1 — no catalog DB):**
 - `copysdk.py` — stages the SDK runtime + license into `sdk/` (resolves the repo root via the `sdkroot` marker).
-- `scan-ca-endpoint.py` — orchestrator that runs the two endpoint scans below (as subprocesses).
+- `scan-ca-endpoint.py` — runs the two endpoint scans below (as subprocesses) and combines their output into a single **`scan-ca-endpoint-result.json`** — the one file the server-side mappers consume.
 - `scan-ca-osdetails.py` — collects OS details (`GetOSInfo`, 1) and, per patch-management product (Windows: signature 1103), missing patches (`GetMissingPatches`, 1013) and installed patches (`GetInstalledPatches`, 1023); writes `scan-ca-osdetails-result.json`.
 - `scan-ca-third-party.py` — detects installed products (`DetectProducts`, 0) and resolves versions (`GetVersion`, 100); writes `scan-ca-third-party-result.json` (with `product_id` and `os_type` for mapping).
 
 **Server mapping (Step 2 — uses the catalog DB):**
-- `map_ca_osdetails.py` — maps `scan-ca-osdetails-result.json` against the Analog catalog (`vuln_system_associations.json` + `cves.json`) to list missing patches and the CVEs each remediates; CVEs already covered by **installed** patches are subtracted (net exposure). Writes `map-ca-osdetails-result.json`. (Follows the ruby sample `get_system_vuln.rb`.)
-- `map_ca_third_party.py` — maps `scan-ca-third-party-result.json` against the catalog to produce per product: the CVEs it is affected by (`vuln_associations.json` + `cves.json`, by product id / signature / version range) and the latest version + `patch_missing` flag (`patch_associations.json` + `patch_aggregation.json`). Writes `map-ca-third-party-result.json`. (Follows `get_vuln.rb` + `get_latest_installer.rb`.)
+- `map_ca_osdetails.py` — reads the `osdetails` section of **`scan-ca-endpoint-result.json`** (falls back to `scan-ca-osdetails-result.json` for standalone runs) and maps it against the Analog catalog (`vuln_system_associations.json` + `cves.json`) to list missing patches and the CVEs each remediates; CVEs already covered by **installed** patches are subtracted (net exposure). Writes `map-ca-osdetails-result.json`. (Follows the ruby sample `get_system_vuln.rb`.)
+- `map_ca_third_party.py` — reads the `third_party` section of **`scan-ca-endpoint-result.json`** (falls back to `scan-ca-third-party-result.json`) and maps it against the catalog to produce per product: the CVEs it is affected by (`vuln_associations.json` + `cves.json`, by product id / signature / version range) and the latest version + `patch_missing` flag (`patch_associations.json` + `patch_aggregation.json`). Writes `map-ca-third-party-result.json`. (Follows `get_vuln.rb` + `get_latest_installer.rb`.)
 - `map-ca.py` — runs both mappers and merges into `map-ca-result.json` with a unified de-duplicated CVE count.
 
 **Full pipeline + shared helpers:**
