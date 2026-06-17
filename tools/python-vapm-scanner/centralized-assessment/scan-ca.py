@@ -45,6 +45,7 @@ PIPELINE = [
 # Intermediate JSON produced by the gather/map steps. After the final report is written
 # to results/ca-result.json, these are removed so there is a single, clear output.
 INTERMEDIATE_JSON = [
+    "scan-ca-endpoint-result.json",
     "scan-ca-osdetails-result.json",
     "scan-ca-third-party-result.json",
     "map-ca-osdetails-result.json",

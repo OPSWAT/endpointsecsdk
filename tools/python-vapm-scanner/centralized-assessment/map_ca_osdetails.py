@@ -35,10 +35,27 @@ if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+# Primary input: the consolidated endpoint scan produced by scan-ca-endpoint.py.
+ENDPOINT_RESULT = os.path.join(SCRIPT_DIR, "scan-ca-endpoint-result.json")
+# Fallback for standalone runs of scan-ca-osdetails.py.
 RESULT_FILE = os.path.join(SCRIPT_DIR, "scan-ca-osdetails-result.json")
 OUTPUT_FILE = os.path.join(SCRIPT_DIR, "map-ca-osdetails-result.json")
 
 OS_TYPE_WINDOWS = 1
+
+
+def load_osdetails_scan():
+    # Prefer the consolidated endpoint scan file (scan-ca-endpoint-result.json) and pull
+    # out the 'osdetails' section; fall back to the individual scan file if run standalone.
+    if os.path.isfile(ENDPOINT_RESULT):
+        with open(ENDPOINT_RESULT, "r", encoding="utf-8") as f:
+            data = json.load(f)
+        if data.get("osdetails") is not None:
+            return data["osdetails"]
+    if os.path.isfile(RESULT_FILE):
+        with open(RESULT_FILE, "r", encoding="utf-8") as f:
+            return json.load(f)
+    return None
 
 
 def find_analog_server_dir():
@@ -115,9 +132,11 @@ def build_cve_index(server_dir):
 
 
 def main():
-    if not os.path.isfile(RESULT_FILE):
-        print(f"ERROR: {os.path.basename(RESULT_FILE)} not found.")
-        print("       Run 'python scan-ca-osdetails.py' first to gather the OS details.")
+    scan = load_osdetails_scan()
+    if scan is None:
+        print("ERROR: endpoint scan not found "
+              "(scan-ca-endpoint-result.json or scan-ca-osdetails-result.json).")
+        print("       Run 'python scan-ca-endpoint.py' (or scan-ca-osdetails.py) first.")
         return
 
     server_dir = find_analog_server_dir()
@@ -125,9 +144,6 @@ def main():
         print("ERROR: Analog server datasets not found under OPSWAT-SDK/extract/analog/server.")
         print("       Run the SDK downloader so the Analog data is extracted.")
         return
-
-    with open(RESULT_FILE, "r", encoding="utf-8") as f:
-        scan = json.load(f)
 
     os_info = scan.get("os_info", {})
     os_id   = os_info.get("os_id")
