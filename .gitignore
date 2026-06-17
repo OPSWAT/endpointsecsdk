@@ -87,16 +87,15 @@ obj/
 /scripts/catalog-appcentric/GetListOfChangedSigs/download_token.txt
 /scripts/catalog-appcentric/GetListOfChangedSigs/app_centric.json
 /scripts/catalog-appcentric/GetListOfChangedSigs/cve_delta.json
-/tools/python-scanner/*.dat
-/tools/python-scanner/*.dll
-/tools/python-scanner/*.so
-/tools/python-scanner/*.dylib
-/tools/python-scanner/*.exe
-/tools/python-scanner/pass_key.txt
-/tools/python-scanner/license.cfg
-/tools/python-scanner/download_token.txt
-/tools/python-scanner/output
-/tools/python-scanner/__pycache__
+# python-vapm-scanner — staged SDK (binaries + license) and run artifacts, per assessment mode
+/tools/python-vapm-scanner/*/sdk
+/tools/python-vapm-scanner/*/output
+/tools/python-vapm-scanner/*/results
+/tools/python-vapm-scanner/*/__pycache__
+/tools/python-vapm-scanner/*/*.json
+# local-only test driver + its root-level result/diff files (not checked in)
+/tools/python-vapm-scanner/scan-all-workflows.py
+/tools/python-vapm-scanner/*.json
 /helloworld/python/sdk
 /helloworld/python/__pycache__
 /helloworld/python/*.exe

@@ -10,7 +10,7 @@ This directory contains higher-level utilities that demonstrate advanced use of 
 |------|------|-------------|
 | [posture](posture/README.md) | C# / .NET (WinForms, Windows) | Endpoint posture/compliance demo — security score, policy validation, geolocation, and browser plugin checks via the OESIS Compliance module. |
 | [vapm-scanner](vapm-scanner/README.md) | C# / .NET (WinForms, Windows) | Vulnerability And Patch Management scanner (`AcmeScanner`) — scans installed products for CVEs and missing patches, browses the OESIS catalog, and can auto-patch. Exports CSV. |
-| [python-scanner](python-scanner/README.md) | Python (Windows/macOS/Linux) | Cross-platform vulnerability and patch scanner driven by `vuln_scanner.py`. |
+| [python-vapm-scanner](python-vapm-scanner/README.md) | Python (Windows/macOS/Linux) | Vulnerability And Patch Management scanner in Python, with `endpoint-assessment` and `centralized-assessment` modes. (Initial stub.) |
 
 ## Prerequisites
 
@@ -19,7 +19,7 @@ All tools require the OESIS Framework SDK. **Run the [SDK downloader](../sdk-dow
 | Tool | Additional requirements |
 |------|--------------------------|
 | posture, vapm-scanner | Windows, Visual Studio 2022 (.NET desktop workload) |
-| python-scanner | Python 3.7+ |
+| python-vapm-scanner | Python 3.7+ |
 
 ## Running the Tools
 
@@ -37,14 +37,13 @@ and run the AcmeScanner startup project.
 ```
 See [vapm-scanner/README.md](vapm-scanner/README.md). Results can be exported to CSV from the UI.
 
-### python-scanner (Python)
+### python-vapm-scanner (Python)
 ```bash
-cd tools/python-scanner
-python3 vuln_scanner.py --scan all
-# scan subsets: --scan product | --scan system
-# override input/output locations: --sdk-path ./sdk --dat-path ./dat --license-path ./license --output-dir ./output
+cd tools/python-vapm-scanner/endpoint-assessment   # or: centralized-assessment
+python copysdk.py        # stage SDK binaries + license into ./sdk
+python vapm_scanner.py   # run the scanner (stub for now)
 ```
-See [python-scanner/README.md](python-scanner/README.md) for the full flag reference and output details.
+See [python-vapm-scanner/README.md](python-vapm-scanner/README.md) for the two assessment modes and details.
 
 ## Troubleshooting
 
