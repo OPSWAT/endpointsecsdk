@@ -18,8 +18,6 @@ python copysdk.py             # stage SDK binaries + license into ./sdk first
 # Recommended — full pipeline (gather -> map -> final consolidated report):
 python scan-ca.py             # -> results/ca-result.json (intermediate files cleaned up)
 
-python vapm_scanner.py        # combined centralized assessment (stub)
-
 # Or run an individual scan:
 python scan-ca-endpoint.py    # orchestrator: runs osdetails + third-party scans
 python scan-ca-osdetails.py   # OS info + missing + installed patches -> scan-ca-osdetails-result.json
@@ -36,7 +34,6 @@ python map-ca.py              # -> map-ca-result.json
 ## Files
 
 - `copysdk.py` — stages the SDK client binaries and license files into a local `sdk/` directory (resolves the repo root via the `sdkroot` marker).
-- `vapm_scanner.py` — the combined centralized patch + vulnerability assessment (stub).
 - `scan-ca-endpoint.py` — orchestrator that runs `scan-ca-osdetails.py` and `scan-ca-third-party.py` in turn (as subprocesses) and prints a summary.
 - `scan-ca-osdetails.py` — collects OS details (`GetOSInfo`, method 1) and, per patch-management product (Windows: signature 1103), the missing patches (`GetMissingPatches`, 1013) and installed patches (`GetInstalledPatches`, 1023); writes `scan-ca-osdetails-result.json`.
 - `scan-ca-third-party.py` — detects installed products (`DetectProducts`, method 0) and resolves each product's version (`GetVersion`, method 100); writes `scan-ca-third-party-result.json` (including `product_id` and `os_type` for mapping).

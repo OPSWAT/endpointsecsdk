@@ -27,7 +27,6 @@ python scan-ea-third-party.py  # detected products + CVEs            -> scan-ea-
 - `scan-ea.py` — **full pipeline**: runs both scans and combines them into a single product-centric report at **`results/ea-result.json`** — a list of products, each with `signature_id`, `product_id`, `name`, `version`, `latest_version`, and the vulnerable `cves`/`cpes`. The OS is included as one product (signature 1103). Schema matches the centralized `results/ca-result.json`. Intermediate `*-result.json` files are cleaned up.
 - `scan-ea-osdetails.py` — live OS assessment (like `helloworld/python/os_vulnerability.py`): `GetOSInfo` (1), loads `wuov2.dat`/`wiv-lite.dat`, `GetLatestInstaller` (50300) for the OS patch, and `GetProductVulnerability` (50505) for OS CVEs. Writes `scan-ea-osdetails-result.json` (same schema as `map-ca-osdetails-result.json`).
 - `scan-ea-third-party.py` — live third-party scan (like `helloworld/python/vulnerability.py`): loads `v2mod.dat`, `DetectProducts` (0), `GetVersion` (100), `GetProductVulnerability` (50505) per product. Writes `scan-ea-third-party-result.json` (same schema as `map-ca-third-party-result.json`).
-- `vapm_scanner.py` — original combined entry point (stub).
 - `sdk_wrapper.py` — `ctypes` wrapper around the OESIS `libwaapi` native library.
 - `platform_utils.py` — platform/architecture detection and SDK environment validation.
 
