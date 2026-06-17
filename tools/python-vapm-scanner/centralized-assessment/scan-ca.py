@@ -23,6 +23,7 @@
 
 import json
 import os
+import re
 import subprocess
 import sys
 from datetime import datetime
@@ -80,74 +81,63 @@ def run_step(label, script_name):
 
 
 def build_final_report(combined):
-    # Derive a consolidated final report from map-ca-result.json.
+    # Derive a consolidated, product-centric final report from map-ca-result.json.
+    # Schema matches the endpoint scan-ea result: a list of products, each with
+    # signature_id, product_id, name, version, latest_version, cves[], cpes[].
     os_assessment = combined.get("os_assessment") or {}
     tp_assessment = combined.get("third_party_assessment") or {}
-    summary       = combined.get("summary") or {}
 
-    # Missing OS patches (kb + the CVE count each remediates)
-    missing_os_patches = [
-        {
-            "kb":        p.get("kb"),
-            "title":     p.get("title"),
-            "severity":  p.get("severity"),
-            "cve_count": p.get("cve_count", 0),
-        }
-        for p in os_assessment.get("missing_patches", [])
-    ]
+    products = []
 
-    # Vulnerable / out-of-date third-party products
-    vulnerable_products = [
-        {
+    # The OS as a single product entry (signature 1103 = Windows Update Agent).
+    os_info = os_assessment.get("os_info") or {}
+    os_cves = sorted({c.get("cve") for c in os_assessment.get("cves", []) if c.get("cve")})
+    os_latest = None
+    mps = os_assessment.get("missing_patches", [])
+    if mps:
+        # Target build is often in the patch title, e.g. "... (KB5094126) (26100.8655)".
+        m = re.search(r"\((\d+\.\d[\d.]*)\)\s*$", mps[0].get("title", "") or "")
+        os_latest = m.group(1) if m else None
+    if os_info or os_cves:
+        products.append({
+            "signature_id":   1103,
+            "product_id":     None,
+            "name":           os_info.get("name"),
+            "version":        os_info.get("version"),
+            "latest_version": os_latest,
+            "cves":           os_cves,
+            "cpes":           [],
+        })
+
+    # Third-party products (trimmed to the shared schema).
+    for p in tp_assessment.get("products", []):
+        products.append({
+            "signature_id":   p.get("signature_id"),
+            "product_id":     p.get("product_id"),
             "name":           p.get("name"),
             "version":        p.get("version"),
             "latest_version": p.get("latest_version"),
-            "patch_missing":  p.get("patch_missing"),
-            "cve_count":      p.get("cve_count", 0),
-        }
-        for p in tp_assessment.get("products", [])
-        if p.get("cve_count", 0) > 0 or p.get("patch_missing")
-    ]
+            "cves":           p.get("cves", []),
+            "cpes":           p.get("cpes", []),
+        })
 
-    # Unified, de-duplicated CVE list, tagged by which assessment surfaced it.
-    cve_map = {}
-    for c in os_assessment.get("cves", []):
-        cve = c.get("cve")
-        if not cve:
-            continue
-        entry = cve_map.setdefault(cve, {"cve": cve, "cwe": c.get("cwe"),
-                                         "published_epoch": c.get("published_epoch"),
-                                         "sources": set()})
-        entry["sources"].add("os")
-        entry["fixed_by_kbs"] = c.get("fixed_by_kbs", [])
-    for c in tp_assessment.get("cves", []):
-        cve = c.get("cve")
-        if not cve:
-            continue
-        entry = cve_map.setdefault(cve, {"cve": cve, "cwe": c.get("cwe"),
-                                         "published_epoch": c.get("published_epoch"),
-                                         "sources": set()})
-        entry["sources"].add("third_party")
-        entry["affected_products"] = c.get("affected_products", [])
-
-    cves = []
-    for cve in sorted(cve_map):
-        e = cve_map[cve]
-        e["sources"] = sorted(e["sources"])
-        cves.append(e)
+    distinct_cves = sorted({cve for pr in products for cve in pr["cves"]})
+    summary = {
+        "total_products":            len(products),
+        "total_vulnerable_products": sum(1 for pr in products if pr["cves"]),
+        "total_distinct_cves":       len(distinct_cves),
+    }
 
     return {
         "assessment":   "centralized",
         "generated_at": datetime.now().isoformat(timespec="seconds"),
         "os": {
-            "name":    (os_assessment.get("os_info") or {}).get("name"),
-            "version": (os_assessment.get("os_info") or {}).get("version"),
-            "os_id":   (os_assessment.get("os_info") or {}).get("os_id"),
+            "name":    os_info.get("name"),
+            "version": os_info.get("version"),
+            "os_id":   os_info.get("os_id"),
         },
-        "summary":             summary,
-        "missing_os_patches":  missing_os_patches,
-        "vulnerable_products": vulnerable_products,
-        "cves":                cves,
+        "summary":  summary,
+        "products": products,
     }
 
 
@@ -181,9 +171,9 @@ def main():
     print("  Centralized Assessment — Final Result")
     print(f"{'=' * 70}")
     print(f"  Endpoint            : {final['os'].get('name')} ({final['os'].get('version')})")
-    print(f"  Missing OS patches  : {len(final['missing_os_patches'])}")
-    print(f"  Vulnerable/outdated products: {len(final['vulnerable_products'])}")
-    print(f"  Total distinct CVEs : {s.get('total_distinct_cves', len(final['cves']))}")
+    print(f"  Products            : {s['total_products']}")
+    print(f"  Vulnerable products : {s['total_vulnerable_products']}")
+    print(f"  Total distinct CVEs : {s['total_distinct_cves']}")
     if removed:
         print(f"  Cleaned up          : {len(removed)} intermediate file(s)")
     print(f"\n  Final report: {FINAL_RESULT}")

@@ -88,14 +88,21 @@ def get_product_vulnerability(sdk, signature_id):
 
 
 def normalize_cve(raw):
-    # Normalize a CVE record, tolerating the field names the SDK may use.
+    # Normalize a CVE record, tolerating the field names the SDK may use, and pull out
+    # the CPE strings (details.cpe[].cpe_2_3) associated with the vulnerability.
     cve_id = raw.get("cve") or raw.get("id") or raw.get("static_id")
     details = raw.get("details") or {}
     cvss = details.get("cvss_3_1") or details.get("cvss_3_0") or details.get("cvss_2_0") or {}
+    cpes = []
+    for entry in details.get("cpe", []) or []:
+        cpe = entry.get("cpe_2_3") or entry.get("cpe_2_2") or entry.get("cpe")
+        if cpe:
+            cpes.append(cpe)
     return {
         "cve":      str(cve_id) if cve_id is not None else None,
         "severity": raw.get("severity") or cvss.get("base_severity"),
         "score":    cvss.get("base_score"),
+        "cpes":     cpes,
     }
 
 
@@ -129,6 +136,7 @@ def main():
             raw_cves = get_product_vulnerability(sdk, sig_id)
             norm = [normalize_cve(c) for c in raw_cves]
             cve_ids = sorted({c["cve"] for c in norm if c["cve"]})
+            cpes = sorted({cpe for c in norm for cpe in c["cpes"]})
 
             products.append({
                 "signature_id": sig_id,
@@ -138,6 +146,7 @@ def main():
                 "version":      get_version(sdk, sig_id),
                 "cve_count":    len(cve_ids),
                 "cves":         cve_ids,
+                "cpes":         cpes,
             })
             for cid in cve_ids:
                 cve_to_products.setdefault(cid, set()).add(name)

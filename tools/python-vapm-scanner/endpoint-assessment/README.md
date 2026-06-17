@@ -13,6 +13,10 @@ Scans **this endpoint** (the local machine) directly via the OESIS Framework SDK
 ```bash
 python copysdk.py              # stage SDK binaries + license into ./sdk first
 
+# Recommended — full pipeline (runs both scans -> single product-centric report):
+python scan-ea.py              # -> results/ea-result.json (intermediate files cleaned up)
+
+# Or run the individual scans:
 python scan-ea-osdetails.py    # OS details + latest installer + OS CVEs -> scan-ea-osdetails-result.json
 python scan-ea-third-party.py  # detected products + CVEs            -> scan-ea-third-party-result.json
 ```
@@ -20,6 +24,7 @@ python scan-ea-third-party.py  # detected products + CVEs            -> scan-ea-
 ## Files
 
 - `copysdk.py` — stages the SDK client binaries and license files into a local `sdk/` directory (resolves the repo root via the `sdkroot` marker).
+- `scan-ea.py` — **full pipeline**: runs both scans and combines them into a single product-centric report at **`results/ea-result.json`** — a list of products, each with `signature_id`, `product_id`, `name`, `version`, `latest_version`, and the vulnerable `cves`/`cpes`. The OS is included as one product (signature 1103). Schema matches the centralized `results/ca-result.json`. Intermediate `*-result.json` files are cleaned up.
 - `scan-ea-osdetails.py` — live OS assessment (like `helloworld/python/os_vulnerability.py`): `GetOSInfo` (1), loads `wuov2.dat`/`wiv-lite.dat`, `GetLatestInstaller` (50300) for the OS patch, and `GetProductVulnerability` (50505) for OS CVEs. Writes `scan-ea-osdetails-result.json` (same schema as `map-ca-osdetails-result.json`).
 - `scan-ea-third-party.py` — live third-party scan (like `helloworld/python/vulnerability.py`): loads `v2mod.dat`, `DetectProducts` (0), `GetVersion` (100), `GetProductVulnerability` (50505) per product. Writes `scan-ea-third-party-result.json` (same schema as `map-ca-third-party-result.json`).
 - `vapm_scanner.py` — original combined entry point (stub).

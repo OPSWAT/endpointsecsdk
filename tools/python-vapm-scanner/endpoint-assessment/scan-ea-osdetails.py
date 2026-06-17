@@ -103,12 +103,18 @@ def normalize_cve(raw, fixed_by_kbs):
     cve_id = raw.get("cve") or raw.get("id") or raw.get("static_id")
     details = raw.get("details") or {}
     cvss = details.get("cvss_3_0") or details.get("cvss_3_1") or details.get("cvss_2_0") or {}
+    cpes = []
+    for entry in details.get("cpe", []) or []:
+        cpe = entry.get("cpe_2_3") or entry.get("cpe_2_2") or entry.get("cpe")
+        if cpe:
+            cpes.append(cpe)
     return {
         "cve":             str(cve_id) if cve_id is not None else None,
         "cwe":             raw.get("cwe"),
         "published_epoch": raw.get("published_epoch"),
         "severity":        raw.get("severity") or cvss.get("base_severity"),
         "score":           cvss.get("base_score"),
+        "cpes":            cpes,
         "fixed_by_kbs":    fixed_by_kbs,
     }
 

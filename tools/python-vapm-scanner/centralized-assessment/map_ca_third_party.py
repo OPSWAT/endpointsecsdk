@@ -155,13 +155,13 @@ def latest_version_for_product(product, assoc_by_pid, agg_latest):
 
 def cves_for_product(product, pid_index):
     # Apply the get_vuln.rb matching: product_id in v4_pids, signature in scope (if listed),
-    # and version within an affected range.
+    # and version within an affected range. Returns the matched CVEs and their CPEs.
     pid = product.get("product_id")
     sig = product.get("signature_id")
     version = product.get("version")
-    cves = set()
+    cves, cpes = set(), set()
     if pid is None:
-        return cves
+        return cves, cpes
 
     for asso in pid_index.get(pid, []):
         # We don't capture the product 'channel'; per get_vuln.rb a channel-scoped
@@ -175,8 +175,10 @@ def cves_for_product(product, pid_index):
             if version_in_range(version, rng.get("start"), rng.get("limit")):
                 if asso.get("cve"):
                     cves.add(asso["cve"])
+                if asso.get("cpe"):
+                    cpes.add(asso["cpe"])
                 break
-    return cves
+    return cves, cpes
 
 
 def main():
@@ -212,7 +214,7 @@ def main():
     cve_to_products = {}   # cve -> set(product name) affected
 
     for product in products:
-        cves = cves_for_product(product, pid_index)
+        cves, cpes = cves_for_product(product, pid_index)
 
         # Determine the latest available version and whether an update/patch is missing.
         current_version = product.get("version")
@@ -233,6 +235,7 @@ def main():
             "patch_missing":  patch_missing,
             "cve_count":      len(cves),
             "cves":           sorted(cves),
+            "cpes":           sorted(cpes),
         })
         for cve in cves:
             cve_to_products.setdefault(cve, set()).add(product.get("name"))
