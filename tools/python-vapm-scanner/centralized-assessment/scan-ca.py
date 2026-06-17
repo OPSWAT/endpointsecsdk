@@ -31,14 +31,41 @@ from datetime import datetime
 if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 
-SCRIPT_DIR    = os.path.dirname(os.path.abspath(__file__))
-MAP_RESULT    = os.path.join(SCRIPT_DIR, "map-ca-result.json")
-FINAL_RESULT  = os.path.join(SCRIPT_DIR, "ca-result.json")
+SCRIPT_DIR   = os.path.dirname(os.path.abspath(__file__))
+RESULTS_DIR  = os.path.join(SCRIPT_DIR, "results")
+MAP_RESULT   = os.path.join(SCRIPT_DIR, "map-ca-result.json")
+FINAL_RESULT = os.path.join(RESULTS_DIR, "ca-result.json")
 
 PIPELINE = [
     ("Endpoint scan (gather)", "scan-ca-endpoint.py"),
     ("Map + combine",          "map-ca.py"),
 ]
+
+# Intermediate JSON produced by the gather/map steps. After the final report is written
+# to results/ca-result.json, these are removed so there is a single, clear output.
+INTERMEDIATE_JSON = [
+    "scan-ca-osdetails-result.json",
+    "scan-ca-third-party-result.json",
+    "map-ca-osdetails-result.json",
+    "map-ca-third-party-result.json",
+    "map-ca-result.json",
+    "ca-result.json",            # any older copy left in the script dir
+    "ca_missing_patches.json",   # legacy filenames
+    "ca_third_party.json",
+]
+
+
+def cleanup_intermediates():
+    removed = []
+    for name in INTERMEDIATE_JSON:
+        path = os.path.join(SCRIPT_DIR, name)
+        if os.path.isfile(path):
+            try:
+                os.remove(path)
+                removed.append(name)
+            except OSError:
+                pass
+    return removed
 
 
 def run_step(label, script_name):
@@ -141,8 +168,12 @@ def main():
         combined = json.load(f)
 
     final = build_final_report(combined)
+    os.makedirs(RESULTS_DIR, exist_ok=True)
     with open(FINAL_RESULT, "w", encoding="utf-8") as f:
         json.dump(final, f, indent=2, default=str)
+
+    # The final report is the single deliverable — clean up the intermediate JSON files.
+    removed = cleanup_intermediates()
 
     # --- Console summary ---
     s = final["summary"]
@@ -153,7 +184,9 @@ def main():
     print(f"  Missing OS patches  : {len(final['missing_os_patches'])}")
     print(f"  Vulnerable/outdated products: {len(final['vulnerable_products'])}")
     print(f"  Total distinct CVEs : {s.get('total_distinct_cves', len(final['cves']))}")
-    print(f"\n  Final report written to: {FINAL_RESULT}")
+    if removed:
+        print(f"  Cleaned up          : {len(removed)} intermediate file(s)")
+    print(f"\n  Final report: {FINAL_RESULT}")
 
     if any(rc != 0 for _, _, rc in statuses):
         sys.exit(1)

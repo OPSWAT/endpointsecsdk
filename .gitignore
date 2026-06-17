@@ -90,6 +90,7 @@ obj/
 # python-vapm-scanner — staged SDK (binaries + license) and run artifacts, per assessment mode
 /tools/python-vapm-scanner/*/sdk
 /tools/python-vapm-scanner/*/output
+/tools/python-vapm-scanner/*/results
 /tools/python-vapm-scanner/*/__pycache__
 /tools/python-vapm-scanner/*/*.json
 /helloworld/python/sdk
