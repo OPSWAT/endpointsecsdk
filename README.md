@@ -19,17 +19,24 @@ It includes everything needed to get started with vulnerability, patch, and comp
 
 ## ⚙️ Getting Started
 
-### 1. Obtain an Evaluation License  
-Request an evaluation key and download token by contacting:  
-**📧 oem@opswat.com**
+### Quick start (Windows)
 
-### 2. Prepare the Environment  
-- Extract the provided evaluation SDK package at the repository root.  
-- Ensure the root includes the file:  
-  ```
-  sdkroot
-  ```
-- Place your license and token files in:  
+First obtain an evaluation license (see step 1 below) and place the files in `eval-license/`. Then, from the repository root, run the setup helper:
+
+```bat
+get-started.bat
+```
+
+It verifies your license files, ensures Python is installed (installing it via `winget` if missing), installs the `requests` package, and runs the SDK downloader to populate `OPSWAT-SDK/`. When it finishes, jump to step 4 to run a sample.
+
+### Manual setup
+
+**1. Obtain an evaluation license**  
+Request a license key and download token by contacting **oem@opswat.com**.
+
+**2. Prepare the environment**  
+- Make sure the `sdkroot` marker file is present at the repository root.  
+- Place your license and token files in `eval-license/`:
   ```
   eval-license/
     ├── license.cfg
@@ -38,8 +45,19 @@ Request an evaluation key and download token by contacting:
   ```
   See [eval-license/README.md](eval-license/README.md) for details.
 
-### 3. Download the SDK Libraries  
-Use the `sdk-downloader` utility to download the correct binaries for your platform.
+**3. Download the SDK libraries**  
+Run the [`sdk-downloader`](sdk-downloader/README.md) for your platform:
+- **Windows:** `sdk-downloader\windows-csharp\bin\SDKDownloader.exe`
+- **Linux/macOS:** `python3 sdk-downloader/script/src/main.py`
+
+**4. Run a sample**  
+For example, the Python HelloWorld:
+```bash
+cd helloworld/python
+python copy_sdk_files.py     # stage the SDK + license into ./sdk
+python detect_products.py
+```
+See [helloworld/README.md](helloworld/README.md) for all samples and languages.
 
 ---
 
