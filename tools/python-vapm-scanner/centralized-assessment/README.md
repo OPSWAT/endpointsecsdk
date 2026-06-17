@@ -63,7 +63,7 @@ python scan-ca.py             # endpoint scan -> server mapping -> results/ca-re
 - `map-ca.py` — runs both mappers and merges into `map-ca-result.json` with a unified de-duplicated CVE count.
 
 **Full pipeline + shared helpers:**
-- `scan-ca.py` — runs the endpoint scan, then `map-ca.py`, then derives the final **product-centric** report at **`results/ca-result.json`** — a list of products, each with `signature_id`, `product_id`, `name`, `version`, `latest_version`, and the vulnerable `cves`/`cpes` (the OS is one product, signature 1103). Schema matches the endpoint `results/ea-result.json`. Intermediate `*-result.json` files are cleaned up so `results/ca-result.json` is the single output.
+- `scan-ca.py` — runs the endpoint scan, then `map-ca.py`, then derives the final report at **`results/ca-result.json`** with a dedicated **`os`** section (the operating system, signature 1103) and a **`products`** list (third-party apps). The `os` section and each product carry `signature_id`, `product_id`, `name`, `version`, `latest_version`, and the vulnerable `cves`/`cpes`. Schema matches the endpoint `results/ea-result.json`. Intermediate `*-result.json` files are cleaned up so `results/ca-result.json` is the single output.
 - `sdk_wrapper.py` — `ctypes` wrapper around the OESIS `libwaapi` native library.
 - `platform_utils.py` — platform/architecture detection and SDK environment validation.
 
