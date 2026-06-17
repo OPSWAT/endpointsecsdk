@@ -82,31 +82,16 @@ def run_step(label, script_name):
 
 
 def build_final_report(combined):
-    # Derive a consolidated, product-centric final report from map-ca-result.json.
-    # Schema matches the endpoint scan-ea result: a list of products, each with
-    # signature_id, product_id, name, version, latest_version, cves[], cpes[].
+    # Derive a consolidated final report from map-ca-result.json. The OS is reported in its
+    # own "os" section; "products" holds the third-party products. Both the OS section and
+    # each product use the shared shape: signature_id, product_id, name, version,
+    # latest_version, cves[], cpes[]. Schema matches the endpoint scan-ea result.
     os_assessment = combined.get("os_assessment") or {}
     tp_assessment = combined.get("third_party_assessment") or {}
 
-    products = []
-    by_sig = {}
+    OS_SIG = 1103
 
-    def add(entry):
-        # Merge entries that share a signature_id (the OS / Windows Update Agent is both
-        # the OS product and a DetectProducts result, both signature 1103).
-        sig = entry["signature_id"]
-        existing = by_sig.get(sig)
-        if existing is None:
-            by_sig[sig] = entry
-            products.append(entry)
-            return
-        existing["cves"] = sorted(set(existing.get("cves", [])) | set(entry.get("cves", [])))
-        existing["cpes"] = sorted(set(existing.get("cpes", [])) | set(entry.get("cpes", [])))
-        for k in ("product_id", "name", "version", "latest_version"):
-            if not existing.get(k) and entry.get(k):
-                existing[k] = entry[k]
-
-    # The OS as a single product entry (signature 1103 = Windows Update Agent).
+    # The OS section (signature 1103 = Windows Update Agent).
     os_info = os_assessment.get("os_info") or {}
     os_cves = sorted({c.get("cve") for c in os_assessment.get("cves", []) if c.get("cve")})
     os_latest = None
@@ -115,20 +100,28 @@ def build_final_report(combined):
         # Target build is often in the patch title, e.g. "... (KB5094126) (26100.8655)".
         m = re.search(r"\((\d+\.\d[\d.]*)\)\s*$", mps[0].get("title", "") or "")
         os_latest = m.group(1) if m else None
-    if os_info or os_cves:
-        add({
-            "signature_id":   1103,
-            "product_id":     None,
-            "name":           os_info.get("name"),
-            "version":        os_info.get("version"),
-            "latest_version": os_latest,
-            "cves":           os_cves,
-            "cpes":           [],
-        })
+    os_section = {
+        "signature_id":   OS_SIG,
+        "product_id":     None,
+        "name":           os_info.get("name"),
+        "version":        os_info.get("version"),
+        "os_id":          os_info.get("os_id"),
+        "latest_version": os_latest,
+        "cves":           os_cves,
+        "cpes":           [],
+    }
 
-    # Third-party products (trimmed to the shared schema).
+    # Third-party products. The OS / Windows Update Agent signature is folded into the OS
+    # section, not listed as a product.
+    products = []
     for p in tp_assessment.get("products", []):
-        add({
+        if p.get("signature_id") == OS_SIG:
+            os_section["cves"] = sorted(set(os_section["cves"]) | set(p.get("cves", [])))
+            os_section["cpes"] = sorted(set(os_section["cpes"]) | set(p.get("cpes", [])))
+            if not os_section.get("product_id") and p.get("product_id"):
+                os_section["product_id"] = p.get("product_id")
+            continue
+        products.append({
             "signature_id":   p.get("signature_id"),
             "product_id":     p.get("product_id"),
             "name":           p.get("name"),
@@ -138,21 +131,19 @@ def build_final_report(combined):
             "cpes":           p.get("cpes", []),
         })
 
-    distinct_cves = sorted({cve for pr in products for cve in pr["cves"]})
+    os_cve_set = set(os_section["cves"])
+    tp_cve_set = {cve for pr in products for cve in pr["cves"]}
     summary = {
+        "os_cve_count":              len(os_cve_set),
         "total_products":            len(products),
         "total_vulnerable_products": sum(1 for pr in products if pr["cves"]),
-        "total_distinct_cves":       len(distinct_cves),
+        "total_distinct_cves":       len(os_cve_set | tp_cve_set),
     }
 
     return {
         "assessment":   "centralized",
         "generated_at": datetime.now().isoformat(timespec="seconds"),
-        "os": {
-            "name":    os_info.get("name"),
-            "version": os_info.get("version"),
-            "os_id":   os_info.get("os_id"),
-        },
+        "os":       os_section,
         "summary":  summary,
         "products": products,
     }
@@ -188,8 +179,8 @@ def main():
     print("  Centralized Assessment — Final Result")
     print(f"{'=' * 70}")
     print(f"  Endpoint            : {final['os'].get('name')} ({final['os'].get('version')})")
-    print(f"  Products            : {s['total_products']}")
-    print(f"  Vulnerable products : {s['total_vulnerable_products']}")
+    print(f"  OS CVEs             : {s['os_cve_count']}")
+    print(f"  Third-party products: {s['total_products']}  ({s['total_vulnerable_products']} vulnerable)")
     print(f"  Total distinct CVEs : {s['total_distinct_cves']}")
     if removed:
         print(f"  Cleaned up          : {len(removed)} intermediate file(s)")

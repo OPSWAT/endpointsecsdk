@@ -2,7 +2,7 @@
 
 A Python Vulnerability And Patch Management (VAPM) sample built on the OESIS Framework SDK. It demonstrates **two ways to assess an endpoint for missing patches and CVEs**, and shows that both workflows can produce the **same final result** — letting you choose where the cost of the large OESIS database files lands.
 
-Both workflows produce a product-centric result with an **identical schema** (`results/ea-result.json` and `results/ca-result.json`): a list of products, each with `signature_id`, `product_id`, `name`, `version`, `latest_version`, and the vulnerable `cves` / `cpes`.
+Both workflows produce a result with an **identical schema** (`results/ea-result.json` and `results/ca-result.json`): a dedicated **`os`** section for the operating system and a **`products`** list for third-party apps. Each (the `os` section and every product) carries `signature_id`, `product_id`, `name`, `version`, `latest_version`, and the vulnerable `cves` / `cpes`.
 
 ## The two workflows
 
