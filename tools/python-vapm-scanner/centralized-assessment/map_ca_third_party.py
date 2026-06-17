@@ -115,6 +115,44 @@ def build_cve_index(server_dir):
     return index
 
 
+def build_patch_indexes(server_dir):
+    # patch_associations: v4_pid -> [ {v4_signatures, patch_id, is_latest, ...} ]
+    # patch_aggregation:  patch_id (_id) -> latest_version
+    # (Simplified form of get_latest_installer.rb — used to find each product's latest
+    #  available version so we can flag whether an update/patch is missing.)
+    assoc_by_pid = {}
+    for rec in read_analog_records(os.path.join(server_dir, "patch_associations.json")):
+        pid = rec.get("v4_pid")
+        if pid is not None:
+            assoc_by_pid.setdefault(pid, []).append(rec)
+
+    agg_latest = {}
+    for rec in read_analog_records(os.path.join(server_dir, "patch_aggregation.json")):
+        _id = rec.get("_id")
+        if _id is not None:
+            agg_latest[_id] = rec.get("latest_version")
+    return assoc_by_pid, agg_latest
+
+
+def latest_version_for_product(product, assoc_by_pid, agg_latest):
+    # Find the latest available version for this product via the patch catalog.
+    pid = product.get("product_id")
+    sig = product.get("signature_id")
+    if pid is None:
+        return None
+    candidates = []
+    for asso in assoc_by_pid.get(pid, []):
+        sigs = asso.get("v4_signatures")
+        if sigs and sig not in sigs:
+            continue
+        candidates.append(asso)
+    if not candidates:
+        return None
+    # Prefer the association flagged is_latest; otherwise take the first match.
+    chosen = next((a for a in candidates if a.get("is_latest")), candidates[0])
+    return agg_latest.get(chosen.get("patch_id"))
+
+
 def cves_for_product(product, pid_index):
     # Apply the get_vuln.rb matching: product_id in v4_pids, signature in scope (if listed),
     # and version within an affected range.
@@ -167,6 +205,7 @@ def main():
 
     pid_index = build_pid_index(server_dir, os_type)
     cve_index = build_cve_index(server_dir)
+    assoc_by_pid, agg_latest = build_patch_indexes(server_dir)
     print(f"  Catalog      : {len(pid_index)} product ids with vuln associations for os_type {os_type}")
 
     mapped_products = []
@@ -174,14 +213,26 @@ def main():
 
     for product in products:
         cves = cves_for_product(product, pid_index)
+
+        # Determine the latest available version and whether an update/patch is missing.
+        current_version = product.get("version")
+        latest_version = latest_version_for_product(product, assoc_by_pid, agg_latest)
+        patch_missing = None  # unknown if we can't resolve the latest version
+        if latest_version:
+            cv, lv = parse_version(current_version), parse_version(latest_version)
+            if cv is not None and lv is not None:
+                patch_missing = _cmp(cv, lv) < 0   # current is older than latest
+
         mapped_products.append({
-            "signature_id": product.get("signature_id"),
-            "product_id":   product.get("product_id"),
-            "name":         product.get("name"),
-            "vendor":       product.get("vendor"),
-            "version":      product.get("version"),
-            "cve_count":    len(cves),
-            "cves":         sorted(cves),
+            "signature_id":   product.get("signature_id"),
+            "product_id":     product.get("product_id"),
+            "name":           product.get("name"),
+            "vendor":         product.get("vendor"),
+            "version":        current_version,
+            "latest_version": latest_version,
+            "patch_missing":  patch_missing,
+            "cve_count":      len(cves),
+            "cves":           sorted(cves),
         })
         for cve in cves:
             cve_to_products.setdefault(cve, set()).add(product.get("name"))
@@ -199,13 +250,23 @@ def main():
 
     # --- Console summary ---
     vulnerable = [m for m in mapped_products if m["cve_count"] > 0]
+    patch_missing_count = sum(1 for m in mapped_products if m["patch_missing"])
     print(f"\n  Vulnerable products: {len(vulnerable)} of {len(mapped_products)}")
-    print("-" * 70)
+    print(f"  {'Product':<34} {'Current':<14}    {'Latest':<14} {'Patch':<10} CVEs")
+    print("-" * 78)
     for m in sorted(vulnerable, key=lambda x: x["cve_count"], reverse=True):
-        print(f"  {(m['name'] or 'Unknown')[:38]:<38} {(m['version'] or '')[:16]:<16} "
-              f"{m['cve_count']} CVE(s)")
+        latest = m["latest_version"] or "?"
+        if m["patch_missing"] is True:
+            flag = "MISSING"
+        elif m["patch_missing"] is False:
+            flag = "current"
+        else:
+            flag = "unknown"
+        print(f"  {(m['name'] or 'Unknown')[:34]:<34} {(m['version'] or '')[:14]:<14} -> "
+              f"{str(latest)[:14]:<14} {flag:<10} {m['cve_count']}")
 
-    print(f"\n  Total distinct CVEs across third-party products: {len(cve_list)}")
+    print(f"\n  Products with a patch missing (any product): {patch_missing_count} of {len(mapped_products)}")
+    print(f"  Total distinct CVEs across third-party products: {len(cve_list)}")
 
     # --- Write JSON result ---
     output = {
@@ -213,6 +274,7 @@ def main():
         "source":    "Analog vuln_associations (offline catalog)",
         "total_products":            len(mapped_products),
         "total_vulnerable_products": len(vulnerable),
+        "total_patch_missing":       patch_missing_count,
         "total_cves":                len(cve_list),
         "products":  mapped_products,
         "cves":      cve_list,
