@@ -111,6 +111,12 @@ def main():
             print(f"ERROR: {required} not found in {license_src}")
             sys.exit(1)
 
+    # Clean the sdk directory first so stale files from a previous run (or a different
+    # architecture / SDK version) don't linger.
+    if os.path.isdir(sdk_dst):
+        print(f"Cleaning existing SDK directory: {sdk_dst}")
+        shutil.rmtree(sdk_dst)
+
     try:
         copy_files(sdk_src, sdk_dst, "SDK binaries")
         copy_files(license_src, sdk_dst, "license files")
