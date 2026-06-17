@@ -15,6 +15,9 @@ Assesses **externally-collected endpoint inventory** for vulnerabilities and mis
 ```bash
 python copysdk.py             # stage SDK binaries + license into ./sdk first
 
+# Recommended — full pipeline (gather -> map -> final consolidated report):
+python scan-ca.py             # -> ca-result.json
+
 python vapm_scanner.py        # combined centralized assessment (stub)
 
 # Or run an individual scan:
@@ -40,6 +43,7 @@ python map-ca.py              # -> map-ca-result.json
 - `map_ca_osdetails.py` — maps `scan-ca-osdetails-result.json` against the Analog offline catalog (`OPSWAT-SDK/extract/analog/server/vuln_system_associations.json` + `cves.json`) to produce a list of missing patches and the CVEs each remediates. CVEs already covered by **installed** patches are subtracted, so the result is the *net* exposure. Writes `map-ca-osdetails-result.json`. (Follows the Windows approach in the Analog ruby sample `get_system_vuln.rb`.)
 - `map_ca_third_party.py` — maps `scan-ca-third-party-result.json` against the Analog catalog to produce, per detected product: the CVEs it is affected by (`vuln_associations.json` + `cves.json`, matched by product id, signature, and version range) and the latest available version with a `patch_missing` flag (`patch_associations.json` + `patch_aggregation.json`). Writes `map-ca-third-party-result.json`. (Follows the Analog ruby samples `get_vuln.rb` and `get_latest_installer.rb`.)
 - `map-ca.py` — runs both mappers (`map_ca_osdetails.py` + `map_ca_third_party.py`) and merges their output into a single `map-ca-result.json`, including a unified de-duplicated CVE count across the OS and third-party assessments.
+- `scan-ca.py` — **full pipeline** entry point: runs the endpoint scan (`scan-ca-endpoint.py`), then `map-ca.py`, then derives a final consolidated report `ca-result.json` (endpoint summary, missing OS patches, vulnerable/outdated products, and a unified CVE list tagged by source).
 - `sdk_wrapper.py` — `ctypes` wrapper around the OESIS `libwaapi` native library.
 - `platform_utils.py` — platform/architecture detection and SDK environment validation.
 
