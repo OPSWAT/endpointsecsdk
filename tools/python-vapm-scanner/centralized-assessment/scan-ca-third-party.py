@@ -25,6 +25,7 @@ import sys
 from sdk_wrapper import OESISWrapper, SDKError
 from platform_utils import validate_sdk_environment
 from platform_utils import get_lib_filename
+from platform_utils import get_os_type
 
 # Force UTF-8 console output so non-ASCII product names don't crash on Windows (cp1252).
 if hasattr(sys.stdout, "reconfigure"):
@@ -88,6 +89,8 @@ def main():
             sig_id = p.get("signature")
             products.append({
                 "signature_id": sig_id,
+                "product_id":   p.get("product", {}).get("id"),
+                "vendor_id":    p.get("vendor",  {}).get("id"),
                 "name":         p.get("product", {}).get("name", "Unknown"),
                 "vendor":       p.get("vendor",  {}).get("name", "Unknown"),
                 "version":      get_version(sdk, sig_id),
@@ -111,10 +114,11 @@ def main():
         output = {
             "methods":  [0, 100],
             "method_names": ["DetectProducts", "GetVersion"],
+            "os_type":  get_os_type(),
             "total":    len(products),
             "products": products,
         }
-        output_file = os.path.join(SCRIPT_DIR, "ca_third_party.json")
+        output_file = os.path.join(SCRIPT_DIR, "scan-ca-third-party-result.json")
         with open(output_file, "w", encoding="utf-8") as f:
             json.dump(output, f, indent=2, default=str)
         print(f"  Full results written to: {output_file}")
