@@ -80,15 +80,16 @@ if (-not (Test-Path $licensePath\license.cfg)) {
     exit 1
 }
 
-if (-not (Test-Path $sdkIncludeDest)) {
-    Write-Host "📁 Include directory not found. Creating: $sdkIncludeDest"
-    New-Item -ItemType Directory -Force -Path $sdkIncludeDest | Out-Null
+# Clean the sdk directory first so stale headers/libraries from a previous build
+# (or a different architecture / SDK version) don't linger.
+$sdkDestRoot = Join-Path $SolutionDir "sdk"
+if (Test-Path $sdkDestRoot) {
+    Write-Host "🧹 Cleaning SDK directory: $sdkDestRoot"
+    Remove-Item -Path $sdkDestRoot -Recurse -Force
 }
 
-if (-not (Test-Path $sdkLibDest)) {
-    Write-Host "📁 Include directory not found. Creating: $sdkLibDest"
-    New-Item -ItemType Directory -Force -Path $sdkLibDest | Out-Null
-}
+New-Item -ItemType Directory -Force -Path $sdkIncludeDest | Out-Null
+New-Item -ItemType Directory -Force -Path $sdkLibDest | Out-Null
 
 
 if (-not (Test-Path $OutputDir)) {
