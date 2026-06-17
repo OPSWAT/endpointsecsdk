@@ -93,6 +93,7 @@ obj/
 /tools/python-vapm-scanner/*/results
 /tools/python-vapm-scanner/*/__pycache__
 /tools/python-vapm-scanner/*/*.json
+/tools/python-vapm-scanner/*/*.dat
 # local-only test driver + its root-level result/diff files (not checked in)
 /tools/python-vapm-scanner/scan-all-workflows.py
 /tools/python-vapm-scanner/*.json
