@@ -1,8 +1,16 @@
 # VAPM Scanner — Centralized Assessment
 
-Assesses **externally-collected endpoint inventory** for vulnerabilities and missing patches against the OESIS Framework offline catalogs — a centralized / server-side model, rather than scanning the local machine live.
+The **centralized** VAPM workflow keeps the endpoint footprint minimal: the endpoint runs a small scan that **does not load the large OESIS catalog/vulnerability database files**, and the resulting minimal detail is mapped to CVEs and patches on a **cloud or on-premise server** that holds those database files. The final result matches the [traditional endpoint workflow](../endpoint-assessment/README.md) — identical schema in `results/ca-result.json` vs `results/ea-result.json` — so you can move the cost of the (large) database files to the server.
 
-> **Status:** stub — the assessment logic is not yet implemented. The script initializes the SDK and outlines the intended workflow.
+The scripts here are deliberately split into the two halves of that workflow:
+
+```
+   ENDPOINT (minimal scan, no catalog DB files)          SERVER (has the catalog DB files)
+   ───────────────────────────────────────────          ──────────────────────────────────
+   scan-ca-osdetails.py    ─┐                            map_ca_osdetails.py   ─┐
+   scan-ca-third-party.py  ─┤ scan-ca-*-result.json ───▶ map_ca_third_party.py ─┤ map-ca-result.json
+   (scan-ca-endpoint.py)    ┘   (small, no CVE data)     (map-ca.py)             ┘  ──▶ ca-result.json
+```
 
 ## Prerequisites
 
@@ -10,42 +18,51 @@ Assesses **externally-collected endpoint inventory** for vulnerabilities and mis
 - License files are in [`eval-license/`](../../../eval-license/README.md) at the repository root.
 - Python 3.7+.
 
-## Usage
+## Step 1 — On the endpoint (no catalog database files)
+
+These scripts perform only detection and patch queries via the SDK — they do **not** load the offline catalog/vulnerability databases. Their output is small (detected products + versions, OS info, patch lists) and is what gets sent to the server.
 
 ```bash
-python copysdk.py             # stage SDK binaries + license into ./sdk first
+python copysdk.py             # stage the SDK runtime + license into ./sdk
+python scan-ca-endpoint.py    # orchestrator: runs both endpoint scans below
+#   scan-ca-osdetails.py      # OS info + missing/installed patches -> scan-ca-osdetails-result.json
+#   scan-ca-third-party.py    # detected products + versions        -> scan-ca-third-party-result.json
+```
 
-# Recommended — full pipeline (gather -> map -> final consolidated report):
-python scan-ca.py             # -> results/ca-result.json (intermediate files cleaned up)
+## Step 2 — On the server (catalog database files required)
 
-# Or run an individual scan:
-python scan-ca-endpoint.py    # orchestrator: runs osdetails + third-party scans
-python scan-ca-osdetails.py   # OS info + missing + installed patches -> scan-ca-osdetails-result.json
-python scan-ca-third-party.py # detected products + versions (DetectProducts / GetVersion)
+These scripts take the endpoint's scan JSON and map it against the OESIS Analog catalog under `OPSWAT-SDK/extract/analog/server/` — this is where the large database files live and the CVE/patch matching happens.
 
-# After the scan-ca-*.py result files exist, map them to CVEs via the Analog catalog:
-python map_ca_osdetails.py    # missing patches + CVEs (OS / system)
-python map_ca_third_party.py  # detected products -> CVEs (third-party apps)
+```bash
+python map_ca_osdetails.py    # OS missing patches + net CVEs
+python map_ca_third_party.py  # third-party product CVEs + latest version / patch-missing
+python map-ca.py              # runs both mappers and merges -> map-ca-result.json
+```
 
-# Or run both mappers and merge into a single combined result:
-python map-ca.py              # -> map-ca-result.json
+## Full demo (both halves on one machine)
+
+For convenience the whole flow can be run end-to-end on a single machine:
+
+```bash
+python scan-ca.py             # endpoint scan -> server mapping -> results/ca-result.json
 ```
 
 ## Files
 
-- `copysdk.py` — stages the SDK client binaries and license files into a local `sdk/` directory (resolves the repo root via the `sdkroot` marker).
-- `scan-ca-endpoint.py` — orchestrator that runs `scan-ca-osdetails.py` and `scan-ca-third-party.py` in turn (as subprocesses) and prints a summary.
-- `scan-ca-osdetails.py` — collects OS details (`GetOSInfo`, method 1) and, per patch-management product (Windows: signature 1103), the missing patches (`GetMissingPatches`, 1013) and installed patches (`GetInstalledPatches`, 1023); writes `scan-ca-osdetails-result.json`.
-- `scan-ca-third-party.py` — detects installed products (`DetectProducts`, method 0) and resolves each product's version (`GetVersion`, method 100); writes `scan-ca-third-party-result.json` (including `product_id` and `os_type` for mapping).
-- `map_ca_osdetails.py` — maps `scan-ca-osdetails-result.json` against the Analog offline catalog (`OPSWAT-SDK/extract/analog/server/vuln_system_associations.json` + `cves.json`) to produce a list of missing patches and the CVEs each remediates. CVEs already covered by **installed** patches are subtracted, so the result is the *net* exposure. Writes `map-ca-osdetails-result.json`. (Follows the Windows approach in the Analog ruby sample `get_system_vuln.rb`.)
-- `map_ca_third_party.py` — maps `scan-ca-third-party-result.json` against the Analog catalog to produce, per detected product: the CVEs it is affected by (`vuln_associations.json` + `cves.json`, matched by product id, signature, and version range) and the latest available version with a `patch_missing` flag (`patch_associations.json` + `patch_aggregation.json`). Writes `map-ca-third-party-result.json`. (Follows the Analog ruby samples `get_vuln.rb` and `get_latest_installer.rb`.)
-- `map-ca.py` — runs both mappers (`map_ca_osdetails.py` + `map_ca_third_party.py`) and merges their output into a single `map-ca-result.json`, including a unified de-duplicated CVE count across the OS and third-party assessments.
-- `scan-ca.py` — **full pipeline** entry point: runs the endpoint scan (`scan-ca-endpoint.py`), then `map-ca.py`, then derives a final **product-centric** report at **`results/ca-result.json`** — a list of products, each with `signature_id`, `product_id`, `name`, `version`, `latest_version`, and the vulnerable `cves`/`cpes` (the OS is included as one product, signature 1103). Schema matches the endpoint `results/ea-result.json`. It then removes the intermediate `*-result.json` files so `results/ca-result.json` is the single, clear output.
+**Endpoint scan (Step 1 — no catalog DB):**
+- `copysdk.py` — stages the SDK runtime + license into `sdk/` (resolves the repo root via the `sdkroot` marker).
+- `scan-ca-endpoint.py` — orchestrator that runs the two endpoint scans below (as subprocesses).
+- `scan-ca-osdetails.py` — collects OS details (`GetOSInfo`, 1) and, per patch-management product (Windows: signature 1103), missing patches (`GetMissingPatches`, 1013) and installed patches (`GetInstalledPatches`, 1023); writes `scan-ca-osdetails-result.json`.
+- `scan-ca-third-party.py` — detects installed products (`DetectProducts`, 0) and resolves versions (`GetVersion`, 100); writes `scan-ca-third-party-result.json` (with `product_id` and `os_type` for mapping).
 
-> **Output:** the full pipeline's only deliverable is `results/ca-result.json`. The individual `scan-ca-*` / `map_ca_*` scripts still write their own `*.json` in this directory when run on their own; `scan-ca.py` cleans those up at the end.
+**Server mapping (Step 2 — uses the catalog DB):**
+- `map_ca_osdetails.py` — maps `scan-ca-osdetails-result.json` against the Analog catalog (`vuln_system_associations.json` + `cves.json`) to list missing patches and the CVEs each remediates; CVEs already covered by **installed** patches are subtracted (net exposure). Writes `map-ca-osdetails-result.json`. (Follows the ruby sample `get_system_vuln.rb`.)
+- `map_ca_third_party.py` — maps `scan-ca-third-party-result.json` against the catalog to produce per product: the CVEs it is affected by (`vuln_associations.json` + `cves.json`, by product id / signature / version range) and the latest version + `patch_missing` flag (`patch_associations.json` + `patch_aggregation.json`). Writes `map-ca-third-party-result.json`. (Follows `get_vuln.rb` + `get_latest_installer.rb`.)
+- `map-ca.py` — runs both mappers and merges into `map-ca-result.json` with a unified de-duplicated CVE count.
+
+**Full pipeline + shared helpers:**
+- `scan-ca.py` — runs the endpoint scan, then `map-ca.py`, then derives the final **product-centric** report at **`results/ca-result.json`** — a list of products, each with `signature_id`, `product_id`, `name`, `version`, `latest_version`, and the vulnerable `cves`/`cpes` (the OS is one product, signature 1103). Schema matches the endpoint `results/ea-result.json`. Intermediate `*-result.json` files are cleaned up so `results/ca-result.json` is the single output.
 - `sdk_wrapper.py` — `ctypes` wrapper around the OESIS `libwaapi` native library.
 - `platform_utils.py` — platform/architecture detection and SDK environment validation.
 
-## Planned assessment flow
-
-- Take endpoint inventory collected elsewhere (e.g. produced by `CollectDeviceInventory` or an agent), then resolve each product's vulnerabilities and available patches against the OESIS offline catalogs — without performing a live scan of the local machine.
+> In a real deployment, Step 1 runs on each endpoint and Step 2 runs on your server; the scan JSON is transferred between them. Running `scan-ca.py` simply does both locally for demonstration.

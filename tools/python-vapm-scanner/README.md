@@ -1,46 +1,41 @@
 # Python VAPM Scanner
 
-A Python Vulnerability And Patch Management (VAPM) scanner built on the OESIS Framework SDK. It follows the same self-contained, copy-the-SDK-locally format as the [helloworld/python](../../helloworld/python/README.md) samples.
+A Python Vulnerability And Patch Management (VAPM) sample built on the OESIS Framework SDK. It demonstrates **two ways to assess an endpoint for missing patches and CVEs**, and shows that both workflows can produce the **same final result** — letting you choose where the cost of the large OESIS database files lands.
 
-> **Status:** initial scaffolding — the scan logic in both modes is currently a **stub**.
+Both workflows produce a product-centric result with an **identical schema** (`results/ea-result.json` and `results/ca-result.json`): a list of products, each with `signature_id`, `product_id`, `name`, `version`, `latest_version`, and the vulnerable `cves` / `cpes`.
 
-## Assessment modes
+## The two workflows
 
-| Folder | Description |
-|--------|-------------|
-| [`endpoint-assessment/`](endpoint-assessment/README.md) | Scans **this endpoint** (the local machine) directly via the SDK for vulnerabilities and missing patches. |
-| [`centralized-assessment/`](centralized-assessment/README.md) | Assesses **externally-collected inventory** against the OESIS offline catalogs (centralized / server-side model), rather than scanning the local machine live. |
+| Workflow | Folder | Where the database files live | What runs where |
+|----------|--------|-------------------------------|-----------------|
+| **Endpoint (traditional)** | [`endpoint-assessment/`](endpoint-assessment/README.md) | **On the endpoint** | The endpoint loads the OESIS database files (`v2mod.dat`, `wuov2.dat`, `wiv-lite.dat`, …) and resolves **all** vulnerability/patch detail locally. |
+| **Centralized** | [`centralized-assessment/`](centralized-assessment/README.md) | **On the server** | The endpoint runs a **minimal scan with no database files** (just product/OS detection). The minimal results are sent to a **cloud or on-premise server**, which does the heavy **mapping** against the catalog database files. |
 
-Each mode is self-contained: it has its own `copysdk.py` (which stages the SDK binaries and license into a local `sdk/` directory) plus copies of the shared `sdk_wrapper.py` and `platform_utils.py` helpers.
+### Why two workflows?
+
+- **Endpoint / traditional** is simplest to deploy, but every endpoint must carry the full OESIS database files (which can be large) and do the matching work.
+- **Centralized** keeps the endpoint footprint tiny — no catalog database files are copied to the endpoint at all. The endpoint only collects a small amount of detail (detected products + versions, OS info, patch lists); the server holds the database files and performs the CVE/patch mapping. This lets organizations concerned with on-endpoint database size **take that hit on the server side** instead.
+
+The key point of the sample: **the end result matches through either workflow**, so you can pick the deployment model that fits your constraints without changing the outcome.
 
 ## Prerequisites
 
 1. **Run the SDK downloader first** so the `OPSWAT-SDK/` directory is populated — see [sdk-downloader/README.md](../../sdk-downloader/README.md).
 2. Place your license files (`license.cfg`, `pass_key.txt`, `download_token.txt`) in [`eval-license/`](../../eval-license/README.md) at the repository root.
-3. Python 3.7+ (the samples use only the standard library).
+3. Python 3.7+ (standard library only).
 
-## Usage
-
-From either assessment folder:
+## Quick start
 
 ```bash
-cd endpoint-assessment        # or: cd centralized-assessment
-python copysdk.py             # stage SDK binaries + license into ./sdk
-python vapm_scanner.py        # run the scanner (stub for now)
+# Traditional endpoint workflow:
+cd endpoint-assessment
+python copysdk.py        # stage the SDK (incl. database files) onto the endpoint
+python scan-ea.py        # -> results/ea-result.json
+
+# Centralized workflow:
+cd ../centralized-assessment
+python copysdk.py        # stage the SDK runtime + license (no catalog DB needed on the endpoint)
+python scan-ca.py        # endpoint scan + server-side mapping -> results/ca-result.json
 ```
 
-## Layout
-
-```
-python-vapm-scanner/
-├── endpoint-assessment/
-│   ├── copysdk.py            # stage the SDK into ./sdk
-│   ├── vapm_scanner.py       # endpoint patch + vulnerability scan (stub)
-│   ├── sdk_wrapper.py        # ctypes wrapper around libwaapi
-│   └── platform_utils.py     # platform/arch + SDK path helpers
-└── centralized-assessment/
-    ├── copysdk.py
-    ├── vapm_scanner.py       # centralized assessment (stub)
-    ├── sdk_wrapper.py
-    └── platform_utils.py
-```
+See each folder's README for the script-by-script breakdown. The endpoint folder runs everything locally; the centralized folder separates its scripts into the **endpoint scan** (no database files) and the **server-side mapping** (uses the catalog database files).

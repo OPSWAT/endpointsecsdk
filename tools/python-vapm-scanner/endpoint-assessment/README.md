@@ -1,6 +1,8 @@
-# VAPM Scanner — Endpoint Assessment
+# VAPM Scanner — Endpoint Assessment (traditional workflow)
 
-Scans **this endpoint** (the local machine) directly via the OESIS Framework SDK for OS and third-party vulnerabilities and patch status. This is the live / agent-style counterpart to the centralized (offline-catalog) assessment; the scripts emit results in the same shape as the centralized `map-ca-*-result.json` files so the two approaches are directly comparable.
+This is the **traditional** VAPM workflow: the OESIS database files are copied **onto the endpoint**, and the endpoint resolves **all** vulnerability and patch detail locally via the SDK. `copysdk.py` stages the SDK runtime **and** the database files (`v2mod.dat`, `wuov2.dat`, `wiv-lite.dat`, …) into `./sdk`; the scan scripts then load those databases and produce the complete result without any server involvement.
+
+Simple to deploy, but every endpoint carries the full (potentially large) OESIS database files and does the matching work. If on-endpoint database size is a concern, use the [centralized workflow](../centralized-assessment/README.md) instead — it does a minimal scan here and the mapping on a server, producing the **same** final result (identical schema in `results/ea-result.json` vs `results/ca-result.json`).
 
 ## Prerequisites
 
@@ -32,4 +34,9 @@ python scan-ea-third-party.py  # detected products + CVEs            -> scan-ea-
 
 ## Endpoint vs centralized
 
-The endpoint scripts use the SDK's own detection on the live machine (so results already reflect installed state), whereas the `centralized-assessment` scripts map collected inventory against the offline Analog catalog. Coverage can differ — for example, the lite `wiv-lite.dat` may report fewer OS CVEs than the catalog's `vuln_system_associations`.
+Both workflows are designed to produce the **same** product-centric result. The difference is *where the work and the database files live*:
+
+- **Endpoint (this folder):** database files are on the endpoint; the endpoint resolves everything locally.
+- **Centralized:** the endpoint runs a minimal scan with **no** database files; a server maps the minimal data against the catalog.
+
+Because they use different data sources, coverage can differ in practice — for example, the lite `wiv-lite.dat` shipped for the endpoint may report fewer OS CVEs than the server catalog's `vuln_system_associations`.
