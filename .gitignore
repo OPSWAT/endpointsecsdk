@@ -97,6 +97,8 @@ obj/
 # local-only test driver + its root-level result/diff files (not checked in)
 /tools/python-vapm-scanner/scan-all-workflows.py
 /tools/python-vapm-scanner/*.json
+/tools/python-vapm-scanner/results/
+/tools/python-vapm-scanner/*.zip
 /helloworld/python/sdk
 /helloworld/python/__pycache__
 /helloworld/python/*.exe

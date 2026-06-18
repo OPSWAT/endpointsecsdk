@@ -10,7 +10,9 @@
 ##
 ##  On Windows the scan is limited to the Windows Update Agent (signature 1103); on
 ##  Linux/macOS every detected patch-management product (category 12) is assessed.
-##  All results are written to scan-ca-osdetails-result.json.
+##  All results are written to scan-ca-osdetails-result.json. The result always carries
+##  os_info (os_type/os_id/os_name/os_version) so the mapper can branch per platform, and
+##  on Linux it additionally reports the installed 'packages' the Linux CVE mapper needs.
 ##
 ##  Usage:
 ##      python3 copysdk.py             # stage the SDK + license into ./sdk first
@@ -30,6 +32,10 @@ from sdk_wrapper import OESISWrapper, SDKError
 from platform_utils import validate_sdk_environment
 from platform_utils import get_lib_filename
 from platform_utils import get_os_type, OS_TYPE_WINDOWS
+
+# OS type identifiers reported by GetOSInfo (match the Analog catalog / ruby samples).
+OS_TYPE_LINUX = 2
+OS_TYPE_MACOS = 4
 
 # Force UTF-8 console output so non-ASCII patch text doesn't crash on Windows (cp1252).
 if hasattr(sys.stdout, "reconfigure"):
@@ -212,6 +218,22 @@ def main():
         print(f"  Total installed   : {total_installed}")
         print(f"{'=' * 70}")
 
+        # On Linux the system-vulnerability check is package/version based (not KB based),
+        # so surface the installed packages the mapper's detect_linux_cves needs. Each
+        # installed "patch" reported by the Linux package-management product represents an
+        # installed package; normalize to {package_name, package_version}.
+        packages = []
+        if os_info.get("os_type") == OS_TYPE_LINUX:
+            seen = set()
+            for r in all_results:
+                for patch in r.get("installed_patches", []):
+                    name = patch.get("package_name") or patch.get("name") or patch.get("title")
+                    version = patch.get("package_version") or patch.get("version")
+                    if name and version and (name, version) not in seen:
+                        seen.add((name, version))
+                        packages.append({"package_name": name, "package_version": str(version)})
+            print(f"\n  Linux packages reported for vulnerability mapping: {len(packages)}")
+
         # Write the full result set to JSON
         output = {
             "os_info":  os_info,
@@ -220,6 +242,7 @@ def main():
             "total_missing_patches":   total_missing,
             "total_installed_patches": total_installed,
             "products": all_results,
+            "packages": packages,
         }
         output_file = os.path.join(SCRIPT_DIR, "scan-ca-osdetails-result.json")
         with open(output_file, "w", encoding="utf-8") as f:
