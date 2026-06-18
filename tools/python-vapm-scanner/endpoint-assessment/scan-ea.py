@@ -160,6 +160,14 @@ def main():
         os_cves = sorted({c.get("cve") for c in osd.get("cves", []) if c.get("cve")})
         os_cpes = sorted({cpe for c in osd.get("cves", []) for cpe in (c.get("cpes") or [])})
         mp = osd.get("missing_patches", [])
+        # Patches associated with the missing OS CVEs: id + name + the CVEs each remediates.
+        os_patches = [{
+            "id":        p.get("kb"),
+            "name":      p.get("title"),
+            "severity":  p.get("severity"),
+            "cve_count": p.get("cve_count", len(p.get("cves", []))),
+            "cves":      p.get("cves", []),
+        } for p in mp]
         os_section = {
             "signature_id":   osd.get("signature") or OS_SIG,
             "product_id":     None,
@@ -169,6 +177,7 @@ def main():
             "latest_version": mp[0].get("version") if mp else None,
             "cves":           os_cves,
             "cpes":           os_cpes,
+            "patches":        os_patches,
         }
     os_sig = os_section["signature_id"] if os_section else OS_SIG
 

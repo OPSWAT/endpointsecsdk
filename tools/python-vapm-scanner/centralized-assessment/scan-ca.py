@@ -85,7 +85,9 @@ def build_final_report(combined):
     # Derive a consolidated final report from map-ca-result.json. The OS is reported in its
     # own "os" section; "products" holds the third-party products. Both the OS section and
     # each product use the shared shape: signature_id, product_id, name, version,
-    # latest_version, cves[], cpes[]. Schema matches the endpoint scan-ea result.
+    # latest_version, cves[], cpes[]. Schema matches the endpoint scan-ea result. The OS
+    # section additionally carries a "patches" list — the name and ID of each patch that
+    # remediates the missing CVEs, with the CVEs each patch covers.
     os_assessment = combined.get("os_assessment") or {}
     tp_assessment = combined.get("third_party_assessment") or {}
 
@@ -94,6 +96,18 @@ def build_final_report(combined):
     # The OS section (signature 1103 = Windows Update Agent).
     os_info = os_assessment.get("os_info") or {}
     os_cves = sorted({c.get("cve") for c in os_assessment.get("cves", []) if c.get("cve")})
+
+    # Patches (KBs) associated with the missing OS CVEs: id + name + the CVEs each remediates.
+    os_patches = []
+    for mp in os_assessment.get("missing_patches", []):
+        os_patches.append({
+            "id":        mp.get("kb"),
+            "name":      mp.get("title"),
+            "severity":  mp.get("severity"),
+            "cve_count": mp.get("cve_count", len(mp.get("cves", []))),
+            "cves":      mp.get("cves", []),
+        })
+
     os_latest = None
     mps = os_assessment.get("missing_patches", [])
     if mps:
@@ -109,6 +123,7 @@ def build_final_report(combined):
         "latest_version": os_latest,
         "cves":           os_cves,
         "cpes":           [],
+        "patches":        os_patches,
     }
 
     # Third-party products. The OS / Windows Update Agent signature is folded into the OS
