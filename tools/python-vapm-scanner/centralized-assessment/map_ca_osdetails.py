@@ -296,16 +296,42 @@ def get_installed_kbs_from_earlier_builds(kb_base, current_build):
     return earlier_kbs
 
 
-def get_cves_for_kb(kb, kb_to_cves):
-    """CVEs for a KB from vuln_system_associations (proper CVE-YYYY-NNNNN format)."""
-    return set(kb_to_cves.get(kb, set()))
+def _normalize_numeric_cve(numeric_id):
+    """Convert numeric CVE id (e.g. 202438203) to CVE-YYYY-NNNNN format."""
+    s = str(numeric_id)
+    if len(s) >= 5:
+        return f"CVE-{s[:4]}-{s[4:]}"
+    return None
+
+
+def get_cves_for_kb(kb, kb_to_cves, kb_cves=None):
+    """Get all CVEs associated with a KB.
+
+    Merges two data sources:
+      - vuln_system_associations: CVE-YYYY-NNNNN format
+      - kb_cves from kb_info.json: numeric format (e.g. 202438203)
+    Both are normalized to CVE-YYYY-NNNNN and deduplicated.
+    """
+    result = set(kb_to_cves.get(kb, set()))
+
+    # Also pull from kb_cves (numeric IDs) and normalize
+    if kb_cves:
+        entry = kb_cves.get(kb) or kb_cves.get(str(kb))
+        if entry:
+            cve_list = entry.get("cves", []) if isinstance(entry, dict) else entry if isinstance(entry, list) else []
+            for cid in cve_list:
+                normalized = _normalize_numeric_cve(cid)
+                if normalized:
+                    result.add(normalized)
+
+    return result
 
 
 def detect_windows_cves(scan, server_dir, os_info, cve_index):
     os_id = os_info.get("os_id")
 
     kb_to_cves = build_kb_to_cves(server_dir, os_id)
-    supersede_graph, kb_base, _kb_cves = load_kb_info_for_os(server_dir, os_id)
+    supersede_graph, kb_base, kb_cves = load_kb_info_for_os(server_dir, os_id)
 
     current_build = str(
         os_info.get("build") or os_info.get("os_version") or os_info.get("version") or ""
@@ -355,10 +381,10 @@ def detect_windows_cves(scan, server_dir, os_info, cve_index):
     # Step 8 + 9 + 10: affected - fixed
     affected_cves = set()
     for kb in effective_missing_kbs:
-        affected_cves |= get_cves_for_kb(kb, kb_to_cves)
+        affected_cves |= get_cves_for_kb(kb, kb_to_cves, kb_cves)
     fixed_cves = set()
     for kb in recursive_installed_kbs:
-        fixed_cves |= get_cves_for_kb(kb, kb_to_cves)
+        fixed_cves |= get_cves_for_kb(kb, kb_to_cves, kb_cves)
     net_cves = affected_cves - fixed_cves
     print(f"\n  Affected CVEs (raw from missing KBs): {len(affected_cves)}")
     print(f"  Fixed CVEs (from installed KBs):      {len(fixed_cves)}")
@@ -376,7 +402,7 @@ def detect_windows_cves(scan, server_dir, os_info, cve_index):
             patch_recursive -= recursive_installed_kbs
             patch_cves = set()
             for kb in patch_recursive:
-                patch_cves |= get_cves_for_kb(kb, kb_to_cves)
+                patch_cves |= get_cves_for_kb(kb, kb_to_cves, kb_cves)
             patch_net = patch_cves & net_cves
             kb_display = next(iter(sorted(cands)), "N/A")
             mapped_patches.append({
