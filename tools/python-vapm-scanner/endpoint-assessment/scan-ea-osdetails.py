@@ -27,6 +27,7 @@
 import json
 import os
 import sys
+from datetime import datetime, timezone
 
 from sdk_wrapper import OESISWrapper, SDKError
 from platform_utils import validate_sdk_environment
@@ -66,19 +67,50 @@ def get_os_info(sdk):
 
 
 def load_patch_database(sdk, database_file):
-    # LoadPatchDatabase (method 50302) — Windows OS patch data.
+    # LoadPatchDatabase (method 50302) — Windows OS patch data. Returns the SDK's load
+    # result (carries version / published_epoch / loaded_files for the patch database).
     rc, result = sdk.invoke(50302, dat_input_source_file=database_file)
     if rc < 0:
         raise Exception(f"LoadPatchDatabase failed (rc={rc}): {result}")
     print(f"  Loaded {os.path.basename(database_file)}")
+    return result.get("result", {})
 
 
 def consume_offline_vmod_database(sdk, database_file):
-    # ConsumeOfflineVmodDatabase (method 50520) — Windows OS vulnerability data.
+    # ConsumeOfflineVmodDatabase (method 50520) — Windows OS vulnerability data. Returns the
+    # SDK's load result (version / published_epoch / details: number_of_cves / number_of_kbs).
     rc, result = sdk.invoke(50520, dat_input_source_file=database_file)
     if rc < 0:
         raise Exception(f"ConsumeOfflineVmodDatabase failed (rc={rc}): {result}")
     print(f"  Loaded {os.path.basename(database_file)}")
+    return result.get("result", {})
+
+
+def summarize_loaded_db(label, file_path, method, result):
+    # Capture the loaded-database provenance the SDK reports (so it travels with the result
+    # instead of being buried in encrypted debug logs). published_epoch is the catalog data's
+    # own definition time; it is also rendered as a readable UTC timestamp.
+    result = result or {}
+    epoch = result.get("published_epoch")
+    published_utc = None
+    try:
+        published_utc = datetime.fromtimestamp(int(epoch), tz=timezone.utc).strftime(
+            "%Y-%m-%d %H:%M:%S UTC")
+    except (TypeError, ValueError):
+        pass
+    file_size = os.path.getsize(file_path) if os.path.isfile(file_path) else None
+    return {
+        "label":           label,
+        "file":            os.path.basename(file_path),
+        "method":          method,
+        "file_size_bytes": file_size,
+        "version":         result.get("version"),
+        "schema_version":  result.get("schema_version"),
+        "published_epoch": epoch,
+        "published_utc":   published_utc,
+        "details":         result.get("details"),
+        "loaded_files":    result.get("loaded_files"),
+    }
 
 
 def get_latest_installer(sdk, signature_id):
@@ -147,8 +179,23 @@ def main(signature_id=DEFAULT_OS_SIGNATURE):
               f"os_id={os_info.get('os_id')}")
 
         print("\nLoading OS databases...")
-        load_patch_database(sdk, WUO_DAT)
-        consume_offline_vmod_database(sdk, WIV_LITE_DAT)
+        patch_db_result = load_patch_database(sdk, WUO_DAT)
+        vmod_db_result  = consume_offline_vmod_database(sdk, WIV_LITE_DAT)
+
+        # Capture the loaded-database details (version / published date / record counts) so
+        # the result is self-documenting and the DB provenance need not be recovered from the
+        # encrypted SDK debug logs.
+        databases = [
+            summarize_loaded_db("OS patch database (LoadPatchDatabase)",
+                                WUO_DAT, 50302, patch_db_result),
+            summarize_loaded_db("OS vulnerability database (ConsumeOfflineVmodDatabase)",
+                                WIV_LITE_DAT, 50520, vmod_db_result),
+        ]
+        print("\nLoaded database details:")
+        for db in databases:
+            print(f"  {db['file']:<14} v{db['version']}  "
+                  f"published={db['published_utc'] or db['published_epoch'] or 'unknown'}  "
+                  f"details={db['details']}")
 
         print(f"\nQuerying OS component signature {signature_id}...")
         installer = get_latest_installer(sdk, signature_id)
@@ -195,6 +242,7 @@ def main(signature_id=DEFAULT_OS_SIGNATURE):
             },
             "source": "OESIS live OS scan (wiv-lite.dat / wuov2.dat)",
             "signature": signature_id,
+            "databases":                       databases,
             "total_missing_patches":           len(missing_patches),
             "total_cves_raw":                  len(cve_ids),
             "total_cves_covered_by_installed": 0,
