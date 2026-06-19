@@ -96,6 +96,8 @@ obj/
 /tools/python-vapm-scanner/*/*.dat
 # local-only test driver + its root-level result/diff files (not checked in)
 /tools/python-vapm-scanner/scan-all-workflows.py
+# local-only NVD-CPE sanity check (online diagnostic, not part of the offline assessment)
+/tools/python-vapm-scanner/centralized-assessment/sanity_check_os_cves.py
 /tools/python-vapm-scanner/*.json
 /tools/python-vapm-scanner/results/
 /tools/python-vapm-scanner/*.zip
