@@ -26,6 +26,7 @@
 
 import json
 import os
+import re
 import sys
 from datetime import datetime, timezone
 
@@ -129,9 +130,29 @@ def get_os_vulnerabilities(sdk, signature_id):
     return result.get("result", {}).get("cves", []) or []
 
 
-def normalize_cve(raw, fixed_by_kbs):
+def kbs_for_cve(raw):
+    # Extract the KB number(s) that remediate THIS CVE from the SDK's resolution data.
+    # GetProductVulnerability returns details.resolution[] with:
+    #   "text": "Install KB##### to fix this vulnerability"   and an optional
+    #   "patches": [ { kb_id / patch_id, ... } ]
+    # Returns bare KB numbers (e.g. "5094126"), matching the centralized mapper's convention.
+    details = raw.get("details") or {}
+    kbs = set()
+    for res in details.get("resolution", []) or []:
+        for m in re.findall(r"KB(\d+)", res.get("text", "") or "", flags=re.IGNORECASE):
+            kbs.add(m)
+        for patch in res.get("patches", []) or []:
+            val = patch.get("kb_id") or patch.get("patch_id") or patch.get("id")
+            val = str(val).upper().replace("KB", "").strip() if val is not None else ""
+            if val.isdigit():
+                kbs.add(val)
+    return sorted(kbs)
+
+
+def normalize_cve(raw, fallback_kbs):
     # Normalize an OS CVE record into the same shape used by map-ca-osdetails-result.json,
-    # tolerating the various field names the SDK may use.
+    # tolerating the various field names the SDK may use. fixed_by_kbs is the KB(s) the SDK
+    # says fix THIS CVE (from its resolution); fallback is used only when none are provided.
     cve_id = raw.get("cve") or raw.get("id") or raw.get("static_id")
     details = raw.get("details") or {}
     cvss = details.get("cvss_3_0") or details.get("cvss_3_1") or details.get("cvss_2_0") or {}
@@ -142,12 +163,12 @@ def normalize_cve(raw, fixed_by_kbs):
             cpes.append(cpe)
     return {
         "cve":             str(cve_id) if cve_id is not None else None,
-        "cwe":             raw.get("cwe"),
-        "published_epoch": raw.get("published_epoch"),
+        "cwe":             raw.get("cwe") or details.get("cwe"),
+        "published_epoch": raw.get("published_epoch") or details.get("published_epoch"),
         "severity":        raw.get("severity") or cvss.get("base_severity"),
         "score":           cvss.get("base_score"),
         "cpes":            cpes,
-        "fixed_by_kbs":    fixed_by_kbs,
+        "fixed_by_kbs":    kbs_for_cve(raw) or list(fallback_kbs),
     }
 
 
@@ -201,35 +222,50 @@ def main(signature_id=DEFAULT_OS_SIGNATURE):
         installer = get_latest_installer(sdk, signature_id)
         raw_cves  = get_os_vulnerabilities(sdk, signature_id)
 
-        # KB / identifier for the latest available OS installer (GetLatestInstaller).
-        installer_kb = None
+        # The latest OS installer (GetLatestInstaller) is the cumulative update that brings
+        # the OS current. Keep it for reference, but DO NOT stamp its id onto every CVE --
+        # each CVE's true remediating KB comes from GetProductVulnerability's resolution.
+        latest_installer = None
         if installer:
-            installer_kb = str(installer.get("patch_id") or installer.get("analog_id") or "N/A")
-        kbs = [installer_kb] if installer_kb else []
+            latest_installer = {
+                "id":      str(installer.get("patch_id") or installer.get("analog_id") or "N/A"),
+                "title":   installer.get("title", "Unknown"),
+                "version": installer.get("minimum_version") or installer.get("version"),
+            }
 
-        # CVEs found for the OS component are remediated by the latest OS patch.
-        cves = [normalize_cve(c, kbs) for c in raw_cves]
+        cves = [normalize_cve(c, []) for c in raw_cves]
         cves = [c for c in cves if c["cve"]]
         cve_ids = sorted({c["cve"] for c in cves})
 
-        # Patch entry derived from GetLatestInstaller (kept under the same schema key as
-        # map-ca-osdetails-result.json for comparability).
+        # Group CVEs by the KB that remediates them -- the correct OS-patch -> CVE mapping.
+        kb_to_cves = {}
+        for c in cves:
+            for kb in c["fixed_by_kbs"]:
+                kb_to_cves.setdefault(kb, set()).add(c["cve"])
+        unmapped = sorted({c["cve"] for c in cves if not c["fixed_by_kbs"]})
+
+        installer_version = latest_installer["version"] if latest_installer else None
         missing_patches = []
-        if installer:
+        for kb in sorted(kb_to_cves):
             missing_patches.append({
-                "kb":        installer_kb,
-                "title":     installer.get("title", "Unknown"),
-                "severity":  installer.get("severity"),
-                "version":   installer.get("minimum_version") or installer.get("version"),
+                "kb":        kb,
+                "title":     f"Security update KB{kb} for {os_info.get('name', 'Windows OS')}",
+                "severity":  None,
+                "version":   installer_version,
                 "product":   os_info.get("name", "Windows OS"),
-                "cve_count": len(cve_ids),
-                "cves":      cve_ids,
+                "cve_count": len(kb_to_cves[kb]),
+                "cves":      sorted(kb_to_cves[kb]),
             })
 
-        print(f"\n  Latest installer (GetLatestInstaller): {len(missing_patches)}")
+        print(f"\n  OS CVEs (GetProductVulnerability): {len(cve_ids)}")
+        print(f"  Mapped to {len(missing_patches)} remediating KB(s):")
         for mp in missing_patches:
-            print(f"    {str(mp['kb']):<12} {(mp['title'] or 'Unknown')[:50]}  (target {mp.get('version')})")
-        print(f"  OS CVEs (GetProductVulnerability / wiv-lite.dat): {len(cve_ids)}")
+            print(f"    KB{mp['kb']:<10} -> {mp['cve_count']} CVE(s)")
+        if unmapped:
+            print(f"  {len(unmapped)} CVE(s) had no KB in the SDK resolution: {unmapped}")
+        if latest_installer:
+            print(f"  Latest installer (brings OS current): {latest_installer['id']}  "
+                  f"{(latest_installer['title'] or '')[:50]}  (target {latest_installer['version']})")
 
         # Output schema matches map-ca-osdetails-result.json. The live SDK scan already
         # reflects installed state, so raw == net and covered == 0.
@@ -240,13 +276,15 @@ def main(signature_id=DEFAULT_OS_SIGNATURE):
                 "os_id":   os_info.get("os_id"),
                 "os_type": os_info.get("os_type"),
             },
-            "source": "OESIS live OS scan (wiv-lite.dat / wuov2.dat)",
+            "source": "OESIS live OS scan (GetProductVulnerability resolution -> KB)",
             "signature": signature_id,
             "databases":                       databases,
+            "latest_installer":                latest_installer,
             "total_missing_patches":           len(missing_patches),
             "total_cves_raw":                  len(cve_ids),
             "total_cves_covered_by_installed": 0,
             "total_cves":                      len(cve_ids),
+            "unmapped_cves":                   unmapped,
             "missing_patches":                 missing_patches,
             "cves":                            cves,
         }

@@ -168,6 +168,13 @@ def main():
             "cve_count": p.get("cve_count", len(p.get("cves", []))),
             "cves":      p.get("cves", []),
         } for p in mp]
+        # Direct CVE -> remediating KB(s) lookup (inverse of os_patches) so a consumer can
+        # answer "which KB fixes this OS CVE?" without scanning the patch list.
+        cve_kbs = {}
+        for p in os_patches:
+            for c in p["cves"]:
+                cve_kbs.setdefault(c, set()).add(p["id"])
+        cve_kbs = {c: sorted(v) for c, v in sorted(cve_kbs.items())}
         os_section = {
             "signature_id":   osd.get("signature") or OS_SIG,
             "product_id":     None,
@@ -178,6 +185,7 @@ def main():
             "cves":           os_cves,
             "cpes":           os_cpes,
             "patches":        os_patches,
+            "cve_kbs":        cve_kbs,
         }
     os_sig = os_section["signature_id"] if os_section else OS_SIG
 
