@@ -108,6 +108,14 @@ def build_final_report(combined):
             "cves":      mp.get("cves", []),
         })
 
+    # Direct CVE -> remediating KB(s) lookup (inverse of os_patches) so a consumer can answer
+    # "which KB fixes this OS CVE?" without scanning the patch list.
+    cve_kbs = {}
+    for p in os_patches:
+        for c in p["cves"]:
+            cve_kbs.setdefault(c, set()).add(p["id"])
+    cve_kbs = {c: sorted(v) for c, v in sorted(cve_kbs.items())}
+
     os_latest = None
     mps = os_assessment.get("missing_patches", [])
     if mps:
@@ -124,6 +132,7 @@ def build_final_report(combined):
         "cves":           os_cves,
         "cpes":           [],
         "patches":        os_patches,
+        "cve_kbs":        cve_kbs,
     }
 
     # Third-party products. The OS / Windows Update Agent signature is folded into the OS
