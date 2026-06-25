@@ -8,9 +8,12 @@
 ##      scan-ea-third-party.py  -> detected products + CVEs + CPEs
 ##  then combines them into a single product-centric report at results/ea-result.json.
 ##
-##  The schema matches the centralized scan-ca result (results/ca-result.json): a list of
-##  products, each with signature_id, product_id, name, version, latest_version, and the
-##  vulnerable CVEs and CPEs. All other detail is trimmed.
+##  The schema matches the centralized scan-ca result (results/ca-result.json): the OS in its
+##  own "os" section and "products" for third-party, each with signature_id, product_id, name,
+##  version, latest_version, and the vulnerable CVEs and CPEs. The OS section also carries:
+##      patches  -> [{id: KB, name, cves[]}]  the KB(s) that remediate the missing OS CVEs
+##      cve_kbs  -> {CVE: [KB]}               direct CVE -> remediating-KB lookup (inverse)
+##  All other detail is trimmed.
 ##
 ##  Usage:
 ##      python3 copysdk.py     # stage the SDK + license into ./sdk first

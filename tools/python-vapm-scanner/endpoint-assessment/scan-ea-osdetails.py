@@ -3,12 +3,24 @@
 ##  VAPM Endpoint Assessment — OS Details / Vulnerabilities (live SDK scan)
 ##  Reference Implementation using the OESIS Framework
 ##
-##  Live, agent-style OS assessment of THIS endpoint. Like helloworld/python/os_vulnerability.py
-##  it loads the Windows OS patch database (wuov2.dat) and vulnerability database
-##  (wiv-lite.dat) and queries the OS component for vulnerabilities. It also gathers OS info
-##  and missing patches so the output matches the centralized mapper's result shape
-##  (map-ca-osdetails-result.json), making the endpoint and centralized assessments
-##  directly comparable.
+##  Live, agent-style OS assessment of THIS endpoint (no server/catalog needed). Workflow:
+##    1. GetOSInfo (1)                      -> OS name / version / os_id / os_type.
+##    2. LoadPatchDatabase (50302, wuov2.dat)        -> Windows OS patch data.
+##       ConsumeOfflineVmodDatabase (50520, wiv-lite.dat) -> Windows OS vulnerability data.
+##       Both load results are captured (version / published date / record counts) into a
+##       'databases' section so the loaded-DB provenance travels with the result.
+##    3. GetProductVulnerability (50505) on the OS signature (default 1103), with
+##       skip_extra_installed_os_patches_checks=true so the engine returns the full OS CVE
+##       set rather than a narrowed subset. Each returned CVE carries the KB that fixes it in
+##       details.resolution; we extract that per-CVE KB and group the result's
+##       missing_patches by the actual remediating KB (the correct OS patch -> CVE mapping).
+##    4. GetLatestInstaller (50300) is recorded separately as 'latest_installer' (the latest
+##       cumulative that brings the OS current); it is NOT used as the per-CVE KB.
+##
+##  Output matches the centralized mapper's shape (map-ca-osdetails-result.json) so the
+##  endpoint and centralized assessments are directly comparable. NOTE: wiv-lite.dat is the
+##  LITE vulnerability DB; its OS CVE coverage is a subset of the full Analog catalog used by
+##  the centralized workflow.
 ##
 ##  Usage:
 ##      python3 copysdk.py                 # stage the SDK + license into ./sdk first
@@ -124,7 +136,11 @@ def get_latest_installer(sdk, signature_id):
 
 def get_os_vulnerabilities(sdk, signature_id):
     # GetProductVulnerability (method 50505) against the loaded wiv-lite.dat.
-    rc, result = sdk.invoke(50505, signature=signature_id)
+    # skip_extra_installed_os_patches_checks=True tells the engine not to suppress CVEs based
+    # on its extra installed-OS-patch heuristics, so the OS vulnerability set is reported in
+    # full (matching the centralized catalog) rather than a narrowed subset.
+    rc, result = sdk.invoke(50505, signature=signature_id,
+                            skip_extra_installed_os_patches_checks=True)
     if rc < 0:
         return []
     return result.get("result", {}).get("cves", []) or []

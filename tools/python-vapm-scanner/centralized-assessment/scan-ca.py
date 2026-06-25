@@ -9,7 +9,10 @@
 ##    2. Runs the combined mapper (map-ca.py)           -> maps those results to missing
 ##       patches and CVEs via the Analog catalog -> map-ca-result.json.
 ##    3. Produces a final, consolidated report: ca-result.json (derived from
-##       map-ca-result.json).
+##       map-ca-result.json). The OS is reported in its own "os" section and third-party in
+##       "products"; the OS section carries:
+##         patches  -> [{id: KB, name, cves[]}]  the KB(s) remediating the missing OS CVEs
+##         cve_kbs  -> {CVE: [KB]}               direct CVE -> remediating-KB lookup (inverse)
 ##
 ##  Usage:
 ##      python3 copysdk.py      # stage the SDK + license into ./sdk first
