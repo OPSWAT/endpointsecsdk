@@ -342,6 +342,23 @@ def detect_windows_cves(scan, server_dir, os_info, cve_index):
     print(f"  KB base      : {len(kb_base)} builds indexed")
     print(f"  Current build: {current_build}")
 
+    # --- Data-quality warnings (do not alter the mapping; just surface risk) -------------
+    if not kb_to_cves:
+        print(f"  WARNING: no Windows KB->CVE associations found for os_id {os_id}. This OS may "
+              f"not be covered by the catalog (or os_id is wrong) -- OS CVE results may be "
+              f"empty or incomplete.")
+    if not supersede_graph or not kb_base:
+        print(f"  WARNING: no kb_info supersedence/kb_base data for os_id {os_id}. Installed-KB "
+              f"seeding from the build is unavailable, so 'already-fixed' CVEs may not be "
+              f"subtracted (results may over-report).")
+    # A valid Windows build is '<build>.<revision>' (e.g. 26100.6584). If GetOSInfo did not
+    # provide it and we fell back to the version string (e.g. '10.0.26100'), the build-based
+    # installed-patch seeding (compare_builds / kb_base lookups) is unreliable.
+    if not re.match(r"^\d{4,}\.\d+$", current_build):
+        print(f"  WARNING: OS build '{current_build}' is not a <build>.<revision> value "
+              f"(expected e.g. 26100.6584). Build-based installed-patch seeding may be "
+              f"unreliable for this scan.")
+
     # Step 1: installed KBs from scan
     installed_kbs = set()
     for product in scan.get("products", []):
