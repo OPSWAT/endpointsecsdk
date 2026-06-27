@@ -152,10 +152,12 @@ def build_kb_to_cves(server_dir, os_id):
 
 
 def load_kb_info_for_os(server_dir, os_id):
-    """Returns (supersede_graph, kb_base, kb_cves) for this os_id from kb_info.json."""
+    """Returns (supersede_graph, kb_base, kb_cves, cumulative_kbs) for this os_id from
+    kb_info.json. cumulative_kbs is the set of KB ids flagged cumulative in kb_tree; it is
+    used to walk supersedence *forward* (see get_superseding_cumulative_kbs)."""
     path = os.path.join(server_dir, "kb_info.json")
     if not os.path.isfile(path):
-        return {}, {}, {}
+        return {}, {}, {}, set()
 
     with open(path, "r", encoding="utf-8") as f:
         data = json.load(f)
@@ -177,18 +179,21 @@ def load_kb_info_for_os(server_dir, os_id):
 
     platform_label = id_os_map.get(os_id)
     if not platform_label:
-        return {}, {}, {}
+        return {}, {}, {}, set()
 
     section = sections.get(platform_label) or {}
 
     tree = section.get("kb_tree") or {}
     graph = {}
+    cumulative_kbs = set()
     for kb, rec in tree.items():
         graph[str(kb)] = {str(v) for v in (rec.get("supersede_kbs") or [])}
+        if rec.get("cumulative"):
+            cumulative_kbs.add(str(kb))
 
     kb_base = section.get("kb_base") or {}
     kb_cves = section.get("kb_cves") or {}
-    return graph, kb_base, kb_cves
+    return graph, kb_base, kb_cves, cumulative_kbs
 
 
 def compare_builds(build1, build2):
@@ -223,6 +228,34 @@ def graph_closure(start, graph):
             if nxt not in visited:
                 queue.append(nxt)
     return visited
+
+
+def build_superseded_by_map(supersede_graph, cumulative_kbs):
+    """Invert the supersede graph, keeping only *cumulative* superseders.
+
+    supersede_graph[kb] = older KBs that kb supersedes (forward edges). The inverse answers
+    'which newer cumulative KBs supersede this KB?' — i.e. superseded_by[old] = {newer cumuls}.
+    """
+    superseded_by = {}
+    for kb, older_kbs in supersede_graph.items():
+        if cumulative_kbs and kb not in cumulative_kbs:
+            continue  # only newer *cumulative* updates are a valid recovery target
+        for old in older_kbs:
+            superseded_by.setdefault(old, set()).add(kb)
+    return superseded_by
+
+
+def get_superseding_cumulative_kbs(missing_kbs, supersede_graph, cumulative_kbs):
+    """Newer cumulative KBs that supersede any reported-missing KB (one hop), excluding the
+    inputs themselves. Mirrors the endpoint's appendMissingCumulKB: if an older cumulative is
+    missing, every cumulative that supersedes it is missing too (cumulatives are cumulative),
+    so the latest cumulative's CVEs are not dropped just because the agent reported a stale KB.
+    """
+    superseded_by = build_superseded_by_map(supersede_graph, cumulative_kbs)
+    out = set()
+    for kb in missing_kbs:
+        out |= superseded_by.get(kb, set())
+    return out - set(missing_kbs)
 
 
 def get_base_kbs_for_build(kb_base, current_build, supersede_graph):
@@ -331,7 +364,7 @@ def detect_windows_cves(scan, server_dir, os_info, cve_index):
     os_id = os_info.get("os_id")
 
     kb_to_cves = build_kb_to_cves(server_dir, os_id)
-    supersede_graph, kb_base, kb_cves = load_kb_info_for_os(server_dir, os_id)
+    supersede_graph, kb_base, kb_cves, cumulative_kbs = load_kb_info_for_os(server_dir, os_id)
 
     current_build = str(
         os_info.get("build") or os_info.get("os_version") or os_info.get("version") or ""
@@ -382,56 +415,99 @@ def detect_windows_cves(scan, server_dir, os_info, cve_index):
         recursive_installed_kbs |= graph_closure(kb, supersede_graph)
     print(f"  Installed KBs after recursion: {len(recursive_installed_kbs)}")
 
-    # Step 5 + 6 + 7: missing KBs, recursive closure, minus installed
-    missing_kbs_input = set()
+    # Step 5: missing KBs reported by the scan (OESIS GetMissingPatches / method 1013).
+    scan_reported_missing_kbs = set()
     for product in scan.get("products", []):
         for patch in product.get("missing_patches", []):
-            missing_kbs_input |= kb_candidates(patch)
-    recursive_missing_kbs = set()
+            scan_reported_missing_kbs |= kb_candidates(patch)
+
+    # Step 5b: forward supersedence. The agent's GetMissingPatches (1013) can report a stale
+    # "latest offered" KB; promote the missing set to the newer cumulative KBs that supersede
+    # it so the latest cumulative's CVEs (e.g. current-month fixes) are not dropped. This
+    # mirrors the endpoint engine's appendMissingCumulKB and keeps the two workflows aligned.
+    superseding_kbs = get_superseding_cumulative_kbs(
+        scan_reported_missing_kbs, supersede_graph, cumulative_kbs)
+    if superseding_kbs:
+        print(f"  Forward supersedence: promoted missing set with "
+              f"{len(superseding_kbs)} newer cumulative KB(s): {sorted(superseding_kbs)}")
+    missing_kbs_input = scan_reported_missing_kbs | superseding_kbs
+
+    # ------------------------------------------------------------------
+    # Affected-CVE calculation — ported from the endpoint engine's calcAffectedCvesList
+    # (wa_vmod_impl_vulns_win.cpp:535). The missing KBs are NOT expanded downward into the
+    # affected set. We take each missing KB's OWN (direct) CVEs, then SUBTRACT (a) the CVEs of
+    # the older KBs those missing KBs supersede and (b) the CVEs already covered by installed
+    # KBs plus their supersede chain:
+    #
+    #   affected = direct_cves(missing)
+    #            - direct_cves(older KBs superseded by missing, not themselves missing)
+    #            - direct_cves(installed + supersede chain)
+    #
+    # The previous approach expanded missing *downward* (closure(missing)); because the
+    # installed baseline only reaches the machine's build, every cumulative newer than the
+    # build leaked in as "affected", accreting the whole historical CVE tail. The engine
+    # avoids this by subtracting the superseded history instead of accumulating it.
+    # ------------------------------------------------------------------
+
+    # (A) Direct CVEs of every missing KB — NO downward expansion.
+    cves_from_missing = set()
     for kb in missing_kbs_input:
-        recursive_missing_kbs |= graph_closure(kb, supersede_graph)
-    effective_missing_kbs = recursive_missing_kbs - recursive_installed_kbs
-    print(f"  Missing KBs  : {len(missing_kbs_input)} input -> "
-          f"{len(recursive_missing_kbs)} recursive -> "
-          f"{len(effective_missing_kbs)} after subtracting installed")
+        cves_from_missing |= get_cves_for_kb(kb, kb_to_cves, kb_cves)
 
-    # Step 8 + 9 + 10: affected - fixed
-    affected_cves = set()
-    for kb in effective_missing_kbs:
-        affected_cves |= get_cves_for_kb(kb, kb_to_cves, kb_cves)
-    fixed_cves = set()
+    # (B) Older KBs superseded by the *scan-reported* missing KBs (excluding any KB that is
+    #     itself missing). The forward-appended cumulatives are intentionally NOT expanded
+    #     here — mirrors appendMissingCumulKB being placed after the child expansion in the
+    #     engine, so the latest cumulative's own CVEs are kept rather than subtracted.
+    superseded_kbs = set()
+    for kb in scan_reported_missing_kbs:
+        superseded_kbs |= graph_closure(kb, supersede_graph)
+    superseded_kbs -= missing_kbs_input
+    cve_from_superseded = set()
+    for kb in superseded_kbs:
+        cve_from_superseded |= get_cves_for_kb(kb, kb_to_cves, kb_cves)
+
+    # (C) CVEs covered by installed KBs and their full supersede chain.
+    cve_from_installed = set()
     for kb in recursive_installed_kbs:
-        fixed_cves |= get_cves_for_kb(kb, kb_to_cves, kb_cves)
-    net_cves = affected_cves - fixed_cves
-    print(f"\n  Affected CVEs (raw from missing KBs): {len(affected_cves)}")
-    print(f"  Fixed CVEs (from installed KBs):      {len(fixed_cves)}")
-    print(f"  Net affected CVEs:                    {len(net_cves)}")
+        cve_from_installed |= get_cves_for_kb(kb, kb_to_cves, kb_cves)
 
-    # Per-patch breakdown
+    net_cves = cves_from_missing - cve_from_superseded - cve_from_installed
+    print(f"  Missing KBs  : {len(scan_reported_missing_kbs)} reported + "
+          f"{len(superseding_kbs)} forward = {len(missing_kbs_input)} total")
+    print(f"\n  CVEs from missing KBs (direct):        {len(cves_from_missing)}")
+    print(f"  - subtracted, superseded/older KBs:    {len(cve_from_superseded)}")
+    print(f"  - subtracted, installed + chain:       {len(cve_from_installed)}")
+    print(f"  Net affected CVEs:                     {len(net_cves)}")
+
+    # Per-patch breakdown: attribute each net CVE to the missing KB(s) whose direct CVE list
+    # contains it (mirrors the engine's cve2MissingKBMap = invert(missingKB2CveMap)).
+    patch_meta = {}  # kb -> (title, severity, product)
+    for product in scan.get("products", []):
+        for patch in product.get("missing_patches", []):
+            for kb in kb_candidates(patch):
+                patch_meta.setdefault(
+                    kb, (patch.get("title", "Unknown"), patch.get("severity"), product.get("name")))
+    os_product_name = next((p.get("name") for p in scan.get("products", [])),
+                           "Windows Update Agent")
+
     mapped_patches = []
     cve_to_patches = {}
-    for product in scan.get("products", []):
-        for patch in product.get("missing_patches", []):
-            cands = kb_candidates(patch)
-            patch_recursive = set()
-            for kb in cands:
-                patch_recursive |= graph_closure(kb, supersede_graph)
-            patch_recursive -= recursive_installed_kbs
-            patch_cves = set()
-            for kb in patch_recursive:
-                patch_cves |= get_cves_for_kb(kb, kb_to_cves, kb_cves)
-            patch_net = patch_cves & net_cves
-            kb_display = next(iter(sorted(cands)), "N/A")
-            mapped_patches.append({
-                "kb":        kb_display,
-                "title":     patch.get("title", "Unknown"),
-                "severity":  patch.get("severity"),
-                "product":   product.get("name"),
-                "cve_count": len(patch_net),
-                "cves":      sorted(patch_net),
-            })
-            for cve in patch_net:
-                cve_to_patches.setdefault(cve, set()).add(kb_display)
+    for kb in sorted(missing_kbs_input):
+        kb_net = get_cves_for_kb(kb, kb_to_cves, kb_cves) & net_cves
+        if not kb_net:
+            continue
+        title, severity, product_name = patch_meta.get(
+            kb, (f"Cumulative update KB{kb} (recovered via supersedence)", None, os_product_name))
+        mapped_patches.append({
+            "kb":        kb,
+            "title":     title,
+            "severity":  severity,
+            "product":   product_name,
+            "cve_count": len(kb_net),
+            "cves":      sorted(kb_net),
+        })
+        for cve in kb_net:
+            cve_to_patches.setdefault(cve, set()).add(kb)
 
     cve_list = [
         enrich_cve(cve, cve_index, fixed_by_kbs=sorted(cve_to_patches.get(cve, set())))
@@ -448,19 +524,21 @@ def detect_windows_cves(scan, server_dir, os_info, cve_index):
 
     return {
         "platform": "windows",
-        "source": "Analog kb_info.json + vuln_system_associations.json (get_windows_vuln.rb logic)",
+        "source": "Analog kb_info.json + vuln_system_associations.json (calcAffectedCvesList logic)",
         "total_missing_patches":   len(mapped_patches),
-        "total_cves_affected_raw": len(affected_cves),
-        "total_cves_fixed":        len(fixed_cves),
+        "total_cves_from_missing": len(cves_from_missing),
+        "total_cves_superseded":   len(cve_from_superseded),
+        "total_cves_installed":    len(cve_from_installed),
         "total_cves":              len(cve_list),
         "debug": {
             "installed_kbs_from_scan":      scan_count,
             "installed_kbs_earlier_builds": len(earlier_kbs),
             "installed_kbs_base":           len(base_kbs),
             "recursive_installed_kbs":      len(recursive_installed_kbs),
+            "scan_reported_missing_kbs":    sorted(scan_reported_missing_kbs),
+            "superseding_cumulative_kbs":   sorted(superseding_kbs),
             "missing_kbs_input":            len(missing_kbs_input),
-            "recursive_missing_kbs":        len(recursive_missing_kbs),
-            "effective_missing_kbs":        len(effective_missing_kbs),
+            "superseded_kbs_subtracted":    len(superseded_kbs),
         },
         "missing_patches": mapped_patches,
         "cves":            cve_list,
