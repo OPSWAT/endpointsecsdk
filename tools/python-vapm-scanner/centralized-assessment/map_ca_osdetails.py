@@ -329,6 +329,34 @@ def get_installed_kbs_from_earlier_builds(kb_base, current_build):
     return earlier_kbs
 
 
+def get_missing_kbs_from_later_builds(kb_base, current_build):
+    """KBs from builds *higher* than current in the same major version line.
+
+    Direct port of the endpoint engine's getMissingKBFromBuildHistory
+    (wa_vmod_utils_vulns_win.cpp). GetMissingPatches (method 1013) reports only the latest
+    offered cumulative, so the intervening months' cumulatives the machine is also missing
+    never enter the scan's missing list and their CVEs get dropped. Forward supersedence
+    (get_superseding_cumulative_kbs) only walks the supersede chain up one hop, not into every
+    intervening build. Any build newer than the running one fixes CVEs the machine has not
+    applied yet, so its KB must be treated as missing. This is the symmetric counterpart of
+    get_installed_kbs_from_earlier_builds (builds below current = installed).
+    """
+    if not kb_base or not current_build:
+        return set()
+    current_major = str(current_build).split(".")[0]
+    later_kbs = set()
+    for build, build_data in kb_base.items():
+        if str(build).split(".")[0] != current_major:
+            continue
+        if compare_builds(build, current_build) <= 0:
+            continue
+        for patch in (build_data or {}).get("kb_articles") or []:
+            kb_id = patch.get("kb_id")
+            if kb_id and str(kb_id) != "0":
+                later_kbs.add(str(kb_id))
+    return later_kbs
+
+
 def _normalize_numeric_cve(numeric_id):
     """Convert numeric CVE id (e.g. 202438203) to CVE-YYYY-NNNNN format."""
     s = str(numeric_id)
@@ -430,7 +458,16 @@ def detect_windows_cves(scan, server_dir, os_info, cve_index):
     if superseding_kbs:
         print(f"  Forward supersedence: promoted missing set with "
               f"{len(superseding_kbs)} newer cumulative KB(s): {sorted(superseding_kbs)}")
-    missing_kbs_input = scan_reported_missing_kbs | superseding_kbs
+
+    # Step 5c: build-history recovery (mirrors the endpoint engine's getMissingKBFromBuildHistory).
+    # GetMissingPatches only offers the latest cumulative and forward supersedence walks the
+    # chain up one hop, so the intervening months' cumulatives are still missing from the set.
+    # Pull every KB whose build is newer than the running build: those fix CVEs not yet applied.
+    later_build_kbs = get_missing_kbs_from_later_builds(kb_base, current_build)
+    if later_build_kbs:
+        print(f"  Build-history recovery: added {len(later_build_kbs)} KB(s) from builds newer "
+              f"than {current_build}")
+    missing_kbs_input = scan_reported_missing_kbs | superseding_kbs | later_build_kbs
 
     # ------------------------------------------------------------------
     # Affected-CVE calculation — ported from the endpoint engine's calcAffectedCvesList
@@ -454,12 +491,14 @@ def detect_windows_cves(scan, server_dir, os_info, cve_index):
     for kb in missing_kbs_input:
         cves_from_missing |= get_cves_for_kb(kb, kb_to_cves, kb_cves)
 
-    # (B) Older KBs superseded by the *scan-reported* missing KBs (excluding any KB that is
-    #     itself missing). The forward-appended cumulatives are intentionally NOT expanded
-    #     here — mirrors appendMissingCumulKB being placed after the child expansion in the
-    #     engine, so the latest cumulative's own CVEs are kept rather than subtracted.
+    # (B) Older KBs superseded by the missing KBs (excluding any KB that is itself missing).
+    #     The scan-reported AND build-history-derived missing KBs are expanded here, mirroring
+    #     the engine: getMissingKBFromBuildHistory KBs are in missingKBList at child-expansion
+    #     time. Only the forward-appended cumulatives (superseding_kbs) are intentionally NOT
+    #     expanded — appendMissingCumulKB runs after child expansion in the engine, so the
+    #     latest cumulative's own CVEs are kept rather than subtracted.
     superseded_kbs = set()
-    for kb in scan_reported_missing_kbs:
+    for kb in scan_reported_missing_kbs | later_build_kbs:
         superseded_kbs |= graph_closure(kb, supersede_graph)
     superseded_kbs -= missing_kbs_input
     cve_from_superseded = set()
@@ -473,7 +512,8 @@ def detect_windows_cves(scan, server_dir, os_info, cve_index):
 
     net_cves = cves_from_missing - cve_from_superseded - cve_from_installed
     print(f"  Missing KBs  : {len(scan_reported_missing_kbs)} reported + "
-          f"{len(superseding_kbs)} forward = {len(missing_kbs_input)} total")
+          f"{len(superseding_kbs)} forward + {len(later_build_kbs)} build-history "
+          f"= {len(missing_kbs_input)} total")
     print(f"\n  CVEs from missing KBs (direct):        {len(cves_from_missing)}")
     print(f"  - subtracted, superseded/older KBs:    {len(cve_from_superseded)}")
     print(f"  - subtracted, installed + chain:       {len(cve_from_installed)}")
@@ -497,7 +537,8 @@ def detect_windows_cves(scan, server_dir, os_info, cve_index):
         if not kb_net:
             continue
         title, severity, product_name = patch_meta.get(
-            kb, (f"Cumulative update KB{kb} (recovered via supersedence)", None, os_product_name))
+            kb, (f"Cumulative update KB{kb} (recovered via supersedence/build history)",
+                 None, os_product_name))
         mapped_patches.append({
             "kb":        kb,
             "title":     title,
@@ -537,6 +578,7 @@ def detect_windows_cves(scan, server_dir, os_info, cve_index):
             "recursive_installed_kbs":      len(recursive_installed_kbs),
             "scan_reported_missing_kbs":    sorted(scan_reported_missing_kbs),
             "superseding_cumulative_kbs":   sorted(superseding_kbs),
+            "later_build_kbs":              len(later_build_kbs),
             "missing_kbs_input":            len(missing_kbs_input),
             "superseded_kbs_subtracted":    len(superseded_kbs),
         },
