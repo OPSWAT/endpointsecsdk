@@ -1,7 +1,7 @@
-﻿///////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////
 ///  Sample Code for HelloWorld
 ///  Reference Implementation using OESIS Framework
-///  
+///
 ///  Created by Chris Seiler
 ///  OPSWAT OEM Solutions Architect
 ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -31,8 +31,57 @@ namespace SDKDownloader
             return result;
         }
 
+        /// <summary>
+        /// HEAD the URL and compare its size to the recorded size. Download only when the file is
+        /// new or its size changed; otherwise skip it (so it is neither re-downloaded nor
+        /// re-extracted). Records the new size / update date in the status on success.
+        /// </summary>
+        private static bool DownloadIfChanged(string key, string url, string localPath,
+                                              DownloadStatus status, string sha256 = null)
+        {
+            string lastModified;
+            long? remoteSize = HttpClientUtils.RemoteContentLength(url, out lastModified);
+            long? prevSize = status.GetSize(key);
 
-        private static void DownloadReleaseFiles(XElement releaseELement, string destPath)
+            // Fast path: server size confirms unchanged -> skip download AND extract.
+            if (remoteSize.HasValue && prevSize.HasValue && remoteSize.Value == prevSize.Value)
+            {
+                Console.WriteLine("  Unchanged (size " + remoteSize.Value +
+                                  " bytes) - skipping download and extract: " + key);
+                return false;
+            }
+
+            string reason = !prevSize.HasValue ? "new"
+                          : !remoteSize.HasValue ? "size unverifiable up front - downloading to verify"
+                          : "size changed " + prevSize.Value + " -> " + remoteSize.Value + " bytes";
+            Console.WriteLine("  Downloading (" + reason + "): " + key);
+
+            bool ok = HttpClientUtils.DownloadValidFile(url, localPath, sha256);
+            if (!(ok && File.Exists(localPath)))
+            {
+                Console.WriteLine("  Download FAILED: " + key);
+                return false;
+            }
+
+            long downloadedSize = new FileInfo(localPath).Length;
+
+            // Post-download check: even though we re-downloaded, if the size matches what we
+            // already have then the content is unchanged -> remove the archive so the extractor
+            // ignores it, and leave the recorded status as-is. This skips a needless re-extract.
+            if (prevSize.HasValue && downloadedSize == prevSize.Value)
+            {
+                Console.WriteLine("  Re-downloaded but size unchanged (" + downloadedSize +
+                                  " bytes) - skipping extract: " + key);
+                try { File.Delete(localPath); } catch { }
+                return false;
+            }
+
+            status.Record(key, url, downloadedSize, sha256, lastModified);
+            return true;
+        }
+
+        private static void DownloadReleaseFiles(XElement releaseELement, string destPath,
+                                                 string platform, DownloadStatus status)
         {
             if (releaseELement != null)
             {
@@ -49,7 +98,9 @@ namespace SDKDownloader
                         // Only Download the static release files
                         if (!fileName.Contains("Adapter") && !fileName.Contains("offline") && (fileName.EndsWith(".zip") || fileName.EndsWith(".tar")))
                         {
-                            HttpClientUtils.DownloadValidFile(fileUrl, localFilePath, sha256Hash);
+                            string key = platform + "/" + fileName;
+                            string sha = string.IsNullOrEmpty(sha256Hash) ? null : sha256Hash;
+                            DownloadIfChanged(key, fileUrl, localFilePath, status, sha);
                         }
                     }
                 }
@@ -58,20 +109,21 @@ namespace SDKDownloader
 
 
 
-        private static void DownloadPlatform(XElement platformElement, string destPath)
+        private static void DownloadPlatform(XElement platformElement, string destPath,
+                                             string platform, DownloadStatus status)
         {
             foreach (XElement releaseElement in platformElement.Elements())
             {
                 if (releaseElement.Name == "Releases" && getAttribute(releaseElement, "Name") == "OESIS Local V4")
                 {
                     XElement latestReleaseElement = releaseElement.Element("LatestRelease");
-                    DownloadReleaseFiles(latestReleaseElement, destPath);
+                    DownloadReleaseFiles(latestReleaseElement, destPath, platform, status);
                 }
             }
         }
 
 
-        private static void DownloadReleases(string sdkDir, string xmlDescription)
+        private static void DownloadReleases(string sdkDir, string xmlDescription, DownloadStatus status)
         {
             XDocument doc = XDocument.Parse(xmlDescription);
             IEnumerable<XElement> firstElements = doc.Elements();
@@ -86,13 +138,13 @@ namespace SDKDownloader
 
                         if (platformName == "Windows" || platformName == "Linux" || platformName == "Mac")
                         {
-                            Console.WriteLine("Downloading Platform: " + platformName);
+                            Console.WriteLine("Platform: " + platformName);
 
                             platformName = platformName.ToLower();
                             string platformDir = Path.Combine(sdkDir, platformName);
                             Directory.CreateDirectory(platformDir);
 
-                            DownloadPlatform(platformElement, platformDir);
+                            DownloadPlatform(platformElement, platformDir, platformName, status);
                         }
                     }
                 }
@@ -105,8 +157,10 @@ namespace SDKDownloader
             return result;
         }
 
-        private static void DownloadArchives(string archiveRoot)
+        private static void DownloadArchives(string archiveRoot, DownloadStatus status)
         {
+            // The descriptor is always fetched (small; it provides the current file URLs) and is
+            // not extracted, so it is not tracked in the download status.
             string oesisFilePath = Path.Combine(archiveRoot, Constants.DESCRIPTOR_FILE);
 
             HttpClientUtils.DownloadFileSynchronous(GetSDKUrl(), oesisFilePath);
@@ -114,38 +168,45 @@ namespace SDKDownloader
             if (File.Exists(oesisFilePath))
             {
                 string xmlString = File.ReadAllText(oesisFilePath);
-                DownloadReleases(archiveRoot, xmlString);
+                DownloadReleases(archiveRoot, xmlString, status);
             }
         }
 
 
-        private static void DownloadDynamicFile(string archiveRoot, string fileName)
+        private static void DownloadDynamicFile(string archiveRoot, string fileName, DownloadStatus status)
         {
+            Console.WriteLine("Dynamic File: " + fileName);
             string filePath = Path.Combine(archiveRoot, fileName);
             string fileURL = Util.GetTokenDownloadURL(fileName);
-            HttpClientUtils.DownloadFileSynchronous(fileURL, filePath);
+            DownloadIfChanged(fileName, fileURL, filePath, status);
         }
 
 
         public static void Download(string sdkRoot)
         {
             string archivePath = Util.GetArchivesPath(sdkRoot);
+            Console.WriteLine("Downloading SDK to " + archivePath);
+            Util.CreateCleanDir(archivePath);
 
-            string firstFile = Util.FindFirstFile(archivePath);
-            if (!Util.IsFileUpdated(firstFile))
-            {
-                Console.WriteLine("Downloading SDK to " + archivePath);
-                Util.CreateCleanDir(archivePath);
-                DownloadArchives(archivePath);
-                Console.WriteLine("SDKDownloader Complete");
-            }
+            // Load the persistent status so we can skip files whose size hasn't changed.
+            DownloadStatus status = new DownloadStatus(sdkRoot).Load();
 
+            DownloadArchives(archivePath, status);
 
             //
             // Now Download the dynamic files
             //
-            DownloadDynamicFile(archivePath, Constants.COMPLIANCE_FILE);
-            DownloadDynamicFile(archivePath, Constants.CATALOG_FILE);
+            DownloadDynamicFile(archivePath, Constants.COMPLIANCE_FILE, status);
+            DownloadDynamicFile(archivePath, Constants.CATALOG_FILE, status);
+
+            status.Save();
+
+            int n = status.DownloadedThisRun.Count;
+            if (n > 0)
+                Console.WriteLine("Downloaded " + n + " new/changed file(s): " +
+                                  string.Join(", ", status.DownloadedThisRun));
+            else
+                Console.WriteLine("All files are up-to-date - nothing downloaded (nothing to extract).");
         }
 
     }

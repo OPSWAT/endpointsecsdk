@@ -19,18 +19,25 @@ namespace SDKDownloader
             {
                 string[] dirList = Directory.GetFiles(archiveDirectory);
 
-                // Extract just the first 2 files in the directory  
+                bool found = false;
                 foreach (string archive in dirList)
                 {
                     if (archive.EndsWith(".zip") || archive.EndsWith(".tar"))
                     {
+                        found = true;
+                        Console.WriteLine("  Extracting new data: " + Path.GetFileName(archive));
                         Util.ExtractFile(archive, extractDirectory);
                     }
+                }
+                if (!found)
+                {
+                    Console.WriteLine("  No new archives to extract in " + archiveDirectory);
                 }
             }
             else
             {
-                Logger.Log("Unable to extract because directory is null or non existent");
+                Console.WriteLine("  Nothing downloaded for " + Path.GetFileName(archiveDirectory) +
+                                  " this run - skipping (existing extracted data kept).");
             }
         }
 
@@ -49,22 +56,24 @@ namespace SDKDownloader
             string archiveFile = Path.Combine(archiveRoot, dynamicFile);
             if (File.Exists(archiveFile))
             {
-                Console.WriteLine("Extracting Dynamic File: " + dynamicFile);
+                Console.WriteLine("Extracting new data: " + dynamicFile);
                 Util.ExtractFile(archiveFile, extractDir);
             }
             else
             {
-                Console.WriteLine("Dynamic file not found: " + dynamicFile);
+                Console.WriteLine("Skipping " + dynamicFile + " - not downloaded this run " +
+                                  "(unchanged; existing extracted data kept).");
             }
         }
 
 
         public static void Extract(string sdkRoot)
         {
+            // The extract directory is intentionally NOT cleaned: unchanged data from prior runs
+            // is preserved, and only the archives downloaded THIS run (the only files present in
+            // the archive directory) are (re)extracted. This is the "only extract new data" behavior.
             string extractRoot = Util.GetExtractPath(sdkRoot);
             string archivePath = Util.GetArchivesPath(sdkRoot);
-
-            Util.CreateCleanDir(extractRoot);
 
             ExtractDyanmicFile(archivePath, extractRoot, Constants.CATALOG_FILE);
             ExtractDyanmicFile(archivePath, extractRoot, Constants.COMPLIANCE_FILE);
