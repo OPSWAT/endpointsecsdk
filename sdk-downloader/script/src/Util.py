@@ -3,6 +3,7 @@ import shutil
 import zipfile
 import tarfile
 import tempfile
+import json
 
 from datetime import datetime, timedelta
 
@@ -10,10 +11,16 @@ from datetime import datetime, timedelta
 class Util:
     VCR_URL = "https://vcr.opswat.com/gw/file/download/%file%?type=1&token=%token%"
 
+    # JSON files larger than this are left compact (not pretty-printed). Pretty-printing
+    # loads the whole file into memory and inflates it on disk, which is impractical for the
+    # huge catalog files (e.g. cves.json, vuln_system_associations.json).
+    MAX_PRETTIFY_BYTES = 100 * 1024 * 1024  # 100 MB
+
     @staticmethod
     def extract_tar(tar_file_path, dest_dir):
         with tarfile.open(tar_file_path, "r") as tar:
             tar.extractall(path=dest_dir)
+            return tar.getnames()
 
     @staticmethod
     def extract_file(archive_file, dest_dir):
@@ -21,9 +28,43 @@ class Util:
             print(f"Extracting ZIP file: {archive_file} to {dest_dir}")
             with zipfile.ZipFile(archive_file, 'r') as zip_ref:
                 zip_ref.extractall(dest_dir)
+                Util.prettify_json_files(zip_ref.namelist(), dest_dir)
         elif archive_file.endswith(".tar"):
-            print(f"Extracting TAR file: {archive_file} to {dest_dir}")      
-            Util.extract_tar(archive_file, dest_dir)
+            print(f"Extracting TAR file: {archive_file} to {dest_dir}")
+            names = Util.extract_tar(archive_file, dest_dir)
+            Util.prettify_json_files(names, dest_dir)
+
+    @staticmethod
+    def prettify_json_files(member_names, dest_dir):
+        """Reformat every extracted .json file as indented ('pretty') JSON in place."""
+        for name in member_names:
+            if name.lower().endswith(".json"):
+                Util.prettify_json(os.path.join(dest_dir, name))
+
+    @staticmethod
+    def prettify_json(file_path):
+        """Rewrite a single JSON file with 2-space indentation in place. Leaves the file
+        untouched if it is missing, unreadable, or not valid JSON (so non-JSON payloads
+        that happen to use a .json extension are never corrupted)."""
+        if not os.path.isfile(file_path):
+            return
+        size = os.path.getsize(file_path)
+        if size > Util.MAX_PRETTIFY_BYTES:
+            print(f"  Skipping JSON prettify (too large: {size // (1024 * 1024)} MB > "
+                  f"{Util.MAX_PRETTIFY_BYTES // (1024 * 1024)} MB): {file_path}")
+            return
+        try:
+            with open(file_path, "r", encoding="utf-8") as f:
+                data = json.load(f)
+        except (ValueError, OSError, UnicodeDecodeError) as e:
+            print(f"  Skipping JSON prettify (unreadable/invalid): {file_path} ({e})")
+            return
+        try:
+            with open(file_path, "w", encoding="utf-8") as f:
+                json.dump(data, f, indent=2, ensure_ascii=False)
+            print(f"  Prettified JSON: {file_path}")
+        except OSError as e:
+            print(f"  Failed to write prettified JSON: {file_path} ({e})")
 
     @staticmethod
     def get_clean_temp_dir(dir_name):
