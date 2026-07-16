@@ -86,6 +86,28 @@ python find-bulletin.py MS22-0110-5009497
 python find-bulletin.py 5009497
 ```
 
+### `list-supported-apps.py [--source winget|opswat]` — all patchable apps
+Lists every supported third-party application the catalog can patch (`patch_aggregation_v2.json`),
+showing each app's **latest version, signature(s), and source** (`opswat` = OPSWAT‑verified, or
+`winget`), with a **total patch count, a unique‑application count, and a per‑source breakdown**
+(patches + unique apps) at the end. `--source` filters to one source.
+```
+python list-supported-apps.py
+python list-supported-apps.py --source winget
+```
+
+### `catalog-counts.py` — catalog-wide totals
+Prints a census of the whole catalog: applications (unique products + total signatures, **how
+many have vulnerability detection** = a CVE mapping, and patchable apps), **BIOS / Driver /
+Firmware patch counts** (driver_firmware_patch_aggregation.json), unique KBs, unique CVEs
+(cves.json + those referenced by mappings), and total CVE mappings (OS + 3rd-party). The summary
+lists total and unique applications, patchable applications, and driver/firmware/BIOS totals.
+```
+python catalog-counts.py
+```
+> Reads the large `cves.json` (~188 MB) and `vuln_system_associations.json` (~670 MB); the CVE
+> section takes a minute or two and a few GB of RAM.
+
 ## Data sources
 | File | Used for |
 |---|---|
@@ -94,6 +116,8 @@ python find-bulletin.py 5009497
 | `vuln_associations.json` | 3rd‑party CVE ↔ product ↔ CPE (find-cve, find-cpe) |
 | `products.json` | signature/product/vendor names |
 | `patch_associations.json` + `patch_aggregation.json` | signature → patch → latest version/downloads/release notes |
+| `patch_aggregation_v2.json` | supported third-party apps: latest version, signature(s), source (opswat/winget) (list-supported-apps) |
+| `driver_firmware_patch_aggregation.json` | BIOS / driver / firmware patch counts by component and vendor (catalog-counts) |
 | `patch_system_aggregation_v2.json` | OS patch release details (title, date, severity, KB article, download URL+SHA1) and patch/package/bulletin lookups — used by find-kb, find-cve, find-patch, find-package, find-bulletin |
 | `os_info.json` | os_id → OS name |
 
