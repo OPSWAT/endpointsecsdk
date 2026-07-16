@@ -4,3 +4,6 @@ __pycache__/
 *.exe
 *.msu
 *.msi
+*.bin
+# default batch output directory
+autodiscover-patches/

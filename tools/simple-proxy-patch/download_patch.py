@@ -63,6 +63,25 @@ def main():
                     help="seconds to wait probing each proxy before falling back")
     args = ap.parse_args()
 
+    # Resolve the target (url / signature / package) -> url + expected hash.
+    url = args.url or args.url_opt
+    target = cr.resolve_target(url=url, signature=args.signature, package=args.package,
+                               arch=args.arch, sha256_override=args.sha256)
+    if target is None:
+        if not (url or args.signature is not None or args.package):
+            ap.error("provide a URL, or --signature, or --package")
+        return 3
+    if not dl.require_hash_ok(target, args.require_hash):
+        return 4
+    url, expected_hash, hash_algo = target["url"], target["hash"], target["hash_algo"]
+
+    dest = args.dest or cr.default_dest(url, target["resolved"])
+
+    # Skip the download if the file already exists (verifying its hash when we know it) — checked
+    # BEFORE any proxy discovery/probing so an already-present file costs no network work.
+    if not args.force and dl.file_already_present(dest, expected_hash, hash_algo):
+        return 0
+
     # Build the list of candidate proxies: an explicit --proxy, else all discovered ones.
     proxy_list = []
     if args.proxy:
@@ -79,24 +98,6 @@ def main():
                     "provided (--token); they will 401 and we'll fall back to direct.")
         else:
             log("[discover] no proxy found; will download directly")
-
-    # Resolve the target (url / signature / package) -> url + expected hash.
-    url = args.url or args.url_opt
-    target = cr.resolve_target(url=url, signature=args.signature, package=args.package,
-                               arch=args.arch, sha256_override=args.sha256)
-    if target is None:
-        if not (url or args.signature is not None or args.package):
-            ap.error("provide a URL, or --signature, or --package")
-        return 3
-    if not dl.require_hash_ok(target, args.require_hash):
-        return 4
-    url, expected_hash, hash_algo = target["url"], target["hash"], target["hash_algo"]
-
-    dest = args.dest or cr.default_dest(url, target["resolved"])
-
-    # Skip the download if the file already exists (verifying its hash when we know it).
-    if not args.force and dl.file_already_present(dest, expected_hash, hash_algo):
-        return 0
 
     try:
         result = dl.fetch(url, dest, proxies=proxy_list, token=args.token,
