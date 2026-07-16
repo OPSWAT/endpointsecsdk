@@ -1,0 +1,40 @@
+[package]
+name = "simple-proxy"
+version = "0.1.0"
+edition = "2021"
+description = "Secure, cross-platform caching download proxy for patch content"
+authors = ["Chris Seiler — OPSWAT OEM Field CTO"]
+license = "MIT"
+
+# Build both a Rust library and a C-ABI dynamic library (.dll/.so/.dylib) so the proxy can be
+# embedded in an existing process, plus the demo executable below.
+[lib]
+name = "simple_proxy"
+crate-type = ["rlib", "cdylib"]
+
+[[bin]]
+name = "simple-proxy-demo"
+path = "src/main.rs"
+
+[dependencies]
+tokio = { version = "1", features = ["full"] }
+axum = "0.7"
+reqwest = { version = "0.12", default-features = false, features = ["rustls-tls", "stream"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+sha2 = "0.10"
+clap = { version = "4", features = ["derive"] }
+futures-util = "0.3"
+bytes = "1"
+tokio-stream = "0.1"
+tokio-util = { version = "0.7", features = ["io"] }
+anyhow = "1"
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+# Used by the demo executable to load the dynamic library (simple_proxy.dll/.so/.dylib) at runtime.
+libloading = "0.8"
+
+[profile.release]
+opt-level = 3
+lto = true
+strip = true

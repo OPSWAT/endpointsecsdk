@@ -1,0 +1,9 @@
+# Rust build output
+/target
+
+# Runtime cache + in-progress downloads
+simple-proxy-cache/
+*.part
+
+# NOTE: Cargo.lock is intentionally committed (this crate ships binaries — lock deps).
+# NOTE: bin/ is intentionally committed (compiled artifacts, per project requirement).
