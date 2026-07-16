@@ -1,0 +1,6 @@
+__pycache__/
+*.pyc
+# downloaded patch artifacts when running the samples
+*.exe
+*.msu
+*.msi
