@@ -3,7 +3,7 @@
 ///  Reference Implementation using OESIS Framework
 ///  
 ///  Created by Chris Seiler
-///  OPSWAT OEM Solutions Architect
+///  OPSWAT OEM Field CTO
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
 using System;
@@ -106,6 +106,89 @@ namespace SDKDownloader
             }
 
             return result;
+        }
+
+        /// <summary>
+        /// Returns the Content-Length via an HTTP HEAD request (and the server Last-Modified via
+        /// the out parameter). Returns null if HEAD fails or the server doesn't report a size -
+        /// the caller then downloads to be safe.
+        /// </summary>
+        public static long? HeadContentLength(string url, out string lastModified)
+        {
+            lastModified = null;
+            try
+            {
+                using (var client = new System.Net.Http.HttpClient())
+                {
+                    client.Timeout = TimeSpan.FromSeconds(30);
+                    using (var request = new HttpRequestMessage(HttpMethod.Head, new Uri(url)))
+                    {
+                        HttpResponseMessage response = client.SendAsync(request).GetAwaiter().GetResult();
+                        response.EnsureSuccessStatusCode();
+                        if (response.Content != null && response.Content.Headers != null)
+                        {
+                            if (response.Content.Headers.LastModified.HasValue)
+                                lastModified = response.Content.Headers.LastModified.Value.ToString("R");
+                            return response.Content.Headers.ContentLength;
+                        }
+                        return null;
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("  HEAD request failed (" + e.Message + "); will download to be safe.");
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Best-effort Content-Length for a URL. Tries HEAD first; if the server doesn't support
+        /// HEAD, falls back to a ranged GET that reads only the response headers (Content-Range
+        /// total) without downloading the body.
+        /// </summary>
+        public static long? RemoteContentLength(string url, out string lastModified)
+        {
+            long? size = HeadContentLength(url, out lastModified);
+            if (size.HasValue)
+                return size;
+
+            try
+            {
+                using (var client = new System.Net.Http.HttpClient())
+                {
+                    client.Timeout = TimeSpan.FromSeconds(30);
+                    using (var request = new HttpRequestMessage(HttpMethod.Get, new Uri(url)))
+                    {
+                        request.Headers.Range = new System.Net.Http.Headers.RangeHeaderValue(0, 0);
+                        // ResponseHeadersRead so the body is not buffered/downloaded.
+                        HttpResponseMessage response = client
+                            .SendAsync(request, HttpCompletionOption.ResponseHeadersRead)
+                            .GetAwaiter().GetResult();
+                        response.EnsureSuccessStatusCode();
+                        if (response.Content != null && response.Content.Headers != null)
+                        {
+                            if (response.Content.Headers.LastModified.HasValue)
+                                lastModified = response.Content.Headers.LastModified.Value.ToString("R");
+
+                            var contentRange = response.Content.Headers.ContentRange;
+                            if (contentRange != null && contentRange.HasLength && contentRange.Length.HasValue)
+                                return contentRange.Length;
+
+                            // Server ignored the Range and returned 200; its Content-Length is the
+                            // full size (we never read the body, so nothing is downloaded).
+                            if ((int)response.StatusCode == 200)
+                                return response.Content.Headers.ContentLength;
+                        }
+                        return null;
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("  Size probe (ranged GET) failed (" + e.Message + ").");
+                return null;
+            }
         }
 
         public static void DownloadFileSynchronous(string url, string destPath)

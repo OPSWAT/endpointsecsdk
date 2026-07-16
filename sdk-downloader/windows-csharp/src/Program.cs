@@ -3,60 +3,56 @@
 ///  Reference Implementation using OESIS Framework
 ///  
 ///  Created by Chris Seiler
-///  OPSWAT OEM Solutions Architect
+///  OPSWAT OEM Field CTO
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
 using System;
 using System.IO;
+using System.Linq;
 
 namespace SDKDownloader
 {
     internal class Program
     {
-      
+
         static int Main(string[] args)
         {
             Console.WriteLine("SDKDownloader Started");
+
+            // --clean erases the OPSWAT-SDK directory first and downloads a clean version.
+            bool clean = args.Contains("--clean");
+            string[] rest = args.Where(a => a != "--clean").ToArray();
 
             string sdkRoot = Util.GetSDKRoot();
             sdkRoot = Path.Combine(sdkRoot, "OPSWAT-SDK");
 
 
-            if (args.Length > 1)
+            if (rest.Length > 1)
             {
-                sdkRoot = args[1];
-                sdkRoot = Path.Combine(sdkRoot, args[2]);
+                sdkRoot = rest[1];
+                if (rest.Length > 2)
+                    sdkRoot = Path.Combine(sdkRoot, rest[2]);
+            }
+
+            if (clean && Directory.Exists(sdkRoot))
+            {
+                Console.WriteLine("--clean: erasing " + sdkRoot + " for a fresh, clean download");
+                Directory.Delete(sdkRoot, true);
             }
 
             //
-            // Check to see if the downloaded files are up to date only download once a day
+            // The per-file download status (download_status.json) governs what is actually
+            // re-downloaded, so we always run and let it skip files whose size hasn't changed -
+            // only new data is downloaded and extracted.
             //
-            bool update= true;
-            string analogHeader = Path.Combine(sdkRoot, "extract/analog/header.json");
-            FileInfo analogHeaderInfo = new FileInfo(analogHeader);
-            if (analogHeaderInfo.Exists)
-            {
-                if(analogHeaderInfo.LastWriteTime.AddDays(1) > DateTime.Now)
-                {
-                    update = false;
-                }
+            Downloader.Download(sdkRoot);
+            Extractor.Extract(sdkRoot);
+            ClientFiles.PrepareFiles(sdkRoot);
 
-
-            }
-
-
-            if (update)
-            {
-                Downloader.Download(sdkRoot);
-                Extractor.Extract(sdkRoot);
-                ClientFiles.PrepareFiles(sdkRoot);
-
-                //
-                // Cleanup the Archives directory
-                //
-                Directory.Delete(Util.GetArchivesPath(sdkRoot), true);
-            }
-
+            //
+            // Cleanup the Archives directory
+            //
+            Directory.Delete(Util.GetArchivesPath(sdkRoot), true);
 
             Console.WriteLine("SDKDownloader Complete");
             return 0;

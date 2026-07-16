@@ -3,7 +3,7 @@
 ///  Reference Implementation using OESIS Framework
 ///  
 ///  Created by Chris Seiler
-///  OPSWAT OEM Solutions Architect
+///  OPSWAT OEM Field CTO
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
 using System;
@@ -46,11 +46,39 @@ namespace SDKDownloader
         {
             if (archiveFile.EndsWith(".zip"))
             {
-                ZipFile.ExtractToDirectory(archiveFile, destDir);
+                ExtractZipOverwrite(archiveFile, destDir);
             }
             else if (archiveFile.EndsWith(".tar"))
             {
                 ExtractTar(archiveFile, destDir);
+            }
+        }
+
+        // .NET Framework's ZipFile.ExtractToDirectory has no overwrite option and throws if a
+        // file already exists. Since the extract directory is no longer wiped each run (so
+        // unchanged data is preserved), re-extracting a changed archive must overwrite existing
+        // files - so extract entry-by-entry with overwrite: true.
+        private static void ExtractZipOverwrite(string zipPath, string destDir)
+        {
+            using (ZipArchive archive = ZipFile.OpenRead(zipPath))
+            {
+                foreach (ZipArchiveEntry entry in archive.Entries)
+                {
+                    string destPath = Path.Combine(destDir, entry.FullName);
+
+                    // Directory entry (names end with '/').
+                    if (string.IsNullOrEmpty(entry.Name))
+                    {
+                        Directory.CreateDirectory(destPath);
+                        continue;
+                    }
+
+                    string parent = Path.GetDirectoryName(destPath);
+                    if (!string.IsNullOrEmpty(parent))
+                        Directory.CreateDirectory(parent);
+
+                    entry.ExtractToFile(destPath, true); // overwrite
+                }
             }
         }
 
