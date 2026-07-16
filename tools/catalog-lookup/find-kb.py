@@ -177,15 +177,23 @@ def main():
         print("  The KB is still supported (see kb_info above) — its patch release metadata just "
               "hasn't been populated in this catalog yet, usually because the KB is newer than "
               "the catalog's patch-release data. A fresher catalog should include it.")
+        print("  Because it is absent from patch_system_aggregation_v2.json (the source for the "
+              "WUO OS patch database, wuov2.dat), wuov2.dat is NOT updated with this KB either — "
+              "the OS patch scan (GetMissingPatches / patch operations) will not offer it until "
+              "the catalog's patch-release data is refreshed.")
 
     # Explicit per-dataset presence so it's clear which files cover the KB.
     kbinfo_status = (f"FOUND in {hits} OS section(s)" if hits else "NOT FOUND")
     psa_status = (f"FOUND ({len(patch_recs)} package record(s))" if patch_recs else "NOT FOUND")
+    wuo_status = ("updated (KB present in patch_system_aggregation)" if patch_recs
+                  else "NOT updated (KB absent from patch_system_aggregation)")
     print("\nCatalog presence:")
     print(f"  kb_info.json                  : {kbinfo_status}"
           f"    (supersedence / build / CVE data)")
     print(f"  patch_system_aggregation_v2.json : {psa_status}"
           f"    (release date / download URL / hash)")
+    print(f"  wuov2.dat (WUO OS patch DB)   : {wuo_status}"
+          f"    (built from patch_system_aggregation)")
 
     print("\n" + "=" * 70)
     if hits and patch_recs:
@@ -193,9 +201,9 @@ def main():
               f"and patch_system_aggregation_v2.json (release details available).")
     elif hits and not patch_recs:
         print(f"RESULT: KB{kb} is SUPPORTED (kb_info.json, {hits} OS section(s)). Its release "
-              f"metadata (date / download URL / hash) is just not populated in "
-              f"patch_system_aggregation_v2.json yet — the catalog isn't fully updated for this KB "
-              f"(typically a very recent release). A fresher catalog should include it.")
+              f"metadata is not yet in patch_system_aggregation_v2.json, so wuov2.dat (the WUO OS "
+              f"patch database) is NOT updated with this KB — the OS patch scan won't offer it "
+              f"until a fresher catalog is downloaded. (Typically a very recent release.)")
     elif not hits and patch_recs:
         print(f"RESULT: KB{kb} has a patch_system_aggregation_v2.json record (release details) but "
               f"is NOT in kb_info.json (no supersedence / CVE mapping).")
