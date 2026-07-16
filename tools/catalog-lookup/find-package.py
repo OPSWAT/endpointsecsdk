@@ -10,7 +10,7 @@
 ##  Usage:
 ##      python3 find-package.py a633e05d-ad72-4553-8752-9c8cb89dbe10
 ##
-##  Created by Chris Seiler — OPSWAT OEM Solutions Architect
+##  Created by Chris Seiler — OPSWAT OEM Field CTO
 ###############################################################################################
 
 import os

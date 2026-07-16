@@ -3,7 +3,7 @@
 ///  Reference Implementation using OESIS Framework
 ///  
 ///  Created by Chris Seiler
-///  OPSWAT OEM Solutions Architect
+///  OPSWAT OEM Field CTO
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
 using System.IO;

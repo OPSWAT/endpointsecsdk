@@ -97,4 +97,4 @@ python find-bulletin.py 5009497
 | `patch_system_aggregation_v2.json` | OS patch release details (title, date, severity, KB article, download URL+SHA1) and patch/package/bulletin lookups — used by find-kb, find-cve, find-patch, find-package, find-bulletin |
 | `os_info.json` | os_id → OS name |
 
-_Created by Chris Seiler — OPSWAT OEM Solutions Architect_
+_Created by Chris Seiler — OPSWAT OEM Field CTO_

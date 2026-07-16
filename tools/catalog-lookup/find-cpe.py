@@ -10,7 +10,7 @@
 ##      python3 find-cpe.py cpe:/a:microsoft:.net
 ##      python3 find-cpe.py "google:chrome"
 ##
-##  Created by Chris Seiler — OPSWAT OEM Solutions Architect
+##  Created by Chris Seiler — OPSWAT OEM Field CTO
 ###############################################################################################
 
 import os

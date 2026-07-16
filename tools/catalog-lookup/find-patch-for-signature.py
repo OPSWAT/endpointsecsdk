@@ -10,7 +10,7 @@
 ##  Usage:
 ##      python3 find-patch-for-signature.py 3880      # e.g. Microsoft .NET Runtime 8.0 x64
 ##
-##  Created by Chris Seiler — OPSWAT OEM Solutions Architect
+##  Created by Chris Seiler — OPSWAT OEM Field CTO
 ###############################################################################################
 
 import os

@@ -11,7 +11,7 @@
 ##      python3 find-kb.py 5094127
 ##      python3 find-kb.py KB5094127
 ##
-##  Created by Chris Seiler — OPSWAT OEM Solutions Architect
+##  Created by Chris Seiler — OPSWAT OEM Field CTO
 ###############################################################################################
 
 import os

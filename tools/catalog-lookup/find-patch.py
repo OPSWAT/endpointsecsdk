@@ -9,7 +9,7 @@
 ##  Usage:
 ##      python3 find-patch.py 1f1b6061-3355-4ba6-ac92-5f4e625e2cc0
 ##
-##  Created by Chris Seiler — OPSWAT OEM Solutions Architect
+##  Created by Chris Seiler — OPSWAT OEM Field CTO
 ###############################################################################################
 
 import os

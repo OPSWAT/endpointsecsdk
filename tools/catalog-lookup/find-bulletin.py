@@ -10,7 +10,7 @@
 ##      python3 find-bulletin.py MS22-0110-5009497
 ##      python3 find-bulletin.py MS22-0110
 ##
-##  Created by Chris Seiler — OPSWAT OEM Solutions Architect
+##  Created by Chris Seiler — OPSWAT OEM Field CTO
 ###############################################################################################
 
 import os

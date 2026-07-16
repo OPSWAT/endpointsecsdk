@@ -14,7 +14,7 @@
 ##
 ##  Note: cves.json is large; the first lookup takes a few seconds to load it.
 ##
-##  Created by Chris Seiler — OPSWAT OEM Solutions Architect
+##  Created by Chris Seiler — OPSWAT OEM Field CTO
 ###############################################################################################
 
 import os

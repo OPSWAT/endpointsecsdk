@@ -6,7 +6,7 @@
 ##  Resolves the catalog location (OPSWAT-SDK/extract/analog/server) by walking up for the
 ##  'sdkroot' marker, and provides small readers over the oesis-wrapped JSON datasets.
 ##
-##  Created by Chris Seiler — OPSWAT OEM Solutions Architect
+##  Created by Chris Seiler — OPSWAT OEM Field CTO
 ###############################################################################################
 
 import json

@@ -12,7 +12,7 @@
 ##      python3 find-signature.py ".net runtime"
 ##      python3 find-signature.py "visual studio 2022"
 ##
-##  Created by Chris Seiler — OPSWAT OEM Solutions Architect
+##  Created by Chris Seiler — OPSWAT OEM Field CTO
 ###############################################################################################
 
 import os
