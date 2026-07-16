@@ -38,6 +38,8 @@ def main():
     ap.add_argument("--discovery-port", type=int, default=8099)
     ap.add_argument("--no-discovery", action="store_true",
                     help="skip the UDP discovery checks (proxy started without --discovery)")
+    ap.add_argument("--skip-redirect", action="store_true",
+                    help="skip the redirect happy-path check (downloads a few MB)")
     args = ap.parse_args()
 
     base = args.base.rstrip("/")
@@ -105,6 +107,18 @@ def main():
           http_get(f"/download?{enc('https://127.0.0.1/')}", timeout=20)[0] in (502, 403))
     check("http scheme rejected (403)",
           http_get(f"/download?{enc('http://example.com/')}", timeout=20)[0] == 403)
+
+    # Redirect happy-path: a GitHub release URL 302-redirects to objects.githubusercontent.com;
+    # a reliable public redirector (unlike httpbin-style services). The proxy should follow it,
+    # return the content, and cache it under the requested URL.
+    if not args.skip_redirect:
+        redir = ("https://github.com/rainmeter/rainmeter/releases/download/"
+                 "v4.5.23.3836/Rainmeter-4.5.23.exe")
+        st, _, body = http_get(f"/download?{enc(redir)}", timeout=120)
+        check("legit redirect followed (200)", st == 200, f"status={st}")
+        check("redirected content returned", len(body) > 0, f"{len(body)} bytes")
+        time.sleep(1.0)  # let the cache-commit finish
+        check("redirect result cached", json.loads(http_get(f"/cached?{enc(redir)}")[2]).get("cached") is True)
 
     # discovery (connected unicast probe to the proxy host)
     if not args.no_discovery and host:
