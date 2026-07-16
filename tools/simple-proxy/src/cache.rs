@@ -74,6 +74,10 @@ impl Cache {
         });
         // Reconcile the loaded index with what's actually on disk, dropping stale/expired items.
         cache.reconcile().await?;
+        // Enforce the size cap immediately, in case an existing cache was larger than the current
+        // --max-cache-size (e.g. the cap was lowered between runs). Otherwise the cap would only
+        // take effect lazily on the next write. ensure_room(0) evicts oldest-first until used<=cap.
+        cache.ensure_room(0).await?;
         Ok(cache)
     }
 

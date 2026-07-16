@@ -243,6 +243,10 @@ security token; it only advertises that one is needed. Discovery is only useful 
 exposed (`--bind 0.0.0.0`); it warns if enabled while bound to loopback. The patch sample
 ([`../simple-proxy-patch`](../simple-proxy-patch)) can auto-discover via `--discover`.
 
+The responder only answers the exact probe string, and replies are **rate-limited per source IP**
+(20 per 10 s) to bound UDP reflection/amplification — in a spoofed-source flood all requests appear
+to come from the victim's IP, so the per-source cap limits reflected traffic to any single victim.
+
 ## Security model
 
 Designed to be safe to run as a shared download point.
