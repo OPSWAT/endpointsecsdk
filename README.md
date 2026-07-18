@@ -9,7 +9,7 @@ It includes everything needed to get started with vulnerability, patch, and comp
 
 | Folder | Description |
 |:-------|:-------------|
-| [**`helloworld/`**](helloworld/README.md) | Sample “Hello World” projects for multiple languages and platforms (Windows C++, Windows C#, Windows Go, Linux C++, macOS C++). Demonstrates basic SDK initialization, scanning, and result retrieval. |
+| [**`helloworld/`**](helloworld/README.md) | Sample “Hello World” projects for multiple languages and platforms (Python, Windows C++, Windows C#, Windows Go, Linux C++, macOS C++). Demonstrates basic SDK initialization, scanning, and result retrieval. |
 | [**`scripts/`**](scripts/README.md) | Python-based data merge and catalog utilities used for building, combining, or analyzing patch and vulnerability datasets. Includes examples for merging analog data, generating associations, and producing JSON outputs. |
 | [**`tools/`**](tools/README.md) | Broader utilities for patch scanning, catalog analysis, and endpoint posture reporting using the SDK. These scripts showcase higher-level posture logic and aggregation. |
 | [**`eval-license/`**](eval-license/README.md) | Directory containing evaluation and licensing artifacts. To use the SDK, place your **license and token files** here. |
@@ -97,6 +97,7 @@ python3 main.py
 ### `helloworld/`
 Contains minimal working examples demonstrating SDK initialization, product scanning, and reporting vulnerability and patch status.  
 Includes examples for:
+- **Python** (cross-platform)
 - **Windows-C++**
 - **Windows-C#**
 - **Windows-Go**
