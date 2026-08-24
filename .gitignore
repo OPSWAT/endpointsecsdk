@@ -101,6 +101,9 @@ obj/
 /tools/python-vapm-scanner/*.json
 /tools/python-vapm-scanner/results/
 /tools/python-vapm-scanner/*.zip
+# local-only python capability test runner + its logs (not checked in)
+/test_all_python.py
+/test-all-python-*.log
 /helloworld/python/sdk
 /helloworld/python/__pycache__
 /helloworld/python/*.exe
