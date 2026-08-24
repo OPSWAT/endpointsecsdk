@@ -10,7 +10,6 @@ using System.Collections.Generic;
 using System.IO;
 using VAPMAdapater;
 using VAPMAdapter.Catalog.POCO;
-using VAPMAdapter.Updates;
 
 namespace VAPMAdapter.Tasks
 {
@@ -27,12 +26,19 @@ namespace VAPMAdapter.Tasks
         {
             List<CatalogProduct> result = new List<CatalogProduct>();
             Catalog.Catalog catalog = new Catalog.Catalog();
-            UpdateCatalog.Update();
 
-            //retrieve the local catalog directory from settings
+            // This page only READS the already-downloaded catalog cache - it does not download or
+            // refresh it. The catalog is downloaded/refreshed by "Update DB" (UpdateCatalog.Update),
+            // so loading it here never triggers a network call.
             string catalogRoot = VAPMSettings.GetLocalCatalogDir();
             catalogRoot = Path.Combine(catalogRoot, "analog/server");
-            catalog.Load(catalogRoot);
+
+            if (!catalog.Load(catalogRoot))
+            {
+                throw new System.Exception(
+                    "No cached catalog was found at " + catalogRoot +
+                    ". Click 'Update DB' to download the catalog, then load it here.");
+            }
 
             //populate the sig vulnerabilities into the catalog object
             catalog.PopulateSignatureVulnerability();

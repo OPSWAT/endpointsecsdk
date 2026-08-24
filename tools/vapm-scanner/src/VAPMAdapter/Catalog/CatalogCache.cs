@@ -11,7 +11,6 @@ namespace VAPMAdapter.Catalog.POCO
     {
         private static readonly string FilePath = "catalog.bin";
         private static List<CatalogProduct> _cachedCatalog = null;
-        private static readonly TimeSpan VietnamTimeDifference = TimeSpan.FromHours(11);
 
         public static List<CatalogProduct> CachedCatalog
         {
@@ -28,15 +27,11 @@ namespace VAPMAdapter.Catalog.POCO
             set
             {
                 _cachedCatalog = value;
-                // Save catalog to file
+                // Save catalog to file. WriteAllBytes stamps catalog.bin with the real save time,
+                // which is what IsJsonCatalogChanged compares against products.json - so the cache
+                // is correctly reused until products.json is refreshed.
                 var bytes = MessagePackSerializer.Serialize(_cachedCatalog);
                 File.WriteAllBytes(FilePath, bytes);
-                if (File.Exists(FilePath))
-                {
-                    DateTime currentLastWriteTime = File.GetLastWriteTimeUtc(FilePath);
-                    DateTime adjustedLastWriteTime = currentLastWriteTime.Add(VietnamTimeDifference);
-                    File.SetLastWriteTimeUtc(FilePath, adjustedLastWriteTime);
-                }
             }
         }
     }

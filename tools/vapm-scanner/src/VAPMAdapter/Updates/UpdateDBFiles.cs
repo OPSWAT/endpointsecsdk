@@ -8,6 +8,7 @@
 
 using VAPMAdapater.Updates;
 using VAPMAdapater;
+using VAPMAdapater.Log;
 using System.IO;
 using System;
 
@@ -25,14 +26,24 @@ namespace VAPMAdapter.Updates
         /// <param name="clientDir">The extracted catalog client folder (catalog/analog/client).</param>
         /// <param name="destPath">The directory where the file should be placed.</param>
         /// <param name="fileName">The name of the DB file to copy.</param>
-        private static void CopyDBFile(string clientDir, string destPath, string fileName)
+        private static void CopyDBFile(string clientDir, string destPath, string fileName, bool optional)
         {
             string source = Path.Combine(clientDir, fileName);
             if (!File.Exists(source))
             {
+                if (optional)
+                {
+                    // Some DBs are not in every catalog flavor (e.g. patch_driver_firmware.dat may
+                    // be absent from production). Skip an optional one and keep going.
+                    Logger.Log("Update DB: optional '" + fileName + "' not found in the catalog; skipping.");
+                    return;
+                }
+
+                // A core DB missing means the extract is incomplete/corrupt - surface it rather
+                // than silently reporting a successful update against stale or absent data.
                 throw new FileNotFoundException(
-                    "Expected DB file '" + fileName + "' was not found in the extracted catalog at " +
-                    clientDir + ". The configured catalog may not include it.");
+                    "Required DB file '" + fileName + "' was not found in the extracted catalog at " +
+                    clientDir + ". The catalog download appears to be incomplete.");
             }
 
             File.Copy(source, Path.Combine(destPath, fileName), true);
@@ -48,19 +59,22 @@ namespace VAPMAdapter.Updates
         {
             string destPath = Directory.GetCurrentDirectory();
 
-            // Download + extract the catalog (no-op if a fresh copy is already cached).
-            UpdateCatalog.Update();
+            // Force a fresh catalog download so "Update DB" always reflects the configured channel
+            // (a cached copy from an earlier Load Catalog could be stale or the other flavor).
+            UpdateCatalog.Update(true);
 
             // The DB files ship inside the catalog under analog/client.
             string clientDir = Path.Combine(VAPMSettings.GetLocalCatalogDir(), "analog", "client");
 
             // Copy the files that used to be downloaded individually out of the extracted catalog.
-            CopyDBFile(clientDir, destPath, VAPMSettings.THIRD_PARTY_VULNERABILITY_DB);
-            CopyDBFile(clientDir, destPath, VAPMSettings.THIRD_PARTY_PATCH_DB);
-            CopyDBFile(clientDir, destPath, VAPMSettings.WINDOWS_PATCH_DB);
-            CopyDBFile(clientDir, destPath, VAPMSettings.WINDOWS_VULNERABILITY_DB);
-            CopyDBFile(clientDir, destPath, VAPMSettings.PATCH_CHECKSUMS_DB);
-            CopyDBFile(clientDir, destPath, VAPMSettings.DRIVER_FIRMWARE_DB); // driver/firmware (incl. BIOS)
+            // The core scan DBs are required; the driver/firmware DB is optional (not shipped by
+            // every catalog flavor), so a missing one only warns instead of failing the update.
+            CopyDBFile(clientDir, destPath, VAPMSettings.THIRD_PARTY_VULNERABILITY_DB, optional: false);
+            CopyDBFile(clientDir, destPath, VAPMSettings.THIRD_PARTY_PATCH_DB, optional: false);
+            CopyDBFile(clientDir, destPath, VAPMSettings.WINDOWS_PATCH_DB, optional: false);
+            CopyDBFile(clientDir, destPath, VAPMSettings.WINDOWS_VULNERABILITY_DB, optional: false);
+            CopyDBFile(clientDir, destPath, VAPMSettings.PATCH_CHECKSUMS_DB, optional: false);
+            CopyDBFile(clientDir, destPath, VAPMSettings.DRIVER_FIRMWARE_DB, optional: true); // driver/firmware (incl. BIOS)
         }
 
         /// <summary>

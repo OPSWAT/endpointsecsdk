@@ -23,29 +23,55 @@ namespace VAPMAdapter.Updates
         /// </summary>
         public static void Update()
         {
+            Update(false);
+        }
+
+        /// <summary>
+        /// Updates the local catalog. Normally the catalog is only re-downloaded if it is older than
+        /// one day; pass <paramref name="forceRefresh"/> = true to always download a fresh copy
+        /// (used by "Update DB" so it never serves a stale or wrong-channel cached catalog).
+        /// </summary>
+        /// <param name="forceRefresh">When true, ignore the one-day cache and re-download.</param>
+        public static void Update(bool forceRefresh)
+        {
             string catalogDir = VAPMSettings.GetLocalCatalogDir();
 
+            // Use the cached catalog if it is fresh enough (unless a refresh is forced).
+            if (Directory.Exists(catalogDir) && !forceRefresh &&
+                Directory.GetCreationTime(catalogDir).Add(TimeSpan.FromDays(1)) > DateTime.Now)
+            {
+                return;
+            }
 
+            // Download and extract into a temporary directory first, then swap it in only after it
+            // succeeds. A failed download (offline, bad token, VCR error) then never destroys a
+            // previously-working catalog.
+            string tempDir = catalogDir + ".new";
+            if (Directory.Exists(tempDir))
+            {
+                Directory.Delete(tempDir, true);
+            }
+            Directory.CreateDirectory(tempDir);
+
+            try
+            {
+                string analogFile = Path.Combine(tempDir, "analog.zip");
+                DownloadCatalog.Download(analogFile);
+                ExtractUtils.ExtractZipFiles(tempDir);
+            }
+            catch
+            {
+                // Leave the existing catalog untouched on any failure.
+                try { Directory.Delete(tempDir, true); } catch { /* best-effort cleanup */ }
+                throw;
+            }
+
+            // Swap the freshly downloaded catalog in for the old one.
             if (Directory.Exists(catalogDir))
             {
-                // Only update the catalog once a day
-                if (Directory.GetCreationTime(catalogDir).Add(TimeSpan.FromDays(1)) > DateTime.Now)
-                {
-                    return;
-                }
-
                 Directory.Delete(catalogDir, true);
             }
-            Directory.CreateDirectory(catalogDir);
-
-            // Define the path for the downloaded catalog zip file
-            string analogFile = Path.Combine(catalogDir, "analog.zip");
-
-            // Download the latest catalog zip file
-            DownloadCatalog.Download(analogFile);
-
-            // Extract all zip files in the catalog directory
-            ExtractUtils.ExtractZipFiles(catalogDir);
+            Directory.Move(tempDir, catalogDir);
         }
 
     }

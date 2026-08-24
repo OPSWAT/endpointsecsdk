@@ -266,14 +266,11 @@ namespace AcmeScanner
             DateTime productsLastModified = File.Exists(productsPath) ? new FileInfo(productsPath).LastWriteTime : DateTime.MinValue;
             DateTime binaryFileLastModified = File.Exists(binaryFilePath) ? new FileInfo(binaryFilePath).LastWriteTime : DateTime.MinValue;
 
-            if (productsLastModified < binaryFileLastModified)
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
+            // The cache (catalog.bin) is stale when the raw catalog (products.json) has been
+            // rewritten more recently than the cache was saved - e.g. after Update DB pulls a new
+            // catalog. In that case return true so the caller re-parses instead of serving the
+            // old cached product list.
+            return productsLastModified > binaryFileLastModified;
         }
 
 
@@ -302,6 +299,16 @@ namespace AcmeScanner
 
         private void LoadCatalogWorker_Completed(object sender, RunWorkerCompletedEventArgs e)
         {
+            // Surface a load failure (e.g. the catalog has not been downloaded yet) instead of
+            // silently showing an empty catalog.
+            if (e.Error != null)
+            {
+                ShowLoading(false);
+                searchCatalog.Enabled = true;
+                MessageBox.Show(e.Error.Message, "Catalog", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
             if (staticProductList != null)
             {
                 UpdateCatalogResults();
@@ -463,11 +470,13 @@ namespace AcmeScanner
                 btnExportCSV.Enabled = false;
                 btnFreshInstall.Enabled = false;
                 btnDomainCSV.Enabled = false;
+                btnScanBiosDrivers.Enabled = false;
             }
             else
             {
                 btnInstall.Enabled = enabled;
                 btnScan.Enabled = enabled;
+                btnScanBiosDrivers.Enabled = enabled;
                 btnCVEJSON.Enabled = enabled;
                 btnScanOrchestration.Enabled = enabled;
                 btnInstallOrchestration.Enabled = enabled;

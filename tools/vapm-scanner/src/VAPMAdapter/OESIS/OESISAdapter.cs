@@ -91,6 +91,15 @@ namespace VAPMAdapter.OESIS
 
         public static int wa_api_invoke(string json_config, out IntPtr json_out)
         {
+            // Invoked before setup / after teardown. Throw a distinct exception rather than
+            // returning a native-looking code: the engine legitimately returns -5 for
+            // "feature not licensed", so reusing -5 here would make a call-ordering bug and a
+            // licensing failure indistinguishable in the logs.
+            if (_invoke == null)
+            {
+                throw new InvalidOperationException(
+                    "OESIS engine is not initialized. Call OESISPipe.InitializeFramework before invoking.");
+            }
             return _invoke(json_config, out json_out);
         }
 
@@ -106,6 +115,11 @@ namespace VAPMAdapter.OESIS
 
         public static int wa_api_free(IntPtr json_data)
         {
+            // Nothing to free once the engine is unloaded.
+            if (_free == null)
+            {
+                return 0;
+            }
             return _free(json_data);
         }
     }

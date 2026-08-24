@@ -104,6 +104,16 @@ namespace VAPMAdapater.Updates
 
             string rootFile = Path.Combine(sdkDir, folder, "x64/release", filename);
 
+            // A missing source is a different problem from a locked destination - report it as
+            // such instead of letting the FileNotFoundException (which derives from IOException)
+            // fall into the lock-retry path below and be misreported as "file held open".
+            if (!File.Exists(rootFile))
+            {
+                throw new FileNotFoundException(
+                    "SDK file '" + filename + "' was not found in the downloaded package at " + rootFile +
+                    ". The downloaded SDK may not include it.");
+            }
+
             for (int i = 1; i <= numberOfRetries; ++i)
             {
                 try

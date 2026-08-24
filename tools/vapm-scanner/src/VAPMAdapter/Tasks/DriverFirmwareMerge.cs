@@ -36,13 +36,16 @@ namespace VAPMAdapter.Tasks
             List<DriverFirmwareStatus> inventory, List<DriverFirmwarePatch> patches)
         {
             List<DriverFirmwareStatus> result = new List<DriverFirmwareStatus>(inventory);
-            HashSet<string> appliedPatchIds = new HashSet<string>();
 
             foreach (DriverFirmwarePatch patch in patches)
             {
                 bool attached = false;
 
-                foreach (DriverFirmwareStatus item in result)
+                // Match only against the original installed inventory, never against synthetic rows
+                // added below for earlier unmatched patches - otherwise a later patch sharing a
+                // version could overwrite an earlier patch's row and be lost. (result starts as a
+                // shallow copy of inventory, so applying to an inventory item updates result too.)
+                foreach (DriverFirmwareStatus item in inventory)
                 {
                     if (!Matches(item, patch))
                     {
@@ -55,11 +58,7 @@ namespace VAPMAdapter.Tasks
                     // of them are genuinely out of date.
                 }
 
-                if (attached)
-                {
-                    appliedPatchIds.Add(patch.patchId);
-                }
-                else
+                if (!attached)
                 {
                     // The catalog knows about an update for hardware the inventory did not
                     // surface (or a component type WMI does not report, such as firmware).
