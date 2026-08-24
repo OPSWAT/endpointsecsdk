@@ -49,21 +49,16 @@ namespace AcmeScanner
         private System.ComponentModel.BackgroundWorker installOnlinePatchWorker;
         private System.ComponentModel.BackgroundWorker loadCatalogWorker;
 
-        // BIOS & Drivers tab (built in code, see BuildBiosDriversTab)
-        private TabPage tabBiosDrivers;
-        private ScannerListView lvBiosDrivers;
-        private System.Windows.Forms.Button btnScanBiosDrivers;
-        private Label lblBiosDriversSummary;
-
         //first method called by the main class
         public ScannerForm(string[] args)
         {
             //initializes UI componets
             InitializeComponent();
+            // The BIOS & Drivers list view routes its double-click back to this form via its
+            // Tag (same pattern as lvCatalog); the designer defines the control, we set the owner.
+            lvBiosDrivers.Tag = this;
             //is used to perform async operations
             InitializeBackgroundWorker();
-            // Build the BIOS & Drivers tab (added to the tab control in SetTabs)
-            BuildBiosDriversTab();
             if (CheckLicenseFiles())
             {
                 UpdateFilesOnStartup();
@@ -140,6 +135,10 @@ namespace AcmeScanner
             {
                 btnUpdate.Text = "Download DB";
             }
+
+            // BIOS & Drivers tab: show the driver/firmware DB version (modified time), size, and
+            // whether the catalog is staging or production. Refreshes on startup and after updates.
+            lblBiosDriversSummary.Text = GetDriverFirmwareDbStatus();
         }
 
         //Check if license files are present in bin folder; does not allow to run program if not
@@ -518,50 +517,6 @@ namespace AcmeScanner
         }
 
 
-        //
-        // BIOS & Drivers tab. Built in code (no Designer changes) and added to the tab control in
-        // SetTabs. A top button runs the driver/firmware scan; results fill the list view.
-        //
-        private void BuildBiosDriversTab()
-        {
-            tabBiosDrivers = new TabPage();
-            tabBiosDrivers.Name = "tabBiosDrivers";
-            tabBiosDrivers.Text = "BIOS & Drivers";
-            tabBiosDrivers.Padding = new Padding(3);
-            tabBiosDrivers.UseVisualStyleBackColor = true;
-
-            lvBiosDrivers = new ScannerListView();
-            lvBiosDrivers.Dock = DockStyle.Fill;
-            lvBiosDrivers.View = View.Details;
-            lvBiosDrivers.FullRowSelect = true;
-            lvBiosDrivers.GridLines = true;
-            lvBiosDrivers.MultiSelect = false;
-            lvBiosDrivers.Name = "lvBiosDrivers";
-            lvBiosDrivers.Tag = this;
-
-            Panel topPanel = new Panel();
-            topPanel.Dock = DockStyle.Top;
-            topPanel.Height = 48;
-
-            btnScanBiosDrivers = new System.Windows.Forms.Button();
-            btnScanBiosDrivers.Text = "Scan BIOS && Drivers";
-            btnScanBiosDrivers.Location = new Point(8, 10);
-            btnScanBiosDrivers.Size = new Size(180, 28);
-            btnScanBiosDrivers.Click += BtnScanBiosDrivers_Click;
-            topPanel.Controls.Add(btnScanBiosDrivers);
-
-            lblBiosDriversSummary = new Label();
-            lblBiosDriversSummary.AutoSize = true;
-            lblBiosDriversSummary.Location = new Point(200, 16);
-            lblBiosDriversSummary.Text = "";
-            topPanel.Controls.Add(lblBiosDriversSummary);
-
-            // Add the fill control first, then the docked top panel (docking z-order).
-            tabBiosDrivers.Controls.Add(lvBiosDrivers);
-            tabBiosDrivers.Controls.Add(topPanel);
-        }
-
-
         private void BtnScanBiosDrivers_Click(object sender, EventArgs e)
         {
             // Driver/firmware detection is Windows-only and can take a while (loads the DB and
@@ -652,7 +607,28 @@ namespace AcmeScanner
             lvBiosDrivers.Items.AddRange(resultList.ToArray());
 
             lblBiosDriversSummary.Text = sortedList.Count + " device(s) found, " +
-                                         missingCount + " needing an update";
+                                         missingCount + " needing an update     |     " +
+                                         GetDriverFirmwareDbStatus();
+        }
+
+        // Version/time of the driver/firmware (BIOS) DB plus the catalog channel it came from.
+        // The .dat carries no embedded version string, so its modified time is the version signal;
+        // the file size distinguishes the broad staging DB from the smaller production one.
+        private string GetDriverFirmwareDbStatus()
+        {
+            string channel = UpdateDBFiles.GetCatalogChannelDescription();
+            string dbName = UpdateDBFiles.DriverFirmwareDbFileName;
+            string path = Path.Combine(Directory.GetCurrentDirectory(), dbName);
+
+            if (!File.Exists(path))
+            {
+                return dbName + ": not present - run Update DB     |     Catalog: " + channel;
+            }
+
+            FileInfo fi = new FileInfo(path);
+            double mb = fi.Length / (1024.0 * 1024.0);
+            return dbName + ":  modified " + fi.LastWriteTime.ToString("yyyy-MM-dd HH:mm") +
+                   "  (" + mb.ToString("0.0") + " MB)     |     Catalog: " + channel;
         }
 
 

@@ -84,6 +84,11 @@ namespace AcmeScanner
             label9 = new Label();
             btnUpdateSDK = new MaterialButton();
             lvScanResults = new ScannerListView();
+            tabBiosDrivers = new TabPage();
+            panelBiosDrivers = new Panel();
+            btnScanBiosDrivers = new Button();
+            lblBiosDriversSummary = new Label();
+            lvBiosDrivers = new ScannerListView();
             tbcMainView = new TabControl();
             panel3.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)pbLoading).BeginInit();
@@ -96,6 +101,8 @@ namespace AcmeScanner
             panel4.SuspendLayout();
             tabOffline.SuspendLayout();
             panel1.SuspendLayout();
+            tabBiosDrivers.SuspendLayout();
+            panelBiosDrivers.SuspendLayout();
             tbcMainView.SuspendLayout();
             SuspendLayout();
             // 
@@ -771,12 +778,65 @@ namespace AcmeScanner
             lvScanResults.UseCompatibleStateImageBehavior = false;
             lvScanResults.View = View.Details;
             lvScanResults.SelectedIndexChanged += LvScanResults_SelectedIndexChanged;
-            // 
+            //
+            // tabBiosDrivers
+            //
+            tabBiosDrivers.Controls.Add(lvBiosDrivers);
+            tabBiosDrivers.Controls.Add(panelBiosDrivers);
+            tabBiosDrivers.Location = new Point(4, 24);
+            tabBiosDrivers.Name = "tabBiosDrivers";
+            tabBiosDrivers.Padding = new Padding(3);
+            tabBiosDrivers.Size = new Size(1058, 570);
+            tabBiosDrivers.TabIndex = 3;
+            tabBiosDrivers.Text = "BIOS & Drivers";
+            tabBiosDrivers.UseVisualStyleBackColor = true;
+            //
+            // panelBiosDrivers
+            //
+            panelBiosDrivers.Controls.Add(btnScanBiosDrivers);
+            panelBiosDrivers.Controls.Add(lblBiosDriversSummary);
+            panelBiosDrivers.Dock = DockStyle.Top;
+            panelBiosDrivers.Location = new Point(3, 3);
+            panelBiosDrivers.Name = "panelBiosDrivers";
+            panelBiosDrivers.Size = new Size(1052, 48);
+            panelBiosDrivers.TabIndex = 0;
+            //
+            // btnScanBiosDrivers
+            //
+            btnScanBiosDrivers.Location = new Point(8, 10);
+            btnScanBiosDrivers.Name = "btnScanBiosDrivers";
+            btnScanBiosDrivers.Size = new Size(180, 28);
+            btnScanBiosDrivers.TabIndex = 0;
+            btnScanBiosDrivers.Text = "Scan BIOS && Drivers";
+            btnScanBiosDrivers.UseVisualStyleBackColor = true;
+            btnScanBiosDrivers.Click += BtnScanBiosDrivers_Click;
+            //
+            // lblBiosDriversSummary
+            //
+            lblBiosDriversSummary.AutoSize = true;
+            lblBiosDriversSummary.Location = new Point(200, 16);
+            lblBiosDriversSummary.Name = "lblBiosDriversSummary";
+            lblBiosDriversSummary.Size = new Size(0, 15);
+            lblBiosDriversSummary.TabIndex = 1;
+            //
+            // lvBiosDrivers
+            //
+            lvBiosDrivers.Dock = DockStyle.Fill;
+            lvBiosDrivers.FullRowSelect = true;
+            lvBiosDrivers.GridLines = true;
+            lvBiosDrivers.MultiSelect = false;
+            lvBiosDrivers.Name = "lvBiosDrivers";
+            lvBiosDrivers.Size = new Size(1052, 519);
+            lvBiosDrivers.TabIndex = 1;
+            lvBiosDrivers.UseCompatibleStateImageBehavior = false;
+            lvBiosDrivers.View = View.Details;
+            //
             // tbcMainView
-            // 
+            //
             tbcMainView.Controls.Add(tabOffline);
             tbcMainView.Controls.Add(tabOrchestrate);
             tbcMainView.Controls.Add(tabCatalog);
+            tbcMainView.Controls.Add(tabBiosDrivers);
             tbcMainView.Dock = DockStyle.Fill;
             tbcMainView.Location = new Point(0, 0);
             tbcMainView.Name = "tbcMainView";
@@ -809,6 +869,9 @@ namespace AcmeScanner
             tabOffline.ResumeLayout(false);
             panel1.ResumeLayout(false);
             panel1.PerformLayout();
+            tabBiosDrivers.ResumeLayout(false);
+            panelBiosDrivers.ResumeLayout(false);
+            panelBiosDrivers.PerformLayout();
             tbcMainView.ResumeLayout(false);
             ResumeLayout(false);
         }
@@ -821,6 +884,11 @@ namespace AcmeScanner
         private ScannerListView lvScanResults;
         private System.Windows.Forms.Timer timer1;
         private TabControl tbcMainView;
+        private TabPage tabBiosDrivers;
+        private Panel panelBiosDrivers;
+        private System.Windows.Forms.Button btnScanBiosDrivers;
+        private Label lblBiosDriversSummary;
+        private ScannerListView lvBiosDrivers;
         private TabPage tabOffline;
         private TabPage tabOrchestrate;
         private CheckBox cbScanOSCVEs;
