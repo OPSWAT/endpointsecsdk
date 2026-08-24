@@ -1,0 +1,8 @@
+{
+  "_comment": "Copy this file to 'catalog_config.json' next to AcmeScanner.exe to choose which catalog (analog) 'Update Catalog' downloads. Delete it (or set channel to 'production') to download the current running/production catalog (analog.zip). Staging downloads dev-analog.zip from the same VCR path and token. This only affects the catalog/analog download; the SDK and patch-status downloads are unaffected.",
+
+  "channel": "staging",
+
+  "_analogFile_comment": "Optional. An explicit file name overrides 'channel' if you need something other than analog.zip / dev-analog.zip.",
+  "analogFile": ""
+}

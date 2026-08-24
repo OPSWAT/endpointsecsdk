@@ -1,4 +1,4 @@
-﻿///////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////
 ///  Sample Code for Acme Scanner
 ///  Reference Implementation using OPSWAT Endpoint SDK Patch and Vulnerability Modules
 ///  
@@ -9,7 +9,6 @@
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 
 using System.Threading.Tasks;

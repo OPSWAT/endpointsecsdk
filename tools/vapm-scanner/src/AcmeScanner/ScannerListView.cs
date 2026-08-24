@@ -1,4 +1,4 @@
-﻿///////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////
 ///  Sample Code for Acme Scanner
 ///  Reference Implementation using OPSWAT Endpoint SDK Patch and Vulnerability Modules
 ///  
@@ -6,10 +6,8 @@
 ///  OPSWAT OEM Solutions Architect
 ///////////////////////////////////////////////////////////////////////////////////////////////
 using Newtonsoft.Json.Linq;
-using System;
 using System.Diagnostics;
 using System.Drawing;
-using System.Text;
 using System.Windows.Forms;
 using AcmeScanner.Dialogs;
 using VAPMAdapter.Catalog;
@@ -177,12 +175,6 @@ namespace AcmeScanner
             textDialog.ShowDialog();
         }
 
-        private void MobyClickHandler(object sender, EventArgs e)
-        {
-            ScannerForm formObject = (ScannerForm)((ScannerListView)sender).Tag;
-            formObject.BtnViewJson_Click(sender,e);
-        }
-
         private void ScannerListView_MouseDoubleClick(object sender, MouseEventArgs e)
         {
 
@@ -194,10 +186,6 @@ namespace AcmeScanner
             else if (this.Columns[0].Text == "CVE ID")
             {
                 CveClickHandler(sender, e);
-            }
-            else if (this.SelectedItems.Count > 0 && this.Columns[0].Text == "Name")
-            {
-                MobyClickHandler(sender, e);
             }
             else if (this.SelectedItems.Count > 0 && this.Columns[0].Text != "Application Name")
             {

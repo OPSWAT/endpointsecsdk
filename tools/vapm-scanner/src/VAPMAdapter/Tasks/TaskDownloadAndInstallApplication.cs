@@ -24,24 +24,6 @@ namespace VAPMAdapter.Tasks
     {
 
         /// <summary>
-        /// Generates the local file path for the installer based on the provided details.
-        /// </summary>
-        /// <param name="installerDetails">An object containing the installer details.</param>
-        /// <returns>The local file path for the installer.</returns>
-        private static string GetLocalPathForInstaller(InstallerDetail installerDetails)
-        {
-            string result;
-
-            string url = installerDetails.url;
-            //generate a filename based on the hash code of the URL and the file type
-            string filename = url.GetHashCode() + "." + installerDetails.fileType;
-            //combine the current directory path with the generated filename
-            result = Path.Combine(Directory.GetCurrentDirectory(), filename);
-
-            return result;
-        }
-
-        /// <summary>
         /// Installs a patch using the provided details.
         /// </summary>
         /// <param name="signatureId">The signature ID for the patch.</param>

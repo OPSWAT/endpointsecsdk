@@ -145,6 +145,69 @@ namespace VAPMAdapter.OESIS
         }
 
 
+        // Human-readable labels for the patches[].reboot_required field (method 50902)
+        private static readonly Dictionary<int, string> REBOOT_LABELS = new Dictionary<int, string>
+        {
+            { -1, "Unknown" },
+            {  0, "No reboot" },
+            {  1, "Requires reboot" },
+            {  2, "Forces reboot" },
+            {  3, "Forces shutdown" },
+            {  4, "Delayed forced reboot" },
+        };
+
+        // Expects JSON from DetectDriverFirmwarePatches (method 50902). Returns the applicable
+        // driver/firmware patches (incl. BIOS). If the device model isn't covered the patches
+        // array is empty; the caller distinguishes that from a real failure via the return code.
+        public static List<DriverFirmwarePatch> GetDriverFirmwarePatchList(string detect_json)
+        {
+            List<DriverFirmwarePatch> result = new List<DriverFirmwarePatch>();
+
+            dynamic jsonOut = JObject.Parse(detect_json);
+            var resultJson = jsonOut.result;
+            if (resultJson == null)
+            {
+                return result;
+            }
+
+            string detectedVendor = resultJson.detected_vendor != null
+                ? (string)resultJson.detected_vendor : "";
+
+            var patchList = resultJson.patches;
+            if (patchList != null)
+            {
+                for (int i = 0; i < patchList.Count; i++)
+                {
+                    var p = patchList[i];
+
+                    string url = "";
+                    var downloads = p.download_urls;
+                    if (downloads != null && downloads.Count > 0 && downloads[0].url != null)
+                    {
+                        url = (string)downloads[0].url;
+                    }
+
+                    int reboot = p.reboot_required != null ? (int)p.reboot_required : -1;
+
+                    DriverFirmwarePatch patch = new DriverFirmwarePatch();
+                    patch.patchId = p.patch_id != null ? (string)p.patch_id : "";
+                    patch.title = p.title != null ? (string)p.title : "Unknown";
+                    patch.component = p.component != null ? (string)p.component : "Unknown";
+                    patch.category = p.category != null ? (string)p.category : "";
+                    patch.severity = p.severity != null ? (string)p.severity : "";
+                    patch.currentVersion = p.current_version != null ? (string)p.current_version : "";
+                    patch.targetVersion = p.target_version != null ? (string)p.target_version : "";
+                    patch.rebootLabel = REBOOT_LABELS.ContainsKey(reboot) ? REBOOT_LABELS[reboot] : "Unknown";
+                    patch.downloadUrl = url;
+                    patch.detectedVendor = detectedVendor;
+                    result.Add(patch);
+                }
+            }
+
+            return result;
+        }
+
+
         // Expects JSON from GetProductVulnerability Products
         public static List<PatchStatus> GetPatchStatusList(string patch_status_json)
         {

@@ -1,13 +1,18 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
+    <!-- Windows-specific: the OESIS adapter P/Invokes libwa*.dll, and the device
+         inventory uses WMI, which System.Management refuses to run on a
+         platform-neutral target framework. -->
+    <TargetFramework>net8.0-windows</TargetFramework>
     <Nullable>disable</Nullable>
     <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="MessagePack" Version="2.5.187" />
+    <PackageReference Include="MessagePack" Version="2.5.302" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <!-- Win32_BIOS / Win32_PnPSignedDriver, for the installed device inventory. -->
+    <PackageReference Include="System.Management" Version="8.0.0" />
   </ItemGroup>
 </Project>

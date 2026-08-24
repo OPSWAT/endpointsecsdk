@@ -1,4 +1,4 @@
-﻿///////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////
 ///  Sample Code for Acme Scanner
 ///  Reference Implementation using OPSWAT Endpoint SDK Patch and Vulnerability Modules
 ///  
@@ -7,11 +7,11 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
 using System;
-using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using VAPMAdapater.Log;
 using VAPMAdapter.Updates;
 
 namespace VAPMAdapater.Updates
@@ -102,14 +102,22 @@ namespace VAPMAdapater.Updates
             const int numberOfRetries = 3;
             const int delayOnRetry = 1000; // 1 second delay between retries
 
+            string rootFile = Path.Combine(sdkDir, folder, "x64/release", filename);
+
+            // A missing source is a different problem from a locked destination - report it as
+            // such instead of letting the FileNotFoundException (which derives from IOException)
+            // fall into the lock-retry path below and be misreported as "file held open".
+            if (!File.Exists(rootFile))
+            {
+                throw new FileNotFoundException(
+                    "SDK file '" + filename + "' was not found in the downloaded package at " + rootFile +
+                    ". The downloaded SDK may not include it.");
+            }
+
             for (int i = 1; i <= numberOfRetries; ++i)
             {
                 try
                 {
-                    string rootFile = Path.Combine(sdkDir, folder);
-                    rootFile = Path.Combine(rootFile, "x64/release");
-                    rootFile = Path.Combine(rootFile, filename);
-
                     // Use FileStream to ensure file is properly closed after use
                     using (var sourceStream = new FileStream(rootFile, FileMode.Open, FileAccess.Read))
                     {
@@ -119,14 +127,26 @@ namespace VAPMAdapater.Updates
                         }
                     }
 
-                    break; // If the copy succeeds, exit the retry loop
+                    return; // If the copy succeeds, we are done
                 }
-                catch (IOException) when (i <= numberOfRetries)
+                catch (IOException ex)
                 {
-                    // Retry if there's an IOException
-                    Thread.Sleep(delayOnRetry);
+                    // The destination may be momentarily locked (e.g. a scan is loading the
+                    // engine). Log and retry a few times before giving up.
+                    Logger.Log($"Copy of {filename} failed (attempt {i}/{numberOfRetries}): {ex.Message}");
+                    if (i < numberOfRetries)
+                    {
+                        Thread.Sleep(delayOnRetry);
+                    }
                 }
             }
+
+            // All retries exhausted. Never leave a stale/mismatched engine DLL behind while
+            // reporting success - a partial engine set fails to load (e.g. "missing
+            // libwaremoval.dll"). Surface the failure so the update is not silently broken.
+            throw new IOException(
+                $"Failed to update SDK file '{filename}' from '{rootFile}'. " +
+                "Close any running scan or AcmeScanner instance holding the engine DLLs, then update again.");
         }
 
         /// <summary>
@@ -152,6 +172,8 @@ namespace VAPMAdapater.Updates
             CopySdkFile(sdkDir, "bin/manageability", "wa_3rd_party_host_32.exe");
             CopySdkFile(sdkDir, "bin/manageability", "wa_3rd_party_host_64.exe");
             CopySdkFile(sdkDir, "bin/vulnerability", "libwavmodapi.dll");
+            CopySdkFile(sdkDir, "bin/deviceinfo", "libwadeviceinfo.dll");
+            CopySdkFile(sdkDir, "bin/removal", "libwaremoval.dll");
             File.Copy(Path.Combine(sdkDir, "bin/libwaresource.dll"), "libwaresource.dll", true);
         }
 
