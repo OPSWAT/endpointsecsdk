@@ -19,11 +19,5 @@
     <Compile Update="Dialogs\TextDialog.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Update="Dialogs\ViewMobyJsonDialog.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Update="testDialog.cs">
-      <SubType>Form</SubType>
-    </Compile>
   </ItemGroup>
 </Project>

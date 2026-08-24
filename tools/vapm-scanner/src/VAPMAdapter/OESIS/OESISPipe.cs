@@ -1,4 +1,4 @@
-﻿///////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////
 ///  Sample Code for Acme Scanner
 ///  Reference Implementation using OPSWAT Endpoint SDK Patch and Vulnerability Modules
 ///  
@@ -11,7 +11,6 @@ using System.IO;
 using System.Reflection;
 using System.Text;
 using System.Text.Json.Nodes;
-using static System.Net.WebRequestMethods;
 
 namespace VAPMAdapter.OESIS
 {
@@ -60,7 +59,11 @@ namespace VAPMAdapter.OESIS
 
         public static void Teardown()
         {
+            // Close the framework, then unload libwaapi.dll so the engine files are no longer
+            // locked on disk. This is what allows "Update SDK" to replace them in-process
+            // (without it, libwaapi/libwaheap/libwautils stay pinned until the app exits).
             OESISAdapter.wa_api_teardown();
+            OESISAdapter.Unload();
         }
 
 
@@ -355,6 +358,46 @@ namespace VAPMAdapter.OESIS
             }
 
             return result;
+        }
+
+        //
+        // Loads the driver/firmware metadata database (patch_driver_firmware.dat). This initializes
+        // the driver/firmware vmod component; without it DetectDriverFirmwarePatches fails with
+        // rc=-5 (WAAPI_ERROR_NOT_INITIALIZED).
+        // https://software.opswat.com/OESIS_V4/html/c_method.html -> method 50900
+        //
+        public static void LoadDriverFirmwareDatabase(string databaseFile)
+        {
+            string result;
+            string json_in = "{\"input\" : {\"method\" : 50900, \"input_path\" : \"" + databaseFile.Replace("\\", "\\\\") + "\"}}";
+
+            int rc = Invoke(json_in, out result);
+            if (rc < 0)
+            {
+                throw new Exception("LoadDriverFirmwareDatabase failed to run correctly (rc=" + rc + ").  " + result);
+            }
+        }
+
+        //
+        // Detects applicable driver/firmware patches (incl. BIOS) by matching the collected system
+        // inventory against the loaded driver/firmware database. With no inventory the engine
+        // collects it internally. Returns the raw JSON and the return code so the caller can treat
+        // MODEL_NOT_SUPPORTED (-1067) as a clean "no coverage" outcome rather than a failure.
+        // Windows only.
+        // https://software.opswat.com/OESIS_V4/html/c_method.html -> method 50902
+        //
+        public static int DetectDriverFirmwarePatches(out string result)
+        {
+            string json_in = "{\"input\" : { \"method\" : 50902 }}";
+            int rc = Invoke(json_in, out result);
+            // -1067 = WA_VMOD_ERROR_MODEL_NOT_SUPPORTED: device model not in the catalog. That is a
+            // coverage gap, not a call failure, so let it through for the caller to handle.
+            if (rc < 0 && rc != -1067)
+            {
+                throw new Exception("DetectDriverFirmwarePatches failed to run correctly (rc=" + rc + ").  " + result);
+            }
+
+            return rc;
         }
     }
 

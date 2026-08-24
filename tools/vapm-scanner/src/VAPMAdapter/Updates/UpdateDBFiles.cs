@@ -51,6 +51,7 @@ namespace VAPMAdapter.Updates
             DownloadDBFile(destPath, VAPMSettings.WINDOWS_PATCH_DB);
             DownloadDBFile(destPath, VAPMSettings.WINDOWS_VULNERABILITY_DB);
             DownloadDBFile(destPath, VAPMSettings.PATCH_CHECKSUMS_DB);
+            DownloadDBFile(destPath, VAPMSettings.DRIVER_FIRMWARE_DB); // driver/firmware (incl. BIOS)
         }
 
         /// <summary>

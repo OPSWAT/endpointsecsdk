@@ -1,4 +1,4 @@
-﻿///////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////
 ///  Sample Code for Acme Scanner
 ///  Reference Implementation using OPSWAT Endpoint SDK Patch and Vulnerability Modules
 ///  
@@ -11,7 +11,6 @@ using VAPMAdapter.OESIS;
 using System.Collections.Generic;
 using System;
 using VAPMAdapter.OESIS.POCO;
-using System.Reflection.Metadata;
 using VAPMAdapter.Catalog;
 using VAPMAdapater;
 

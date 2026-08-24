@@ -23,6 +23,21 @@ namespace VAPMAdapater.Updates
     {
 
         /// <summary>
+        /// Masks the value of a "token" query parameter in a URL so download tokens are never
+        /// written to logs in plaintext.
+        /// </summary>
+        public static string RedactUrl(string url)
+        {
+            if (string.IsNullOrEmpty(url))
+            {
+                return url;
+            }
+            // Replace token=<value> (up to the next & or end of string) with token=***REDACTED***
+            return System.Text.RegularExpressions.Regex.Replace(
+                url, @"(?i)(token=)[^&\s]+", "$1***REDACTED***");
+        }
+
+        /// <summary>
         /// Converts a byte array to a string representation.
         /// </summary>
         /// <param name="array">The byte array to convert.</param>
@@ -122,7 +137,7 @@ namespace VAPMAdapater.Updates
             }
             else
             {
-                Console.WriteLine("Downlaod Failed URL: " + url);
+                Console.WriteLine("Downlaod Failed URL: " + RedactUrl(url));
             }
 
             return result;
@@ -137,7 +152,7 @@ namespace VAPMAdapater.Updates
         {
             using (var client = new System.Net.Http.HttpClient()) // WebClient
             {
-                Logger.Log("Downloading URL: " + url);
+                Logger.Log("Downloading URL: " + RedactUrl(url));
                 Logger.Log("Downloading: " + destPath);
 
                 var fileName = destPath;

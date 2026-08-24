@@ -11,9 +11,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.Diagnostics.Eventing.Reader;
 using System.Drawing;
-using System.Drawing.Text;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -26,13 +24,9 @@ using VAPMAdapter.Catalog.POCO;
 using VAPMAdapter.OESIS.POCO;
 using VAPMAdapter.Tasks;
 using VAPMAdapter.Updates;
-using VAPMAdapter.Moby.POCO;
-using VAPMAdapter.Moby;
 using Newtonsoft.Json;
-using System.Security.Cryptography.Xml;
 using System.Globalization;
 using AcmeScanner.Dialogs;
-using System.Net.Http.Json;
 using Newtonsoft.Json.Linq;
 using VAPMAdapter.Catalog;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
@@ -45,22 +39,21 @@ namespace AcmeScanner
         static Dictionary<string, ProductScanResult> staticScanResults = new Dictionary<string, ProductScanResult>();
         static Dictionary<string, CatalogSignature> staticSignatureCatalogResults = new Dictionary<string, CatalogSignature>();
         static Dictionary<string, OnlinePatchDetail> staticOrchestrationScanResults = new Dictionary<string, OnlinePatchDetail>();
-        private CVEDetailsManager cveDetailsManager = new CVEDetailsManager();
+        static List<DriverFirmwareStatus> staticDriverResults = new List<DriverFirmwareStatus>();
         static List<CatalogProduct> staticProductList = null;
-        static List<MobyProduct> staticMobyProductList = null;
-        static List<PatchStatus> staticPatchStatusList = null;
         static bool isCatalogUpdated = false;
-        static List<string> sigIds;
 
         private System.ComponentModel.BackgroundWorker scanWorker;
         private System.ComponentModel.BackgroundWorker updateDBWorker;
-        private System.ComponentModel.BackgroundWorker updateMobyWorker;
         private System.ComponentModel.BackgroundWorker installVAPMPatchWorker;
         private System.ComponentModel.BackgroundWorker installOnlinePatchWorker;
         private System.ComponentModel.BackgroundWorker loadCatalogWorker;
-        private System.ComponentModel.BackgroundWorker loadMobyWorker;
-        private System.ComponentModel.BackgroundWorker loadStatusWorker;
-        private System.ComponentModel.BackgroundWorker loadVulnerabilitiesWorker;
+
+        // BIOS & Drivers tab (built in code, see BuildBiosDriversTab)
+        private TabPage tabBiosDrivers;
+        private ScannerListView lvBiosDrivers;
+        private System.Windows.Forms.Button btnScanBiosDrivers;
+        private Label lblBiosDriversSummary;
 
         //first method called by the main class
         public ScannerForm(string[] args)
@@ -69,6 +62,8 @@ namespace AcmeScanner
             InitializeComponent();
             //is used to perform async operations
             InitializeBackgroundWorker();
+            // Build the BIOS & Drivers tab (added to the tab control in SetTabs)
+            BuildBiosDriversTab();
             if (CheckLicenseFiles())
             {
                 UpdateFilesOnStartup();
@@ -80,47 +75,13 @@ namespace AcmeScanner
 
 
 
-        protected override void OnKeyDown(KeyEventArgs e)
-        {
-            base.OnKeyDown(e);
-
-            if (e.KeyCode == Keys.D && e.Control)
-            {
-                ShowDevTabs();
-            }
-        }
-
-        private void ShowDevTabs()
-        {
-            if (tbcMainView.TabPages.Count < 4)
-            {
-                tbcMainView.TabPages.Add(tabStatus);
-                tbcMainView.TabPages.Add(tabMoby);
-                tbcMainView.TabPages.Add(tabVulnerabilities);
-            }
-        }
-
-
         private void SetTabs(string[] args)
         {
             tbcMainView.TabPages.Clear();
             tbcMainView.TabPages.Add(tabOffline);
             tbcMainView.TabPages.Add(tabOrchestrate);
             tbcMainView.TabPages.Add(tabCatalog);
-
-
-            //
-            // Enable the Moby component here
-            //
-            if (args != null && args.Length > 0)
-            {
-                if (args[0] == "--dev")
-                {
-                    tbcMainView.TabPages.Add(tabStatus);
-                    tbcMainView.TabPages.Add(tabMoby);
-                    tbcMainView.TabPages.Add(tabVulnerabilities);
-                }
-            }
+            tbcMainView.TabPages.Add(tabBiosDrivers);
         }
 
         private void SetTitleWithFileVersion()
@@ -248,48 +209,12 @@ namespace AcmeScanner
                 new RunWorkerCompletedEventHandler(
             UpdateDBWorker_Completed);
 
-            updateMobyWorker = new BackgroundWorker();
-            updateMobyWorker.DoWork +=
-                new DoWorkEventHandler(UpdateMobyWorker_DoWork);
-            updateMobyWorker.RunWorkerCompleted +=
-                new RunWorkerCompletedEventHandler(UpdateMobyWorker_Completed);
-
-
             loadCatalogWorker = new BackgroundWorker();
             loadCatalogWorker.DoWork +=
                 new DoWorkEventHandler(LoadCatalogWorker_DoWork);
             loadCatalogWorker.RunWorkerCompleted +=
                 new RunWorkerCompletedEventHandler(
             LoadCatalogWorker_Completed);
-
-            loadStatusWorker = new BackgroundWorker();
-            loadStatusWorker.DoWork +=
-                new DoWorkEventHandler(LoadStatusWorker_DoWork);
-            loadStatusWorker.RunWorkerCompleted +=
-                new RunWorkerCompletedEventHandler(
-            LoadStatusWorker_Completed);
-
-            loadMobyWorker = new BackgroundWorker();
-            loadMobyWorker.DoWork +=
-                new DoWorkEventHandler(LoadMobyWorker_DoWork);
-            loadMobyWorker.RunWorkerCompleted +=
-                new RunWorkerCompletedEventHandler(LoadMobyWorker_Completed);
-
-            loadVulnerabilitiesWorker = new BackgroundWorker();
-            loadVulnerabilitiesWorker.DoWork +=
-                new DoWorkEventHandler(loadVulnerabilitiesWorker_DoWork);
-            loadVulnerabilitiesWorker.RunWorkerCompleted +=
-                new RunWorkerCompletedEventHandler(loadVulnerabilitiesWorker_Completed);
-        }
-
-        private List<string> GetScanResults()
-        {
-            List<String> results = new List<string>();
-            foreach (string item in staticScanResults.Keys)
-            {
-                results.Add(item);
-            }
-            return results;
         }
 
         ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -306,7 +231,6 @@ namespace AcmeScanner
                 // Scan Offline
                 bool scanOSCVEs = cbScanOSCVEs.Checked;
                 staticScanResults = TaskScanAll.Scan(scanOSCVEs);
-                sigIds = GetScanResults();
             }
             else
             {
@@ -390,30 +314,6 @@ namespace AcmeScanner
         }
 
 
-
-        private void LoadStatusWorker_DoWork(object sender, DoWorkEventArgs e)
-        {
-            staticPatchStatusList = TaskLoadStatus.Load();
-        }
-
-        private void LoadStatusWorker_Completed(object sender, RunWorkerCompletedEventArgs e)
-        {
-            UpdatePatchStatusResults();
-            ShowLoading(false);
-        }
-
-        private void LoadMobyWorker_DoWork(object sender, DoWorkEventArgs e)
-        {
-            staticMobyProductList = TaskLoadMoby.Load();
-
-            mobyCounts = TaskLoadMobyCounts.LoadCounts();
-        }
-
-        private void LoadMobyWorker_Completed(object sender, RunWorkerCompletedEventArgs e)
-        {
-            UpdateMobyScanResults();
-            ShowLoading(false);
-        }
 
         private void InstallVAPMPatchWorker_DoWork(object sender, DoWorkEventArgs e)
         {
@@ -526,53 +426,6 @@ namespace AcmeScanner
             FillSDKlabels();//change sdk labels to current version
         }
 
-        private void UpdateMobyWorker_DoWork(object sender, DoWorkEventArgs e)
-        {
-            UpdateMobyFile.DownloadMoby();
-
-        }
-
-        private void UpdateMobyWorker_Completed(object sender, RunWorkerCompletedEventArgs e)
-        {
-            btnUpdateMoby.UseAccentColor = false;
-            btnUpdateMoby.Text = "Update Moby";
-            ShowLoading(false);
-        }
-        private void loadVulnerabilitiesWorker_DoWork(Object sender, DoWorkEventArgs e)
-        {
-            e.Result = LoadVulnerabilities();
-        }
-
-        private void loadVulnerabilitiesWorker_Completed(Object sender, RunWorkerCompletedEventArgs e)
-        {
-            if (e.Error == null)
-            {
-                var resultList = (List<ListViewItem>)e.Result;
-                lvVulnerabilities.BeginInvoke(new Action(() =>
-                {
-                    lvVulnerabilities.Columns.Clear();
-                    lvVulnerabilities.Columns.Add("Application Name", 200);
-                    lvVulnerabilities.Columns.Add("Platform", 200);
-                    lvVulnerabilities.Columns.Add("SigID", 200);
-                    lvVulnerabilities.Columns.Add("Info", 300);
-                    lvVulnerabilities.View = View.Details;
-                    lvVulnerabilities.Items.AddRange(resultList.ToArray());
-                    lvVulnerabilities.Update();
-
-                    if (!tabVulnerabilities.Controls.Contains(lvVulnerabilities))
-                    {
-                        tabVulnerabilities.Controls.Add(lvVulnerabilities);
-                    }
-                    ShowLoading(false);
-                }));
-            }
-            else
-            {
-                ShowLoading(false);
-                MessageBox.Show("An error occurred: " + e.Error.Message);
-            }
-        }
-
         private static bool ShowMessageDialog(IScannerMessageDialog messageDialog)
         {
             bool result = false;
@@ -596,7 +449,6 @@ namespace AcmeScanner
         {
             bool SDKdownload = UpdateSDK.DoesSDKExist();
             bool DBdownload = UpdateDBFiles.DoesDBExist();
-            bool MobyDownload = UpdateMobyFile.DoesMobyExist();
 
             if (!SDKdownload || !DBdownload)
             {
@@ -627,8 +479,6 @@ namespace AcmeScanner
                 btnExportCSV.Enabled = enabled;
                 btnFreshInstall.Enabled = enabled;
                 btnDomainCSV.Enabled = enabled;
-                btnRefreshStatus.Enabled = enabled;
-                btnLoadCVEs.Enabled = enabled;
 
             }
             
@@ -646,7 +496,6 @@ namespace AcmeScanner
             }
             btnUpdate.Enabled = enabled;
             btnUpdateSDK.Enabled = enabled;
-            btnUpdateMoby.Enabled = enabled;
         }
 
         private void ShowLoading(bool visible)
@@ -666,6 +515,144 @@ namespace AcmeScanner
                 pbLoading.Visible = false;
                 EnableButtons(true);
             }
+        }
+
+
+        //
+        // BIOS & Drivers tab. Built in code (no Designer changes) and added to the tab control in
+        // SetTabs. A top button runs the driver/firmware scan; results fill the list view.
+        //
+        private void BuildBiosDriversTab()
+        {
+            tabBiosDrivers = new TabPage();
+            tabBiosDrivers.Name = "tabBiosDrivers";
+            tabBiosDrivers.Text = "BIOS & Drivers";
+            tabBiosDrivers.Padding = new Padding(3);
+            tabBiosDrivers.UseVisualStyleBackColor = true;
+
+            lvBiosDrivers = new ScannerListView();
+            lvBiosDrivers.Dock = DockStyle.Fill;
+            lvBiosDrivers.View = View.Details;
+            lvBiosDrivers.FullRowSelect = true;
+            lvBiosDrivers.GridLines = true;
+            lvBiosDrivers.MultiSelect = false;
+            lvBiosDrivers.Name = "lvBiosDrivers";
+            lvBiosDrivers.Tag = this;
+
+            Panel topPanel = new Panel();
+            topPanel.Dock = DockStyle.Top;
+            topPanel.Height = 48;
+
+            btnScanBiosDrivers = new System.Windows.Forms.Button();
+            btnScanBiosDrivers.Text = "Scan BIOS && Drivers";
+            btnScanBiosDrivers.Location = new Point(8, 10);
+            btnScanBiosDrivers.Size = new Size(180, 28);
+            btnScanBiosDrivers.Click += BtnScanBiosDrivers_Click;
+            topPanel.Controls.Add(btnScanBiosDrivers);
+
+            lblBiosDriversSummary = new Label();
+            lblBiosDriversSummary.AutoSize = true;
+            lblBiosDriversSummary.Location = new Point(200, 16);
+            lblBiosDriversSummary.Text = "";
+            topPanel.Controls.Add(lblBiosDriversSummary);
+
+            // Add the fill control first, then the docked top panel (docking z-order).
+            tabBiosDrivers.Controls.Add(lvBiosDrivers);
+            tabBiosDrivers.Controls.Add(topPanel);
+        }
+
+
+        private void BtnScanBiosDrivers_Click(object sender, EventArgs e)
+        {
+            // Driver/firmware detection is Windows-only and can take a while (loads the DB and
+            // collects the hardware inventory), so run it off the UI thread.
+            ShowLoading(true);
+            btnScanBiosDrivers.Enabled = false;
+
+            BackgroundWorker worker = new BackgroundWorker();
+            worker.DoWork += (s, ev) => { ev.Result = TaskScanDriverFirmware.ScanWithInventory(); };
+            worker.RunWorkerCompleted += (s, ev) =>
+            {
+                if (ev.Error != null)
+                {
+                    MessageBox.Show(
+                        "BIOS/Driver scan failed:\n\n" + ev.Error.Message,
+                        "BIOS & Drivers",
+                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
+                else
+                {
+                    staticDriverResults = (List<DriverFirmwareStatus>)ev.Result;
+                    UpdateDriverResults();
+                }
+                btnScanBiosDrivers.Enabled = true;
+                ShowLoading(false);
+            };
+            worker.RunWorkerAsync();
+        }
+
+
+        private void UpdateDriverResults()
+        {
+            List<ListViewItem> resultList = new List<ListViewItem>();
+
+            // Everything that needs updating goes to the top - on a typical machine this is a
+            // handful of rows among a couple of hundred devices, and burying them defeats the
+            // point of the view. BIOS/firmware outranks drivers within each group.
+            List<DriverFirmwareStatus> sortedList = staticDriverResults
+                .OrderBy(p => p.IsMissing ? 0 : 1)
+                .ThenBy(p => p.component == "BIOS" ? 0 : 1)
+                .ThenBy(p => p.component)
+                .ThenBy(p => p.title)
+                .ToList();
+
+            lvBiosDrivers.Columns.Clear();
+            lvBiosDrivers.Columns.Add("Status", 80);
+            lvBiosDrivers.Columns.Add("Component", 80);
+            lvBiosDrivers.Columns.Add("Title", 320);
+            lvBiosDrivers.Columns.Add("Category", 130);
+            lvBiosDrivers.Columns.Add("Severity", 80);
+            lvBiosDrivers.Columns.Add("Current", 110);
+            lvBiosDrivers.Columns.Add("Target", 110);
+            lvBiosDrivers.Columns.Add("Reboot", 130);
+            lvBiosDrivers.Columns.Add("Vendor", 120);
+            lvBiosDrivers.Columns.Add("Download", 400);
+            lvBiosDrivers.View = View.Details;
+            lvBiosDrivers.Update();
+
+            int missingCount = 0;
+
+            foreach (DriverFirmwareStatus current in sortedList)
+            {
+                ListViewItem lvi = new ListViewItem();
+                lvi.Text = current.status;                    // column 0
+                lvi.SubItems.Add(current.component);
+                lvi.SubItems.Add(current.title);
+                lvi.SubItems.Add(current.category);
+                lvi.SubItems.Add(current.severity);
+                lvi.SubItems.Add(current.currentVersion);
+                lvi.SubItems.Add(current.targetVersion);
+                lvi.SubItems.Add(current.rebootLabel);
+                lvi.SubItems.Add(current.vendor);
+                lvi.SubItems.Add(current.downloadUrl);
+                lvi.Tag = current.patchId;
+
+                if (current.IsMissing)
+                {
+                    // Colour rather than an icon: it survives sorting and copy/paste of the row.
+                    lvi.ForeColor = Color.Firebrick;
+                    lvi.Font = new Font(lvBiosDrivers.Font, FontStyle.Bold);
+                    missingCount++;
+                }
+
+                resultList.Add(lvi);
+            }
+
+            lvBiosDrivers.Items.Clear();
+            lvBiosDrivers.Items.AddRange(resultList.ToArray());
+
+            lblBiosDriversSummary.Text = sortedList.Count + " device(s) found, " +
+                                         missingCount + " needing an update";
         }
 
 
@@ -779,47 +766,6 @@ namespace AcmeScanner
 
 
 
-        private void UpdatePatchStatusResults()
-        {
-            List<ListViewItem> resultList = new List<ListViewItem>();
-
-            //
-            // Setup the header
-            //
-
-            lvStatus.Columns.Clear();
-            lvStatus.Columns.Add("Status", 80);
-            lvStatus.Columns.Add("Product", 150);
-            lvStatus.Columns.Add("Signature", 150);
-            lvStatus.Columns.Add("Platform", 80);
-            lvStatus.Columns.Add("ProductId", 80);
-            lvStatus.Columns.Add("SignatureId", 80);
-            lvStatus.Columns.Add("LastGood", 80);
-            lvStatus.Columns.Add("LastTested", 80);
-
-            lvStatus.Columns.Add("", 400);
-            lvStatus.View = View.Details;
-            lvStatus.Update();
-
-            foreach (PatchStatus patch in staticPatchStatusList)
-            {
-                ListViewItem lviCurrent = new ListViewItem();
-                lviCurrent.Text = patch.status;
-                lviCurrent.SubItems.Add(patch.productName);
-                lviCurrent.SubItems.Add(patch.signatureName);
-                lviCurrent.SubItems.Add(patch.platform);
-                lviCurrent.SubItems.Add(patch.productId.ToString());
-                lviCurrent.SubItems.Add(patch.signatureId.ToString());
-                lviCurrent.SubItems.Add(patch.lastKnownGood);
-                lviCurrent.SubItems.Add(patch.lastTested);
-                resultList.Add(lviCurrent);
-            }
-
-            lvStatus.Items.Clear();
-            lvStatus.Items.AddRange(resultList.ToArray());
-        }
-
-
         private void UpdateScanResults()
         {
             List<ListViewItem> resultList = new List<ListViewItem>();
@@ -918,105 +864,12 @@ namespace AcmeScanner
             lvOrchestrationScanResult.Items.AddRange(resultList.ToArray());
         }
 
-        private void UpdateMobyScanResults()
-        {
-            List<ListViewItem> resultList = new List<ListViewItem>();
-
-            // Setup the header
-
-            scannerListView1.Columns.Clear();
-            scannerListView1.Columns.Add("Name", 200);
-            scannerListView1.Columns.Add("Signature ID", 100);
-            scannerListView1.Columns.Add("OS Type", 100);
-            scannerListView1.Columns.Add("Supports Auto Patching", 200);
-            scannerListView1.Columns.Add("Validation Supported", 200);
-            scannerListView1.Columns.Add("Supports App Remover", 200);
-            scannerListView1.Columns.Add("Supports Background Patching", 220);
-            scannerListView1.Tag = this;
-            scannerListView1.View = View.Details;
-            scannerListView1.Update();
-
-            foreach (MobyProduct product in staticMobyProductList)
-            {
-                foreach (MobySignature signature in product.sigList)
-                {
-                    ListViewItem lviCurrent = new ListViewItem();
-                    lviCurrent.Text = signature.Name;
-                    lviCurrent.SubItems.Add(signature.Id);
-                    lviCurrent.SubItems.Add(product.osType);
-                    lviCurrent.SubItems.Add(signature.supportAutoPatching.ToString());
-                    lviCurrent.SubItems.Add(signature.validationSupported.ToString());
-                    lviCurrent.SubItems.Add(signature.supportAppRemover.ToString());
-                    lviCurrent.SubItems.Add(signature.backgroundPatchingSupported.ToString());
-
-                    // Set Tag to store signature Id
-                    lviCurrent.Tag = product.Id;
-
-                    // Add ListViewItem to the resultList
-                    resultList.Add(lviCurrent);
-                }
-            }
-
-
-
-            scannerListView1.Items.Clear();
-            scannerListView1.Items.AddRange(resultList.ToArray());
-        }
-
-        private ListViewItem CreateCountListViewItem(string name, MobyPlatformCounts counts)
-        {
-            ListViewItem lviCounts = new ListViewItem();
-            lviCounts.Text = name;
-            lviCounts.SubItems.Add(counts.Total.ToString());
-            lviCounts.SubItems.Add(counts.Windows.ToString());
-            lviCounts.SubItems.Add(counts.Mac.ToString());
-            lviCounts.SubItems.Add(counts.Linux.ToString());
-            return lviCounts;
-        }
-
-        private void BtnLoadMoby_Click(object sender, EventArgs e)
-        {
-            ShowLoading(true);
-            loadMobyWorker.RunWorkerAsync();
-        }
-
         private void BtnScan_Click(object sender, EventArgs e)
         {
             ShowLoading(true);
             scanWorker.RunWorkerAsync(true);
         }
 
-
-        private string GetMobyTotalCountsJson()
-        {
-            if (mobyCounts == null)
-            {
-                mobyCounts = TaskLoadMobyCounts.LoadCounts();
-            }
-
-            var totalCounts = new
-            {
-                TotalProducts = mobyCounts.TotalProductsCount,
-                TotalSignatures = mobyCounts.TotalSignaturesCount,
-                CveDetection = mobyCounts.CveDetection,
-                SupportAutoPatching = mobyCounts.SupportAutoPatching,
-                BackgroundPatching = mobyCounts.BackgroundPatching,
-                FreshInstallable = mobyCounts.FreshInstallable,
-                ValidationSupported = mobyCounts.ValidationSupported,
-                AppRemover = mobyCounts.AppRemover
-            };
-
-            return JsonConvert.SerializeObject(totalCounts, Formatting.Indented);
-        }
-
-
-        private void BtnMobyViewTotals_Click(object sender, EventArgs e)
-        {
-            string totalCountsJson = GetMobyTotalCountsJson();
-            TextDialog textDialog = new TextDialog(totalCountsJson);
-            textDialog.StartPosition = FormStartPosition.CenterParent;
-            textDialog.ShowDialog();
-        }
 
         private void BtnCVEJSON_Click(object sender, EventArgs e)
         {
@@ -1321,12 +1174,6 @@ namespace AcmeScanner
             ShowMessageDialog("The files \"urls.csv\" and \"domains.csv\" have been created in the working directory.", false);
         }
 
-        private void BtnRefreshStatus_Click(object sender, EventArgs e)
-        {
-            ShowLoading(true);
-            loadStatusWorker.RunWorkerAsync();
-        }
-
         private void LvScanResults_SelectedIndexChanged(object sender, EventArgs e)
         {
 
@@ -1359,31 +1206,6 @@ namespace AcmeScanner
 
 
 
-
-        public void BtnViewJson_Click(object sender, EventArgs e)
-        {
-            ScannerListView listViewObject = (ScannerListView)sender;
-
-            string sigID = listViewObject.SelectedItems[0].SubItems[1].Text;
-            string pID = listViewObject.SelectedItems[0].Tag.ToString();
-            MobyProduct selectedProduct = staticMobyProductList.FirstOrDefault(product => product.Id == pID);
-            MobySignature selectedSignature = selectedProduct.sigList.FirstOrDefault(signature => signature.Id == sigID);
-            string json = JsonConvert.SerializeObject(selectedSignature, Formatting.Indented);
-
-
-
-
-            ViewMobyJsonDialog textDialog = new ViewMobyJsonDialog(json);
-            textDialog.StartPosition = FormStartPosition.CenterParent;
-            textDialog.ShowDialog();
-
-        }
-
-        private void BtnUpdateMoby_Click(object sender, EventArgs e)
-        {
-            ShowLoading(true);
-            updateMobyWorker.RunWorkerAsync(true);
-        }
 
         private void Button1_Click(object sender, EventArgs e)
         {
@@ -1430,227 +1252,6 @@ namespace AcmeScanner
 
         }
 
-        //need to rework this panel
-        private void LoadMobySubsets()
-        {
-            //need to hide the other panels when this panel opens up, so you can only see this one, then reopen them when this panel is closed
-            panel1.Visible = false;
-            panel2.Visible = false;
-            panel3.Visible = false;
-            panel4.Visible = false;
-            panel5.Visible = false;
-            panel6.Visible = false;
-            panel7.Visible = false;
-
-
-            // Get the dictionary of JSON file names and timestamps
-            Dictionary<string, string> mobyFileTimestamps = DownloadMobySubsets.GetMobyFileTimestamps();
-
-            // Clear previous controls from the ListView
-            System.Windows.Forms.ListView listView = mobySubsetsPanel.Controls.OfType<System.Windows.Forms.ListView>().FirstOrDefault();
-
-            if (listView != null)
-            {
-                listView.Items.Clear();
-                listView.Columns.Clear();
-
-                listView.Columns.Add("JSON File Name", 200);
-                listView.Columns.Add("Timestamp (GMT 0 Time)", 200);
-
-                // Add items to the ListView
-                foreach (var entry in mobyFileTimestamps)
-                {
-                    ListViewItem listViewItem = new ListViewItem(entry.Key);
-                    listViewItem.SubItems.Add(entry.Value);
-                    listView.Items.Add(listViewItem);
-                }
-
-                // Show the panel
-                mobySubsetsPanel.Visible = true;
-            }
-        }
-
-        private async void BtnViewMobySubsets_Click(object sender, EventArgs e)
-        {
-            await DownloadMobySubsets.DownloadMobyFilesAsync();
-
-            LoadMobySubsets();
-        }
-
-        private void BtnMobysubsetClose_Click(object sender, EventArgs e)
-        {
-            mobySubsetsPanel.Visible = false;  // Hide the panel
-            panel1.Visible = true;
-            panel2.Visible = true;
-            panel3.Visible = true;
-            panel4.Visible = true;
-            panel5.Visible = true;
-            panel6.Visible = true;
-            panel7.Visible = true;
-
-        }
-
-        private void ListView_ItemActivateMobySubsetTable(object sender, EventArgs e)
-        {
-            System.Windows.Forms.ListView listView = sender as System.Windows.Forms.ListView;
-
-            if (listView != null && listView.SelectedItems.Count > 0)
-            {
-                string fileName = listView.SelectedItems[0].Text;
-                ShowJsonContentMobySubset(fileName);
-            }
-        }
-
-        // Method to show JSON content in a text dialog
-        private void ShowJsonContentMobySubset(string filename)
-        {
-            string jsonContent = DownloadMobySubsets.GetJsonContent(filename);
-            ViewMobyJsonDialog textDialog = new ViewMobyJsonDialog(jsonContent);
-            textDialog.StartPosition = FormStartPosition.CenterParent;
-            textDialog.ShowDialog();
-        }
-
-        private List<ListViewItem> LoadVulnerabilities()
-        {
-            int cveCount = 0;
-            string currentDirectory = Directory.GetCurrentDirectory();
-            string jsonFilePath = Path.Combine(currentDirectory, @"..\..\..");
-            jsonFilePath = Path.GetFullPath(jsonFilePath);
-            string JsonName = "T1Applications.json";
-            string FilePath = Path.Combine(jsonFilePath, JsonName);
-
-            List<ListViewItem> resultList = new List<ListViewItem>();
-            Dictionary<string, string> productDictionary = new Dictionary<string, string>();
-
-            // Read and parse the JSON file
-            var jsonContent = File.ReadAllText(FilePath);
-            var productList = JArray.Parse(jsonContent);
-
-            foreach (var product in productList)
-            {
-                string productName = product["name"]?.ToString();
-                string productID = product["productID"]?.ToString();
-
-                if (string.IsNullOrEmpty(productName) || string.IsNullOrEmpty(productID))
-                    continue;
-
-                // Populate the dictionary with productID as the key and productName as the value
-                productDictionary[productID] = productName;
-            }
-
-            // Pass the dictionary to MapPatchData to get vulnerabilities
-            var vulnerabilities = TaskGetProductVulnerabilities.MapPatchData(productDictionary);
-
-            foreach (var kvp in vulnerabilities)
-            {
-                string productID = kvp.Key;
-                string productVulJson = kvp.Value;
-                string productName = productDictionary[productID];
-
-                string platform = "Windows"; // Default platform
-                if (productName.Contains("macOS", StringComparison.OrdinalIgnoreCase))
-                {
-                    platform = "Mac";
-                }
-                else if (productName.Contains("Linux", StringComparison.OrdinalIgnoreCase))
-                {
-                    platform = "Linux";
-                }
-
-                if (productVulJson == "Install app to see data")
-                {
-                    ListViewItem item = new ListViewItem(productName);
-                    item.SubItems.Add(platform); // Add platform information
-                    item.SubItems.Add(productID);
-                    item.SubItems.Add(productVulJson); // Use the error message directly
-
-                    // Optionally store an empty JSON or a message in the Tag property
-                    item.Tag = productVulJson;
-
-                    resultList.Add(item);
-                }
-                else
-                {
-                    try
-                    {
-                        // Try to parse the JSON
-                        JObject cveJson = JObject.Parse(productVulJson);
-                        cveCount += cveJson["result"]["cves"].Count();
-
-                        ListViewItem item = new ListViewItem(productName);
-                        item.SubItems.Add(platform);
-                        item.SubItems.Add(productID);
-                        item.SubItems.Add("Double click to view CVEs and resolutions");
-
-                        // Store the JSON content in the Tag property for easy access later
-                        item.Tag = productVulJson;
-
-                        resultList.Add(item);
-                    }
-                    catch (JsonReaderException ex)
-                    {
-                        // Handle JSON parsing error
-                        Console.WriteLine($"Error parsing JSON for productID {productID}: {ex.Message}");
-                        // Optionally add an item with an error message
-                        ListViewItem item = new ListViewItem(productName);
-                        item.SubItems.Add(platform); // Add platform information
-                        item.SubItems.Add(productID);
-                        item.SubItems.Add("Error parsing product vulnerabilities");
-
-                        // Optionally store the error message or invalid JSON in the Tag property
-                        item.Tag = productVulJson;
-
-                        resultList.Add(item);
-                    }
-                }
-            }
-
-            if (InvokeRequired)
-            {
-                this.Invoke(new System.Windows.Forms.MethodInvoker(delegate
-                {
-                    label17.Text = cveCount.ToString();
-                }));
-            }
-
-            return resultList;
-        }
-
-
-        private void LvVulnerabilities_DoubleClick(object sender, EventArgs e)
-        {
-            if (lvVulnerabilities.SelectedItems.Count > 0)
-            {
-                ListViewItem selectedItem = lvVulnerabilities.SelectedItems[0];
-                string jsonContent = selectedItem.Tag as string;
-
-                if (!string.IsNullOrEmpty(jsonContent))
-                {
-                    try
-                    {
-                        // Parse and format the JSON string
-                        var parsedJson = JToken.Parse(jsonContent);
-                        string formattedJson = parsedJson.ToString(Formatting.Indented);
-
-                        // Pass the formatted JSON string to the dialog
-                        ViewMobyJsonDialog textDialog = new ViewMobyJsonDialog(formattedJson);
-                        textDialog.StartPosition = FormStartPosition.CenterParent;
-                        textDialog.ShowDialog();
-                    }
-                    catch
-                    {
-                        // Handle JSON parsing error
-                        MessageBox.Show($"Error", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    }
-                }
-            }
-        }
-
-        private void BtnLoadCVEs_Click(object sender, EventArgs e)
-        {
-            ShowLoading(true);
-            loadVulnerabilitiesWorker.RunWorkerAsync();
-        }
         //Removes placeholder text of "Search Products" when search bar is clicked
         private void searchCatalogClicked(object sender, EventArgs e)
         {
@@ -1741,56 +1342,6 @@ namespace AcmeScanner
                 UpdateSearchCatalogResults(resultList);
 
             }
-        }
-
-        private void btnExportMobyCSV_Click(object sender, EventArgs e)
-        {
-            if (staticMobyProductList == null || staticMobyProductList.Count == 0)
-            {
-                MessageBox.Show("Load Moby first to export results.");
-                return;
-            }
-
-
-            StringBuilder CSVResult = new StringBuilder();
-
-            CSVResult.AppendLine("Name,SignatureID,OSType,AutoPatching,VulnDetection");
-
-            foreach (MobyProduct product in staticMobyProductList)
-            {
-                foreach (MobySignature signature in product.sigList)
-                {
-                    CSVResult.Append(signature.Name);
-                    CSVResult.Append(",");
-                    CSVResult.Append(signature.Id);
-                    CSVResult.Append(",");
-                    CSVResult.Append(product.osType);
-                    CSVResult.Append(",");
-                    CSVResult.Append(signature.supportAutoPatching);
-                    CSVResult.Append(",");
-
-                    if (signature.vulnerabilityVersions != null && signature.vulnerabilityVersions.Count > 0)
-                    {
-                        CSVResult.Append("TRUE");
-                    }
-                    else
-                    {
-                        CSVResult.Append("FALSE");
-                    }
-
-                    CSVResult.AppendLine("");
-                }
-            }
-
-
-            string listFileName = "vapm-list.csv";
-            if (File.Exists(listFileName))
-            {
-                File.Delete(listFileName);
-            }
-
-            File.WriteAllText(listFileName, CSVResult.ToString());
-            MessageBox.Show("Results have been written to " + Path.Combine(Directory.GetCurrentDirectory(), listFileName));
         }
 
         private void btnUpdateSDK_Click_1(object sender, EventArgs e)

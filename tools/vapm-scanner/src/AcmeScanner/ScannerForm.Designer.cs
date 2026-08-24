@@ -1,7 +1,6 @@
 ﻿using MaterialSkin.Controls;
 using System.Drawing;
 using System.Windows.Forms;
-using VAPMAdapter.Moby.POCO;
 
 namespace AcmeScanner
 {
@@ -40,32 +39,7 @@ namespace AcmeScanner
             panel3 = new Panel();
             pbLoading = new PictureBox();
             panel2 = new Panel();
-            btnExportMobyCSV = new MaterialButton();
             timer1 = new Timer(components);
-            mobySubsetsPanel = new Panel();
-            MobySubsetsLabel = new Label();
-            btnClose = new Button();
-            listView = new ListView();
-            tabVulnerabilities = new TabPage();
-            panel8 = new Panel();
-            btnLoadCVEs = new MaterialButton();
-            label16 = new Label();
-            label17 = new Label();
-            lvVulnerabilities = new ScannerListView();
-            tabMoby = new TabPage();
-            panel7 = new Panel();
-            btnLoadMoby = new MaterialButton();
-            btnMobyViewTotals = new MaterialButton();
-            btnUpdateMoby = new MaterialButton();
-            btnRunChecksMoby = new MaterialButton();
-            btnViewMobySubsets = new MaterialButton();
-            mobyTimestamp = new Label();
-            mobyTimestampData = new Label();
-            scannerListView1 = new ScannerListView();
-            tabStatus = new TabPage();
-            panel6 = new Panel();
-            btnRefreshStatus = new MaterialButton();
-            lvStatus = new ScannerListView();
             tabCatalog = new TabPage();
             panel5 = new Panel();
             mbLoad = new MaterialButton();
@@ -114,13 +88,6 @@ namespace AcmeScanner
             panel3.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)pbLoading).BeginInit();
             panel2.SuspendLayout();
-            mobySubsetsPanel.SuspendLayout();
-            tabVulnerabilities.SuspendLayout();
-            panel8.SuspendLayout();
-            tabMoby.SuspendLayout();
-            panel7.SuspendLayout();
-            tabStatus.SuspendLayout();
-            panel6.SuspendLayout();
             tabCatalog.SuspendLayout();
             panel5.SuspendLayout();
             panel9.SuspendLayout();
@@ -167,377 +134,7 @@ namespace AcmeScanner
             panel2.Name = "panel2";
             panel2.Size = new Size(1068, 600);
             panel2.TabIndex = 2;
-            // 
-            // btnExportMobyCSV
-            // 
-            btnExportMobyCSV.AutoSizeMode = AutoSizeMode.GrowAndShrink;
-            btnExportMobyCSV.Density = MaterialButton.MaterialButtonDensity.Default;
-            btnExportMobyCSV.Depth = 0;
-            btnExportMobyCSV.HighEmphasis = true;
-            btnExportMobyCSV.Icon = null;
-            btnExportMobyCSV.Location = new Point(0, 0);
-            btnExportMobyCSV.Margin = new Padding(4, 6, 4, 6);
-            btnExportMobyCSV.MouseState = MaterialSkin.MouseState.HOVER;
-            btnExportMobyCSV.Name = "btnExportMobyCSV";
-            btnExportMobyCSV.NoAccentTextColor = Color.Empty;
-            btnExportMobyCSV.Size = new Size(75, 36);
-            btnExportMobyCSV.TabIndex = 0;
-            btnExportMobyCSV.Type = MaterialButton.MaterialButtonType.Contained;
-            btnExportMobyCSV.UseAccentColor = false;
-            // 
-            // mobySubsetsPanel
-            // 
-            mobySubsetsPanel.BorderStyle = BorderStyle.FixedSingle;
-            mobySubsetsPanel.Controls.Add(MobySubsetsLabel);
-            mobySubsetsPanel.Controls.Add(btnClose);
-            mobySubsetsPanel.Controls.Add(listView);
-            mobySubsetsPanel.Dock = DockStyle.Fill;
-            mobySubsetsPanel.Location = new Point(0, 0);
-            mobySubsetsPanel.Margin = new Padding(2);
-            mobySubsetsPanel.Name = "mobySubsetsPanel";
-            mobySubsetsPanel.Size = new Size(1098, 630);
-            mobySubsetsPanel.TabIndex = 3;
-            // 
-            // MobySubsetsLabel
-            // 
-            MobySubsetsLabel.AutoSize = true;
-            MobySubsetsLabel.Font = new Font("Arial", 12F, FontStyle.Bold);
-            MobySubsetsLabel.Location = new Point(7, 6);
-            MobySubsetsLabel.Margin = new Padding(2, 0, 2, 0);
-            MobySubsetsLabel.Name = "MobySubsetsLabel";
-            MobySubsetsLabel.Size = new Size(353, 19);
-            MobySubsetsLabel.TabIndex = 2;
-            MobySubsetsLabel.Text = "Double-click a JSON name to view its content";
-            // 
-            // btnClose
-            // 
-            btnClose.Location = new Point(0, 0);
-            btnClose.Margin = new Padding(2);
-            btnClose.Name = "btnClose";
-            btnClose.Size = new Size(52, 14);
-            btnClose.TabIndex = 1;
-            btnClose.Text = "Close";
-            btnClose.Click += BtnMobysubsetClose_Click;
-            // 
-            // listView
-            // 
-            listView.FullRowSelect = true;
-            listView.GridLines = true;
-            listView.Location = new Point(0, 0);
-            listView.Margin = new Padding(2);
-            listView.Name = "listView";
-            listView.Size = new Size(86, 60);
-            listView.TabIndex = 2;
-            listView.UseCompatibleStateImageBehavior = false;
-            listView.View = View.Details;
-            listView.ItemActivate += ListView_ItemActivateMobySubsetTable;
-            // 
-            // tabVulnerabilities
-            // 
-            tabVulnerabilities.Controls.Add(lvVulnerabilities);
-            tabVulnerabilities.Controls.Add(panel8);
-            tabVulnerabilities.Location = new Point(4, 24);
-            tabVulnerabilities.Margin = new Padding(2);
-            tabVulnerabilities.Name = "tabVulnerabilities";
-            tabVulnerabilities.Padding = new Padding(2);
-            tabVulnerabilities.Size = new Size(1058, 570);
-            tabVulnerabilities.TabIndex = 5;
-            tabVulnerabilities.Text = "Vulnerabilities";
-            tabVulnerabilities.UseVisualStyleBackColor = true;
-            // 
-            // panel8
-            // 
-            panel8.BorderStyle = BorderStyle.FixedSingle;
-            panel8.Controls.Add(label17);
-            panel8.Controls.Add(label16);
-            panel8.Controls.Add(btnLoadCVEs);
-            panel8.Dock = DockStyle.Top;
-            panel8.Location = new Point(2, 2);
-            panel8.Margin = new Padding(10, 9, 10, 9);
-            panel8.Name = "panel8";
-            panel8.Padding = new Padding(10, 9, 10, 9);
-            panel8.Size = new Size(1054, 78);
-            panel8.TabIndex = 5;
-            // 
-            // btnLoadCVEs
-            // 
-            btnLoadCVEs.AutoSize = false;
-            btnLoadCVEs.AutoSizeMode = AutoSizeMode.GrowAndShrink;
-            btnLoadCVEs.Density = MaterialButton.MaterialButtonDensity.Default;
-            btnLoadCVEs.Depth = 0;
-            btnLoadCVEs.HighEmphasis = true;
-            btnLoadCVEs.Icon = null;
-            btnLoadCVEs.Location = new Point(13, 14);
-            btnLoadCVEs.Margin = new Padding(3, 4, 3, 4);
-            btnLoadCVEs.MouseState = MaterialSkin.MouseState.HOVER;
-            btnLoadCVEs.Name = "btnLoadCVEs";
-            btnLoadCVEs.NoAccentTextColor = Color.Empty;
-            btnLoadCVEs.Size = new Size(122, 40);
-            btnLoadCVEs.TabIndex = 0;
-            btnLoadCVEs.Text = "Load CVEs";
-            btnLoadCVEs.Type = MaterialButton.MaterialButtonType.Contained;
-            btnLoadCVEs.UseAccentColor = false;
-            btnLoadCVEs.UseVisualStyleBackColor = true;
-            btnLoadCVEs.Click += BtnLoadCVEs_Click;
-            // 
-            // label16
-            // 
-            label16.Font = new Font("Segoe UI", 11F);
-            label16.Location = new Point(160, 23);
-            label16.Margin = new Padding(2, 0, 2, 0);
-            label16.Name = "label16";
-            label16.Size = new Size(90, 20);
-            label16.TabIndex = 1;
-            label16.Text = "CVE Count: ";
-            // 
-            // label17
-            // 
-            label17.Font = new Font("Segoe UI", 11F);
-            label17.Location = new Point(240, 23);
-            label17.Margin = new Padding(2, 0, 2, 0);
-            label17.Name = "label17";
-            label17.Size = new Size(226, 20);
-            label17.TabIndex = 2;
-            // 
-            // lvVulnerabilities
-            // 
-            lvVulnerabilities.Dock = DockStyle.Fill;
-            lvVulnerabilities.FullRowSelect = true;
-            lvVulnerabilities.GridLines = true;
-            lvVulnerabilities.Location = new Point(2, 80);
-            lvVulnerabilities.Margin = new Padding(2);
-            lvVulnerabilities.MultiSelect = false;
-            lvVulnerabilities.Name = "lvVulnerabilities";
-            lvVulnerabilities.OwnerDraw = true;
-            lvVulnerabilities.Size = new Size(1054, 488);
-            lvVulnerabilities.TabIndex = 6;
-            lvVulnerabilities.UseCompatibleStateImageBehavior = false;
-            lvVulnerabilities.View = View.Details;
-            lvVulnerabilities.DoubleClick += LvVulnerabilities_DoubleClick;
-            // 
-            // tabMoby
-            // 
-            tabMoby.Controls.Add(scannerListView1);
-            tabMoby.Controls.Add(panel7);
-            tabMoby.Location = new Point(4, 24);
-            tabMoby.Name = "tabMoby";
-            tabMoby.Padding = new Padding(3);
-            tabMoby.Size = new Size(1058, 570);
-            tabMoby.TabIndex = 4;
-            tabMoby.Text = "Moby";
-            tabMoby.UseVisualStyleBackColor = true;
-            // 
-            // panel7
-            // 
-            panel7.BorderStyle = BorderStyle.FixedSingle;
-            panel7.Controls.Add(mobyTimestampData);
-            panel7.Controls.Add(mobyTimestamp);
-            panel7.Controls.Add(btnViewMobySubsets);
-            panel7.Controls.Add(btnRunChecksMoby);
-            panel7.Controls.Add(btnUpdateMoby);
-            panel7.Controls.Add(btnMobyViewTotals);
-            panel7.Controls.Add(btnLoadMoby);
-            panel7.Dock = DockStyle.Top;
-            panel7.Location = new Point(3, 3);
-            panel7.Margin = new Padding(2);
-            panel7.Name = "panel7";
-            panel7.Size = new Size(1052, 77);
-            panel7.TabIndex = 0;
-            // 
-            // btnLoadMoby
-            // 
-            btnLoadMoby.AutoSizeMode = AutoSizeMode.GrowAndShrink;
-            btnLoadMoby.Density = MaterialButton.MaterialButtonDensity.Default;
-            btnLoadMoby.Depth = 0;
-            btnLoadMoby.HighEmphasis = true;
-            btnLoadMoby.Icon = null;
-            btnLoadMoby.Location = new Point(19, 21);
-            btnLoadMoby.Margin = new Padding(3, 4, 3, 4);
-            btnLoadMoby.MouseState = MaterialSkin.MouseState.HOVER;
-            btnLoadMoby.Name = "btnLoadMoby";
-            btnLoadMoby.NoAccentTextColor = Color.Empty;
-            btnLoadMoby.Size = new Size(104, 36);
-            btnLoadMoby.TabIndex = 0;
-            btnLoadMoby.Text = "Load Moby";
-            btnLoadMoby.Type = MaterialButton.MaterialButtonType.Contained;
-            btnLoadMoby.UseAccentColor = false;
-            btnLoadMoby.UseVisualStyleBackColor = true;
-            btnLoadMoby.Click += BtnLoadMoby_Click;
-            // 
-            // btnMobyViewTotals
-            // 
-            btnMobyViewTotals.AutoSizeMode = AutoSizeMode.GrowAndShrink;
-            btnMobyViewTotals.Density = MaterialButton.MaterialButtonDensity.Default;
-            btnMobyViewTotals.Depth = 0;
-            btnMobyViewTotals.HighEmphasis = true;
-            btnMobyViewTotals.Icon = null;
-            btnMobyViewTotals.Location = new Point(375, 21);
-            btnMobyViewTotals.Margin = new Padding(3, 4, 3, 4);
-            btnMobyViewTotals.MouseState = MaterialSkin.MouseState.HOVER;
-            btnMobyViewTotals.Name = "btnMobyViewTotals";
-            btnMobyViewTotals.NoAccentTextColor = Color.Empty;
-            btnMobyViewTotals.Size = new Size(167, 36);
-            btnMobyViewTotals.TabIndex = 3;
-            btnMobyViewTotals.Text = "view total counts";
-            btnMobyViewTotals.Type = MaterialButton.MaterialButtonType.Contained;
-            btnMobyViewTotals.UseAccentColor = false;
-            btnMobyViewTotals.UseVisualStyleBackColor = true;
-            btnMobyViewTotals.Click += BtnMobyViewTotals_Click;
-            // 
-            // btnUpdateMoby
-            // 
-            btnUpdateMoby.AutoSizeMode = AutoSizeMode.GrowAndShrink;
-            btnUpdateMoby.Density = MaterialButton.MaterialButtonDensity.Default;
-            btnUpdateMoby.Depth = 0;
-            btnUpdateMoby.HighEmphasis = true;
-            btnUpdateMoby.Icon = null;
-            btnUpdateMoby.Location = new Point(548, 21);
-            btnUpdateMoby.Margin = new Padding(3, 4, 3, 4);
-            btnUpdateMoby.MouseState = MaterialSkin.MouseState.HOVER;
-            btnUpdateMoby.Name = "btnUpdateMoby";
-            btnUpdateMoby.NoAccentTextColor = Color.Empty;
-            btnUpdateMoby.Size = new Size(147, 36);
-            btnUpdateMoby.TabIndex = 4;
-            btnUpdateMoby.Text = "Download Moby";
-            btnUpdateMoby.Type = MaterialButton.MaterialButtonType.Contained;
-            btnUpdateMoby.UseAccentColor = false;
-            btnUpdateMoby.UseVisualStyleBackColor = true;
-            btnUpdateMoby.Click += BtnUpdateMoby_Click;
-            // 
-            // btnRunChecksMoby
-            // 
-            btnRunChecksMoby.AutoSizeMode = AutoSizeMode.GrowAndShrink;
-            btnRunChecksMoby.Density = MaterialButton.MaterialButtonDensity.Default;
-            btnRunChecksMoby.Depth = 0;
-            btnRunChecksMoby.HighEmphasis = true;
-            btnRunChecksMoby.Icon = null;
-            btnRunChecksMoby.Location = new Point(258, 21);
-            btnRunChecksMoby.Margin = new Padding(3, 4, 3, 4);
-            btnRunChecksMoby.MouseState = MaterialSkin.MouseState.HOVER;
-            btnRunChecksMoby.Name = "btnRunChecksMoby";
-            btnRunChecksMoby.NoAccentTextColor = Color.Empty;
-            btnRunChecksMoby.Size = new Size(111, 36);
-            btnRunChecksMoby.TabIndex = 5;
-            btnRunChecksMoby.Text = "Run checks";
-            btnRunChecksMoby.Type = MaterialButton.MaterialButtonType.Contained;
-            btnRunChecksMoby.UseAccentColor = false;
-            btnRunChecksMoby.UseVisualStyleBackColor = true;
-            // 
-            // btnViewMobySubsets
-            // 
-            btnViewMobySubsets.AutoSizeMode = AutoSizeMode.GrowAndShrink;
-            btnViewMobySubsets.Density = MaterialButton.MaterialButtonDensity.Default;
-            btnViewMobySubsets.Depth = 0;
-            btnViewMobySubsets.HighEmphasis = true;
-            btnViewMobySubsets.Icon = null;
-            btnViewMobySubsets.Location = new Point(129, 21);
-            btnViewMobySubsets.Margin = new Padding(3, 4, 3, 4);
-            btnViewMobySubsets.MouseState = MaterialSkin.MouseState.HOVER;
-            btnViewMobySubsets.Name = "btnViewMobySubsets";
-            btnViewMobySubsets.NoAccentTextColor = Color.Empty;
-            btnViewMobySubsets.Size = new Size(123, 36);
-            btnViewMobySubsets.TabIndex = 6;
-            btnViewMobySubsets.Text = "View Subsets";
-            btnViewMobySubsets.Type = MaterialButton.MaterialButtonType.Contained;
-            btnViewMobySubsets.UseAccentColor = false;
-            btnViewMobySubsets.UseVisualStyleBackColor = true;
-            btnViewMobySubsets.Click += BtnViewMobySubsets_Click;
-            // 
-            // mobyTimestamp
-            // 
-            mobyTimestamp.AutoSize = true;
-            mobyTimestamp.BorderStyle = BorderStyle.FixedSingle;
-            mobyTimestamp.Location = new Point(712, 21);
-            mobyTimestamp.Margin = new Padding(1, 0, 1, 0);
-            mobyTimestamp.Name = "mobyTimestamp";
-            mobyTimestamp.Size = new Size(72, 17);
-            mobyTimestamp.TabIndex = 7;
-            mobyTimestamp.Text = "Timestamp:";
-            // 
-            // mobyTimestampData
-            // 
-            mobyTimestampData.AutoSize = true;
-            mobyTimestampData.BorderStyle = BorderStyle.FixedSingle;
-            mobyTimestampData.Location = new Point(785, 21);
-            mobyTimestampData.Margin = new Padding(1, 0, 1, 0);
-            mobyTimestampData.Name = "mobyTimestampData";
-            mobyTimestampData.Size = new Size(2, 17);
-            mobyTimestampData.TabIndex = 8;
-            // 
-            // scannerListView1
-            // 
-            scannerListView1.Dock = DockStyle.Fill;
-            scannerListView1.FullRowSelect = true;
-            scannerListView1.GridLines = true;
-            scannerListView1.Location = new Point(3, 80);
-            scannerListView1.Margin = new Padding(1);
-            scannerListView1.MultiSelect = false;
-            scannerListView1.Name = "scannerListView1";
-            scannerListView1.OwnerDraw = true;
-            scannerListView1.Size = new Size(1052, 487);
-            scannerListView1.TabIndex = 1;
-            scannerListView1.UseCompatibleStateImageBehavior = false;
-            scannerListView1.View = View.Details;
-            // 
-            // tabStatus
-            // 
-            tabStatus.Controls.Add(lvStatus);
-            tabStatus.Controls.Add(panel6);
-            tabStatus.Location = new Point(4, 24);
-            tabStatus.Name = "tabStatus";
-            tabStatus.Padding = new Padding(3);
-            tabStatus.Size = new Size(1058, 570);
-            tabStatus.TabIndex = 3;
-            tabStatus.Text = "Status";
-            tabStatus.UseVisualStyleBackColor = true;
-            // 
-            // panel6
-            // 
-            panel6.BorderStyle = BorderStyle.FixedSingle;
-            panel6.Controls.Add(btnRefreshStatus);
-            panel6.Dock = DockStyle.Top;
-            panel6.Location = new Point(3, 3);
-            panel6.Margin = new Padding(15);
-            panel6.Name = "panel6";
-            panel6.Padding = new Padding(15);
-            panel6.Size = new Size(1052, 77);
-            panel6.TabIndex = 5;
-            // 
-            // btnRefreshStatus
-            // 
-            btnRefreshStatus.AutoSize = false;
-            btnRefreshStatus.AutoSizeMode = AutoSizeMode.GrowAndShrink;
-            btnRefreshStatus.Density = MaterialButton.MaterialButtonDensity.Default;
-            btnRefreshStatus.Depth = 0;
-            btnRefreshStatus.HighEmphasis = true;
-            btnRefreshStatus.Icon = null;
-            btnRefreshStatus.Location = new Point(19, 21);
-            btnRefreshStatus.Margin = new Padding(4, 6, 4, 6);
-            btnRefreshStatus.MouseState = MaterialSkin.MouseState.HOVER;
-            btnRefreshStatus.Name = "btnRefreshStatus";
-            btnRefreshStatus.NoAccentTextColor = Color.Empty;
-            btnRefreshStatus.Size = new Size(163, 42);
-            btnRefreshStatus.TabIndex = 0;
-            btnRefreshStatus.Text = "Load Patch Status";
-            btnRefreshStatus.Type = MaterialButton.MaterialButtonType.Contained;
-            btnRefreshStatus.UseAccentColor = false;
-            btnRefreshStatus.UseVisualStyleBackColor = true;
-            btnRefreshStatus.Click += BtnRefreshStatus_Click;
-            // 
-            // lvStatus
-            // 
-            lvStatus.Dock = DockStyle.Fill;
-            lvStatus.FullRowSelect = true;
-            lvStatus.GridLines = true;
-            lvStatus.Location = new Point(3, 80);
-            lvStatus.MultiSelect = false;
-            lvStatus.Name = "lvStatus";
-            lvStatus.OwnerDraw = true;
-            lvStatus.Size = new Size(1052, 487);
-            lvStatus.TabIndex = 6;
-            lvStatus.UseCompatibleStateImageBehavior = false;
-            lvStatus.View = View.Details;
-            // 
+            //
             // tabCatalog
             // 
             tabCatalog.Controls.Add(lvCatalog);
@@ -1180,9 +777,6 @@ namespace AcmeScanner
             tbcMainView.Controls.Add(tabOffline);
             tbcMainView.Controls.Add(tabOrchestrate);
             tbcMainView.Controls.Add(tabCatalog);
-            tbcMainView.Controls.Add(tabStatus);
-            tbcMainView.Controls.Add(tabMoby);
-            tbcMainView.Controls.Add(tabVulnerabilities);
             tbcMainView.Dock = DockStyle.Fill;
             tbcMainView.Location = new Point(0, 0);
             tbcMainView.Name = "tbcMainView";
@@ -1196,7 +790,6 @@ namespace AcmeScanner
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(1098, 630);
             Controls.Add(panel3);
-            Controls.Add(mobySubsetsPanel);
             Icon = (Icon)resources.GetObject("$this.Icon");
             KeyPreview = true;
             Name = "ScannerForm";
@@ -1204,15 +797,6 @@ namespace AcmeScanner
             panel3.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)pbLoading).EndInit();
             panel2.ResumeLayout(false);
-            mobySubsetsPanel.ResumeLayout(false);
-            mobySubsetsPanel.PerformLayout();
-            tabVulnerabilities.ResumeLayout(false);
-            panel8.ResumeLayout(false);
-            tabMoby.ResumeLayout(false);
-            panel7.ResumeLayout(false);
-            panel7.PerformLayout();
-            tabStatus.ResumeLayout(false);
-            panel6.ResumeLayout(false);
             tabCatalog.ResumeLayout(false);
             panel5.ResumeLayout(false);
             panel5.PerformLayout();
@@ -1230,7 +814,6 @@ namespace AcmeScanner
         }
 
         #endregion
-        private Panel mobySubsetsPanel;
         private Panel panel1;
         private Panel panel3;
         private Panel panel2;
@@ -1263,12 +846,6 @@ namespace AcmeScanner
         private MaterialSkin.Controls.MaterialButton btnExportCSV;
         private MaterialSkin.Controls.MaterialButton btnFreshInstall;
         private MaterialSkin.Controls.MaterialButton btnDomainCSV;
-        private TabPage tabStatus;
-        private TabPage tabMoby;
-        private TabPage tabVulnerabilities;
-        private ScannerListView lvStatus;
-        private Panel panel6;
-        private MaterialSkin.Controls.MaterialButton btnRefreshStatus;
         private Label label5;
         private Label label4;
         private Label label7;
@@ -1281,27 +858,7 @@ namespace AcmeScanner
         private Label label15;
         private Label label14;
         private Label label13;
-        private Panel panel7;
-        private MaterialButton btnExportMobyCSV;
-        private ScannerListView scannerListView1;
-        private MaterialSkin.Controls.MaterialButton btnLoadMoby;
-        private MobyTotalCounts mobyCounts;
-        private MaterialSkin.Controls.MaterialButton btnMobyViewTotals;
-        private MaterialSkin.Controls.MaterialButton btnUpdateMoby;
-        private MaterialSkin.Controls.MaterialButton btnRunChecksMoby;
         public PictureBox pbLoading;
-        private MaterialSkin.Controls.MaterialButton btnViewMobySubsets;
-        private Button btnClose;
-        private ListView listView;
-        private Label mobyTimestampData;
-        private Label mobyTimestamp;
-        private Label MobySubsetsLabel;
-        private ScannerListView lvVulnerabilities;
-        //vulnerabilities panel
-        private Panel panel8;
-        private MaterialSkin.Controls.MaterialButton btnLoadCVEs;
-        private Label label17;
-        private Label label16;
         private TextBox searchCatalog;
         private Panel panel9;
         private PictureBox pictureBox1;

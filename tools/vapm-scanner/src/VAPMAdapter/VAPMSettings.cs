@@ -26,6 +26,8 @@ namespace VAPMAdapater
         public static string WINDOWS_VULNERABILITY_DB       = "wiv-lite.dat";
         public static string WINDOWS_PATCH_DB               = "wuo.dat";
         public static string PATCH_CHECKSUMS_DB             = "ap_checksum.dat";
+        // Driver/firmware (incl. BIOS) metadata database, loaded via OESIS method 50900.
+        public static string DRIVER_FIRMWARE_DB             = "patch_driver_firmware.dat";
 
         private static string GetDownloadToken()
         {
