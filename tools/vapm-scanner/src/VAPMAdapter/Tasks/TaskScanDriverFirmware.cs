@@ -53,7 +53,11 @@ namespace VAPMAdapter.Tasks
             OESISPipe.InitializeFramework(false);
             try
             {
-                result.systemModel = DeviceInventory.GetSystemModel();
+                string vendor, model;
+                DeviceInventory.GetPCModelParts(out vendor, out model);
+                result.systemVendor = vendor;
+                result.systemModelName = model;
+                result.systemModel = (vendor + " " + model).Trim();
                 result.isVirtualMachine = DeviceInventory.IsVirtualMachine();
 
                 // Inventory first: it is still useful if detection finds nothing (an uncovered
@@ -69,21 +73,23 @@ namespace VAPMAdapter.Tasks
 
             result.detectRc = detectRc;
 
+            // Both codes mean the same thing to the operator: the catalog holds no
+            // driver/firmware data for this machine, so the devices below are inventory only.
             if (detectRc == VENDOR_NOT_SUPPORTED)
             {
                 result.patchingSupported = false;
                 result.unsupportedReason =
-                    "Driver and BIOS patching is not supported on this device - its hardware " +
-                    "vendor is not covered by the driver/firmware catalog (rc=-1066). The devices " +
-                    "below were found on the system, but no updates can be offered for them.";
+                    "Driver/BIOS database is not available for this device - its hardware vendor " +
+                    "is not in the driver/firmware catalog (rc=-1066). Inventory only; no updates " +
+                    "can be offered.";
             }
             else if (detectRc == MODEL_NOT_SUPPORTED)
             {
                 result.patchingSupported = false;
                 result.unsupportedReason =
-                    "Driver and BIOS patching is not supported on this device - this model is not " +
-                    "covered by the driver/firmware catalog (rc=-1067). The devices below were " +
-                    "found on the system, but no updates can be offered for them.";
+                    "Driver/BIOS database is not available for this device - this model is not in " +
+                    "the driver/firmware catalog (rc=-1067). Inventory only; no updates can be " +
+                    "offered.";
             }
 
             result.devices = DriverFirmwareMerge.Merge(inventory, patches);

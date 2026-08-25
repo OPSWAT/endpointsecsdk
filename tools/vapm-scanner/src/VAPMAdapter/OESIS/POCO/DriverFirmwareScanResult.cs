@@ -38,5 +38,9 @@ namespace VAPMAdapter.OESIS.POCO
         // "Manufacturer Model" of this machine, e.g. "VMware, Inc. VMware Virtual Platform".
         // Shown with the notice so it is obvious which box is uncovered.
         public string systemModel = "";
+
+        // The same identity split out, because the view labels them separately.
+        public string systemVendor = "";
+        public string systemModelName = "";
     }
 }
