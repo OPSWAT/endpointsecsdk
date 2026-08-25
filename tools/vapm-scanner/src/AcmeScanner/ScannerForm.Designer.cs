@@ -798,7 +798,9 @@ namespace AcmeScanner
             panelBiosDrivers.Dock = DockStyle.Top;
             panelBiosDrivers.Location = new Point(3, 3);
             panelBiosDrivers.Name = "panelBiosDrivers";
-            panelBiosDrivers.Size = new Size(1052, 48);
+            // Tall enough for the three-line summary: the unsupported-device notice needs a
+            // headline, an explanation and the device counts without clipping.
+            panelBiosDrivers.Size = new Size(1052, 76);
             panelBiosDrivers.TabIndex = 0;
             //
             // btnScanBiosDrivers
@@ -814,7 +816,7 @@ namespace AcmeScanner
             // lblBiosDriversSummary
             //
             lblBiosDriversSummary.AutoSize = true;
-            lblBiosDriversSummary.Location = new Point(200, 16);
+            lblBiosDriversSummary.Location = new Point(200, 8);
             lblBiosDriversSummary.Name = "lblBiosDriversSummary";
             lblBiosDriversSummary.Size = new Size(0, 15);
             lblBiosDriversSummary.TabIndex = 1;

@@ -379,10 +379,36 @@ namespace VAPMAdapter.OESIS
         }
 
         //
+        // Collects the endpoint inventory the driver/firmware matcher works from: system identity,
+        // OS, BIOS and the full hardware device list with driver and firmware versions. This is the
+        // SDK's own answer to "what is on this machine", so the view never needs Windows APIs.
+        // Returns result.inventory_collection with system / os / bios / devices.
+        // Windows only.
+        // https://software.opswat.com/OESIS_V4/html/c_method.html -> method 50901
+        //
+        public static string CollectDeviceInventory(string outputFile)
+        {
+            string result;
+            // output_file is optional; when given the engine also writes the inventory to disk.
+            string json_in = string.IsNullOrEmpty(outputFile)
+                ? "{\"input\" : { \"method\" : 50901 }}"
+                : "{\"input\" : { \"method\" : 50901, \"output_file\" : \"" +
+                  outputFile.Replace("\\", "\\\\") + "\" }}";
+
+            int rc = Invoke(json_in, out result);
+            if (rc < 0)
+            {
+                throw new Exception("CollectDeviceInventory failed to run correctly (rc=" + rc + ").  " + result);
+            }
+
+            return result;
+        }
+
+        //
         // Detects applicable driver/firmware patches (incl. BIOS) by matching the collected system
         // inventory against the loaded driver/firmware database. With no inventory the engine
         // collects it internally. Returns the raw JSON and the return code so the caller can treat
-        // MODEL_NOT_SUPPORTED (-1067) as a clean "no coverage" outcome rather than a failure.
+        // the "not covered" codes as a clean no-coverage outcome rather than a failure.
         // Windows only.
         // https://software.opswat.com/OESIS_V4/html/c_method.html -> method 50902
         //
@@ -390,14 +416,78 @@ namespace VAPMAdapter.OESIS
         {
             string json_in = "{\"input\" : { \"method\" : 50902 }}";
             int rc = Invoke(json_in, out result);
-            // -1067 = WA_VMOD_ERROR_MODEL_NOT_SUPPORTED: device model not in the catalog. That is a
-            // coverage gap, not a call failure, so let it through for the caller to handle.
-            if (rc < 0 && rc != -1067)
+            // Coverage gaps, not call failures - let them through for the caller to handle:
+            //   -1066 WA_VMOD_ERROR_VENDOR_NOT_SUPPORTED: this hardware vendor has no
+            //         driver/firmware coverage at all (common on VMs and white-box hardware).
+            //   -1067 WA_VMOD_ERROR_MODEL_NOT_SUPPORTED: the vendor is covered, this model is not.
+            // Both mean "we cannot patch this box", which is a normal answer on a demo machine and
+            // must not discard the device inventory we can still show.
+            if (rc < 0 && rc != VENDOR_NOT_SUPPORTED && rc != MODEL_NOT_SUPPORTED)
             {
                 throw new Exception("DetectDriverFirmwarePatches failed to run correctly (rc=" + rc + ").  " + result);
             }
 
             return rc;
+        }
+
+        public const int VENDOR_NOT_SUPPORTED = -1066;
+        public const int MODEL_NOT_SUPPORTED = -1067;
+
+        //
+        // Device Info family. These are how the scanner learns what hardware it is running on -
+        // the SDK is the source of truth for that, not Windows APIs, because an OEM embedding
+        // OESIS gets exactly these answers and nothing more.
+        //
+
+        //
+        // Computer manufacturer and model, e.g. { "manufacturer": "Dell Inc.", "model":
+        // "Latitude 5450" }. This is the identity the driver/firmware catalog matches on, so it
+        // is what to show when a device turns out not to be covered.
+        // https://software.opswat.com/OESIS_V4/html/c_method.html -> method 30001
+        //
+        public static string GetPCModel()
+        {
+            string result;
+            int rc = Invoke("{\"input\" : { \"method\" : 30001 }}", out result);
+            if (rc < 0)
+            {
+                throw new Exception("GetPCModel failed to run correctly (rc=" + rc + ").  " + result);
+            }
+
+            return result;
+        }
+
+        //
+        // Installed hardware: video adapters and network adapters.
+        // https://software.opswat.com/OESIS_V4/html/c_method.html -> method 30003
+        //
+        public static string GetPCComponents()
+        {
+            string result;
+            int rc = Invoke("{\"input\" : { \"method\" : 30003 }}", out result);
+            if (rc < 0)
+            {
+                throw new Exception("GetPCComponents failed to run correctly (rc=" + rc + ").  " + result);
+            }
+
+            return result;
+        }
+
+        //
+        // Whether this machine is a virtual machine. Worth surfacing next to an unsupported-device
+        // notice: a VM has no real vendor firmware, which is usually the reason it is uncovered.
+        // https://software.opswat.com/OESIS_V4/html/c_method.html -> method 30006
+        //
+        public static string IsCurrentDeviceVirtual()
+        {
+            string result;
+            int rc = Invoke("{\"input\" : { \"method\" : 30006 }}", out result);
+            if (rc < 0)
+            {
+                throw new Exception("IsCurrentDeviceVirtual failed to run correctly (rc=" + rc + ").  " + result);
+            }
+
+            return result;
         }
     }
 

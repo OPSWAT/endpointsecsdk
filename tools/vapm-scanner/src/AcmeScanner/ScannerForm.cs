@@ -40,6 +40,7 @@ namespace AcmeScanner
         static Dictionary<string, CatalogSignature> staticSignatureCatalogResults = new Dictionary<string, CatalogSignature>();
         static Dictionary<string, OnlinePatchDetail> staticOrchestrationScanResults = new Dictionary<string, OnlinePatchDetail>();
         static List<DriverFirmwareStatus> staticDriverResults = new List<DriverFirmwareStatus>();
+        static DriverFirmwareScanResult staticDriverScan = new DriverFirmwareScanResult();
         static List<CatalogProduct> staticProductList = null;
         static bool isCatalogUpdated = false;
 
@@ -597,7 +598,8 @@ namespace AcmeScanner
                 }
                 else
                 {
-                    staticDriverResults = (List<DriverFirmwareStatus>)ev.Result;
+                    staticDriverScan = (DriverFirmwareScanResult)ev.Result;
+                    staticDriverResults = staticDriverScan.devices;
                     UpdateDriverResults();
                 }
                 btnScanBiosDrivers.Enabled = true;
@@ -666,9 +668,30 @@ namespace AcmeScanner
             lvBiosDrivers.Items.Clear();
             lvBiosDrivers.Items.AddRange(resultList.ToArray());
 
-            lblBiosDriversSummary.Text = sortedList.Count + " device(s) found, " +
-                                         missingCount + " needing an update     |     " +
-                                         GetDriverFirmwareDbStatus();
+            // Lead with the coverage verdict when this machine cannot be patched. The device list
+            // below is still real and still worth reading, so the notice explains rather than
+            // replaces it - and names the model, since that is what the catalog matched against.
+            string model = string.IsNullOrEmpty(staticDriverScan.systemModel)
+                           ? "Unknown model"
+                           : staticDriverScan.systemModel;
+            string counts = sortedList.Count + " device(s) found, " +
+                            missingCount + " needing an update";
+
+            if (!staticDriverScan.patchingSupported)
+            {
+                lblBiosDriversSummary.ForeColor = Color.Firebrick;
+                lblBiosDriversSummary.Text =
+                    "PATCHING NOT SUPPORTED ON THIS DEVICE  -  " + model + Environment.NewLine +
+                    staticDriverScan.unsupportedReason + Environment.NewLine +
+                    counts + " (inventory only)     |     " + GetDriverFirmwareDbStatus();
+            }
+            else
+            {
+                lblBiosDriversSummary.ForeColor = SystemColors.ControlText;
+                lblBiosDriversSummary.Text =
+                    "Device: " + model + Environment.NewLine +
+                    counts + "     |     " + GetDriverFirmwareDbStatus();
+            }
         }
 
         // Version/time of the driver/firmware (BIOS) DB plus the catalog channel it came from.
