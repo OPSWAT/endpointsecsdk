@@ -449,17 +449,7 @@ def detect_windows_cves(scan, server_dir, os_info, cve_index):
         for patch in product.get("missing_patches", []):
             scan_reported_missing_kbs |= kb_candidates(patch)
 
-    # Step 5b: forward supersedence. The agent's GetMissingPatches (1013) can report a stale
-    # "latest offered" KB; promote the missing set to the newer cumulative KBs that supersede
-    # it so the latest cumulative's CVEs (e.g. current-month fixes) are not dropped. This
-    # mirrors the endpoint engine's appendMissingCumulKB and keeps the two workflows aligned.
-    superseding_kbs = get_superseding_cumulative_kbs(
-        scan_reported_missing_kbs, supersede_graph, cumulative_kbs)
-    if superseding_kbs:
-        print(f"  Forward supersedence: promoted missing set with "
-              f"{len(superseding_kbs)} newer cumulative KB(s): {sorted(superseding_kbs)}")
-
-    # Step 5c: build-history recovery (mirrors the endpoint engine's getMissingKBFromBuildHistory).
+    # Step 5b: build-history recovery (mirrors the endpoint engine's getMissingKBFromBuildHistory).
     # GetMissingPatches only offers the latest cumulative and forward supersedence walks the
     # chain up one hop, so the intervening months' cumulatives are still missing from the set.
     # Pull every KB whose build is newer than the running build: those fix CVEs not yet applied.
@@ -467,6 +457,17 @@ def detect_windows_cves(scan, server_dir, os_info, cve_index):
     if later_build_kbs:
         print(f"  Build-history recovery: added {len(later_build_kbs)} KB(s) from builds newer "
               f"than {current_build}")
+
+    # Step 5c: forward supersedence. Promote the missing set to the newer cumulative KBs that
+    # supersede any known-missing KB so the latest cumulative's CVEs (e.g. current-month fixes)
+    # are not dropped. This mirrors the endpoint engine's appendMissingCumulKB which runs on
+    # the full missingKBList (scan-reported + build-history) before calcAffectedCvesList.
+    superseding_kbs = get_superseding_cumulative_kbs(
+        scan_reported_missing_kbs | later_build_kbs, supersede_graph, cumulative_kbs)
+    if superseding_kbs:
+        print(f"  Forward supersedence: promoted missing set with "
+              f"{len(superseding_kbs)} newer cumulative KB(s): {sorted(superseding_kbs)}")
+
     missing_kbs_input = scan_reported_missing_kbs | superseding_kbs | later_build_kbs
 
     # ------------------------------------------------------------------
