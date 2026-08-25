@@ -141,42 +141,55 @@ namespace OPSWAT_Adapter.Tasks
 
         public int GetSecurityScore()
         {
-            int resultCount = 0;
+            int totalScore = 0;
 
             OESISFramework.InitializeFramework();
-
-            List<int> firewallProducts = Util.GetProductSignaturesByCategory(OESISCategory.FIREWALL, GetProductList());
-            if (IsFirewallRunning(firewallProducts))
+            try
             {
-                resultCount += 2;
+                // Ask the SDK to calculate the OPSWAT Security Score directly
+                // (WAAPI_MID_GET_SECURITY_SCORE, method 111) instead of summing individual checks.
+                // force_refresh makes the engine refresh the underlying security status rather
+                // than using cached values.
+                string json_in = "{\"input\": { \"method\": 111, \"force_refresh\": true } }";
+                string json_out = "";
+                int callResult = OESISFramework.Invoke(json_in, out json_out);
+
+                if (callResult < 0)
+                {
+                    GetLogger().Log(false, "Security Score: SDK call failed (rc=" + callResult + ")");
+                    return 0;
+                }
+
+                JObject parsed = JObject.Parse(json_out);
+                JToken result = parsed["result"];
+
+                // total_score is on a 0-100 scale.
+                totalScore = (int)result["total_score"];
+                string scoreStatus = (string)result["score_status"];
+                GetLogger().Log(scoreStatus == "good",
+                    "OPSWAT Security Score: " + totalScore + " / 100 (" + scoreStatus + ")");
+
+                // Log the per-category breakdown so the tab shows where the score came from.
+                JToken categories = result["categories"];
+                if (categories != null)
+                {
+                    foreach (JToken category in categories)
+                    {
+                        string name = (string)category["name"];
+                        int score = (int)category["score"];
+                        int maxScore = (int)category["max_score"];
+                        string status = (string)category["status"];
+                        GetLogger().Log(status == "good",
+                            name + ": " + score + " / " + maxScore + " (" + status + ")");
+                    }
+                }
+            }
+            finally
+            {
+                OESISFramework.TearDown();
             }
 
-            List<int> encryptionProducts = Util.GetProductSignaturesByCategory(OESISCategory.DISK_ENCRYPTION, GetProductList());
-            if (IsDiskEncrypted(encryptionProducts))
-            {
-                resultCount += 2;
-            }
-
-            List<int> antimalwareProducts = Util.GetProductSignaturesByCategory(OESISCategory.ANTIMALWARE, GetProductList());
-            if (IsAntimalwareProtected(antimalwareProducts))
-            {
-                resultCount += 2;
-            }
-
-            if (IsUpdateDefinitionRecent(antimalwareProducts, DateTime.Now.AddDays(-1)))
-            {
-                resultCount += 2;
-            }
-
-            if (IsScanRecent(antimalwareProducts, DateTime.Now.AddDays(-1)))
-            {
-                resultCount += 2;
-            }
-
-
-            OESISFramework.TearDown();
-
-            return resultCount;
+            return totalScore;
         }
 
     }
