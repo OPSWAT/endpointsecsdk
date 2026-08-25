@@ -7,6 +7,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
 using System.Collections;
+using System.Globalization;
 using System.Windows.Forms;
 
 /// <summary>
@@ -59,8 +60,23 @@ public class ListViewColumnSorter : IComparer
         listviewX = (ListViewItem)x;
         listviewY = (ListViewItem)y;
 
-        // Compare the two items
-        compareResult = ObjectCompare.Compare(listviewX.SubItems[ColumnToSort].Text, listviewY.SubItems[ColumnToSort].Text);
+        string textX = listviewX.SubItems[ColumnToSort].Text;
+        string textY = listviewY.SubItems[ColumnToSort].Text;
+
+        // Compare numerically only when both cells are plain integers (e.g. Signature ID: 20 sorts
+        // before 120). Use invariant culture so decimal/thousands separators never enter into it,
+        // and fall back to a case-insensitive text compare for everything else (names, versions
+        // like "10.0.1", etc.).
+        long numX, numY;
+        if (long.TryParse(textX, NumberStyles.Integer, CultureInfo.InvariantCulture, out numX)
+            && long.TryParse(textY, NumberStyles.Integer, CultureInfo.InvariantCulture, out numY))
+        {
+            compareResult = numX.CompareTo(numY);
+        }
+        else
+        {
+            compareResult = ObjectCompare.Compare(textX, textY);
+        }
 
         // Calculate correct return value based on object comparison
         if (OrderOfSort == SortOrder.Ascending)

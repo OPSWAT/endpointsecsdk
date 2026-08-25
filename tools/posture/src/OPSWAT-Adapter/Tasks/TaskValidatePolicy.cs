@@ -335,32 +335,38 @@ namespace ComplianceAdapater.Policy
             bool result = true;
 
             OESISFramework.InitializeFramework();
-
-            if (securityPolicy != null)
+            try
             {
-                if (!ValidateAntimalware(securityPolicy.antimalwarePolicy))
+                if (securityPolicy != null)
                 {
-                    result = false;
+                    if (!ValidateAntimalware(securityPolicy.antimalwarePolicy))
+                    {
+                        result = false;
+                    }
+
+
+                    if (!ValidateFirewall(securityPolicy.firewallPolicy))
+                    {
+                        result = false;
+                    }
+
+
+                    if (!ValidateEncryption(securityPolicy.encryptionPolicy))
+                    {
+                        result = false;
+                    }
                 }
-
-
-                if (!ValidateFirewall(securityPolicy.firewallPolicy))
+                else
                 {
-                    result = false;
-                }
-
-
-                if (!ValidateEncryption(securityPolicy.encryptionPolicy))
-                {
-                    result = false;
+                    GetLogger().Log(true, "Security Policy: Not configured returning success");
                 }
             }
-            else
+            finally
             {
-                GetLogger().Log(true, "Security Policy: Not configured returning success");
+                // Always tear down, even if a validation step throws, so the engine isn't left
+                // initialized (which would corrupt the next InitializeFramework).
+                OESISFramework.TearDown();
             }
-
-            OESISFramework.TearDown();
 
             return result;
         }

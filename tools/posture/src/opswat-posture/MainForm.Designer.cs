@@ -110,6 +110,12 @@ namespace OPSWATPosture
             this.label13 = new System.Windows.Forms.Label();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.pbLoader = new System.Windows.Forms.PictureBox();
+            this.tabComplianceReport = new System.Windows.Forms.TabPage();
+            this.btnGetComplianceReport = new System.Windows.Forms.Button();
+            this.txtComplianceReport = new System.Windows.Forms.TextBox();
+            this.tabCategories = new System.Windows.Forms.TabPage();
+            this.btnGetCategories = new System.Windows.Forms.Button();
+            this.lvCategories = new OPSWATPosture.PostureListView();
             this.GeolocationTab.SuspendLayout();
             this.tabPolicyCheck.SuspendLayout();
             this.gbEncryption.SuspendLayout();
@@ -127,6 +133,8 @@ namespace OPSWATPosture
             this.groupBox2.SuspendLayout();
             this.groupBox1.SuspendLayout();
             this.tabPage2.SuspendLayout();
+            this.tabComplianceReport.SuspendLayout();
+            this.tabCategories.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pbPluginStatus)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pbLoader)).BeginInit();
@@ -138,14 +146,91 @@ namespace OPSWATPosture
             this.GeolocationTab.Controls.Add(this.tabScore);
             this.GeolocationTab.Controls.Add(this.tabPage1);
             this.GeolocationTab.Controls.Add(this.tabPage2);
+            this.GeolocationTab.Controls.Add(this.tabComplianceReport);
+            this.GeolocationTab.Controls.Add(this.tabCategories);
             this.GeolocationTab.Location = new System.Drawing.Point(12, 83);
             this.GeolocationTab.Name = "GeolocationTab";
             this.GeolocationTab.SelectedIndex = 0;
             this.GeolocationTab.Size = new System.Drawing.Size(810, 407);
             this.GeolocationTab.TabIndex = 4;
-            // 
+            //
+            // tabComplianceReport
+            //
+            this.tabComplianceReport.Controls.Add(this.txtComplianceReport);
+            this.tabComplianceReport.Controls.Add(this.btnGetComplianceReport);
+            this.tabComplianceReport.Location = new System.Drawing.Point(4, 22);
+            this.tabComplianceReport.Name = "tabComplianceReport";
+            this.tabComplianceReport.Padding = new System.Windows.Forms.Padding(3);
+            this.tabComplianceReport.Size = new System.Drawing.Size(802, 381);
+            this.tabComplianceReport.TabIndex = 4;
+            this.tabComplianceReport.Text = "Compliance Report";
+            this.tabComplianceReport.UseVisualStyleBackColor = true;
+            //
+            // btnGetComplianceReport
+            //
+            this.btnGetComplianceReport.Location = new System.Drawing.Point(9, 9);
+            this.btnGetComplianceReport.Name = "btnGetComplianceReport";
+            this.btnGetComplianceReport.Size = new System.Drawing.Size(120, 30);
+            this.btnGetComplianceReport.TabIndex = 0;
+            this.btnGetComplianceReport.Text = "Get Report";
+            this.btnGetComplianceReport.UseVisualStyleBackColor = true;
+            this.btnGetComplianceReport.Click += new System.EventHandler(this.btnGetComplianceReport_Click);
+            //
+            // txtComplianceReport
+            //
+            this.txtComplianceReport.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+            | System.Windows.Forms.AnchorStyles.Left)
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.txtComplianceReport.Font = new System.Drawing.Font("Consolas", 9F);
+            this.txtComplianceReport.Location = new System.Drawing.Point(9, 46);
+            this.txtComplianceReport.Multiline = true;
+            this.txtComplianceReport.Name = "txtComplianceReport";
+            this.txtComplianceReport.ReadOnly = true;
+            this.txtComplianceReport.ScrollBars = System.Windows.Forms.ScrollBars.Both;
+            this.txtComplianceReport.Size = new System.Drawing.Size(787, 326);
+            this.txtComplianceReport.TabIndex = 1;
+            this.txtComplianceReport.WordWrap = false;
+            //
+            // tabCategories
+            //
+            this.tabCategories.Controls.Add(this.lvCategories);
+            this.tabCategories.Controls.Add(this.btnGetCategories);
+            this.tabCategories.Location = new System.Drawing.Point(4, 22);
+            this.tabCategories.Name = "tabCategories";
+            this.tabCategories.Padding = new System.Windows.Forms.Padding(3);
+            this.tabCategories.Size = new System.Drawing.Size(802, 381);
+            this.tabCategories.TabIndex = 5;
+            this.tabCategories.Text = "Categories";
+            this.tabCategories.UseVisualStyleBackColor = true;
+            //
+            // btnGetCategories
+            //
+            this.btnGetCategories.Location = new System.Drawing.Point(9, 9);
+            this.btnGetCategories.Name = "btnGetCategories";
+            this.btnGetCategories.Size = new System.Drawing.Size(120, 30);
+            this.btnGetCategories.TabIndex = 0;
+            this.btnGetCategories.Text = "Get Categories";
+            this.btnGetCategories.UseVisualStyleBackColor = true;
+            this.btnGetCategories.Click += new System.EventHandler(this.btnGetCategories_Click);
+            //
+            // lvCategories
+            //
+            this.lvCategories.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+            | System.Windows.Forms.AnchorStyles.Left)
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.lvCategories.FullRowSelect = true;
+            this.lvCategories.GridLines = true;
+            this.lvCategories.Location = new System.Drawing.Point(9, 46);
+            this.lvCategories.MultiSelect = false;
+            this.lvCategories.Name = "lvCategories";
+            this.lvCategories.OwnerDraw = true;
+            this.lvCategories.Size = new System.Drawing.Size(787, 326);
+            this.lvCategories.TabIndex = 1;
+            this.lvCategories.UseCompatibleStateImageBehavior = false;
+            this.lvCategories.View = System.Windows.Forms.View.Details;
+            //
             // tabPolicyCheck
-            // 
+            //
             this.tabPolicyCheck.Controls.Add(this.pbLoader);
             this.tabPolicyCheck.Controls.Add(this.lvPolicy);
             this.tabPolicyCheck.Controls.Add(this.gbEncryption);
@@ -994,6 +1079,9 @@ namespace OPSWATPosture
             this.groupBox1.ResumeLayout(false);
             this.tabPage2.ResumeLayout(false);
             this.tabPage2.PerformLayout();
+            this.tabComplianceReport.ResumeLayout(false);
+            this.tabComplianceReport.PerformLayout();
+            this.tabCategories.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.pbPluginStatus)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pbLoader)).EndInit();
@@ -1006,6 +1094,12 @@ namespace OPSWATPosture
 
         private System.Windows.Forms.PictureBox pictureBox1;
         private System.Windows.Forms.TabControl GeolocationTab;
+        private System.Windows.Forms.TabPage tabComplianceReport;
+        private System.Windows.Forms.Button btnGetComplianceReport;
+        private System.Windows.Forms.TextBox txtComplianceReport;
+        private System.Windows.Forms.TabPage tabCategories;
+        private System.Windows.Forms.Button btnGetCategories;
+        private OPSWATPosture.PostureListView lvCategories;
         private System.Windows.Forms.TabPage tabPolicyCheck;
         private System.Windows.Forms.Button btnCheckPolicy;
         private System.Windows.Forms.TabPage tabScore;

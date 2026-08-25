@@ -10,13 +10,15 @@
 using ComplianceAdapater.Log;
 using ComplianceAdapater.OESIS;
 using ComplianceAdapater.Policy;
+using OPSWAT_Adapter.POCO;
+using OPSWAT_Adapter.Tasks;
 using System;
 using System.Collections.Generic;
-using System.Windows.Forms;
 using System.ComponentModel;
-using OPSWAT_Adapter.Tasks;
+using System.IO;
+using System.Reflection;
+using System.Windows.Forms;
 using VAPMAdapater.Updates;
-using OPSWAT_Adapter.POCO;
 
 namespace OPSWATPosture
 {
@@ -28,6 +30,14 @@ namespace OPSWATPosture
         private BackgroundWorker geoLocationWorker;
         private BackgroundWorker updateSDKWorker;
         private BackgroundWorker checkPluginsWorker;
+        private BackgroundWorker getComplianceReportWorker;
+        private BackgroundWorker getCategoriesWorker;
+
+        // Serializes access to the process-global OESIS engine. All the OESIS worker threads
+        // (policy, score, geolocation, plugins, compliance report, categories) each run
+        // InitializeFramework -> Invoke -> TearDown; without this, two overlapping runs could tear
+        // the engine down mid-invoke on another thread and crash.
+        private static readonly object oesisLock = new object();
 
 
         private TaskValidatePolicy      taskValidatePolicy;
@@ -37,11 +47,99 @@ namespace OPSWATPosture
         TaskGeoLocation geolocationValidator = new TaskGeoLocation();
 
 
+
+        //
+        // Walks up from startDir looking for the 'sdkroot' marker file that identifies the repo
+        // root (next to the eval-license directory). Returns null if not found.
+        //
+        private static string FindRepoRoot(string startDir)
+        {
+            DirectoryInfo dir = new DirectoryInfo(startDir);
+            while (dir != null)
+            {
+                if (File.Exists(Path.Combine(dir.FullName, "sdkroot")))
+                {
+                    return dir.FullName;
+                }
+                dir = dir.Parent;
+            }
+            return null;
+        }
+
+
+        //
+        // Ensures license.cfg and pass_key.txt exist in runDir. If they are missing, copies them
+        // (and download_token.txt if present) from the repo's eval-license directory. If they can't
+        // be found there either, throws a clear "License not found" error.
+        //
+        private static void EnsureLicenseFiles(string runDir)
+        {
+            string cfg = Path.Combine(runDir, "license.cfg");
+            string key = Path.Combine(runDir, "pass_key.txt");
+
+            // Locate <repo-root>/eval-license (repo root is marked by an 'sdkroot' file); may be null.
+            string repoRoot = FindRepoRoot(runDir) ?? FindRepoRoot(Environment.CurrentDirectory);
+            string evalDir = (repoRoot != null) ? Path.Combine(repoRoot, "eval-license") : null;
+
+            // Provision the license itself if it isn't already in the running directory.
+            if (!File.Exists(cfg) || !File.Exists(key))
+            {
+                bool copied = false;
+                if (evalDir != null)
+                {
+                    string evalCfg = Path.Combine(evalDir, "license.cfg");
+                    string evalKey = Path.Combine(evalDir, "pass_key.txt");
+                    if (File.Exists(evalCfg) && File.Exists(evalKey))
+                    {
+                        File.Copy(evalCfg, cfg, true);
+                        File.Copy(evalKey, key, true);
+                        copied = true;
+                    }
+                }
+
+                if (!copied)
+                {
+                    throw new Exception(
+                        "License not found. Please include license.cfg and pass_key.txt in the running directory: " + runDir);
+                }
+            }
+
+            // Always make sure the download token is present too (used by the SDK/DB update flow) -
+            // even when the license files were already in place - copying it from eval-license if
+            // it's missing and available.
+            string token = Path.Combine(runDir, "download_token.txt");
+            if (!File.Exists(token) && evalDir != null)
+            {
+                string evalToken = Path.Combine(evalDir, "download_token.txt");
+                if (File.Exists(evalToken))
+                {
+                    File.Copy(evalToken, token, true);
+                }
+            }
+        }
+
+
+
         //
         // Update SDK if needed
         //
         private void UpdateFilesOnStartup()
         {
+            // The SDK reads license.cfg / pass_key.txt from the executable's directory, so provision
+            // them there (with a fallback to the repo's eval-license directory). If no license can be
+            // found, show a clear message and exit cleanly rather than crashing during construction.
+            string appDir = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
+            try
+            {
+                EnsureLicenseFiles(appDir);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "License", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                Environment.Exit(1);
+                return;
+            }
+
             GeolocationTab.Enabled = false;
             if (!UpdateSDK.isSDKUpdated())
             {
@@ -135,7 +233,23 @@ namespace OPSWATPosture
                 new RunWorkerCompletedEventHandler(
             checkPlugins_Worker_Completed);
 
-            
+
+            getComplianceReportWorker = new BackgroundWorker();
+            getComplianceReportWorker.DoWork +=
+                new DoWorkEventHandler(getComplianceReportWorker_DoWork);
+            getComplianceReportWorker.RunWorkerCompleted +=
+                new RunWorkerCompletedEventHandler(
+            getComplianceReportWorker_Completed);
+
+
+            getCategoriesWorker = new BackgroundWorker();
+            getCategoriesWorker.DoWork +=
+                new DoWorkEventHandler(getCategoriesWorker_DoWork);
+            getCategoriesWorker.RunWorkerCompleted +=
+                new RunWorkerCompletedEventHandler(
+            getCategoriesWorker_Completed);
+
+
 
             UpdateFilesOnStartup();
         }
@@ -151,7 +265,11 @@ namespace OPSWATPosture
         {
             try
             {
-                bool valid = taskValidatePolicy.ValidatePolicy();
+                bool valid;
+                lock (oesisLock)
+                {
+                    valid = taskValidatePolicy.ValidatePolicy();
+                }
                 e.Result = valid;
             }
             catch(Exception exception)
@@ -189,7 +307,11 @@ namespace OPSWATPosture
             try
             {
                 taskSecurityScore = new TaskSecurityScore();
-                int securityScore = taskSecurityScore.GetSecurityScore();
+                int securityScore;
+                lock (oesisLock)
+                {
+                    securityScore = taskSecurityScore.GetSecurityScore();
+                }
 
                 e.Result = securityScore;
             }
@@ -219,14 +341,15 @@ namespace OPSWATPosture
                 {
                     pbScoreImage.Image = Properties.Resources.RedLight;
                 }
-
-                Cursor.Current = Cursors.Default;
-                btnGetSecurityScore.Enabled = true;
             }
             else
             {
                 pbScoreImage.Image = Properties.Resources.RedLight;
             }
+
+            // Always re-enable the button and reset the cursor, so a failure doesn't strand the tab.
+            Cursor.Current = Cursors.Default;
+            btnGetSecurityScore.Enabled = true;
         }
 
         ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -240,7 +363,10 @@ namespace OPSWATPosture
 
             try
             {
-                geolocationValidator.GetGeolocation();
+                lock (oesisLock)
+                {
+                    geolocationValidator.GetGeolocation();
+                }
 
                 GeoLocationInfo info = geolocationValidator.GetGeoLocationInfo();
                 e.Result = info;
@@ -343,6 +469,8 @@ namespace OPSWATPosture
             GeolocationTab.Enabled = true;
             pbLoader.SendToBack();
             pbLoader.Visible = false;
+
+
             LoadLists();
         }
 
@@ -355,7 +483,10 @@ namespace OPSWATPosture
         {
             try
             {
-                checkPlugins();
+                lock (oesisLock)
+                {
+                    checkPlugins();
+                }
                 e.Result = true;
             }
             catch(Exception exception)
@@ -533,6 +664,95 @@ namespace OPSWATPosture
 
             // Do a scan again
             getSecurityScoreWorker.RunWorkerAsync(true);
+        }
+
+        private void btnGetComplianceReport_Click(object sender, EventArgs e)
+        {
+            Cursor.Current = Cursors.WaitCursor;
+            btnGetComplianceReport.Enabled = false;
+            txtComplianceReport.Text = "Getting compliance report...";
+
+            getComplianceReportWorker.RunWorkerAsync(true);
+        }
+
+        private void getComplianceReportWorker_DoWork(object sender, DoWorkEventArgs e)
+        {
+            lock (oesisLock)
+            {
+                e.Result = TaskComplianceReport.GetReportJson();
+            }
+        }
+
+        private void getComplianceReportWorker_Completed(object sender, RunWorkerCompletedEventArgs e)
+        {
+            if (e.Error != null)
+            {
+                txtComplianceReport.Text = "Error getting compliance report:" +
+                    Environment.NewLine + Environment.NewLine + e.Error.Message;
+            }
+            else
+            {
+                // The engine pretty-prints with '\n'; normalize to Windows line endings so the
+                // multiline TextBox renders the JSON correctly.
+                string json = (string)e.Result;
+                txtComplianceReport.Text = json.Replace("\r\n", "\n").Replace("\n", Environment.NewLine);
+            }
+
+            Cursor.Current = Cursors.Default;
+            btnGetComplianceReport.Enabled = true;
+        }
+
+        private void btnGetCategories_Click(object sender, EventArgs e)
+        {
+            Cursor.Current = Cursors.WaitCursor;
+            btnGetCategories.Enabled = false;
+
+            getCategoriesWorker.RunWorkerAsync(true);
+        }
+
+        private void getCategoriesWorker_DoWork(object sender, DoWorkEventArgs e)
+        {
+            lock (oesisLock)
+            {
+                e.Result = TaskCategories.GetCategories();
+            }
+        }
+
+        private void getCategoriesWorker_Completed(object sender, RunWorkerCompletedEventArgs e)
+        {
+            if (e.Error != null)
+            {
+                MessageBox.Show("Error getting categories:" +
+                    Environment.NewLine + Environment.NewLine + e.Error.Message);
+            }
+            else
+            {
+                List<ProductCategory> categories = (List<ProductCategory>)e.Result;
+
+                lvCategories.BeginUpdate();
+                lvCategories.Items.Clear();
+                lvCategories.Columns.Clear();
+                lvCategories.Columns.Add("Application", 380);
+                lvCategories.Columns.Add("Signature ID", 120);
+                lvCategories.Columns.Add("Category", 260);
+
+                // One row per (application, category); products with multiple categories repeat.
+                // Build the items first and AddRange once so the active column sorter runs a single
+                // sort rather than re-sorting on every insert.
+                List<ListViewItem> items = new List<ListViewItem>();
+                foreach (ProductCategory pc in categories)
+                {
+                    ListViewItem item = new ListViewItem(pc.application);
+                    item.SubItems.Add(pc.signatureId.ToString());
+                    item.SubItems.Add(pc.category);
+                    items.Add(item);
+                }
+                lvCategories.Items.AddRange(items.ToArray());
+                lvCategories.EndUpdate();
+            }
+
+            Cursor.Current = Cursors.Default;
+            btnGetCategories.Enabled = true;
         }
 
         private void btnGetLocation_Click(object sender, EventArgs e)
