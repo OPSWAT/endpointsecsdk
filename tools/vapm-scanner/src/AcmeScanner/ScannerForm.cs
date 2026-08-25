@@ -141,21 +141,72 @@ namespace AcmeScanner
             lblBiosDriversSummary.Text = GetDriverFirmwareDbStatus();
         }
 
-        //Check if license files are present in bin folder; does not allow to run program if not
+        //Check if license files are present in the running directory. If not, fall back to the
+        //repo's eval-license directory and copy them over; otherwise error and do not run.
         private bool CheckLicenseFiles()
         {
-            bool result = false;
-            if (!File.Exists("license.cfg") || !File.Exists("pass_key.txt"))
+            string runDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            string cfg = Path.Combine(runDir, "license.cfg");
+            string key = Path.Combine(runDir, "pass_key.txt");
+
+            if (File.Exists(cfg) && File.Exists(key))
             {
-                ShowMessageDialog("This program requires the license.cfg and pass_key.txt to be in the running directory.  Please check and make sure this is correct.", false);
-                Close();
-            }
-            else
-            {
-                result = true;
+                return true;
             }
 
-            return result;
+            // Not in the running directory - try the repo's eval-license directory
+            // (repo root is marked by an 'sdkroot' file).
+            string repoRoot = FindRepoRoot(runDir) ?? FindRepoRoot(Directory.GetCurrentDirectory());
+            if (repoRoot != null)
+            {
+                string evalDir = Path.Combine(repoRoot, "eval-license");
+                string evalCfg = Path.Combine(evalDir, "license.cfg");
+                string evalKey = Path.Combine(evalDir, "pass_key.txt");
+
+                if (File.Exists(evalCfg) && File.Exists(evalKey))
+                {
+                    try
+                    {
+                        File.Copy(evalCfg, cfg, true);
+                        File.Copy(evalKey, key, true);
+
+                        // The download token is used by the Update SDK/DB flow; copy it if present.
+                        string evalToken = Path.Combine(evalDir, "download_token.txt");
+                        if (File.Exists(evalToken))
+                        {
+                            File.Copy(evalToken, Path.Combine(runDir, "download_token.txt"), true);
+                        }
+                        return true;
+                    }
+                    catch (Exception ex)
+                    {
+                        ShowMessageDialog("Found an evaluation license in " + evalDir +
+                            " but could not copy it to the running directory:\n\n" + ex.Message, false);
+                        Close();
+                        return false;
+                    }
+                }
+            }
+
+            ShowMessageDialog("License not found. Please include license.cfg and pass_key.txt in the running directory:\n\n" + runDir, false);
+            Close();
+            return false;
+        }
+
+        //Walks up from startDir looking for the 'sdkroot' marker file that identifies the repo
+        //root (next to the eval-license directory). Returns null if not found.
+        private static string FindRepoRoot(string startDir)
+        {
+            DirectoryInfo dir = new DirectoryInfo(startDir);
+            while (dir != null)
+            {
+                if (File.Exists(Path.Combine(dir.FullName, "sdkroot")))
+                {
+                    return dir.FullName;
+                }
+                dir = dir.Parent;
+            }
+            return null;
         }
 
         //
