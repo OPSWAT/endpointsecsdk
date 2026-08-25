@@ -496,10 +496,12 @@ namespace OPSWATPosture
             // tbSecurityScore
             // 
             this.tbSecurityScore.Location = new System.Drawing.Point(9, 64);
+            this.tbSecurityScore.Maximum = 100;
+            this.tbSecurityScore.TickFrequency = 10;
             this.tbSecurityScore.Name = "tbSecurityScore";
             this.tbSecurityScore.Size = new System.Drawing.Size(310, 45);
             this.tbSecurityScore.TabIndex = 6;
-            this.tbSecurityScore.Value = 5;
+            this.tbSecurityScore.Value = 70;
             this.tbSecurityScore.Scroll += new System.EventHandler(this.tbSecurityScore_Scroll);
             // 
             // btnGetSecurityScore
