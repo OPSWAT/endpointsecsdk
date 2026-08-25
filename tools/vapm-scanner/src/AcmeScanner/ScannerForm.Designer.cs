@@ -798,9 +798,9 @@ namespace AcmeScanner
             panelBiosDrivers.Dock = DockStyle.Top;
             panelBiosDrivers.Location = new Point(3, 3);
             panelBiosDrivers.Name = "panelBiosDrivers";
-            // Tall enough for the three-line summary: the unsupported-device notice needs a
-            // headline, an explanation and the device counts without clipping.
-            panelBiosDrivers.Size = new Size(1052, 76);
+            // Tall enough for the three-line summary: identity, the coverage note and the
+            // device counts, at the reduced font size used by lblBiosDriversSummary.
+            panelBiosDrivers.Size = new Size(1052, 62);
             panelBiosDrivers.TabIndex = 0;
             //
             // btnScanBiosDrivers
@@ -816,6 +816,9 @@ namespace AcmeScanner
             // lblBiosDriversSummary
             //
             lblBiosDriversSummary.AutoSize = true;
+            // Smaller than the form default: this block is three lines of supporting detail
+            // above the grid, and at the default size it crowds the tab and runs off the edge.
+            lblBiosDriversSummary.Font = new Font("Segoe UI", 7.5F);
             lblBiosDriversSummary.Location = new Point(200, 8);
             lblBiosDriversSummary.Name = "lblBiosDriversSummary";
             lblBiosDriversSummary.Size = new Size(0, 15);

@@ -668,28 +668,31 @@ namespace AcmeScanner
             lvBiosDrivers.Items.Clear();
             lvBiosDrivers.Items.AddRange(resultList.ToArray());
 
-            // Lead with the coverage verdict when this machine cannot be patched. The device list
-            // below is still real and still worth reading, so the notice explains rather than
-            // replaces it - and names the model, since that is what the catalog matched against.
-            string model = string.IsNullOrEmpty(staticDriverScan.systemModel)
-                           ? "Unknown model"
-                           : staticDriverScan.systemModel;
+            // Identify the machine on its own line: vendor and model are what the driver/firmware
+            // catalog matches on, so when there is no coverage they are the useful facts.
+            string vendor = string.IsNullOrEmpty(staticDriverScan.systemVendor)
+                            ? "Unknown" : staticDriverScan.systemVendor;
+            string model = string.IsNullOrEmpty(staticDriverScan.systemModelName)
+                           ? "Unknown" : staticDriverScan.systemModelName;
             string counts = sortedList.Count + " device(s) found, " +
                             missingCount + " needing an update";
 
+            // Deliberately not colour-coded: no coverage for this hardware is a normal state of
+            // affairs, not an error, and red reads as something being broken.
+            lblBiosDriversSummary.ForeColor = SystemColors.ControlText;
+            string identity = "Vendor: " + vendor + "     Model: " + model;
+
             if (!staticDriverScan.patchingSupported)
             {
-                lblBiosDriversSummary.ForeColor = Color.Firebrick;
                 lblBiosDriversSummary.Text =
-                    "PATCHING NOT SUPPORTED ON THIS DEVICE  -  " + model + Environment.NewLine +
+                    identity + Environment.NewLine +
                     staticDriverScan.unsupportedReason + Environment.NewLine +
                     counts + " (inventory only)     |     " + GetDriverFirmwareDbStatus();
             }
             else
             {
-                lblBiosDriversSummary.ForeColor = SystemColors.ControlText;
                 lblBiosDriversSummary.Text =
-                    "Device: " + model + Environment.NewLine +
+                    identity + Environment.NewLine +
                     counts + "     |     " + GetDriverFirmwareDbStatus();
             }
         }

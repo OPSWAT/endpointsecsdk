@@ -68,15 +68,29 @@ namespace VAPMAdapter.Tasks
         /// </summary>
         public static string GetSystemModel()
         {
+            string vendor, model;
+            GetPCModelParts(out vendor, out model);
+            return (vendor + " " + model).Trim();
+        }
+
+
+        /// <summary>
+        /// Manufacturer and model as separate values, from GetPCModel (30001) - the view labels
+        /// them individually rather than showing one concatenated string.
+        /// </summary>
+        public static void GetPCModelParts(out string vendor, out string model)
+        {
+            vendor = "";
+            model = "";
+
             try
             {
                 dynamic json = JObject.Parse(OESISPipe.GetPCModel());
                 var res = json.result;
                 if (res != null)
                 {
-                    string maker = res.manufacturer != null ? (string)res.manufacturer : "";
-                    string model = res.model != null ? (string)res.model : "";
-                    return (maker + " " + model).Trim();
+                    vendor = res.manufacturer != null ? (string)res.manufacturer : "";
+                    model = res.model != null ? (string)res.model : "";
                 }
             }
             catch (Exception ex)
@@ -84,8 +98,6 @@ namespace VAPMAdapter.Tasks
                 // Never let inventory metadata sink the scan.
                 Logger.Log("GetPCModel failed: " + ex.Message);
             }
-
-            return "";
         }
 
 
