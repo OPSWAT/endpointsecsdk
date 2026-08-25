@@ -7,14 +7,17 @@ using System.Threading.Tasks;
 
 namespace OPSWAT_Adapter
 {
+    /// <summary>
+    /// Builds the authenticated OPSWAT VCR download URLs used by the SDK updater. The download
+    /// token is read from download_token.txt in the running directory.
+    /// Contact oem@opswat.com for a download token / SDK URL.
+    /// </summary>
     internal class SDKSettings
     {
-        //
-        // Please email me for the values for %download_token% and %SDK-URL%.   You need these values for the auto download to work
-        // Email: christopher.seiler@opswat.com
-        //
+        // VCR download URL template; %file% and %token% are substituted at runtime.
         private static string VCR_URL = "https://vcr.opswat.com/gw/file/download/%file%?type=1&token=%token%";
 
+        // Reads the OPSWAT download token from download_token.txt in the running directory.
         private static string GetDownloadToken()
         {
             string sdk_token_file = "download_token.txt";
@@ -28,6 +31,7 @@ namespace OPSWAT_Adapter
         }
 
       
+        /// <summary>Returns the token-authenticated VCR download URL for the given file name.</summary>
         public static string GetTokenDownloadURL(string fileName)
         {
             string token = GetDownloadToken();
@@ -36,6 +40,7 @@ namespace OPSWAT_Adapter
             return result;
         }
 
+        /// <summary>Returns the download URL for the OESIS package descriptor (OesisPackageLinks.xml).</summary>
         public static string GetSDKURL()
         {
             string downloadURL = GetTokenDownloadURL("OesisPackageLinks.xml");

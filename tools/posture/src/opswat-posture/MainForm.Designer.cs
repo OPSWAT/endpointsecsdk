@@ -35,6 +35,7 @@ namespace OPSWATPosture
             System.Windows.Forms.ListViewItem listViewItem2 = new System.Windows.Forms.ListViewItem("");
             this.GeolocationTab = new System.Windows.Forms.TabControl();
             this.tabPolicyCheck = new System.Windows.Forms.TabPage();
+            this.pbLoader = new System.Windows.Forms.PictureBox();
             this.lvPolicy = new System.Windows.Forms.ListView();
             this.columnHeader1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.gbEncryption = new System.Windows.Forms.GroupBox();
@@ -106,12 +107,29 @@ namespace OPSWATPosture
             this.lvPlugins = new OPSWATPosture.PostureListView();
             this.btnCheckPlugins = new System.Windows.Forms.Button();
             this.pbPluginStatus = new System.Windows.Forms.PictureBox();
+            this.tabComplianceReport = new System.Windows.Forms.TabPage();
+            this.txtComplianceReport = new System.Windows.Forms.TextBox();
+            this.btnGetComplianceReport = new System.Windows.Forms.Button();
+            this.tabCategories = new System.Windows.Forms.TabPage();
+            this.lvCategories = new OPSWATPosture.PostureListView();
+            this.btnGetCategories = new System.Windows.Forms.Button();
             this.label12 = new System.Windows.Forms.Label();
             this.label13 = new System.Windows.Forms.Label();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
-            this.pbLoader = new System.Windows.Forms.PictureBox();
+            this.btnUpdateSDK = new System.Windows.Forms.Button();
+            this.lblSdkInfo = new System.Windows.Forms.Label();
+            this.tabCustom = new System.Windows.Forms.TabPage();
+            this.btnPrefillGetVersion = new System.Windows.Forms.Button();
+            this.btnPrefillGetProductInfo = new System.Windows.Forms.Button();
+            this.btnPrefillDetectProducts = new System.Windows.Forms.Button();
+            this.btnCustomInvoke = new System.Windows.Forms.Button();
+            this.lblCustomRequest = new System.Windows.Forms.Label();
+            this.txtCustomInput = new System.Windows.Forms.TextBox();
+            this.lblCustomResponse = new System.Windows.Forms.Label();
+            this.txtCustomOutput = new System.Windows.Forms.TextBox();
             this.GeolocationTab.SuspendLayout();
             this.tabPolicyCheck.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pbLoader)).BeginInit();
             this.gbEncryption.SuspendLayout();
             this.gbFirewall.SuspendLayout();
             this.gbAntimalware.SuspendLayout();
@@ -128,8 +146,10 @@ namespace OPSWATPosture
             this.groupBox1.SuspendLayout();
             this.tabPage2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pbPluginStatus)).BeginInit();
+            this.tabComplianceReport.SuspendLayout();
+            this.tabCategories.SuspendLayout();
+            this.tabCustom.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pbLoader)).BeginInit();
             this.SuspendLayout();
             // 
             // GeolocationTab
@@ -138,6 +158,9 @@ namespace OPSWATPosture
             this.GeolocationTab.Controls.Add(this.tabScore);
             this.GeolocationTab.Controls.Add(this.tabPage1);
             this.GeolocationTab.Controls.Add(this.tabPage2);
+            this.GeolocationTab.Controls.Add(this.tabComplianceReport);
+            this.GeolocationTab.Controls.Add(this.tabCategories);
+            this.GeolocationTab.Controls.Add(this.tabCustom);
             this.GeolocationTab.Location = new System.Drawing.Point(12, 83);
             this.GeolocationTab.Name = "GeolocationTab";
             this.GeolocationTab.SelectedIndex = 0;
@@ -163,6 +186,16 @@ namespace OPSWATPosture
             this.tabPolicyCheck.TabIndex = 0;
             this.tabPolicyCheck.Text = "Policy Check";
             this.tabPolicyCheck.UseVisualStyleBackColor = true;
+            // 
+            // pbLoader
+            // 
+            this.pbLoader.Image = global::OPSWATPosture.Properties.Resources.progressbar;
+            this.pbLoader.Location = new System.Drawing.Point(14, 29);
+            this.pbLoader.Name = "pbLoader";
+            this.pbLoader.Size = new System.Drawing.Size(89, 80);
+            this.pbLoader.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.pbLoader.TabIndex = 5;
+            this.pbLoader.TabStop = false;
             // 
             // lvPolicy
             // 
@@ -497,10 +530,10 @@ namespace OPSWATPosture
             // 
             this.tbSecurityScore.Location = new System.Drawing.Point(9, 64);
             this.tbSecurityScore.Maximum = 100;
-            this.tbSecurityScore.TickFrequency = 10;
             this.tbSecurityScore.Name = "tbSecurityScore";
             this.tbSecurityScore.Size = new System.Drawing.Size(310, 45);
             this.tbSecurityScore.TabIndex = 6;
+            this.tbSecurityScore.TickFrequency = 10;
             this.tbSecurityScore.Value = 70;
             this.tbSecurityScore.Scroll += new System.EventHandler(this.tbSecurityScore_Scroll);
             // 
@@ -918,8 +951,189 @@ namespace OPSWATPosture
             this.pbPluginStatus.TabIndex = 8;
             this.pbPluginStatus.TabStop = false;
             // 
-            // label12
+            // tabComplianceReport
             // 
+            this.tabComplianceReport.Controls.Add(this.txtComplianceReport);
+            this.tabComplianceReport.Controls.Add(this.btnGetComplianceReport);
+            this.tabComplianceReport.Location = new System.Drawing.Point(4, 22);
+            this.tabComplianceReport.Name = "tabComplianceReport";
+            this.tabComplianceReport.Padding = new System.Windows.Forms.Padding(3);
+            this.tabComplianceReport.Size = new System.Drawing.Size(802, 381);
+            this.tabComplianceReport.TabIndex = 4;
+            this.tabComplianceReport.Text = "Compliance Report";
+            this.tabComplianceReport.UseVisualStyleBackColor = true;
+            // 
+            // txtComplianceReport
+            // 
+            this.txtComplianceReport.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.txtComplianceReport.Font = new System.Drawing.Font("Consolas", 9F);
+            this.txtComplianceReport.Location = new System.Drawing.Point(9, 46);
+            this.txtComplianceReport.Multiline = true;
+            this.txtComplianceReport.Name = "txtComplianceReport";
+            this.txtComplianceReport.ReadOnly = true;
+            this.txtComplianceReport.ScrollBars = System.Windows.Forms.ScrollBars.Both;
+            this.txtComplianceReport.Size = new System.Drawing.Size(787, 326);
+            this.txtComplianceReport.TabIndex = 1;
+            this.txtComplianceReport.WordWrap = false;
+            // 
+            // btnGetComplianceReport
+            // 
+            this.btnGetComplianceReport.Location = new System.Drawing.Point(9, 9);
+            this.btnGetComplianceReport.Name = "btnGetComplianceReport";
+            this.btnGetComplianceReport.Size = new System.Drawing.Size(120, 30);
+            this.btnGetComplianceReport.TabIndex = 0;
+            this.btnGetComplianceReport.Text = "Get Report";
+            this.btnGetComplianceReport.UseVisualStyleBackColor = true;
+            this.btnGetComplianceReport.Click += new System.EventHandler(this.btnGetComplianceReport_Click);
+            // 
+            // tabCategories
+            // 
+            this.tabCategories.Controls.Add(this.lvCategories);
+            this.tabCategories.Controls.Add(this.btnGetCategories);
+            this.tabCategories.Location = new System.Drawing.Point(4, 22);
+            this.tabCategories.Name = "tabCategories";
+            this.tabCategories.Padding = new System.Windows.Forms.Padding(3);
+            this.tabCategories.Size = new System.Drawing.Size(802, 381);
+            this.tabCategories.TabIndex = 5;
+            this.tabCategories.Text = "Categories";
+            this.tabCategories.UseVisualStyleBackColor = true;
+            // 
+            // lvCategories
+            // 
+            this.lvCategories.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.lvCategories.FullRowSelect = true;
+            this.lvCategories.GridLines = true;
+            this.lvCategories.HideSelection = false;
+            this.lvCategories.Location = new System.Drawing.Point(9, 46);
+            this.lvCategories.MultiSelect = false;
+            this.lvCategories.Name = "lvCategories";
+            this.lvCategories.OwnerDraw = true;
+            this.lvCategories.Size = new System.Drawing.Size(787, 326);
+            this.lvCategories.TabIndex = 1;
+            this.lvCategories.UseCompatibleStateImageBehavior = false;
+            this.lvCategories.View = System.Windows.Forms.View.Details;
+            // 
+            // btnGetCategories
+            // 
+            this.btnGetCategories.Location = new System.Drawing.Point(9, 9);
+            this.btnGetCategories.Name = "btnGetCategories";
+            this.btnGetCategories.Size = new System.Drawing.Size(120, 30);
+            this.btnGetCategories.TabIndex = 0;
+            this.btnGetCategories.Text = "Get Categories";
+            this.btnGetCategories.UseVisualStyleBackColor = true;
+            this.btnGetCategories.Click += new System.EventHandler(this.btnGetCategories_Click);
+            //
+            // tabCustom
+            //
+            this.tabCustom.Controls.Add(this.txtCustomOutput);
+            this.tabCustom.Controls.Add(this.lblCustomResponse);
+            this.tabCustom.Controls.Add(this.txtCustomInput);
+            this.tabCustom.Controls.Add(this.lblCustomRequest);
+            this.tabCustom.Controls.Add(this.btnCustomInvoke);
+            this.tabCustom.Controls.Add(this.btnPrefillDetectProducts);
+            this.tabCustom.Controls.Add(this.btnPrefillGetProductInfo);
+            this.tabCustom.Controls.Add(this.btnPrefillGetVersion);
+            this.tabCustom.Location = new System.Drawing.Point(4, 22);
+            this.tabCustom.Name = "tabCustom";
+            this.tabCustom.Padding = new System.Windows.Forms.Padding(3);
+            this.tabCustom.Size = new System.Drawing.Size(802, 381);
+            this.tabCustom.TabIndex = 6;
+            this.tabCustom.Text = "Custom";
+            this.tabCustom.UseVisualStyleBackColor = true;
+            //
+            // btnPrefillGetVersion
+            //
+            this.btnPrefillGetVersion.Location = new System.Drawing.Point(9, 9);
+            this.btnPrefillGetVersion.Name = "btnPrefillGetVersion";
+            this.btnPrefillGetVersion.Size = new System.Drawing.Size(110, 26);
+            this.btnPrefillGetVersion.TabIndex = 0;
+            this.btnPrefillGetVersion.Text = "GetVersion";
+            this.btnPrefillGetVersion.UseVisualStyleBackColor = true;
+            this.btnPrefillGetVersion.Click += new System.EventHandler(this.btnPrefillGetVersion_Click);
+            //
+            // btnPrefillGetProductInfo
+            //
+            this.btnPrefillGetProductInfo.Location = new System.Drawing.Point(125, 9);
+            this.btnPrefillGetProductInfo.Name = "btnPrefillGetProductInfo";
+            this.btnPrefillGetProductInfo.Size = new System.Drawing.Size(120, 26);
+            this.btnPrefillGetProductInfo.TabIndex = 1;
+            this.btnPrefillGetProductInfo.Text = "GetProductInfo";
+            this.btnPrefillGetProductInfo.UseVisualStyleBackColor = true;
+            this.btnPrefillGetProductInfo.Click += new System.EventHandler(this.btnPrefillGetProductInfo_Click);
+            //
+            // btnPrefillDetectProducts
+            //
+            this.btnPrefillDetectProducts.Location = new System.Drawing.Point(251, 9);
+            this.btnPrefillDetectProducts.Name = "btnPrefillDetectProducts";
+            this.btnPrefillDetectProducts.Size = new System.Drawing.Size(120, 26);
+            this.btnPrefillDetectProducts.TabIndex = 2;
+            this.btnPrefillDetectProducts.Text = "DetectProducts";
+            this.btnPrefillDetectProducts.UseVisualStyleBackColor = true;
+            this.btnPrefillDetectProducts.Click += new System.EventHandler(this.btnPrefillDetectProducts_Click);
+            //
+            // btnCustomInvoke
+            //
+            this.btnCustomInvoke.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnCustomInvoke.Location = new System.Drawing.Point(686, 9);
+            this.btnCustomInvoke.Name = "btnCustomInvoke";
+            this.btnCustomInvoke.Size = new System.Drawing.Size(110, 26);
+            this.btnCustomInvoke.TabIndex = 3;
+            this.btnCustomInvoke.Text = "Invoke";
+            this.btnCustomInvoke.UseVisualStyleBackColor = true;
+            this.btnCustomInvoke.Click += new System.EventHandler(this.btnCustomInvoke_Click);
+            //
+            // lblCustomRequest
+            //
+            this.lblCustomRequest.AutoSize = true;
+            this.lblCustomRequest.Location = new System.Drawing.Point(9, 44);
+            this.lblCustomRequest.Name = "lblCustomRequest";
+            this.lblCustomRequest.Size = new System.Drawing.Size(76, 13);
+            this.lblCustomRequest.TabIndex = 4;
+            this.lblCustomRequest.Text = "Request JSON:";
+            //
+            // txtCustomInput
+            //
+            this.txtCustomInput.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.txtCustomInput.Font = new System.Drawing.Font("Consolas", 9F);
+            this.txtCustomInput.Location = new System.Drawing.Point(9, 60);
+            this.txtCustomInput.Multiline = true;
+            this.txtCustomInput.Name = "txtCustomInput";
+            this.txtCustomInput.ScrollBars = System.Windows.Forms.ScrollBars.Both;
+            this.txtCustomInput.Size = new System.Drawing.Size(787, 120);
+            this.txtCustomInput.TabIndex = 5;
+            this.txtCustomInput.WordWrap = false;
+            //
+            // lblCustomResponse
+            //
+            this.lblCustomResponse.AutoSize = true;
+            this.lblCustomResponse.Location = new System.Drawing.Point(9, 188);
+            this.lblCustomResponse.Name = "lblCustomResponse";
+            this.lblCustomResponse.Size = new System.Drawing.Size(58, 13);
+            this.lblCustomResponse.TabIndex = 6;
+            this.lblCustomResponse.Text = "Response:";
+            //
+            // txtCustomOutput
+            //
+            this.txtCustomOutput.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+            | System.Windows.Forms.AnchorStyles.Left)
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.txtCustomOutput.Font = new System.Drawing.Font("Consolas", 9F);
+            this.txtCustomOutput.Location = new System.Drawing.Point(9, 204);
+            this.txtCustomOutput.Multiline = true;
+            this.txtCustomOutput.Name = "txtCustomOutput";
+            this.txtCustomOutput.ReadOnly = true;
+            this.txtCustomOutput.ScrollBars = System.Windows.Forms.ScrollBars.Both;
+            this.txtCustomOutput.Size = new System.Drawing.Size(787, 168);
+            this.txtCustomOutput.TabIndex = 7;
+            this.txtCustomOutput.WordWrap = false;
+            //
+            // label12
+            //
             this.label12.AutoSize = true;
             this.label12.Font = new System.Drawing.Font("Microsoft Sans Serif", 24F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label12.Location = new System.Drawing.Point(12, 9);
@@ -932,11 +1146,11 @@ namespace OPSWATPosture
             // 
             this.label13.AutoSize = true;
             this.label13.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, ((System.Drawing.FontStyle)((System.Drawing.FontStyle.Bold | System.Drawing.FontStyle.Italic))), System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label13.Location = new System.Drawing.Point(605, 48);
+            this.label13.Location = new System.Drawing.Point(237, 27);
             this.label13.Name = "label13";
-            this.label13.Size = new System.Drawing.Size(213, 13);
+            this.label13.Size = new System.Drawing.Size(114, 13);
             this.label13.TabIndex = 6;
-            this.label13.Text = "Powered by OPSWAT Endpoint SDK";
+            this.label13.Text = "Powered by OESIS";
             // 
             // pictureBox1
             // 
@@ -946,21 +1160,33 @@ namespace OPSWATPosture
             this.pictureBox1.TabIndex = 3;
             this.pictureBox1.TabStop = false;
             // 
-            // pbLoader
+            // btnUpdateSDK
             // 
-            this.pbLoader.Image = global::OPSWATPosture.Properties.Resources.progressbar;
-            this.pbLoader.Location = new System.Drawing.Point(14, 29);
-            this.pbLoader.Name = "pbLoader";
-            this.pbLoader.Size = new System.Drawing.Size(89, 80);
-            this.pbLoader.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
-            this.pbLoader.TabIndex = 5;
-            this.pbLoader.TabStop = false;
+            this.btnUpdateSDK.Location = new System.Drawing.Point(698, 8);
+            this.btnUpdateSDK.Name = "btnUpdateSDK";
+            this.btnUpdateSDK.Size = new System.Drawing.Size(124, 26);
+            this.btnUpdateSDK.TabIndex = 7;
+            this.btnUpdateSDK.Text = "Update SDK";
+            this.btnUpdateSDK.UseVisualStyleBackColor = true;
+            this.btnUpdateSDK.Click += new System.EventHandler(this.btnUpdateSDK_Click);
+            // 
+            // lblSdkInfo
+            // 
+            this.lblSdkInfo.AutoSize = true;
+            this.lblSdkInfo.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold);
+            this.lblSdkInfo.Location = new System.Drawing.Point(15, 62);
+            this.lblSdkInfo.Name = "lblSdkInfo";
+            this.lblSdkInfo.Size = new System.Drawing.Size(109, 13);
+            this.lblSdkInfo.TabIndex = 8;
+            this.lblSdkInfo.Text = "SDK: not installed";
             // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(834, 503);
+            this.Controls.Add(this.btnUpdateSDK);
+            this.Controls.Add(this.lblSdkInfo);
             this.Controls.Add(this.label13);
             this.Controls.Add(this.label12);
             this.Controls.Add(this.GeolocationTab);
@@ -970,6 +1196,7 @@ namespace OPSWATPosture
             this.GeolocationTab.ResumeLayout(false);
             this.tabPolicyCheck.ResumeLayout(false);
             this.tabPolicyCheck.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pbLoader)).EndInit();
             this.gbEncryption.ResumeLayout(false);
             this.gbEncryption.PerformLayout();
             this.gbFirewall.ResumeLayout(false);
@@ -995,8 +1222,12 @@ namespace OPSWATPosture
             this.tabPage2.ResumeLayout(false);
             this.tabPage2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pbPluginStatus)).EndInit();
+            this.tabComplianceReport.ResumeLayout(false);
+            this.tabComplianceReport.PerformLayout();
+            this.tabCategories.ResumeLayout(false);
+            this.tabCustom.ResumeLayout(false);
+            this.tabCustom.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pbLoader)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -1006,6 +1237,23 @@ namespace OPSWATPosture
 
         private System.Windows.Forms.PictureBox pictureBox1;
         private System.Windows.Forms.TabControl GeolocationTab;
+        private System.Windows.Forms.TabPage tabComplianceReport;
+        private System.Windows.Forms.Button btnGetComplianceReport;
+        private System.Windows.Forms.TextBox txtComplianceReport;
+        private System.Windows.Forms.TabPage tabCategories;
+        private System.Windows.Forms.Button btnGetCategories;
+        private OPSWATPosture.PostureListView lvCategories;
+        private System.Windows.Forms.TabPage tabCustom;
+        private System.Windows.Forms.Button btnPrefillGetVersion;
+        private System.Windows.Forms.Button btnPrefillGetProductInfo;
+        private System.Windows.Forms.Button btnPrefillDetectProducts;
+        private System.Windows.Forms.Button btnCustomInvoke;
+        private System.Windows.Forms.Label lblCustomRequest;
+        private System.Windows.Forms.TextBox txtCustomInput;
+        private System.Windows.Forms.Label lblCustomResponse;
+        private System.Windows.Forms.TextBox txtCustomOutput;
+        private System.Windows.Forms.Button btnUpdateSDK;
+        private System.Windows.Forms.Label lblSdkInfo;
         private System.Windows.Forms.TabPage tabPolicyCheck;
         private System.Windows.Forms.Button btnCheckPolicy;
         private System.Windows.Forms.TabPage tabScore;

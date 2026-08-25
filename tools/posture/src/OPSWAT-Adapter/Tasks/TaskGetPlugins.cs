@@ -39,21 +39,27 @@ namespace OPSWAT_Adapter.Tasks
             List<BrowserPlugins> result = new List<BrowserPlugins>();
 
             OESISFramework.InitializeFramework();
-
-            List<int> browserProducts = Util.GetProductSignaturesByCategory(OESISCategory.BROWSER, GetProductList());
-
-            foreach(int signature in browserProducts)
+            try
             {
-                BrowserPlugins plugin = OESISCompliance.GetBrowserPlugin(signature.ToString());
-                if (plugin != null && plugin.signatureId != null)
+                List<int> browserProducts = Util.GetProductSignaturesByCategory(OESISCategory.BROWSER, GetProductList());
+
+                foreach(int signature in browserProducts)
                 {
-                    ProductInfo productInfo = OESISCore.GetProductInfo(plugin.signatureId);
-                    plugin.browserName = productInfo.name;
-                    result.Add(plugin);
+                    BrowserPlugins plugin = OESISCompliance.GetBrowserPlugin(signature.ToString());
+                    if (plugin != null && plugin.signatureId != null)
+                    {
+                        ProductInfo productInfo = OESISCore.GetProductInfo(plugin.signatureId);
+                        plugin.browserName = productInfo.name;
+                        result.Add(plugin);
+                    }
                 }
             }
-
-            OESISFramework.TearDown();
+            finally
+            {
+                // Always tear down, even if detection/parsing throws, so the engine isn't left
+                // initialized (which would corrupt the next InitializeFramework).
+                OESISFramework.TearDown();
+            }
 
             return result;
         }

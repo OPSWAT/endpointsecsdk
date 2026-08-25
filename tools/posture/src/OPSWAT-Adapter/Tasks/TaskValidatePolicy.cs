@@ -15,6 +15,13 @@ using System.Collections.Generic;
 
 namespace ComplianceAdapater.Policy
 {
+    /// <summary>
+    /// Validates the endpoint against a configurable <see cref="SecurityPolicy"/> using the OESIS
+    /// Compliance module. For each enabled sub-policy (firewall / encryption / antimalware) it
+    /// detects the relevant products and checks the required conditions (expected product installed,
+    /// protection enabled, definitions/scan recent), logging each result. Progress is recorded in
+    /// the Logger (see GetLogger) for display in the UI.
+    /// </summary>
     public class TaskValidatePolicy
     {
         private JArray productList = null;
@@ -66,6 +73,10 @@ namespace ComplianceAdapater.Policy
         }
 
 
+        /// <summary>
+        /// True if the policy's expected product (by signature) is among the installed products of
+        /// that category; logs the outcome. Used when a policy names a specific required product.
+        /// </summary>
         public bool IsProductInstalled(List<int> installedProductList, ProductInfo productInfo, string categoryString)
         {
             bool result = false;
@@ -94,6 +105,11 @@ namespace ComplianceAdapater.Policy
 
 
 
+        /// <summary>
+        /// Validates the firewall sub-policy: if enabled, checks the expected product is installed
+        /// (when specified) and that a firewall is running. Returns true if compliant (or the policy
+        /// is null/disabled).
+        /// </summary>
         public bool ValidateFirewall(FirewallPolicy firewallPolicy)
         {
             bool result = true;
@@ -228,6 +244,11 @@ namespace ComplianceAdapater.Policy
 
 
 
+        /// <summary>
+        /// Validates the disk-encryption sub-policy: if enabled, checks the expected product is
+        /// installed (when specified) and that the disk is fully encrypted. Returns true if
+        /// compliant (or the policy is null/disabled).
+        /// </summary>
         public bool ValidateEncryption(EncryptionPolicy encryptionPolicy)
         {
             bool result = true;
@@ -271,6 +292,12 @@ namespace ComplianceAdapater.Policy
         }
 
 
+        /// <summary>
+        /// Validates the antimalware sub-policy: if enabled, checks the expected product is installed
+        /// (when specified), real-time protection is active, and (when configured) that definitions
+        /// and the last scan are recent enough. Returns true if compliant (or the policy is
+        /// null/disabled).
+        /// </summary>
         public bool ValidateAntimalware(AntimalwarePolicy antimalwarePolicy)
         {
             bool result = true;
@@ -330,37 +357,48 @@ namespace ComplianceAdapater.Policy
 
 
 
+        /// <summary>
+        /// Runs the full policy check: initializes the framework and validates each configured
+        /// sub-policy (antimalware, firewall, encryption). Returns true only if every enabled
+        /// sub-policy passes. Tears down the framework in a finally.
+        /// </summary>
         public bool ValidatePolicy()
         {
             bool result = true;
 
             OESISFramework.InitializeFramework();
-
-            if (securityPolicy != null)
+            try
             {
-                if (!ValidateAntimalware(securityPolicy.antimalwarePolicy))
+                if (securityPolicy != null)
                 {
-                    result = false;
+                    if (!ValidateAntimalware(securityPolicy.antimalwarePolicy))
+                    {
+                        result = false;
+                    }
+
+
+                    if (!ValidateFirewall(securityPolicy.firewallPolicy))
+                    {
+                        result = false;
+                    }
+
+
+                    if (!ValidateEncryption(securityPolicy.encryptionPolicy))
+                    {
+                        result = false;
+                    }
                 }
-
-
-                if (!ValidateFirewall(securityPolicy.firewallPolicy))
+                else
                 {
-                    result = false;
-                }
-
-
-                if (!ValidateEncryption(securityPolicy.encryptionPolicy))
-                {
-                    result = false;
+                    GetLogger().Log(true, "Security Policy: Not configured returning success");
                 }
             }
-            else
+            finally
             {
-                GetLogger().Log(true, "Security Policy: Not configured returning success");
+                // Always tear down, even if a validation step throws, so the engine isn't left
+                // initialized (which would corrupt the next InitializeFramework).
+                OESISFramework.TearDown();
             }
-
-            OESISFramework.TearDown();
 
             return result;
         }

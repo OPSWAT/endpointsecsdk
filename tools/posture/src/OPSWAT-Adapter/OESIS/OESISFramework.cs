@@ -24,17 +24,9 @@ namespace ComplianceAdapater.OESIS
             // https://software.opswat.com/OESIS_V4/html/c_sdk.html
             //
 
+
             string path = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
-            
-            //
-            // Check to make sure there is a license.cfg and a pass_key.txt
-            //
-            if(!File.Exists("pass_key.txt") || !File.Exists("license.cfg"))
-            {
-                throw new Exception("License Files Missing!!! \n\nPlease ensure that pass_key.txt and license.cfg are in the running directory: " + Environment.CurrentDirectory);
-            }
-            
-            string passkey = File.ReadAllText(path + "/pass_key.txt");
+            string passkey = File.ReadAllText(Path.Combine(path, "pass_key.txt"));
             string config = "{ \"config\" : { \"passkey_string\": \"" + passkey + "\", \"enable_pretty_print\": true, \"online_mode\": false, \"silent_mode\": true } }";
 
 

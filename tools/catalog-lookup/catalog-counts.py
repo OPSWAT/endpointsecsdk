@@ -46,11 +46,16 @@ def main():
             total_signatures += len(r.get("signatures") or [])
 
     # --- Patchable applications (patch_aggregation_v2.json, latest) --------------------------
+    # Prefer the v2 dataset (has is_latest / product.name / data_source). If it isn't present,
+    # fall back to the v1 patch_aggregation.json (flat records keyed by _id with product_name and
+    # no data_source) and, per the v1 format, count every application as OPSWAT-verified.
     pav = os.path.join(server, "patch_aggregation_v2.json")
+    pav1 = os.path.join(server, "patch_aggregation.json")
     patch_total = 0
     patch_unique = set()
     by_source = Counter()
     if os.path.isfile(pav):
+        patch_src = "patch_aggregation_v2.json"
         for r in cat.read_records(pav):
             if not r.get("is_latest"):
                 continue
@@ -59,6 +64,18 @@ def main():
             if name:
                 patch_unique.add(name)
             by_source[str(r.get("data_source") or "unknown").lower()] += 1
+    elif os.path.isfile(pav1):
+        patch_src = "patch_aggregation.json"
+        # v1 has no is_latest (each record is the latest patch for a product) and no data_source;
+        # assume all applications are OPSWAT-verified.
+        for r in cat.read_records(pav1):
+            patch_total += 1
+            name = r.get("product_name")
+            if name:
+                patch_unique.add(name)
+            by_source["opswat"] += 1
+    else:
+        patch_src = "patch_aggregation(_v2).json (not found)"
 
     # --- Driver / firmware / BIOS patches (driver_firmware_patch_aggregation.json) -----------
     # This dataset is vendor-keyed ({header, dell, lenovo, ...}); each vendor maps patch-id ->
@@ -137,7 +154,7 @@ def main():
     print(f"    detection only (no CVE mapping)  : {len(unique_products) - apps_with_vuln}")
     print(f"  total application signatures       : {total_signatures}")
 
-    print("Patchable applications (patch_aggregation_v2.json, latest):")
+    print(f"Patchable applications ({patch_src}, latest):")
     print(f"  unique applications                : {len(patch_unique)}")
     print(f"  total patch entries                : {patch_total}")
     for src in sorted(by_source):
