@@ -14,27 +14,37 @@ namespace VAPMAdapater.Updates
 {
     public class UpdateSDK
     {
-        public static bool isSDKUpdated()
+        // True if the SDK (compliance engine) is present in the running directory.
+        public static bool DoesSDKExist()
         {
-            bool result = false;
-
-            if(File.Exists("libwalocal.dll"))
-            {
-                FileInfo vmodInfo = new FileInfo("libwalocal.dll");
-
-                //
-                // Update the SDK every 7 days
-                //
-                if(vmodInfo.LastWriteTime > DateTime.Now.AddDays(-7))
-                {
-                    result = true;
-                }
-            }
-
-            return result;
+            return File.Exists("libwalocal.dll");
         }
 
-        
+        // The installed SDK's file version, or null if the SDK is not present.
+        public static string GetSDKVersion()
+        {
+            if (!File.Exists("libwalocal.dll"))
+            {
+                return null;
+            }
+
+            FileInfo info = new FileInfo("libwalocal.dll");
+            return System.Diagnostics.FileVersionInfo.GetVersionInfo(info.FullName).FileVersion;
+        }
+
+        // When the SDK was last installed/updated (the engine DLL's last write time), or null if
+        // the SDK is not present.
+        public static DateTime? GetSDKDate()
+        {
+            if (!File.Exists("libwalocal.dll"))
+            {
+                return null;
+            }
+
+            return new FileInfo("libwalocal.dll").LastWriteTime;
+        }
+
+
         private static void CopySdkFile(string sdkDir, string folder, string filename)
         {
             string rootFile = Path.Combine(sdkDir, folder);
@@ -68,12 +78,14 @@ namespace VAPMAdapater.Updates
                 Directory.CreateDirectory(destDirName);
             }
 
-            // Get the files in the directory and copy them to the new location.
+            // Get the files in the directory and copy them to the new location, overwriting any
+            // existing copy (e.g. support-chart XMLs left from a previous SDK update) so re-running
+            // "Update SDK" doesn't fail with "file already exists".
             FileInfo[] files = dir.GetFiles();
             foreach (FileInfo file in files)
             {
                 string temppath = Path.Combine(destDirName, file.Name);
-                file.CopyTo(temppath, false);
+                file.CopyTo(temppath, true);
             }
 
             // If copying subdirectories, copy them and their contents to new location.

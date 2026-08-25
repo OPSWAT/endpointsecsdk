@@ -10,6 +10,7 @@
 using ComplianceAdapater.Log;
 using ComplianceAdapater.OESIS;
 using ComplianceAdapater.Policy;
+using Newtonsoft.Json.Linq;
 using OPSWAT_Adapter.POCO;
 using OPSWAT_Adapter.Tasks;
 using System;
@@ -32,6 +33,10 @@ namespace OPSWATPosture
         private BackgroundWorker checkPluginsWorker;
         private BackgroundWorker getComplianceReportWorker;
         private BackgroundWorker getCategoriesWorker;
+        private BackgroundWorker customInvokeWorker;
+
+        // Default signature used by the Custom tab prefill buttons: Mozilla Firefox (signature 3039).
+        private const int FIREFOX_SIGNATURE = 3039;
 
         // Serializes access to the process-global OESIS engine. All the OESIS worker threads
         // (policy, score, geolocation, plugins, compliance report, categories) each run
@@ -140,24 +145,46 @@ namespace OPSWATPosture
                 return;
             }
 
-            GeolocationTab.Enabled = false;
-            if (!UpdateSDK.isSDKUpdated())
+            // The SDK is updated only on demand via the "Update SDK" button now - no automatic
+            // update on startup. Just show the installed version/date and load if it's present.
+            RefreshSdkInfo();
+
+            pbLoader.Visible = false;
+            if (UpdateSDK.DoesSDKExist())
             {
-                pbLoader.BringToFront();
-                pbLoader.Visible = true;
-                updateSDKWorker.RunWorkerAsync(true);
+                GeolocationTab.Enabled = true;
+                LoadLists();
             }
             else
             {
-                pbLoader.BringToFront();
-                pbLoader.Visible = false;
-                GeolocationTab.Enabled = true;
-                LoadLists();
+                // No SDK yet - the user must click "Update SDK" before the checks can run.
+                GeolocationTab.Enabled = false;
+            }
+        }
+
+        // Updates the top-of-window label with the installed SDK version and date.
+        private void RefreshSdkInfo()
+        {
+            string version = UpdateSDK.GetSDKVersion();
+            DateTime? date = UpdateSDK.GetSDKDate();
+
+            if (version == null || date == null)
+            {
+                lblSdkInfo.Text = "SDK: not installed - click Update SDK";
+            }
+            else
+            {
+                lblSdkInfo.Text = "SDK " + version + "  •  " + date.Value.ToString("MMMM dd, yyyy");
             }
         }
 
         private void LoadLists()
         {
+            // Clear first so this is safe to call again after an SDK update (no duplicate entries).
+            comboFirewallProduct.Items.Clear();
+            comboEncryptionProduct.Items.Clear();
+            comboAntimalwareProduct.Items.Clear();
+
             List<ProductInfo> firewalList = SupportChart.LoadProductList(OESISCategory.FIREWALL);
             foreach(ProductInfo productInfo in firewalList)
             {
@@ -248,6 +275,14 @@ namespace OPSWATPosture
             getCategoriesWorker.RunWorkerCompleted +=
                 new RunWorkerCompletedEventHandler(
             getCategoriesWorker_Completed);
+
+
+            customInvokeWorker = new BackgroundWorker();
+            customInvokeWorker.DoWork +=
+                new DoWorkEventHandler(customInvokeWorker_DoWork);
+            customInvokeWorker.RunWorkerCompleted +=
+                new RunWorkerCompletedEventHandler(
+            customInvokeWorker_Completed);
 
 
 
@@ -464,14 +499,37 @@ namespace OPSWATPosture
             }
         }
 
+        private void btnUpdateSDK_Click(object sender, EventArgs e)
+        {
+            Cursor.Current = Cursors.WaitCursor;
+            btnUpdateSDK.Enabled = false;
+            GeolocationTab.Enabled = false;
+
+            // Status: show that a download is in progress (spinner + text). RefreshSdkInfo() in the
+            // Completed handler restores the version/date when it finishes.
+            lblSdkInfo.Text = "Downloading SDK...";
+            pbLoader.BringToFront();
+            pbLoader.Visible = true;
+            Refresh();
+
+            updateSDKWorker.RunWorkerAsync(true);
+        }
+
         private void updateSDK_Worker_Completed(object sender, RunWorkerCompletedEventArgs e)
         {
-            GeolocationTab.Enabled = true;
             pbLoader.SendToBack();
             pbLoader.Visible = false;
 
+            RefreshSdkInfo();
 
-            LoadLists();
+            if (UpdateSDK.DoesSDKExist())
+            {
+                GeolocationTab.Enabled = true;
+                LoadLists();
+            }
+
+            btnUpdateSDK.Enabled = true;
+            Cursor.Current = Cursors.Default;
         }
 
         ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -753,6 +811,102 @@ namespace OPSWATPosture
 
             Cursor.Current = Cursors.Default;
             btnGetCategories.Enabled = true;
+        }
+
+        ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>
+        ///  Custom tab - lets a developer send arbitrary request JSON straight to the engine
+        ///  (wa_api_invoke) and view the raw response. The prefill buttons populate the input with
+        ///  common examples; the Firefox signature (3039) is used as the default for the methods that
+        ///  need one.
+        /// </summary>
+        ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        private void btnPrefillGetVersion_Click(object sender, EventArgs e)
+        {
+            // Method 100 (GetVersion) - returns the installed version for a product signature.
+            txtCustomInput.Text =
+                "{" + Environment.NewLine +
+                "  \"input\": {" + Environment.NewLine +
+                "    \"method\": 100," + Environment.NewLine +
+                "    \"signature\": " + FIREFOX_SIGNATURE + Environment.NewLine +
+                "  }" + Environment.NewLine +
+                "}";
+        }
+
+        private void btnPrefillGetProductInfo_Click(object sender, EventArgs e)
+        {
+            // Method 109 (GetProductInfo) - returns product details for a product signature.
+            txtCustomInput.Text =
+                "{" + Environment.NewLine +
+                "  \"input\": {" + Environment.NewLine +
+                "    \"method\": 109," + Environment.NewLine +
+                "    \"signature\": " + FIREFOX_SIGNATURE + Environment.NewLine +
+                "  }" + Environment.NewLine +
+                "}";
+        }
+
+        private void btnPrefillDetectProducts_Click(object sender, EventArgs e)
+        {
+            // Method 0 (DetectProducts) - enumerates installed products (no signature required).
+            txtCustomInput.Text =
+                "{" + Environment.NewLine +
+                "  \"input\": {" + Environment.NewLine +
+                "    \"method\": 0" + Environment.NewLine +
+                "  }" + Environment.NewLine +
+                "}";
+        }
+
+        private void btnCustomInvoke_Click(object sender, EventArgs e)
+        {
+            string requestJson = txtCustomInput.Text;
+
+            // Validate the JSON before invoking so the user gets a clear parse error instead of the
+            // engine failing on malformed input.
+            try
+            {
+                JToken.Parse(requestJson);
+            }
+            catch (Exception ex)
+            {
+                txtCustomOutput.Text = "Invalid JSON - request not sent:" +
+                    Environment.NewLine + Environment.NewLine + ex.Message;
+                return;
+            }
+
+            Cursor.Current = Cursors.WaitCursor;
+            btnCustomInvoke.Enabled = false;
+            txtCustomOutput.Text = "Invoking...";
+
+            customInvokeWorker.RunWorkerAsync(requestJson);
+        }
+
+        private void customInvokeWorker_DoWork(object sender, DoWorkEventArgs e)
+        {
+            string requestJson = (string)e.Argument;
+            lock (oesisLock)
+            {
+                e.Result = TaskCustomInvoke.Invoke(requestJson);
+            }
+        }
+
+        private void customInvokeWorker_Completed(object sender, RunWorkerCompletedEventArgs e)
+        {
+            if (e.Error != null)
+            {
+                txtCustomOutput.Text = "Error invoking request:" +
+                    Environment.NewLine + Environment.NewLine + e.Error.Message;
+            }
+            else
+            {
+                // The engine pretty-prints with '\n'; normalize to Windows line endings so the
+                // multiline TextBox renders the JSON correctly.
+                string json = (string)e.Result;
+                txtCustomOutput.Text = json.Replace("\r\n", "\n").Replace("\n", Environment.NewLine);
+            }
+
+            Cursor.Current = Cursors.Default;
+            btnCustomInvoke.Enabled = true;
         }
 
         private void btnGetLocation_Click(object sender, EventArgs e)

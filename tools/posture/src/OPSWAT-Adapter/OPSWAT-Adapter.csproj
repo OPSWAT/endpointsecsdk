@@ -67,6 +67,7 @@
     <Compile Include="SDKSettings.cs" />
     <Compile Include="Tasks\TaskCategories.cs" />
     <Compile Include="Tasks\TaskComplianceReport.cs" />
+    <Compile Include="Tasks\TaskCustomInvoke.cs" />
     <Compile Include="Tasks\TaskGeoLocation.cs" />
     <Compile Include="Tasks\TaskGetPlugins.cs" />
     <Compile Include="Tasks\TaskSecurityScore.cs" />

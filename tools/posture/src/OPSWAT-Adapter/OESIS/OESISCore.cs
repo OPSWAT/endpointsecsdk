@@ -45,18 +45,6 @@ namespace ComplianceAdapater.OESIS
 
     public class OESISCore
     {
-        // 
-        // This will return JSON for all of the products found in the system
-        // https://software.opswat.com/OESIS_V4/html/c_method.html
-        // on the left select OESIS Core/Discover Products
-        public static int DetectAllProducts(out string json_out, int category)
-        {
-            int result = 0;
-            string json_in = "{\"input\": { \"method\": 0, \"category\":" + category + " } }";
-            result = OESISFramework.Invoke(json_in, out json_out);
-            return result;
-        }
-
         //
         // This will return JSON for all of the products found in the system
         // https://software.opswat.com/OESIS_V4/html/c_method.html

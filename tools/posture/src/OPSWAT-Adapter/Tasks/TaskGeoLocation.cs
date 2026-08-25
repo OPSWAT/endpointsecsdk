@@ -1,9 +1,23 @@
-﻿using ComplianceAdapater.Log;
+﻿///////////////////////////////////////////////////////////////////////////////////////////////
+///  Sample Code for OPSWAT Posture
+///  Reference Implementation using OPSWAT Endpoint SDK Compliance module for demoing the
+///  Compliance capability
+///
+///  Created by Chris Seiler
+///  OPSWAT OEM Solutions Architect
+///////////////////////////////////////////////////////////////////////////////////////////////
+
+using ComplianceAdapater.Log;
 using ComplianceAdapater.OESIS;
 using System;
 
 namespace OPSWAT_Adapter.Tasks
 {
+    /// <summary>
+    /// Retrieves the device's geolocation via the OESIS Compliance module and provides a
+    /// great-circle distance helper for geo-fencing. Call GetGeolocation() first, then read
+    /// GetGeoLocationInfo() / CalculateMiles().
+    /// </summary>
     public class TaskGeoLocation
     {
         private Logger checkLog = new Logger();
@@ -15,12 +29,17 @@ namespace OPSWAT_Adapter.Tasks
             return checkLog;
         }
 
+        /// <summary>The geolocation captured by the last GetGeolocation() call (null before then).</summary>
         public GeoLocationInfo GetGeoLocationInfo()
         {
             return geoLocationInfo;
         }
 
 
+        /// <summary>
+        /// Great-circle (haversine) distance in miles between the given point and the device's
+        /// last-detected location. Used to evaluate a "within N miles" geo-fence policy.
+        /// </summary>
         public double CalculateMiles(double sLatitude, double sLongitude)
         {
             var radiansOverDegrees = (Math.PI / 180.0);
@@ -45,16 +64,25 @@ namespace OPSWAT_Adapter.Tasks
         }
 
 
+        /// <summary>
+        /// Initializes the framework, enables the OS location service, and captures the device's
+        /// geolocation (available afterward via GetGeoLocationInfo). Tears down in a finally so the
+        /// engine is released even on error.
+        /// </summary>
         public int GetGeolocation()
         {
             int resultCount = 0;
 
             OESISFramework.InitializeFramework();
-
-            OESISCompliance.SetLocationServiceState("enable");
-            geoLocationInfo = OESISCompliance.GetGeoLocation();
-
-            OESISFramework.TearDown();
+            try
+            {
+                OESISCompliance.SetLocationServiceState("enable");
+                geoLocationInfo = OESISCompliance.GetGeoLocation();
+            }
+            finally
+            {
+                OESISFramework.TearDown();
+            }
 
             return resultCount;
         }
