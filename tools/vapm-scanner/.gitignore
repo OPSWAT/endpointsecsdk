@@ -1,0 +1,11 @@
+.vs/
+
+src/AcmeScanner/bin/
+src/AcmeScanner/obj/
+src/AcmeScanner/.vs/
+src/AcmeScanner/AcmeScanner.csproj.user
+
+src/VAPMAdapter/bin/
+src/VAPMAdapter/obj/
+src/VAPMAdapter/.vs/
+src/VAPMAdapter/VAPMAdapter.csproj.user
