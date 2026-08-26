@@ -138,8 +138,9 @@ namespace AcmeScanner
             }
 
             // BIOS & Drivers tab: show the driver/firmware DB version (modified time), size, and
-            // whether the catalog is staging or production. Refreshes on startup and after updates.
-            lblBiosDriversSummary.Text = GetDriverFirmwareDbStatus();
+            // whether the catalog is staging or production, in the DB label to the right of the
+            // buttons. Refreshes on startup and after updates.
+            lblBiosDriversDb.Text = GetDriverFirmwareDbStatus();
         }
 
         //Check if license files are present in the running directory. If not, fall back to the
@@ -523,12 +524,14 @@ namespace AcmeScanner
                 btnFreshInstall.Enabled = false;
                 btnDomainCSV.Enabled = false;
                 btnScanBiosDrivers.Enabled = false;
+                btnPatchBiosDrivers.Enabled = false;
             }
             else
             {
                 btnInstall.Enabled = enabled;
                 btnScan.Enabled = enabled;
                 btnScanBiosDrivers.Enabled = enabled;
+                btnPatchBiosDrivers.Enabled = enabled;
                 btnCVEJSON.Enabled = enabled;
                 btnScanOrchestration.Enabled = enabled;
                 btnInstallOrchestration.Enabled = enabled;
@@ -609,6 +612,73 @@ namespace AcmeScanner
         }
 
 
+        private void BtnPatchBiosDrivers_Click(object sender, EventArgs e)
+        {
+            // "Item not selected" case: report it and stop before doing any work.
+            if (lvBiosDrivers.SelectedItems.Count == 0)
+            {
+                ShowMessageDialog(
+                    "No device is selected. Select a BIOS/driver row that needs an update, then " +
+                    "click Patch BIOS/Driver.", false);
+                return;
+            }
+
+            DriverFirmwareStatus device = lvBiosDrivers.SelectedItems[0].Tag as DriverFirmwareStatus;
+
+            // "Not available to patch" case: an Up to date row, or one from a machine the catalog
+            // does not cover, has no applicable update. Report it up front rather than confirming
+            // an install that cannot run. (The adapter guards this too and returns
+            // ERR_NOT_AVAILABLE_TO_PATCH; this keeps the UI responsive.)
+            if (device == null || !device.IsMissing || string.IsNullOrEmpty(device.patchId))
+            {
+                ShowMessageDialog(
+                    "The selected item is not available to patch - it is up to date or not covered " +
+                    "by the driver/firmware catalog.", false);
+                return;
+            }
+
+            // Confirm: BIOS/driver installs can force a reboot, so make the user opt in.
+            bool confirmed = ShowMessageDialog(
+                "Install the update for \"" + device.title + "\"  (" + device.currentVersion +
+                " -> " + device.targetVersion + ")?" +
+                (string.IsNullOrEmpty(device.rebootLabel) ? "" : "\n\nReboot: " + device.rebootLabel),
+                true);
+            if (!confirmed)
+            {
+                return;
+            }
+
+            ShowLoading(true);
+            btnPatchBiosDrivers.Enabled = false;
+
+            // Downloading and installing a driver/firmware/BIOS package can take a while, so run it
+            // off the UI thread like the scan does.
+            BackgroundWorker worker = new BackgroundWorker();
+            worker.DoWork += (s, ev) => { ev.Result = TaskPatchDriverFirmware.Install(device); };
+            worker.RunWorkerCompleted += (s, ev) =>
+            {
+                if (ev.Error != null)
+                {
+                    ShowMessageDialog("BIOS/Driver patch failed:\n\n" + ev.Error.Message, false);
+                }
+                else
+                {
+                    DriverFirmwarePatchResult result = (DriverFirmwarePatchResult)ev.Result;
+                    ShowMessageDialog(result.message, false);
+
+                    // On success, re-scan so the row flips from Missing to Up to date.
+                    if (result.success)
+                    {
+                        BtnScanBiosDrivers_Click(this, EventArgs.Empty);
+                    }
+                }
+                btnPatchBiosDrivers.Enabled = true;
+                ShowLoading(false);
+            };
+            worker.RunWorkerAsync();
+        }
+
+
         private void UpdateDriverResults()
         {
             List<ListViewItem> resultList = new List<ListViewItem>();
@@ -652,7 +722,7 @@ namespace AcmeScanner
                 lvi.SubItems.Add(current.rebootLabel);
                 lvi.SubItems.Add(current.vendor);
                 lvi.SubItems.Add(current.downloadUrl);
-                lvi.Tag = current.patchId;
+                lvi.Tag = current;
 
                 if (current.IsMissing)
                 {
@@ -668,8 +738,8 @@ namespace AcmeScanner
             lvBiosDrivers.Items.Clear();
             lvBiosDrivers.Items.AddRange(resultList.ToArray());
 
-            // Identify the machine on its own line: vendor and model are what the driver/firmware
-            // catalog matches on, so when there is no coverage they are the useful facts.
+            // Vendor and model are what the driver/firmware catalog matches on, so when there is
+            // no coverage they are the useful facts.
             string vendor = string.IsNullOrEmpty(staticDriverScan.systemVendor)
                             ? "Unknown" : staticDriverScan.systemVendor;
             string model = string.IsNullOrEmpty(staticDriverScan.systemModelName)
@@ -682,19 +752,20 @@ namespace AcmeScanner
             lblBiosDriversSummary.ForeColor = SystemColors.ControlText;
             string identity = "Vendor: " + vendor + "     Model: " + model;
 
+            // Device identity and counts on the summary line; the DB/catalog status lives in its
+            // own two-line label to the right of the buttons (refreshed below).
             if (!staticDriverScan.patchingSupported)
             {
                 lblBiosDriversSummary.Text =
-                    identity + Environment.NewLine +
-                    staticDriverScan.unsupportedReason + Environment.NewLine +
-                    counts + " (inventory only)     |     " + GetDriverFirmwareDbStatus();
+                    identity + "     |     " + counts + " (inventory only)" + Environment.NewLine +
+                    staticDriverScan.unsupportedReason;
             }
             else
             {
-                lblBiosDriversSummary.Text =
-                    identity + Environment.NewLine +
-                    counts + "     |     " + GetDriverFirmwareDbStatus();
+                lblBiosDriversSummary.Text = identity + "     |     " + counts;
             }
+
+            lblBiosDriversDb.Text = GetDriverFirmwareDbStatus();
         }
 
         // Version/time of the driver/firmware (BIOS) DB plus the catalog channel it came from.
@@ -708,13 +779,16 @@ namespace AcmeScanner
 
             if (!File.Exists(path))
             {
-                return dbName + ": not present - run Update DB     |     Catalog: " + channel;
+                // Two lines: DB state on top, catalog channel beneath.
+                return dbName + ": not present - run Update DB" + Environment.NewLine +
+                       "Catalog: " + channel;
             }
 
             FileInfo fi = new FileInfo(path);
             double mb = fi.Length / (1024.0 * 1024.0);
             return dbName + ":  modified " + fi.LastWriteTime.ToString("yyyy-MM-dd HH:mm") +
-                   "  (" + mb.ToString("0.0") + " MB)     |     Catalog: " + channel;
+                   "  (" + mb.ToString("0.0") + " MB)" + Environment.NewLine +
+                   "Catalog: " + channel;
         }
 
 

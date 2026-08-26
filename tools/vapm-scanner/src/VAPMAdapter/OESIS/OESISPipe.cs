@@ -434,6 +434,30 @@ namespace VAPMAdapter.OESIS
         public const int MODEL_NOT_SUPPORTED = -1067;
 
         //
+        // (Windows only) Installs a driver/firmware/BIOS update package that was detected by
+        // DetectDriverFirmwarePatches (method 50902) and downloaded locally. The engine may extract
+        // the package to a temp directory and writes installer logs alongside it.
+        //
+        // Unlike the other pipe calls this does NOT throw on rc<0: a failed install (bad package,
+        // insufficient privileges, or a blocked BIOS preflight check) is a normal result the caller
+        // needs to report with its exact code, not an exception. The raw JSON carries
+        // install_return_code, require_restart and log_paths.
+        // https://software.opswat.com/OESIS_V4/html/c_method.html -> method 50903
+        //
+        public static int InstallDriverFirmwareUpdate(string patchId, string installerPath, out string result)
+        {
+            JsonObject inputObject = new JsonObject();
+            inputObject.Add("method", 50903);
+            inputObject.Add("patch_id", patchId);
+            inputObject.Add("installer_path", installerPath);
+
+            JsonObject json = new JsonObject();
+            json.Add("input", inputObject);
+
+            return Invoke(json.ToJsonString(), out result);
+        }
+
+        //
         // Device Info family. These are how the scanner learns what hardware it is running on -
         // the SDK is the source of truth for that, not Windows APIs, because an OEM embedding
         // OESIS gets exactly these answers and nothing more.

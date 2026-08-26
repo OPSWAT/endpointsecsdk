@@ -79,17 +79,15 @@ namespace VAPMAdapter.Tasks
             {
                 result.patchingSupported = false;
                 result.unsupportedReason =
-                    "Driver/BIOS database is not available for this device - its hardware vendor " +
-                    "is not in the driver/firmware catalog (rc=-1066). Inventory only; no updates " +
-                    "can be offered.";
+                    "No driver/BIOS catalog coverage for this hardware vendor (rc=-1066) - " +
+                    "inventory only, no updates available.";
             }
             else if (detectRc == MODEL_NOT_SUPPORTED)
             {
                 result.patchingSupported = false;
                 result.unsupportedReason =
-                    "Driver/BIOS database is not available for this device - this model is not in " +
-                    "the driver/firmware catalog (rc=-1067). Inventory only; no updates can be " +
-                    "offered.";
+                    "No driver/BIOS catalog coverage for this device model (rc=-1067) - " +
+                    "inventory only, no updates available.";
             }
 
             result.devices = DriverFirmwareMerge.Merge(inventory, patches);
