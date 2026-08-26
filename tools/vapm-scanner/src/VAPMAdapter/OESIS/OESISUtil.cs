@@ -208,6 +208,50 @@ namespace VAPMAdapter.OESIS
         }
 
 
+        // Fills a DriverFirmwarePatchResult from the JSON returned by InstallDriverFirmwareUpdate
+        // (method 50903): install_return_code (vendor installer rc), require_restart, and log_paths.
+        // The engine only populates these on a successful call, so a null result block is left as
+        // the defaults.
+        public static void FillDriverFirmwareInstallResult(string install_json, DriverFirmwarePatchResult result)
+        {
+            if (string.IsNullOrEmpty(install_json))
+            {
+                return;
+            }
+
+            dynamic jsonOut = JObject.Parse(install_json);
+            var resultJson = jsonOut.result;
+            if (resultJson == null)
+            {
+                return;
+            }
+
+            if (resultJson.install_return_code != null)
+            {
+                result.installReturnCode = (string)resultJson.install_return_code;
+            }
+
+            if (resultJson.require_restart != null)
+            {
+                int reboot = (int)resultJson.require_restart;
+                result.requireRestart = reboot;
+                result.rebootLabel = REBOOT_LABELS.ContainsKey(reboot) ? REBOOT_LABELS[reboot] : "Unknown";
+            }
+
+            var logs = resultJson.log_paths;
+            if (logs != null)
+            {
+                for (int i = 0; i < logs.Count; i++)
+                {
+                    if (logs[i] != null)
+                    {
+                        result.logPaths.Add((string)logs[i]);
+                    }
+                }
+            }
+        }
+
+
         // Expects JSON from GetProductVulnerability Products
         public static List<PatchStatus> GetPatchStatusList(string patch_status_json)
         {
