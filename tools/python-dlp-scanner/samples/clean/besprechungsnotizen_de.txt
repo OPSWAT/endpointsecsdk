@@ -1,0 +1,7 @@
+Teambesprechung - 12.08.2026
+============================
+
+- Umsatz im Q3 von 482 auf 1203 gestiegen.
+- Naechstes Meeting um 15 Uhr in Raum 214.
+- Zielversion 4.2.1, Build 33021.
+- Aufgabe: Angebot bis Freitag fertigstellen.

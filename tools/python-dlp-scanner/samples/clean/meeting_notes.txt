@@ -1,0 +1,7 @@
+Team Sync - 2026-08-12
+======================
+
+- Q3 leads grew from 482 to 1203, win rate 34 percent.
+- Next standup at 3pm in room 214; invite 12 people.
+- Ship target: version 4.2.1, build 33021.
+- Action: Dana to draft the Q4 plan by Friday.
