@@ -1,0 +1,12 @@
+# The DLP engine runtime is staged into sdk/ by prepare.py. It is large and not
+# ours to redistribute, so it is never committed. Re-stage it locally with:
+#     python prepare.py
+sdk/*
+!sdk/README.md
+
+# Sample documents are generated locally, not committed. Create them with:
+#     python make_samples.py
+samples/
+
+__pycache__/
+*.pyc
