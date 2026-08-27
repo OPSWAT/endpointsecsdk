@@ -1,7 +1,0 @@
-Northwind App - Release Notes
-=============================
-
-Version 4.2.1 (build 33021)
-  * Fixed a crash when opening large reports.
-  * Improved sync speed by roughly 18 percent.
-  * Tested on 8 machines across Windows and macOS.

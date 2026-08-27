@@ -8,13 +8,15 @@ with the helper from the parent folder:
 python prepare.py
 ```
 
-That copies the minimal set the scanner needs out of the OESIS DLP package:
+That copies the minimal set the scanner needs out of the OESIS DLP package for
+your platform. Library extensions are `.dll` on Windows, `.dylib` on macOS, and
+`.so` on Linux:
 
 | File | Purpose |
 |------|---------|
-| `libwadlpscan.dll` | The DLP scanner engine (`wa_dlpscan_*`) |
-| `libwautils.dll`, `libwaheap.dll` | Engine dependencies |
-| `pdfium.dll` | PDF text extraction |
+| `libwadlpscan.*` | The DLP scanner engine (`wa_dlpscan_*`) |
+| `libwautils.*`, `libwaheap.*` | Engine dependencies |
+| `pdfium.*` (or `libpdfium.*`) | PDF text extraction |
 | `dlp_rules.dat` | Detector rulepack (~2,000 detectors) |
 | `dlp_rules.manifest.json` | Rulepack integrity hash |
 | `tessdata/eng.traineddata` | OCR language data (needed to scan images) |

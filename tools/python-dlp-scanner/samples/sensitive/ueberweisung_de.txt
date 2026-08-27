@@ -1,9 +1,0 @@
-Zahlungsanweisung - Musterbank AG
-==================================
-
-Empfaenger:   Hans Mueller
-Verwendung:   Gehaltszahlung August 2026
-IBAN:         DE89 3704 0044 0532 0130 00
-Betrag:       3.450,00 EUR
-
-Bitte die Ueberweisung bis zum 28.08.2026 ausfuehren.

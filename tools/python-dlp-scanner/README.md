@@ -22,10 +22,12 @@ numbers) isn't flagged.
 
 ## Requirements
 
-- **Windows x64**
+- **Windows, macOS, or Linux** (x64). The scanner loads the matching engine
+  library automatically — `libwadlpscan.dll` / `.dylib` / `.so`.
 - **Python 3.8+**
-- The **OESIS DLP engine runtime** staged into `sdk/` (not committed — run
-  `prepare.py`, below). No license file is required for this engine build.
+- The **OESIS DLP engine runtime** for your platform, staged into `sdk/` (not
+  committed — run `prepare.py`, below). Use the DLP package built for the OS you
+  run on. No license file is required for this engine build.
 - `Pillow` — only to regenerate the image sample (`pip install pillow`)
 
 ## Setup
@@ -45,6 +47,13 @@ It copies only the seven files the DLP scan path needs (the scanner engine, its
 two dependency DLLs, `pdfium` for PDFs, the rulepack + its manifest, and the OCR
 data) and skips everything else in the package. The staged `sdk/` contents stay
 local (they're in `.gitignore`).
+
+The sample documents used in the examples below aren't committed either — create
+them once with:
+
+```bash
+python make_samples.py
+```
 
 ## Usage
 

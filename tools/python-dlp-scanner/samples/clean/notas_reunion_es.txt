@@ -1,7 +1,0 @@
-Reunion de equipo - 12/08/2026
-==============================
-
-- Los clientes potenciales crecieron de 482 a 1203.
-- Proxima reunion a las 15:00 en la sala 214.
-- Version objetivo 4.2.1, compilacion 33021.
-- Tarea: preparar el plan del Q4 para el viernes.

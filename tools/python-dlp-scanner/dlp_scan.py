@@ -2,10 +2,11 @@
 ###############################################################################
 #  Sample Code for OESIS Endpoint-DLP  -  "hello world"
 #  The simplest possible example: scan ONE file for sensitive data (SSNs, credit
-#  cards, IBANs, ... ~2,000 detectors) using the OESIS DLP engine.
+#  cards, IBANs, ... ~2,000 detectors) using the OESIS DLP engine. Runs on
+#  Windows, macOS and Linux.
 #
-#  The engine runtime (DLLs, rulepack, OCR data) is loaded from the sdk/ folder.
-#  Run "python prepare.py" once to stage it there from the OESIS DLP package.
+#  The engine runtime (libraries, rulepack, OCR data) is loaded from the sdk/
+#  folder. Run "python prepare.py" once to stage it from the OESIS DLP package.
 #
 #  Created by Chris Seiler
 #  OPSWAT OEM Solutions Architect
@@ -36,8 +37,9 @@ Usage:
 The engine is loaded from the sdk/ subfolder. Set it up once with:
     python prepare.py
 
-Windows x64 only. (For confidence floors, batch/folder scanning, and other
-options, see the more advanced configuration sample.)
+Runs on Windows, macOS and Linux (x64), loading the matching engine library
+(.dll / .dylib / .so). For confidence floors, batch/folder scanning, and other
+options, see the more advanced configuration sample.
 """
 
 import ctypes
@@ -45,10 +47,15 @@ import json
 import os
 import sys
 
-# The engine runtime (DLLs, rulepack, OCR data) lives in the sdk/ subfolder,
+# The engine runtime (libraries, rulepack, OCR data) lives in the sdk/ subfolder,
 # staged there by prepare.py.
 HERE = os.path.dirname(os.path.abspath(__file__))
 SDK_DIR = os.path.join(HERE, "sdk")
+
+# Shared-library naming for this platform. The OESIS libraries keep their "libwa"
+# prefix on every OS; only the extension changes.
+_LIB_EXT = {"win32": ".dll", "darwin": ".dylib"}.get(sys.platform, ".so")
+ENGINE_LIB = "libwadlpscan" + _LIB_EXT
 
 # DLP invoke method IDs.
 METHOD_CONFIGURE = 130002   # load rulepack + set confidence floor
@@ -71,21 +78,39 @@ class DlpEngine:
         self._lib = None
 
     def load(self):
-        """Load libwadlpscan.dll and declare its C signatures."""
-        dll = os.path.join(SDK_DIR, "libwadlpscan.dll")
-        if not os.path.isfile(dll):
+        """Load the DLP engine library and declare its C signatures.
+
+        Windows loads libwadlpscan.dll (WinDLL / __stdcall); macOS
+        libwadlpscan.dylib and Linux libwadlpscan.so (CDLL). The dependency
+        libraries (libwautils, libwaheap, pdfium) sit beside it in sdk/.
+        """
+        lib = os.path.join(SDK_DIR, ENGINE_LIB)
+        if not os.path.isfile(lib):
             raise FileNotFoundError(
-                "libwadlpscan.dll not found in the sdk folder.\n"
-                "Run 'python prepare.py' first to stage the DLP engine into sdk/.")
+                "%s not found in the sdk folder.\n"
+                "Run 'python prepare.py' first to stage the DLP engine into sdk/."
+                % ENGINE_LIB)
 
-        # Dependent DLLs (libwautils, libwaheap, pdfium) sit beside it in sdk/;
-        # make them findable.
-        os.environ["PATH"] = SDK_DIR + os.pathsep + os.environ.get("PATH", "")
-        if hasattr(os, "add_dll_directory"):
-            os.add_dll_directory(SDK_DIR)
+        if sys.platform == "win32":
+            # Let Windows resolve the dependent DLLs sitting beside the engine.
+            os.environ["PATH"] = SDK_DIR + os.pathsep + os.environ.get("PATH", "")
+            if hasattr(os, "add_dll_directory"):
+                os.add_dll_directory(SDK_DIR)
+            self._lib = ctypes.WinDLL(lib)
+        else:
+            # On macOS/Linux the dynamic linker won't discover sibling libraries
+            # from an env var set after the process starts, so preload the
+            # dependency chain (leaf first) with global visibility, then load the
+            # engine itself.
+            for dep in ("libwaheap", "libwautils", "pdfium", "libpdfium"):
+                dep_path = os.path.join(SDK_DIR, dep + _LIB_EXT)
+                if os.path.isfile(dep_path):
+                    try:
+                        ctypes.CDLL(dep_path, mode=ctypes.RTLD_GLOBAL)
+                    except OSError:
+                        pass
+            self._lib = ctypes.CDLL(lib)
 
-        # The Windows engine is __stdcall with wide-char strings.
-        self._lib = ctypes.WinDLL(dll)
         for name in ("wa_dlpscan_setup", "wa_dlpscan_invoke"):
             fn = getattr(self._lib, name)
             fn.argtypes = [ctypes.c_wchar_p, ctypes.POINTER(ctypes.c_wchar_p)]

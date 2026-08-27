@@ -4,5 +4,9 @@
 sdk/*
 !sdk/README.md
 
+# Sample documents are generated locally, not committed. Create them with:
+#     python make_samples.py
+samples/
+
 __pycache__/
 *.pyc
