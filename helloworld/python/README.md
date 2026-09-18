@@ -59,7 +59,7 @@ python copy_sdk_files.py
 
 Every sample will check that the `sdk/` directory is ready and exit with a clear message if it is not.
 
-The package-flow samples (`show_packages.py`, `install_package.py`, `Rollback.py`) additionally need the **v2 patch database**, which `copy_sdk_files.py` does not copy yet:
+The package-flow samples (`show_packages.py`, `install_package.py`, `rollback.py`) additionally need the **v2 patch database**, which `copy_sdk_files.py` does not copy yet:
 
 ```bash
 cp ../../OPSWAT-SDK/extract/analog/client/patchv2.dat sdk/
@@ -92,7 +92,7 @@ Python 3.7 or later is required. No third-party packages are needed — all depe
 ├── uninstall_product.py    # Uninstall a product by signature ID
 ├── show_packages.py        # List every installable version of a product and which apply here (read-only)
 ├── install_package.py      # Install a specific version via the package (v2) flow
-├── Rollback.py             # Roll a product back to an OPSWAT-approved earlier version
+├── rollback.py             # Roll a product back to an OPSWAT-approved earlier version
 ├── security_score.py       # OPSWAT device security score with per-category breakdown
 ├── collect_device_inventory.py     # Collect system/OS/BIOS/device inventory (Windows only)
 └── detect_driver_firmware_patches.py  # Detect driver/firmware patches (Windows only)
@@ -419,7 +419,7 @@ python install_package.py --signature 3241 --download-only    # stop before inst
 
 ---
 
-### `Rollback.py`
+### `rollback.py`
 
 Rolls a product back to an **earlier** version that OPSWAT has approved as a rollback target. Refuses any version not flagged `is_rollback_target` in the catalog. The flow is:
 
@@ -434,9 +434,9 @@ Defaults to Notepad++ x64 (signature `3241`) → `8.9.6.4`. `--list` prints ever
 > **Requires Administrator / root access** and **OESIS 4.3.6607.0 or newer** (`enable_rollback` was added in that build).
 
 ```bash
-python Rollback.py --list                 # what can be rolled back?
-python Rollback.py                        # Notepad++ x64  8.9.8 -> 8.9.6.4
-python Rollback.py 3241 8.9.6.4 --yes     # no confirmation prompt
+python rollback.py --list                 # what can be rolled back?
+python rollback.py                        # Notepad++ x64  8.9.8 -> 8.9.6.4
+python rollback.py 3241 8.9.6.4 --yes     # no confirmation prompt
 ```
 
 **Output:**

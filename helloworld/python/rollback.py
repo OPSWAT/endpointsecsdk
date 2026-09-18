@@ -18,12 +18,12 @@
 ##      6. Re-detect and confirm the endpoint is on the requested version
 ##
 ##  Usage:
-##      python Rollback.py [signature_id] [target_version] [--yes]
+##      python rollback.py [signature_id] [target_version] [--yes]
 ##
 ##  Examples:
-##      python Rollback.py                        # Notepad++ x64  8.9.8 -> 8.9.6.4
-##      python Rollback.py 3241 8.9.6.4           # the same, stated explicitly
-##      python Rollback.py 303  8.9.6.4 --yes     # Notepad++ x86, no confirmation prompt
+##      python rollback.py                        # Notepad++ x64  8.9.8 -> 8.9.6.4
+##      python rollback.py 3241 8.9.6.4           # the same, stated explicitly
+##      python rollback.py 303  8.9.6.4 --yes     # Notepad++ x86, no confirmation prompt
 ##
 ##  Only a small number of products currently carry an approved rollback target.
 ##  Run with --list to print every rollback target in the catalog.
@@ -314,7 +314,7 @@ def parse_args(argv):
             signature_id = int(args[0])
         except ValueError:
             print(f"ERROR: Invalid signature ID '{args[0]}' -- must be an integer.")
-            print("Usage: python Rollback.py [signature_id] [target_version] [--yes]")
+            print("Usage: python rollback.py [signature_id] [target_version] [--yes]")
             return None, None, None, None
     if len(args) >= 2:
         target_version = args[1]
@@ -353,7 +353,7 @@ def main():
     if not record:
         print(f"\nERROR: Version {target_version} is not an approved rollback target "
               f"for signature {signature_id}.")
-        print("       Run 'python Rollback.py --list' to see the approved targets.")
+        print("       Run 'python rollback.py --list' to see the approved targets.")
         return
 
     product_name = record.get("product", {}).get("name", "Unknown")
