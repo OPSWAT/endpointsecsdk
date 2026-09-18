@@ -59,13 +59,13 @@ python copy_sdk_files.py
 
 Every sample will check that the `sdk/` directory is ready and exit with a clear message if it is not.
 
-The package-flow samples (`show_packages.py`, `install_package.py`, `rollback.py`) additionally need the **v2 patch database**, which `copy_sdk_files.py` does not copy yet:
+The package-flow samples (`get_packages.py`, `show_packages.py`, `install_package.py`, `rollback.py`) additionally need the **v2 patch database**, which `copy_sdk_files.py` does not copy yet:
 
 ```bash
 cp ../../OPSWAT-SDK/extract/analog/client/patchv2.dat sdk/
 ```
 
-Those three scripts also read the server-side catalog at `OPSWAT-SDK/extract/analog/server/patch_aggregation_v2.json` (produced by the SDK downloader) to turn a signature into a `patch_uuid`. The SDK has no call that does this lookup.
+`show_packages.py`, `install_package.py` and `rollback.py` also read the server-side catalog at `OPSWAT-SDK/extract/analog/server/patch_aggregation_v2.json` (produced by the SDK downloader) to turn a signature into a `patch_uuid`. The SDK has no call that does this lookup. `get_packages.py` needs no catalog — it takes the `patch_uuid` on the command line.
 
 ### 4. Python Version
 
@@ -90,6 +90,7 @@ Python 3.7 or later is required. No third-party packages are needed — all depe
 ├── product_detail.py       # Full detail report for a single product by signature ID
 ├── patch_status.py         # Missing and installed patches for all patch management agents
 ├── uninstall_product.py    # Uninstall a product by signature ID
+├── get_packages.py         # Hello-world for GetPackages: one patch_uuid in, packages out (read-only)
 ├── show_packages.py        # List every installable version of a product and which apply here (read-only)
 ├── install_package.py      # Install a specific version via the package (v2) flow
 ├── rollback.py             # Roll a product back to an OPSWAT-approved earlier version
@@ -363,6 +364,40 @@ What the SDK **cannot** do, and why these scripts also read `patch_aggregation_v
 | Which version is an **approved rollback target** (`is_rollback_target`) | catalog only — not present in any SDK response |
 | Package details for a known `patch_uuid` (URL, SHA-256, arch, applicability) | SDK (`patchv2.dat`) |
 | Install, with hash verification | SDK |
+
+The single missing hop is **signature → list of patches**. The chain today is
+`DetectProducts → GetVersion → GetLatestInstaller` on one side and
+`GetPackages(patch_uuid) → InstallPackage` on the other, with nothing joining them: `GetLatestInstaller` returns only the latest version and a `patch_id` that is the patch *family* (identical for every version), and no SDK response contains a `patch_uuid`. A `GetPatches(signature)` returning `{patch_uuid, version, release_date, is_latest, is_rollback_target}` would make the whole flow work with no JSON on the endpoint — the versions are already in `patchv2.dat`, as `get_packages.py` demonstrates.
+
+---
+
+### `get_packages.py`
+
+The smallest possible use of `GetPackages`: load `patchv2.dat`, hand the SDK one `patch_uuid`, print the packages that come back — first as a summary, then the raw response so the exact shape is visible. Read-only, no Administrator rights, **no catalog file** — this is what a developer can do with the SDK alone once they hold a `patch_uuid`. Works for any version in the database, not only the latest.
+
+```bash
+python get_packages.py                                          # Notepad++ 8.9.8 (default UUID)
+python get_packages.py a2191f8b-66b0-5d11-961b-7dc0a3c21dff     # Notepad++ 8.9.6.4
+python get_packages.py eeeaba57-c17b-570d-8e64-f66295cfd570 --first
+```
+
+**Output:**
+```
+  Patch version : 8.9.6.4
+  Packages      : 1
+
+    package_uuid      : 45f8a080-d049-4302-84af-f86fe60eebd4
+    architectures     : 64-bit
+    evaluation_status : applicable
+    sha256            : CB902F8A9628324DBE5233B5202E716EA469720C9A1AC968007DF2288E4ED2EA
+    download          : https://github.com/.../v8.9.6.4/npp.8.9.6.4.Installer.x64.exe
+```
+
+> The default `patch_uuid` is hardcoded because the SDK offers no way to obtain one on the endpoint — see the table above. An unknown UUID, or a signature or `patch_id` in its place, returns `-20 WAAPI_ERROR_INVALID_INPUT_ARGS`.
+
+**SDK methods used:**
+- `50302` — LoadPatchDatabase (`patchv2.dat`)
+- `50306` — GetPackages (`package_limit` = `all` | `first`)
 
 ---
 
