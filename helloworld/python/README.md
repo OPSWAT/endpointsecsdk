@@ -59,6 +59,14 @@ python copy_sdk_files.py
 
 Every sample will check that the `sdk/` directory is ready and exit with a clear message if it is not.
 
+The package-flow samples (`get_packages.py`, `show_packages.py`, `install_package.py`, `rollback.py`) additionally need the **v2 patch database**, which `copy_sdk_files.py` does not copy yet:
+
+```bash
+cp ../../OPSWAT-SDK/extract/analog/client/patchv2.dat sdk/
+```
+
+`show_packages.py`, `install_package.py` and `rollback.py` also read the server-side catalog at `OPSWAT-SDK/extract/analog/server/patch_aggregation_v2.json` (produced by the SDK downloader) to turn a signature into a `patch_uuid`. The SDK has no call that does this lookup. `get_packages.py` needs no catalog — it takes the `patch_uuid` on the command line.
+
 ### 4. Python Version
 
 Python 3.7 or later is required. No third-party packages are needed — all dependencies are from the standard library.
@@ -82,6 +90,10 @@ Python 3.7 or later is required. No third-party packages are needed — all depe
 ├── product_detail.py       # Full detail report for a single product by signature ID
 ├── patch_status.py         # Missing and installed patches for all patch management agents
 ├── uninstall_product.py    # Uninstall a product by signature ID
+├── get_packages.py         # Hello-world for GetPackages: one patch_uuid in, packages out (read-only)
+├── show_packages.py        # List every installable version of a product and which apply here (read-only)
+├── install_package.py      # Install a specific version via the package (v2) flow
+├── rollback.py             # Roll a product back to an OPSWAT-approved earlier version
 ├── security_score.py       # OPSWAT device security score with per-category breakdown
 ├── collect_device_inventory.py     # Collect system/OS/BIOS/device inventory (Windows only)
 └── detect_driver_firmware_patches.py  # Detect driver/firmware patches (Windows only)
@@ -334,6 +346,161 @@ Run detect_products.py to list all installed products and their signature IDs.
 
 ---
 
+## Package Flow (v2) — Versions, Install and Rollback
+
+`patch.py` uses the original flow: signature → `GetLatestInstaller` → `InstallFromFiles`, which only ever installs the **latest** version. The three scripts below use the package-based flow introduced with `patchv2.dat`:
+
+```
+patch_uuid  →  GetPackages (50306)  →  InstallPackage (50305)
+```
+
+Any version in the database can be resolved and installed, the SDK evaluates each package for the current endpoint (`evaluation_status`), and installs are verified by `expected_installer_sha256`.
+
+What the SDK **cannot** do, and why these scripts also read `patch_aggregation_v2.json`:
+
+| Need | Source |
+|---|---|
+| Which versions exist for a product, and their `patch_uuid` | catalog only — `GetPackages` requires a `patch_uuid`; passing a signature returns `-20 INVALID_INPUT_ARGS` |
+| Which version is an **approved rollback target** (`is_rollback_target`) | catalog only — not present in any SDK response |
+| Package details for a known `patch_uuid` (URL, SHA-256, arch, applicability) | SDK (`patchv2.dat`) |
+| Install, with hash verification | SDK |
+
+The single missing hop is **signature → list of patches**. The chain today is
+`DetectProducts → GetVersion → GetLatestInstaller` on one side and
+`GetPackages(patch_uuid) → InstallPackage` on the other, with nothing joining them: `GetLatestInstaller` returns only the latest version and a `patch_id` that is the patch *family* (identical for every version), and no SDK response contains a `patch_uuid`. A `GetPatches(signature)` returning `{patch_uuid, version, release_date, is_latest, is_rollback_target}` would make the whole flow work with no JSON on the endpoint — the versions are already in `patchv2.dat`, as `get_packages.py` demonstrates.
+
+---
+
+### `get_packages.py`
+
+The smallest possible use of `GetPackages`: load `patchv2.dat`, hand the SDK one `patch_uuid`, print the packages that come back — first as a summary, then the raw response so the exact shape is visible. Read-only, no Administrator rights, **no catalog file** — this is what a developer can do with the SDK alone once they hold a `patch_uuid`. Works for any version in the database, not only the latest.
+
+```bash
+python get_packages.py                                          # Notepad++ 8.9.8 (default UUID)
+python get_packages.py a2191f8b-66b0-5d11-961b-7dc0a3c21dff     # Notepad++ 8.9.6.4
+python get_packages.py eeeaba57-c17b-570d-8e64-f66295cfd570 --first
+```
+
+**Output:**
+```
+  Patch version : 8.9.6.4
+  Packages      : 1
+
+    package_uuid      : 45f8a080-d049-4302-84af-f86fe60eebd4
+    architectures     : 64-bit
+    evaluation_status : applicable
+    sha256            : CB902F8A9628324DBE5233B5202E716EA469720C9A1AC968007DF2288E4ED2EA
+    download          : https://github.com/.../v8.9.6.4/npp.8.9.6.4.Installer.x64.exe
+```
+
+> The default `patch_uuid` is hardcoded because the SDK offers no way to obtain one on the endpoint — see the table above. An unknown UUID, or a signature or `patch_id` in its place, returns `-20 WAAPI_ERROR_INVALID_INPUT_ARGS`.
+
+**SDK methods used:**
+- `50302` — LoadPatchDatabase (`patchv2.dat`)
+- `50306` — GetPackages (`package_limit` = `all` | `first`)
+
+---
+
+### `show_packages.py`
+
+Read-only, no Administrator rights. For a signature, walks every version in the catalog and calls `GetPackages` on each, printing the SDK's view (package UUID, architecture, `evaluation_status`, SHA-256, download URL) next to the catalog-only flags (`LATEST`, `ROLLBACK TARGET`, `INSTALLED`). With a bare `patch_uuid` it shows a single patch from the SDK alone.
+
+```bash
+python show_packages.py --signature 3241            # Notepad++ x64, every version
+python show_packages.py --signature 3241 --latest   # current version only
+python show_packages.py eeeaba57-c17b-570d-8e64-f66295cfd570   # one patch, SDK only
+```
+
+**Output:**
+```
+  8.9.6.4  released 06/04/2026   ROLLBACK TARGET
+    patch_uuid : a2191f8b-66b0-5d11-961b-7dc0a3c21dff
+    45f8a080-...  64-bit   -      applicable      sha256=CB902F8A9628324D   rollback=yes
+
+  8.9.8  released 08/23/2026   LATEST  INSTALLED
+    patch_uuid : eeeaba57-c17b-570d-8e64-f66295cfd570
+    2766faba-...  64-bit   -      applicable      sha256=7B2A949BF460FB37   rollback=no
+
+  Approved rollback targets: 8.9.6.4
+```
+
+> The SDK returns only the packages relevant to this endpoint — the catalog's arm64 packages are filtered out on an x64 machine.
+
+**SDK methods used:**
+- `50302` — LoadPatchDatabase (`patchv2.dat`)
+- `50306` — GetPackages (`package_limit="all"`)
+- `100` — GetVersion
+
+---
+
+### `install_package.py`
+
+Installs a specific version of a product through the package flow. Takes a `patch_uuid` directly (pure SDK path) or `--signature` with an optional `--version` (resolved through the catalog; defaults to the latest). Picks the package the SDK evaluated as `applicable`, downloads it, verifies SHA-256 locally, then hands the same hash to `InstallPackage` so the SDK verifies it again before running the installer. `--download-only` stops after the download.
+
+> **The install step requires Administrator / root access.**
+
+```bash
+python install_package.py --signature 3241                    # Notepad++ x64, latest
+python install_package.py --signature 3241 --version 8.9.6.4  # a specific version
+python install_package.py eeeaba57-c17b-570d-8e64-f66295cfd570
+python install_package.py --signature 3241 --download-only    # stop before install
+```
+
+**SDK methods used:**
+- `50302` — LoadPatchDatabase (`patchv2.dat`)
+- `50306` — GetPackages
+- `50305` — InstallPackage (`expected_installer_sha256`, `force_close_processes`)
+- `100` — GetVersion
+
+---
+
+### `rollback.py`
+
+Rolls a product back to an **earlier** version that OPSWAT has approved as a rollback target. Refuses any version not flagged `is_rollback_target` in the catalog. The flow is:
+
+1. Confirm the target is approved and report the version currently installed
+2. Download the older installer and verify its SHA-256 — *before* anything is changed
+3. Remove the current version with **AppRemover** (`40000`, `type="auto"`)
+4. Install the older version with `InstallFromFiles` using `enable_rollback=true` + `requested_version`
+5. Re-detect and confirm the endpoint is on the requested version
+
+Defaults to Notepad++ x64 (signature `3241`) → `8.9.6.4`. `--list` prints every approved rollback target in the catalog (12 products at the time of writing).
+
+> **Requires Administrator / root access** and **OESIS 4.3.6607.0 or newer** (`enable_rollback` was added in that build).
+
+```bash
+python rollback.py --list                 # what can be rolled back?
+python rollback.py                        # Notepad++ x64  8.9.8 -> 8.9.6.4
+python rollback.py 3241 8.9.6.4 --yes     # no confirmation prompt
+```
+
+**Output:**
+```
+[1/3] Downloading 8.9.6.4 installer ....... Checksum verified successfully
+[2/3] Removing Notepad++ 8.9.8 with AppRemover ... code 0
+[3/3] Installing 8.9.6.4 (enable_rollback=true) .. code 0
+======================================================================
+  ROLLBACK SUCCEEDED
+    Notepad++: 8.9.8  ->  8.9.6.4
+======================================================================
+```
+
+Things to know before building on this:
+
+- **Rollback is uninstall-and-reinstall, not an in-place restore.** The SDK does not guarantee application data, settings or cache survive, and only the default instance of a multi-instance app is rolled back.
+- **`patchv2.dat` is mandatory.** With the v1 database loaded, every step succeeds until the install, which fails with `-1052 WA_VMOD_VERSION_LOCK_NOT_SUPPORTED` — *after* the current version has already been removed. The SDK does not auto-restore. The script refuses to start without `patchv2.dat` for this reason.
+- **The application's own updater can undo the rollback.** Notepad++'s updater reinstalled 8.9.8 on the next launch during testing. A production rollback has to suppress the app's self-update (Notepad++ `noUpdate`, browser update policies, etc.); the SDK provides nothing for this today.
+- **Eligibility is per package.** Notepad++ 8.9.6.4 is a rollback target for x64 and x86 but not arm64, although an arm64 package exists.
+
+**SDK methods used:**
+- `50302` — LoadPatchDatabase (`patchv2.dat`)
+- `109` — GetProductInfo (with `run_detection=True`)
+- `100` — GetVersion
+- `40000` — Uninstall / AppRemover (`type="auto"`)
+- `50301` — InstallFromFiles (`enable_rollback=true`, `requested_version`)
+
+---
+
 ### `security_score.py`
 
 Calculates the OPSWAT device security score and prints the overall score plus a per-category breakdown (Anti Malware, Antiphishing, Patch Management, Vulnerabilities, Encryption, Firewall, Backup, Unwanted Apps). Loads the offline CVE database first so the Vulnerabilities category is scored against real CVE data. Writes the full result to `security_score.json`.
@@ -420,11 +587,14 @@ python detect_driver_firmware_patches.py device_inventory.json  # use a prebuilt
 
 # 3. Stage the SDK binaries + license files into the local sdk/ directory
 python copy_sdk_files.py
+#    (for show_packages / install_package / Rollback, also copy the v2 patch database)
+cp ../../OPSWAT-SDK/extract/analog/client/patchv2.dat sdk/
 
 # 4. Run any sample
 python detect_products.py
 python vulnerability.py
 python product_detail.py 3039
+python show_packages.py --signature 3241
 ```
 
 ---
