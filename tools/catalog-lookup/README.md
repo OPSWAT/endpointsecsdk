@@ -96,6 +96,37 @@ python list-supported-apps.py
 python list-supported-apps.py --source winget
 ```
 
+### `list-patches.py <signature_id> [--json] [--latest]` — every version of an app, with packages
+Given a product signature id, lists **every** 3rd‑party patch (version) in `patch_aggregation_v2.json`
+for that product, oldest first, with the install flags (`requires_close_first` / `requires_uninstall_first`
+/ `requires_restart`) and **every package** under each: `package_uuid`, architecture, **SHA256, download
+link** and `is_rollback_target`. Tags the current version `LATEST` and approved rollback versions
+`ROLLBACK TARGET`.
+```
+python list-patches.py 3241            # Notepad++ x64: 6 versions, 12 packages
+python list-patches.py 3241 --latest   # just the current version
+python list-patches.py 3241 --json     # machine-readable
+```
+> This is the lookup the endpoint SDK does not provide: `GetPackages` (50306) needs a `patch_uuid`
+> and `GetLatestInstaller` (50300) returns only the latest version, so nothing on the endpoint turns
+> a signature into its set of versions. The `--json` output is shaped the way a `GetPatches(signature)`
+> call would return it — `{signature, product, patches:[{patch_uuid, version, release_date, is_latest,
+> is_rollback_target, packages:[...]}]}`. Pair with `find-signature.py` to get the id.
+
+### `list-rollback-targets.py [--json]` — apps that can be rolled back
+Lists every application with an OPSWAT‑approved **rollback target** — a package flagged
+`is_rollback_target` in `patch_aggregation_v2.json` — showing the **latest** version, the version it can
+be **rolled back to**, the qualifying **architectures** and **signatures**, and the vendor. 12 of 469
+patchable products at the time of writing.
+```
+python list-rollback-targets.py
+python list-rollback-targets.py --json
+```
+> A rollback target is the one earlier version OPSWAT approved, not necessarily the previous release
+> (Claude's is a 1.x build behind a 2.x latest), and eligibility is per architecture (Notepad++ 8.9.6.4
+> is a target for x86/x64 but not arm64). The endpoint SDK has no call that exposes this flag —
+> `helloworld/python/rollback.py` reads it from the same file.
+
 ### `catalog-counts.py` — catalog-wide totals
 Prints a census of the whole catalog: applications (unique products + total signatures, **how
 many have vulnerability detection** = a CVE mapping, and patchable apps), **BIOS / Driver /
@@ -116,7 +147,7 @@ python catalog-counts.py
 | `vuln_associations.json` | 3rd‑party CVE ↔ product ↔ CPE (find-cve, find-cpe) |
 | `products.json` | signature/product/vendor names |
 | `patch_associations.json` + `patch_aggregation.json` | signature → patch → latest version/downloads/release notes |
-| `patch_aggregation_v2.json` | supported third-party apps: latest version, signature(s), source (opswat/winget) (list-supported-apps) |
+| `patch_aggregation_v2.json` | supported third-party apps: latest version, signature(s), source (opswat/winget) (list-supported-apps); every version + package per signature (list-patches); `is_rollback_target` (list-rollback-targets) |
 | `driver_firmware_patch_aggregation.json` | BIOS / driver / firmware patch counts by component and vendor (catalog-counts) |
 | `patch_system_aggregation_v2.json` | OS patch release details (title, date, severity, KB article, download URL+SHA1) and patch/package/bulletin lookups — used by find-kb, find-cve, find-patch, find-package, find-bulletin |
 | `os_info.json` | os_id → OS name |
