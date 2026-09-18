@@ -37,13 +37,22 @@ src/Vulnerability-WOS/obj/
 src/Vulnerability-WOS/.vs/
 src/Vulnerability-WOS/Vulnerability-WOS.csproj.user
 
+# InlineLicense project build output (the project's source must stay tracked;
+# an earlier `**/*license*` rule was hiding the whole sample)
+src/InlineLicense/bin/
+src/InlineLicense/obj/
+src/InlineLicense/.vs/
+src/InlineLicense/InlineLicense.csproj.user
+
 # License files
-**/*license*
 **/pass_key.txt
+**/passkey.txt
 **/license.cfg
+# src/license.hide is a renamed license.cfg (contains a live license_key)
+**/license.hide
+**/lc.dat
 
 # Download tokens
-**/*token*
 **/download_token.txt
 **/token.cfg
 

@@ -114,3 +114,51 @@ obj/
 
 /helloworld/python/analog/moby_platforms.json
 /helloworld/python/analog
+
+################################################################################
+# Global rules — apply at any depth. Everything above is path-specific; these
+# close the gaps so a `git add -A` can never sweep in secrets or build output.
+################################################################################
+
+# --- License / credential material (never commit, anywhere) -------------------
+download_token.txt
+pass_key.txt
+passkey.txt
+license.cfg
+license.hide
+lc.dat
+
+# --- OESIS engine binaries and databases (staged by copy_sdk_files / downloader)
+libwa*.dll
+libwa*.dylib
+libwa*.so
+wa_3rd_party_host_*.exe
+*.dat
+tessdata/
+
+# --- Python caches ------------------------------------------------------------
+__pycache__/
+*.pyc
+*.pyo
+
+# --- Downloaded installers left behind by patch / rollback samples ------------
+/helloworld/python/npp.*.exe
+
+# --- tools/vapm-scanner: bin/ is tracked (built AcmeScanner); only the secrets
+#     dropped next to it are ignored — covered by the global rules above.
+
+# --- tools/catalog-lookup: internal analysis kept out of the repo -------------
+/tools/catalog-lookup/reports/
+/tools/catalog-lookup/competitors/
+/tools/catalog-lookup/*.results
+/tools/catalog-lookup/PATCH-CATALOG-COUNTING.md
+/tools/catalog-lookup/PATCH-CATALOG-COUNTING.pdf
+
+# --- python-dlp-scanner: SDK drop and sample files ----------------------------
+/tools/python-dlp-scanner/sdk/*
+!/tools/python-dlp-scanner/sdk/README.md
+/tools/python-dlp-scanner/samples/
+
+# --- Root-level working notes -------------------------------------------------
+/v5-*.md
+/v5-*.csv
