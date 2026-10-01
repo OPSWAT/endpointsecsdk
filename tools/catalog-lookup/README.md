@@ -55,6 +55,75 @@ python find-patch-for-signature.py 41       # Google Chrome
 python find-patch-for-signature.py 3880     # Microsoft .NET Runtime 8.0 x64
 ```
 
+### `find-os-vulns.py <os_id|name> <build>` — what is a Windows build vulnerable to?
+Given an OS and its installed build (e.g. `17763.4974` from `10.0.17763.4974`), lists every
+catalog build **newer** than the installed one, the **KB** that ships it, when it became
+available, and the **CVEs those missing KBs remediate**.
+```
+python find-os-vulns.py 73 10.0.17763.4974          # Windows Server 2019 Standard
+python find-os-vulns.py "Server 2019 Standard" 17763.4974
+python find-os-vulns.py 73 17763.4974 --list-cves   # every CVE id
+python find-os-vulns.py 73 17763.4974 --details     # + severity/CVSS (loads cves.json, slow)
+python find-os-vulns.py 73 17763.4974 --details --html os-vulns.html   # HTML summary
+```
+Nothing in the catalog is keyed *"OS version → CVE list"*. The shipped
+`sample_code/get_system_vuln.rb` query is keyed by **KB article + os_id** and returns the CVEs
+that *one KB* fixes — and OPSWAT marks that path *"Not recommended"* for Windows. `kb_info.json`
+does map `build → kb_articles` and `kb → cves`, so the CVEs a build is still exposed to are those
+fixed by KBs in **higher builds**. That delta is read verbatim from the catalog, not inferred.
+`--html PATH` also writes a **self-contained HTML summary**: exposure cards (missing KBs, distinct
+CVEs, how far behind, newest build), CVEs by year and by severity, the missing-KB timeline, and a
+sortable/searchable CVE table linking each CVE to NVD and the KB that fixes it. Pair it with
+`--details` so the page carries severity and CVSS.
+
+> For production Windows assessment OPSWAT recommends **WIV.dat + WUO.dat** at runtime instead of
+> the KB-article query. Use this script for offline/catalog-side analysis and reporting.
+
+### `cve-to-patch.py [CVE] [--html PATH]` — which products have a CVE, and the patch that fixes it
+Given a CVE, lists every affected product (`vuln_associations.json` → `v4_pids`) with its
+**vulnerable version ranges**, platform, the **version that fixes it**, and the **patch download
+URL** that resolves it. `--html` builds a **self-contained searchable page** (default
+`cve-to-patch.html`) carrying **every CVE in the catalog**, so any of them can be looked up
+offline with no server.
+```
+python cve-to-patch.py CVE-2023-4863
+python cve-to-patch.py 2023-4863                    # CVE- prefix optional
+python cve-to-patch.py --html cve-to-patch.html     # build the searchable page
+python cve-to-patch.py --serve                      # serve it with the Refresh workflow
+python cve-to-patch.py --serve --update-cmd "..."   # fetch new catalog files first
+```
+Signatures are shown as **`Signature Name: #id`** (e.g. `Microsoft Office 2019: #3242`). A
+signature's own name is more specific than its product's — signature 3242 is named *Microsoft
+Office 2019* while its product is *Microsoft Office C2R* — so the signature name is used.
+
+The page has a **Refresh data** button. Served with `--serve` (default port 8765) it starts a
+**refresh workflow** that reports each stage as it runs — fetch (if `--update-cmd` is set), read
+`products.json`, read the patch files, read `vuln_associations.json`, rebuild the index — then
+swaps the new data in and re-renders, keeping your current search. If a stage fails, the page says
+which one and keeps the previously loaded data rather than blanking.
+
+`--update-cmd "CMD"` is what makes the workflow load *updated* values rather than re-reading what
+is already on disk: the command runs first (your SDK downloader, a sync script, whatever refreshes
+the catalog), and the workflow aborts with the command's error if it fails. Without it the
+workflow just re-reads the current files.
+
+Opened as a plain file the button can only reload the file itself, because a browser cannot read
+the catalog JSON from `file://` — regenerate with `--html`, or use `--serve` for a live refresh.
+The page shows its snapshot date and build time so you can tell how fresh it is.
+
+The page takes a full or partial CVE id (partial lists matches to pick from) and deep-links:
+`cve-to-patch.html#CVE-2023-4863` opens straight to that CVE.
+
+The join: `vuln_associations.json` (cve → `v4_pids` + ranges + `os_type`) → `products.json`
+(names, vendor, signature ids) → `patch_associations.json` (the `is_latest` patch, by `v4_pid` or
+by signature) → `patch_aggregation.json` / `_v2.json` (`latest_version`, `download_links`,
+`release_note_link`). Fields are read verbatim.
+> Roughly **two thirds of the products referenced by CVEs have no patch in the catalog** — OPSWAT
+> detects vulnerabilities in far more products than it ships installers for. Those are reported as
+> *no patch in catalog* rather than hidden, so a gap is never mistaken for a failed lookup.
+> This covers **third-party applications**; OS-level CVEs live in `vuln_system_associations.json`
+> and are keyed by KB article — use `find-os-vulns.py` for those.
+
 ### `find-cpe.py <cpe or substring>` — what a CPE maps to
 Searches `vuln_associations.json` for matching CPE strings and shows the product(s)/signature(s)
 they belong to and the CVEs associated with each.
@@ -142,9 +211,9 @@ python catalog-counts.py
 ## Data sources
 | File | Used for |
 |---|---|
-| `kb_info.json` | KB supersedence / build / KB→CVE (find-kb, find-cve OS patches) |
+| `kb_info.json` | KB supersedence / build / KB→CVE (find-kb, find-cve OS patches, find-os-vulns) |
 | `cves.json` | CVE metadata (find-cve) |
-| `vuln_associations.json` | 3rd‑party CVE ↔ product ↔ CPE (find-cve, find-cpe) |
+| `vuln_associations.json` | 3rd‑party CVE ↔ product ↔ CPE + vulnerable version ranges (find-cve, find-cpe, cve-to-patch) |
 | `products.json` | signature/product/vendor names |
 | `patch_associations.json` + `patch_aggregation.json` | signature → patch → latest version/downloads/release notes |
 | `patch_aggregation_v2.json` | supported third-party apps: latest version, signature(s), source (opswat/winget) (list-supported-apps); every version + package per signature (list-patches); `is_rollback_target` (list-rollback-targets) |
