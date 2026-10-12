@@ -16,6 +16,9 @@
 ##    * KBs               - unique KB numbers across every OS section (kb_info.json).
 ##    * CVEs              - unique CVEs in cves.json, and unique CVEs referenced by mappings.
 ##    * CVE mappings      - OS (vuln_system_associations) + 3rd-party (vuln_associations) rows.
+##    * moby-aligned      - detectable / patchable per platform in the same units as the compliance
+##                          support chart (client/compliance/*/docs/moby/moby.json), compared to it
+##                          product by product with every difference named.
 ##
 ##  Usage:
 ##      python3 catalog-counts.py
@@ -95,6 +98,79 @@ def platforms_of(row):
     return found or {"unknown"}
 
 
+# Product ids are allocated in per-platform ranges (Windows < 100000 <= macOS < 200000 <= Linux),
+# e.g. Google Chrome is 39 / 100004 / 200001. moby.json's per-platform product_ids follow the same
+# ranges, so this is what lets the server data be split the same way moby splits it.
+MOBY_PLATFORMS = (("windows", "WINDOWS"), ("mac", "MAC"), ("linux", "LINUX"))
+
+
+def platform_of_pid(pid):
+    pid = int(pid)
+    return "windows" if pid < 100000 else "mac" if pid < 200000 else "linux"
+
+
+def app_key(name):
+    """Name-based identity of an application. products.json can hold several product ids for the
+    same app (e.g. Flock 89 'Flock, Inc.' and 3111 'Flock FZ LLC', GoToMeeting 1394 Citrix and 3025
+    LogMeIn) when the vendor or installer changed; moby.json is keyed by product name, so it holds
+    one entry per name per platform and files every signature under a single id."""
+    return " ".join(str(name or "").casefold().split())
+
+
+def compare_to_moby(analog_pids, moby_pids, name_by_pid):
+    """Compare one platform's analog product ids with moby's {pid: name}, the way moby counts.
+
+    analog_pids are collapsed to one per app name (duplicates = extra ids folded in). Ids left
+    over on both sides after matching by id are then paired by app name: the same app filed under
+    a different id is not a difference. Returns (analog_app_count, duplicates, renamed, only_moby,
+    only_analog) where duplicates is [(kept_pid, [other_pids], name)], renamed is
+    [(analog_pid, moby_pid, name)] and the only_* lists are [(pid, name)]."""
+    groups = defaultdict(list)
+    for pid in sorted(analog_pids):
+        groups[app_key(name_by_pid.get(pid)) or f"#{pid}"].append(pid)
+    duplicates = [(pids[0], pids[1:], name_by_pid.get(pids[0], ""))
+                  for pids in groups.values() if len(pids) > 1]
+
+    moby_only = {pid: name for pid, name in moby_pids.items() if pid not in analog_pids}
+    analog_only = {}
+    for key, pids in groups.items():
+        if not any(pid in moby_pids for pid in pids):
+            analog_only[key] = pids[0]
+    renamed = []
+    for mpid, mname in sorted(moby_only.items()):
+        apid = analog_only.pop(app_key(mname), None)
+        if apid is not None:
+            renamed.append((apid, mpid, mname))
+    matched_moby = {mpid for _a, mpid, _n in renamed}
+    only_moby = [(pid, name) for pid, name in sorted(moby_only.items()) if pid not in matched_moby]
+    only_analog = sorted((pid, name_by_pid.get(pid, "")) for pid in analog_only.values())
+    return len(groups), duplicates, renamed, only_moby, only_analog
+
+
+def load_moby(server):
+    """Per-platform product-id sets from the compliance support chart (moby.json) that ships in the
+    same analog package: {'detectable'|'patchable': {platform: {pid: name}}}, plus its timestamp.
+    All three platform copies of moby.json are identical; the Windows one is read. Returns
+    (None, None) when the file is absent."""
+    path = os.path.join(os.path.dirname(server), "client", "compliance", "windows",
+                        "docs", "moby", "moby.json")
+    if not os.path.isfile(path):
+        return None, None
+    moby = cat.load_json(path)
+    sets = {"detectable": defaultdict(dict), "patchable": defaultdict(dict)}
+    for name, by_plat in (moby.get("products") or {}).items():
+        for plat, key in MOBY_PLATFORMS:
+            p = by_plat.get(key)
+            if not p:
+                continue
+            pid = p.get("product_id")
+            if p.get("cve_detection"):
+                sets["detectable"][plat][pid] = name
+            if any(s.get("support_auto_patching") for s in p.get("signatures") or []):
+                sets["patchable"][plat][pid] = name
+    return sets, moby.get("timestamp")
+
+
 def main():
     server = cat.require_server_dir()
 
@@ -105,18 +181,29 @@ def main():
     total_signatures = 0
     unique_products = set()
     vendor_by_pid = {}   # product id -> vendor name (products.json stores vendor as {id, name})
+    name_by_pid = {}
+    # Products flagged patchable in products.json: third-party patching on the product or any of
+    # its signatures, OR system patching (Microsoft products updated through Windows Update - SQL
+    # Server, Office MSI, Exchange, SharePoint, ...). This union is what moby.json calls
+    # auto-patchable; patch_aggregation_v2 alone misses the system-patched ones.
+    flag_patchable = set()
     pj = os.path.join(server, "products.json")
     if os.path.isfile(pj):
         for r in cat.read_records(pj):
             product = r.get("product") or {}
             pid = product.get("id")
+            sigs = r.get("signatures") or []
             if pid is not None:
                 unique_products.add(pid)
+                name_by_pid[pid] = product.get("name") or ""
                 vendor = r.get("vendor") or ""
                 if isinstance(vendor, dict):
                     vendor = vendor.get("name") or ""
                 vendor_by_pid[pid] = str(vendor)
-            total_signatures += len(r.get("signatures") or [])
+                if (r.get("support_3rd_party_patch") or r.get("support_system_patch")
+                        or any(s.get("support_3rd_party_patch") for s in sigs)):
+                    flag_patchable.add(pid)
+            total_signatures += len(sigs)
 
     # --- Patchable applications (patch_aggregation_v2.json, latest) --------------------------
     # Prefer the v2 dataset (has is_latest / product.v4_pid / v4_signatures / data_source). If it
@@ -280,6 +367,16 @@ def main():
     mapped_unique = os_cves | tp_cves
     apps_with_vuln = len(vuln_pids & unique_products)
 
+    # --- moby-aligned view: the same units moby.json (and anything built on it) reports ----------
+    #   detectable = products with a CVE mapping (vuln_associations)  ~ moby cve_detection
+    #   patchable  = products.json third-party OR system patch flag    ~ moby support_auto_patching
+    aligned = {"detectable": defaultdict(set), "patchable": defaultdict(set)}
+    for pid in vuln_pids & unique_products:
+        aligned["detectable"][platform_of_pid(pid)].add(pid)
+    for pid in flag_patchable:
+        aligned["patchable"][platform_of_pid(pid)].add(pid)
+    moby_sets, moby_ts = load_moby(server)
+
     # --- Report ------------------------------------------------------------------------------
     print("\nApplications (products.json):")
     print(f"  unique applications (products)     : {len(unique_products)}")
@@ -328,6 +425,46 @@ def main():
             for display, reason in comparable["eol_third_party_titles"] + comparable["eol_microsoft_titles"]:
                 print(f"      - {display.split(' | ', 1)[-1]}   [{reason}]")
 
+    # Same units as moby.json's counts block, per platform. When moby.json ships in the package the
+    # two are compared product by product and every difference is named, so a mismatch can be
+    # chased to a catalog record rather than argued about as a number.
+    print("moby-aligned view (compare to moby.json / dashboards built on it):")
+    print("  detectable = has a CVE mapping (vuln_associations); "
+          "patchable = products.json 3rd-party or system patch flag")
+    print("  counted per application name, as moby does: product ids sharing a name are one app")
+    if moby_sets:
+        print(f"  moby.json timestamp: {moby_ts}")
+        print(f"    {'':<18} {'platform':<8} {'analog':>7} {'moby':>6} {'diff':>6}")
+    else:
+        print("  (moby.json not found next to the server data - analog counts only)")
+        print(f"    {'':<18} {'platform':<8} {'analog':>7}")
+    aligned_totals = {}
+    for kind in ("detectable", "patchable"):
+        total_a = total_m = 0
+        for plat, _key in MOBY_PLATFORMS:
+            m = moby_sets[kind][plat] if moby_sets else {}
+            apps, dups, renamed, only_moby, only_analog = compare_to_moby(
+                aligned[kind][plat], m, name_by_pid)
+            total_a += apps
+            if not moby_sets:
+                print(f"    {kind:<18} {plat:<8} {apps:>7}")
+            else:
+                total_m += len(m)
+                print(f"    {kind:<18} {plat:<8} {apps:>7} {len(m):>6} {apps - len(m):>+6}")
+            for kept, others, name in dups:
+                print(f"      duplicate app : {kept} {name}  (also {', '.join(map(str, others))})")
+            for apid, mpid, name in renamed:
+                print(f"      same app      : {apid} {name}  (moby files it under {mpid})")
+            for pid, name in only_moby:
+                print(f"      only in moby  : {pid} {name}")
+            for pid, name in only_analog:
+                print(f"      only in analog: {pid} {name}")
+        aligned_totals[kind] = (total_a, total_m if moby_sets else None)
+        if moby_sets:
+            print(f"    {kind:<18} {'total':<8} {total_a:>7} {total_m:>6} {total_a - total_m:>+6}")
+        else:
+            print(f"    {kind:<18} {'total':<8} {total_a:>7}")
+
     print("Driver / firmware patches (driver_firmware_patch_aggregation.json):")
     print(f"  BIOS                               : {df_by_component.get('BIOS', 0)}")
     print(f"  Driver                             : {df_by_component.get('Driver', 0)}")
@@ -364,6 +501,9 @@ def main():
         print(f"  Comparable   : {comparable['active_third_party']} active third-party titles "
               f"({comparable['titles']} collapsed titles - {comparable['microsoft']} Microsoft - "
               f"{comparable['eol_third_party']} EOL); {comparable['eol']} EOL titles to clean up")
+    det, pat = aligned_totals["detectable"], aligned_totals["patchable"]
+    moby_note = (f"   (moby.json: {det[1]} / {pat[1]})" if moby_sets else "")
+    print(f"  moby-aligned : {det[0]} detectable / {pat[0]} patchable{moby_note}")
     print(f"  Driver/FW    : {df_total} total "
           f"(BIOS {df_by_component.get('BIOS', 0)}, Driver {df_by_component.get('Driver', 0)}, "
           f"Firmware {df_by_component.get('Firmware', 0)})")
