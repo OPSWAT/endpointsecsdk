@@ -17,6 +17,15 @@ The application is organized into two projects:
 
 Note: the `VAPMAdapter` folder contains two project files — `VAPMAdapter.csproj` (the one referenced by the solution and by `AcmeScanner`) and a misspelled `VAPMAdapater.csproj`. The solution uses `VAPMAdapter.csproj`.
 
+<a href="docs/acmescanner-scan.png">
+  <img src="docs/acmescanner-scan.png" alt="AcmeScanner Detection tab after an offline scan: installed applications with version, latest version, patch status, signature and patch ids" width="820">
+</a>
+
+<sub>The Detection tab after a scan. Each detected application shows its installed and latest
+version, architecture and language, CVE count and severity, and whether a patch is missing. It
+also shows whether OESIS can auto-patch it, the signature and patch ids, and the patch download
+URL. The SDK version and catalog date are at the top right. Click to view full size.</sub>
+
 ## Capabilities
 
 The UI exposes the following tabs and actions (driven by the OESIS Framework through `VAPMAdapter`):

@@ -30,6 +30,13 @@ That one command does everything:
    (skip with `--no-scanner`).
 
 ### AcmeScanner at the end
+<a href="../vapm-scanner/docs/acmescanner-scan.png">
+  <img src="../vapm-scanner/docs/acmescanner-scan.png" alt="AcmeScanner Detection tab after a scan" width="820">
+</a>
+
+<sub>AcmeScanner after a scan. Click **SCAN** once staging finishes, and the staged apps should
+show as patch `Missing` with CVEs against them. See [vapm-scanner](../vapm-scanner/README.md).</sub>
+
 `fetch.py` builds `scanner\` in the bundle, ready to run:
 - the binaries from `tools\vapm-scanner\bin`,
 - the SDK DLLs,
