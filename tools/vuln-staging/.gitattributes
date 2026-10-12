@@ -1,0 +1,3 @@
+# run-stage.cmd must keep CRLF line endings: cmd.exe mis-parses labels/goto in LF batch files,
+# and GitHub zip downloads ship whatever is stored in the repo.
+*.cmd text eol=crlf
