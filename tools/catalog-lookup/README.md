@@ -301,6 +301,13 @@ many have vulnerability detection** = a CVE mapping, and patchable apps), **BIOS
 Firmware patch counts** (driver_firmware_patch_aggregation.json), unique KBs, unique CVEs
 (cves.json + those referenced by mappings), and total CVE mappings (OS + 3rd-party). The summary
 lists total and unique applications, patchable applications, and driver/firmware/BIOS totals.
+
+It also prints a **moby-aligned view**: detectable (has a CVE mapping) and patchable (products.json
+third-party or system patch flag) per Windows / macOS / Linux, in the same units as the compliance
+support chart `client/compliance/*/docs/moby/moby.json`. Product ids that share an application
+name count as one app (moby is keyed by name), and when moby.json is present every remaining
+difference is named — `duplicate app`, `same app` (moby files it under another id),
+`only in moby`, `only in analog` — so a mismatch can be traced to a catalog record.
 ```
 python catalog-counts.py
 ```
