@@ -11,6 +11,8 @@
 ##      GetPackages (50306)       SDK view of the planned patch_uuid (logged, not required)
 ##      InstallPackage (50305)    package_uuid + local path + expected_installer_sha256;
 ##                                the SDK supplies the silent-install switches
+##                                (on -1069 -- nothing installed yet -- the installer is run
+##                                directly with the app's "silent" switches from _staging.py)
 ##      auto-update pin           registry policy / service / task / updater folder
 ##      GetVersion (100)          confirm the target version is what is installed
 ##      GetProductVulnerability   (50505, v2mod.dat via 50520) the CVEs the SDK reports,
@@ -38,6 +40,7 @@
 ###############################################################################################
 
 import ctypes
+import hashlib
 import os
 import sys
 from datetime import datetime, timezone
@@ -64,6 +67,8 @@ METHOD_INSTALL_PACKAGE      = 50305
 METHOD_GET_PACKAGES         = 50306
 METHOD_GET_VULNERABILITY    = 50505
 METHOD_CONSUME_VMOD         = 50520
+
+ERROR_NO_SIGNATURE_INSTALLED = -1069     # WA_VMOD_ERROR_NO_SIGNATURE_INSTALLED
 
 
 def parse_args(argv):
@@ -167,6 +172,35 @@ def uninstall(sdk, sig):
     return rc
 
 
+def install_direct(app, path, sha256, entry, log):
+    """Fresh install without the SDK: check the SHA-256 (InstallPackage did not get that far),
+    then run the installer with the app's silent switches. Updates entry["install"] and returns
+    0 on success or a negative rc, so cleanup.py treats it like an InstallPackage install."""
+    sdk_rc = entry["install"]["rc"]
+    switches = st.silent_switches(app["key"], app.get("silent"))
+    if switches is None:
+        log("no silent switches for this app in _staging.py; cannot install it directly")
+        return sdk_rc
+    actual = hashlib.sha256()
+    with open(path, "rb") as f:
+        for chunk in iter(lambda: f.read(1 << 20), b""):
+            actual.update(chunk)
+    if actual.hexdigest().lower() != sha256.lower():
+        log(f"direct install refused: sha256 mismatch (got {actual.hexdigest()})")
+        return sdk_rc
+    print("    not installed yet; running the installer silently (InstallPackage needs an "
+          "installed copy)")
+    code, cmdline = st.run_installer(path, switches)
+    ok = code in st.INSTALL_OK_EXIT
+    log(f"direct install: {cmdline} -> exit {code}"
+        + (f" ({st.INSTALL_OK_EXIT[code]})" if ok else ""))
+    entry["install"].update({"method": "direct", "sdk_rc": sdk_rc, "rc": 0 if ok else -1,
+                             "installer_exit_code": code, "command": cmdline})
+    if not ok:
+        entry["install"]["error"] = f"installer exit code {code}"
+    return entry["install"]["rc"]
+
+
 # --- per app ---------------------------------------------------------------------------------
 
 def stage_app(sdk, app, bundle, opts, previous):
@@ -222,6 +256,10 @@ def stage_app(sdk, app, bundle, opts, previous):
                                 "reported_version": result.get("version"),
                                 "terminated_processes": result.get("terminated_processes")}
             log(f"InstallPackage rc={rc}")
+            if rc == ERROR_NO_SIGNATURE_INSTALLED:
+                # The package flow only patches a product that is already installed, so a fresh
+                # install goes through the installer itself with the app's silent switches.
+                rc = install_direct(app, installer_path, inst["sha256"], entry, log)
             if rc < 0:
                 entry["status"] = "INSTALL_FAILED"
                 entry["install"]["error"] = result

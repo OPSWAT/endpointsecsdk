@@ -29,6 +29,11 @@ WINDOWS_PID_LIMIT = 100000
 #   rename_dir   : rename a folder out of the way  {"path": ...}
 #   mozilla      : distribution\policies.json DisableAppUpdate under the install dir
 #   note         : nothing to do; the app only notifies (never installs on its own)
+#
+# "silent" is the installer's own silent command line. stage.py runs the installer with it
+# only when InstallPackage refuses a fresh install (-1069 WA_VMOD_ERROR_NO_SIGNATURE_INSTALLED:
+# the package flow patches a product that is already there). An .msi goes through msiexec
+# /i ... /qn /norestart, and "silent" adds MSI properties.
 PF = os.environ.get("ProgramFiles", r"C:\Program Files")
 
 # Chosen from what the catalog can actually deliver: every Windows product with an older,
@@ -42,39 +47,54 @@ DOTNET_BLOCK_MU = {"kind": "policy_reg", "key": r"SOFTWARE\Microsoft\.NET",
 
 APPS = [
     {"key": "firefox",       "name": "Mozilla Firefox", "pid": 44,
+     "silent": ["-ms"],
      "pin": [{"kind": "policy_reg", "key": r"SOFTWARE\Policies\Mozilla\Firefox",
               "values": {"DisableAppUpdate": ("REG_DWORD", "1")}},
              {"kind": "mozilla", "dir": os.path.join(PF, "Mozilla Firefox")},
              {"kind": "service", "name": "MozillaMaintenance"},
              {"kind": "task", "match": "Mozilla"}]},
     {"key": "acrobatreader", "name": "Adobe Acrobat Reader DC", "pid": 2966,
+     "silent": ["/sAll", "/rs", "/msi", "EULA_ACCEPT=YES"],
      "pin": [{"kind": "policy_reg",
               "key": r"SOFTWARE\Policies\Adobe\Acrobat Reader\DC\FeatureLockDown",
               "values": {"bUpdater": ("REG_DWORD", "0")}},
              {"kind": "service", "name": "AdobeARMservice"},
              {"kind": "task", "match": "Adobe Acrobat Update"}]},
+    # Foxit's MultiLangBootstrapper takes only its own switches (/quiet /lang /force /log
+    # /noshortcut ...); anything else -- /norestart, Inno or MSI syntax -- exits 1 with "Command
+    # incorrect" in %TEMP%\fx_install.*.txt.
     {"key": "foxitreader",   "name": "Foxit Reader", "pid": 394,
+     "silent": ["/quiet"],
      "pin": [{"kind": "service", "name": "FoxitReaderUpdateService"},
              {"kind": "task", "match": "Foxit"}]},
     {"key": "foxiteditor",   "name": "Foxit PDF Editor", "pid": 3417,
+     "silent": ["/quiet"],
      "pin": [{"kind": "service", "name": "FoxitPDFEditorUpdateService"},
              {"kind": "task", "match": "Foxit"}]},
     {"key": "virtualbox",    "name": "VirtualBox", "pid": 205,
+     "silent": ["--silent", "--ignore-reboot"],
      "pin": [{"kind": "note", "text": "update check notifies only"}]},
     {"key": "wireshark",     "name": "Wireshark", "pid": 207,
+     "silent": ["/S"],
      "pin": [{"kind": "note", "text": "update check notifies only"}]},
     {"key": "libreoffice",   "name": "LibreOffice", "pid": 838,
+     "silent": [],
      "pin": [{"kind": "note", "text": "update check notifies only"}]},
     {"key": "vscode",        "name": "Visual Studio Code", "pid": 3087,
+     "silent": ["/VERYSILENT", "/SUPPRESSMSGBOXES", "/NORESTART", "/MERGETASKS=!runcode"],
      "pin": [{"kind": "policy_reg", "key": r"SOFTWARE\Policies\Microsoft\VSCode",
               "values": {"UpdateMode": ("REG_SZ", "none")}}]},
     {"key": "notepadpp",     "name": "Notepad++", "pid": 298,
+     "silent": ["/S"],
      "pin": [{"kind": "rename_dir", "path": os.path.join(PF, "Notepad++", "updater")}]},
     {"key": "dotnet9",       "name": ".NET Runtime 9.0", "pid": 3603,
+     "silent": ["/install", "/quiet", "/norestart"],
      "pin": [DOTNET_BLOCK_MU]},
     {"key": "aspnetcore9",   "name": "ASP.NET Core Runtime 9.0", "pid": 3605,
+     "silent": ["/install", "/quiet", "/norestart"],
      "pin": [DOTNET_BLOCK_MU]},
     {"key": "java8",         "name": "Java 8", "pid": 111,
+     "silent": ["/s", "AUTO_UPDATE=0", "WEB_ANALYTICS=0", "REBOOT=0"],
      "pin": [{"kind": "policy_reg", "key": r"SOFTWARE\JavaSoft\Java Update\Policy",
               "values": {"EnableJavaUpdate": ("REG_DWORD", "0"),
                          "EnableAutoUpdateCheck": ("REG_DWORD", "0")}},
@@ -82,17 +102,23 @@ APPS = [
               "values": {"EnableJavaUpdate": ("REG_DWORD", "0"),
                          "EnableAutoUpdateCheck": ("REG_DWORD", "0")}}]},
     {"key": "python313",     "name": "Python 3.13", "pid": 3527,
+     "silent": ["/quiet", "InstallAllUsers=1", "PrependPath=0", "Include_launcher=0"],
      "pin": [{"kind": "note", "text": "no updater"}]},
     {"key": "python314",     "name": "Python 3.14", "pid": 3719,
+     "silent": ["/quiet", "InstallAllUsers=1", "PrependPath=0", "Include_launcher=0"],
      "pin": [{"kind": "note", "text": "no updater"}]},
     {"key": "zoom",          "name": "Zoom", "pid": 1844,
+     "silent": [],
      "pin": [{"kind": "policy_reg", "key": r"SOFTWARE\Policies\Zoom\Zoom Meetings\General",
               "values": {"EnableClientAutoUpdate": ("REG_DWORD", "0")}}]},
     {"key": "openvpn",       "name": "OpenVPN", "pid": 1082,
+     "silent": [],
      "pin": [{"kind": "note", "text": "no updater"}]},
     {"key": "7zip",          "name": "7-Zip", "pid": 196,
+     "silent": [],
      "pin": [{"kind": "note", "text": "no updater"}]},
     {"key": "vlc",           "name": "VLC media player", "pid": 184,
+     "silent": ["/S"],
      "pin": [{"kind": "note", "text": "update check notifies only"}]},
 ]
 
@@ -116,6 +142,41 @@ def save_json(path, data):
     with open(tmp, "w", encoding="utf-8") as f:
         json.dump(data, f, indent=2)
     os.replace(tmp, path)
+
+
+def silent_switches(key, fallback=None):
+    """The app's silent switches from APPS. A bundle built before "silent" existed has none in
+    staging.json, so the app list that ships with stage.py is the source of truth."""
+    for a in APPS:
+        if a["key"] == key and a.get("silent") is not None:
+            return a["silent"]
+    return fallback
+
+
+# Exit codes that mean the install worked: 3010 / 1641 ask for (or started) a reboot.
+INSTALL_OK_EXIT = {0: "ok", 3010: "ok, reboot required", 1641: "ok, reboot started"}
+
+
+def run_installer(path, switches, timeout=1800):
+    """Run an installer silently, without the SDK. Returns (exit_code or None, command line).
+    fetch.py names a download with no usable file name <package_uuid>.bin; Windows will not run
+    that, so it is copied next to itself as .exe first."""
+    ext = os.path.splitext(path)[1].lower()
+    if ext == ".msi":
+        cmd = ["msiexec.exe", "/i", path, "/qn", "/norestart"] + list(switches)
+    else:
+        if ext != ".exe":
+            exe = os.path.splitext(path)[0] + ".exe"
+            if not os.path.isfile(exe):
+                import shutil
+                shutil.copy2(path, exe)
+            path = exe
+        cmd = [path] + list(switches)
+    try:
+        p = subprocess.run(cmd, timeout=timeout)
+        return p.returncode, subprocess.list2cmdline(cmd)
+    except subprocess.TimeoutExpired:
+        return None, subprocess.list2cmdline(cmd) + f"  (timed out after {timeout}s)"
 
 
 # --- auto-update pinning (stage.py, on the box) ---------------------------------------------

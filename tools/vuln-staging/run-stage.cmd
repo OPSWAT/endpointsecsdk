@@ -97,13 +97,27 @@ if not exist "%PYEXE%" if not exist "%BUNDLE%\%PYZIP%" (
 net session >nul 2>&1
 if errorlevel 1 if not defined VERIFY goto :elevate
 
-rem --no-scanner is ours; everything else goes to stage.py
+rem --no-scanner is ours; everything else goes to stage.py. cmd splits arguments on commas,
+rem so "--apps a,b" arrives as "--apps a b": gather the keys into one quoted list.
 set "NOSCANNER="
 set "STAGEARGS="
+set "BAPPS="
 :bargloop
 if "%~1"=="" goto :bargdone
-if /i "%~1"=="--no-scanner" (set "NOSCANNER=1") else (set STAGEARGS=%STAGEARGS% %1)
+if /i "%~1"=="--no-scanner" (set "NOSCANNER=1" & shift & goto :bargloop)
+if /i "%~1"=="--apps" (set "BAPPS=%~2" & shift & shift & goto :bappsloop)
+set STAGEARGS=%STAGEARGS% %1
 shift
+goto :bargloop
+:bappsloop
+set "NEXT=%~1"
+if not defined NEXT goto :bappsdone
+if "%NEXT:~0,2%"=="--" goto :bappsdone
+set "BAPPS=%BAPPS%,%NEXT%"
+shift
+goto :bappsloop
+:bappsdone
+set STAGEARGS=%STAGEARGS% --apps "%BAPPS%"
 goto :bargloop
 :bargdone
 
@@ -153,9 +167,21 @@ set "STAGEARGS="
 :argloop
 if "%~1"=="" goto :argdone
 if /i "%~1"=="--refresh-sdk" (set "REFRESH=1" & shift & goto :argloop)
-if /i "%~1"=="--apps" set "APPS=%~2"
+if /i "%~1"=="--apps" (set "APPS=%~2" & shift & shift & goto :appsloop)
 set STAGEARGS=%STAGEARGS% %1
 shift
+goto :argloop
+:appsloop
+rem cmd splits arguments on commas, so "--apps a,b" arrives as "--apps a b": gather the keys
+rem up to the next option and pass them on as one quoted list.
+set "NEXT=%~1"
+if not defined NEXT goto :appsdone
+if "%NEXT:~0,2%"=="--" goto :appsdone
+set "APPS=%APPS%,%NEXT%"
+shift
+goto :appsloop
+:appsdone
+set STAGEARGS=%STAGEARGS% --apps "%APPS%"
 goto :argloop
 :argdone
 
@@ -233,7 +259,7 @@ if errorlevel 1 (
     goto :fail
 )
 if defined APPS (
-    %RUN% "%HERE%\fetch.py" --bundle "%BUNDLE%" --apps %APPS%
+    %RUN% "%HERE%\fetch.py" --bundle "%BUNDLE%" --apps "%APPS%"
 ) else (
     %RUN% "%HERE%\fetch.py" --bundle "%BUNDLE%"
 )

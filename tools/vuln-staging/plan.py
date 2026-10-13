@@ -120,6 +120,7 @@ def pick_x64_package(rec):
 def plan_app(app, records, cve_ranges, opts):
     mine = [r for r in records if (r.get("product") or {}).get("v4_pid") == app["pid"]]
     entry = {"key": app["key"], "name": app["name"], "pid": app["pid"], "pin": app["pin"],
+             "silent": app.get("silent"),
              "signatures": sorted({s for r in mine for s in (r["product"].get("v4_signatures") or [])}),
              "catalog_versions": len({r.get("version") for r in mine}),
              "candidates": [], "rejected": []}

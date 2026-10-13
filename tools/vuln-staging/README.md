@@ -200,7 +200,12 @@ Per app, using the OESIS API only (no WMI):
 1. **GetVersion (100)** for each of the app's signatures, to see what is installed now.
 2. **GetPackages (50306)** for the planned patch. Its `evaluation_status` is logged.
 3. **InstallPackage (50305)** with the local path and `expected_installer_sha256`. The SDK
-   supplies the silent-install switches and closes blocking processes.
+   supplies the silent-install switches and closes blocking processes. InstallPackage only
+   patches a product that is **already installed**; on a fresh box it returns
+   `-1069 WA_VMOD_ERROR_NO_SIGNATURE_INSTALLED`. stage.py then checks the installer's SHA-256
+   itself and runs it with the app's `silent` switches from `_staging.py → APPS` (an `.msi` goes
+   through `msiexec /i … /qn /norestart`). Exit codes 0, 3010 and 1641 count as success, and the
+   manifest records `install.method = direct` with the command line and exit code.
 4. **Auto-update pin** from `APPS`, so an updater cannot undo the install:
    - Firefox: `DisableAppUpdate` policy (registry and `distribution\policies.json`), plus the
      Mozilla Maintenance service disabled.
