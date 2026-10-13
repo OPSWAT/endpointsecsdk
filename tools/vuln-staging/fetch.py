@@ -187,6 +187,26 @@ def fetch_app(app, bundle, opts):
     return False
 
 
+def carry_over(prior, plan, bundle):
+    """Copy each app's fetch result from an older staging.json into a new plan, pointing
+    'selected' at the same package in the new candidate list. Skipped when that package is no
+    longer a candidate or its file is gone. An app fetched again overwrites this anyway."""
+    old = {a["key"]: a for a in prior.get("apps", [])}
+    for app in plan.get("apps", []):
+        was = old.get(app["key"])
+        if not was or was.get("selected") is None or not was.get("installer"):
+            continue
+        uuid = was["installer"].get("package_uuid")
+        idx = next((i for i, c in enumerate(app.get("candidates") or [])
+                    if c["package"].get("package_uuid") == uuid), None)
+        if idx is None or not os.path.isfile(os.path.join(bundle, was["installer"]["path"])):
+            continue
+        app["selected"] = idx
+        app["installer"] = dict(was["installer"], patch_uuid=app["candidates"][idx]["patch_uuid"])
+        app["attempts"] = was.get("attempts", [])
+        app["fetch_status"] = was.get("fetch_status", "ok")
+
+
 def add_portable_python(bundle, opts):
     """Put the embeddable Python into bundle\\python so an offline box needs nothing installed.
     Pinned hash -- keep in step with run-stage.cmd. Returns None or a warning."""
@@ -310,11 +330,15 @@ def main():
         sys.exit(2)
     plan = st.load_json(plan_path)
     state_path = os.path.join(bundle, "staging.json")
-    # Resume: keep earlier fetch results for apps not re-fetched, as long as the plan is the same.
+    # Resume: keep earlier fetch results for apps not re-fetched. Same plan -> reuse it as is;
+    # a re-run plan (run-stage.cmd runs plan.py every time) -> carry each app's result over
+    # when its fetched package is still a candidate.
     if os.path.isfile(state_path):
         prior = st.load_json(state_path)
         if prior.get("generated") == plan.get("generated"):
             plan = prior
+        else:
+            carry_over(prior, plan, bundle)
     plan["fetched"] = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
     print(f"Vuln staging fetch -> {bundle}")

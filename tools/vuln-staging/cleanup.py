@@ -86,7 +86,8 @@ def pin_id(pin):
 
 
 def installed_by_stage(entry):
-    """True when stage.py ran InstallPackage for this app and it succeeded."""
+    """True when stage.py installed this app (InstallPackage, or the direct silent install it
+    falls back to on a fresh box) and it succeeded."""
     return (entry.get("install") or {}).get("rc", -1) >= 0
 
 
