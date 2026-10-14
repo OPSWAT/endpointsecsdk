@@ -7,6 +7,8 @@
 ##    * corresponding OS patches  — KB(s) that remediate it, by OS (kb_info.json / kb_cves)
 ##    * corresponding 3rd-party patches — affected product(s)/signature(s), the patched
 ##      version to upgrade to (patch_associations + patch_aggregation), and version ranges
+##    * Linux / macOS OS packages — affected distro releases, packages and the version that
+##      fixes them (vuln_system_associations.json)
 ##    * associated CPEs (vuln_associations.json)
 ##
 ##  Usage:
@@ -248,16 +250,26 @@ def main():
                 if p.get("release_note"):
                     print(f"          release notes: {p['release_note']}")
 
-    # 4) CPEs
+    # 4) Linux / macOS OS packages
+    os_rows = cat.find_os_associations(server, cve)
+    releases, fixed_releases = cat.os_association_summary(os_rows)
+    print()
+    if os_rows:
+        cat.print_os_associations(os_rows)
+    else:
+        print(f"  OS packages (Linux, macOS) : none in {cat.OS_ASSOC_FILE}")
+
+    # 5) CPEs
     print(f"\n  CPEs : {len(cpes)}")
     for c in sorted(cpes):
         print(f"    {c}")
 
     print("\n" + "=" * 70)
-    total = len(os_patches) + len(tp)
+    total = len(os_patches) + len(tp) + len(os_rows)
     if rec or total:
         print(f"RESULT: {cve} found — {len(os_patches)} OS KB(s), {len(tp)} 3rd-party "
-              f"association(s), {len(cpes)} CPE(s).")
+              f"association(s), {len(releases)} Linux/macOS release(s) "
+              f"({len(fixed_releases)} with a fix), {len(cpes)} CPE(s).")
     else:
         print(f"RESULT: {cve} not found anywhere in the catalog.")
 
